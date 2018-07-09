@@ -84,10 +84,6 @@
 </template>
 
 <script>
-import { WeirbClient } from 'weirb-client'
-
-let client = new WeirbClient()
-
 export default {
   name: 'HelloWorld',
   data() {
@@ -96,7 +92,7 @@ export default {
     }
   },
   async mounted() {
-    let response = await client.get('/api/server')
+    let response = await this.$api.get('/server')
     this.msg = `Server Ready: ${response.data.id}`
   }
 }
