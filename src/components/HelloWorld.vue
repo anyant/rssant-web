@@ -84,19 +84,28 @@
 </template>
 
 <script>
+import { WeirbClient } from 'weirb-client'
+
+let client = new WeirbClient()
+
 export default {
   name: 'HelloWorld',
-  data () {
+  data() {
     return {
       msg: 'Welcome to RSS Ant'
     }
+  },
+  async mounted() {
+    let response = await client.get('/api/server')
+    this.msg = `Server Ready: ${response.data.id}`
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h1, h2 {
+h1,
+h2 {
   font-weight: normal;
 }
 ul {
