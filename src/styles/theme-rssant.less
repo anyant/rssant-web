@@ -1,0 +1,22 @@
+@import './common.less';
+@import '~muse-ui/src/styles/theme.less'; // 主题相关的样式
+
+// 让页面滚动条出现时不跳动
+// http://www.zhangxinxu.com/wordpress/2015/01/css-page-scrollbar-toggle-center-no-jumping/
+html {
+  overflow-y: scroll;
+}
+
+:root {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+:root body {
+  position: absolute;
+}
+
+body {
+  width: 100vw;
+  overflow: hidden;
+}
