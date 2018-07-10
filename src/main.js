@@ -16,7 +16,7 @@ import {
   TableColumn
 } from 'element-ui'
 import router from './router'
-import store from './/store'
+import store from './store'
 import api from './plugin/api'
 
 Vue.config.productionTip = false
@@ -33,6 +33,7 @@ Vue.component(TableColumn.name, TableColumn)
 
 window.app = new Vue({
   el: '#app',
+  store,
   router,
   render: h => h(App)
 })

@@ -1,44 +1,39 @@
 <template>
-  <div class="rssant-header">
+  <div class="header">
     <div class="logo" @click="handleLogoClick">
-      <span class="logo-rss">RSS</span><span class="logo-ant">Ant</span>
-    </div>
-    <div class="nav">
-      <mu-tabs :value="activeTab" @change="handleTabChange" class="tabs">
-        <mu-tab value="StoryList" title="故事" class="tabs-tab"/>
-        <mu-tab value="FeedList" title="订阅" class="tabs-tab"/>
-        <mu-tab value="TaskList" title="任务" class="tabs-tab"/>
-      </mu-tabs>
+      <span class="logo-rss">RSS</span>
+      <span class="logo-ant">Ant</span>
     </div>
     <div class="actions">
-      <mu-button flat mini @click="openDialog">
+      <mu-button flat mini class="action create-feed" @click="openDialog">
         <i class="fa fa-plus"></i>
       </mu-button>
-    </div>
-    <AddFeedDialog :open="dialogOpen" :close="closeDialog" :save="handleSaveFeed"></AddFeedDialog>
-    <div class="user">
-      <div v-if="isLogin" class="user-menu">
-        <mu-button flat class="user-menu-button" ref="userMenuButton" @click="toggleUserMenu">
-          <mu-avatar class="user-avatar" :src="currentUser.avatar_url"></mu-avatar>
-          <span class="user-username">{{ currentUser.username }}</span>
-        </mu-button>
-        <mu-popover class="user-menu-list" :trigger="userMenuTrigger" :open="isUserMenuOpen">
-          <mu-menu>
-            <mu-menu-item title="Logout" @click="handleLogout"/>
+      <div class="action user">
+        <div v-if="isLogin" class="user-menu">
+          <mu-menu placement="bottom" open-on-hover>
+            <mu-button flat class="user-menu-button">
+              <mu-avatar size="36" class="user-avatar">
+                <img :src="currentUser.avatar_url">
+              </mu-avatar>
+            </mu-button>
+            <mu-list slot="content">
+              <mu-list-item button @click="handleLogout">Logout</mu-list-item>
+            </mu-list>
           </mu-menu>
-        </mu-popover>
+        </div>
+        <mu-button flat v-else @click="handleLogin" class="user-login">
+          <i class="user-login-icon fa fa-github" aria-hidden="true"></i>
+          <label class="user-login-label">GitHub登录</label>
+        </mu-button>
       </div>
-      <mu-button flat v-else @click="handleLogin" class="user-login">
-        <i class="user-login-icon fa fa-github" aria-hidden="true"></i>
-        <label class="user-login-label">GitHub登录</label>
-      </mu-button >
     </div>
+    <AddFeedDialog :isOpen="isDialogOpen" :close="closeDialog" :save="handleCreateFeed"></AddFeedDialog>
   </div>
 </template>
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
-import { AddFeedDialog } from './AddFeedDialog'
+import AddFeedDialog from './AddFeedDialog'
 
 export default {
   components: { AddFeedDialog },
@@ -46,84 +41,71 @@ export default {
     return {
       userMenuTrigger: null,
       isUserMenuOpen: false,
-      dialogOpen: false
+      isDialogOpen: false
     }
   },
   computed: {
-    ...mapGetters(['isLogin', 'currentUser', 'feedList']),
-    activeTab() {
-      return this.$route.name
-    }
+    ...mapGetters(['isLogin', 'currentUser', 'feedList'])
   },
   methods: {
-    ...mapActions(['login', 'logout', 'fetchFeedList', 'saveFeed']),
-    handleTabChange(val) {
-      this.$router.replace({
-        name: val
-      })
-    },
+    ...mapActions(['login', 'logout', 'fetchFeedList', 'createFeed']),
     handleLogoClick() {
       location.assign('/')
     },
     async handleLogin() {
       await this.login()
-      this.updateUserMenuTrigger()
     },
     async handleLogout() {
       await this.logout()
       this.closeUserMenu()
     },
     toggleUserMenu() {
-      if (this.userMenuTrigger == null) {
-        return
-      }
       this.isUserMenuOpen = !this.isUserMenuOpen
     },
     closeUserMenu() {
-      if (this.userMenuTrigger == null) {
-        return
-      }
       this.isUserMenuOpen = false
     },
-    updateUserMenuTrigger() {
-      if (this.isLogin) {
-        this.userMenuTrigger = this.$refs.userMenuButton.$el
-      }
-    },
-    async handleSaveFeed(feedUrl) {
-      await this.saveFeed({ url: feedUrl })
+    async handleCreateFeed(feedUrl) {
+      await this.createFeed({ url: feedUrl })
     },
     closeDialog() {
-      this.dialogOpen = false
+      this.isDialogOpen = false
     },
     openDialog() {
-      this.dialogOpen = true
+      this.isDialogOpen = true
     }
-  },
-  afterLogin() {
-    this.updateUserMenuTrigger()
   }
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 @import '../../styles/common.less';
 
-.rssant-header {
-  height: 64px;
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 8px;
-  padding-right: 8px;
-  border-bottom: 1px solid #e9e9e9;
+.header {
   display: flex;
-}
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: 8px;
+  border-bottom: 1px solid #e9e9e9;
 
-.rssant-header {
   .logo {
     min-width: 108px;
-    cursor: pointer;
+    display: inline-block;
   }
+
+  .actions {
+    flex: 1;
+  }
+}
+
+.logo {
+  cursor: pointer;
+}
+
+.logo {
+  font-size: 0;
+
   .logo-rss,
   .logo-ant {
     display: inline-block;
@@ -137,36 +119,25 @@ export default {
   .logo-rss {
     color: #f44336;
   }
+
   .logo-ant {
     color: #66bb6a;
   }
+}
 
-  .logo,
-  .nav {
-    display: inline-block;
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-top: 4px;
+  padding-bottom: 4px;
+
+  .action {
+    margin-left: 8px;
   }
+}
 
-  .nav {
-    flex: 1;
-  }
-
-  .tabs {
-    margin: 0 auto;
-    width: 400px;
-  }
-
-  .tabs-tab {
-    font-size: 18px;
-    font-weight: 600;
-  }
-
-  .actions {
-    padding-top: 4px;
-    padding-bottom: 4px;
-    margin-left: 16px;
-    margin-right: 16px;
-  }
-
+.user {
   .user-menu {
     height: 48px;
     line-height: 48px;
@@ -177,22 +148,15 @@ export default {
     height: 48px;
     line-height: 48px;
     text-transform: none;
-    padding-left: 8px;
-    padding-right: 8px;
+    padding-left: 4px;
+    padding-right: 4px;
   }
 
   .user-avatar {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     margin-top: 4px;
     margin-bottom: 4px;
-  }
-
-  .user-username {
-    display: inline-block;
-    flex: 1;
-    padding-left: 4px;
-    font-size: 20px;
   }
 
   .user-login {

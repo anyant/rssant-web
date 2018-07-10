@@ -1,16 +1,33 @@
+import api from '@/plugin/api'
+
 const state = {
   feedList: []
 }
 
-const getters = {}
+const getters = {
+  feedList(state) {
+    return state.feedList
+  }
+}
 
-const mutations = {}
+const mutations = {
+  addFeed(state, feed) {
+    state.feedList.push(feed)
+  }
+}
 
 const actions = {
-  saveFeed({
+  async createFeed({
     commit
-  }, feed) {
-
+  }, {
+    name,
+    url
+  }) {
+    let feed = await api.call('/rss/create_feed', {
+      name,
+      url
+    })
+    commit('addFeed', feed)
   }
 }
 

@@ -17,8 +17,8 @@ const getters = {
   currentUser(state) {
     return state.loginUser
   },
-  shouldCheckLogin(state) {
-    if (this.isLogin(state)) {
+  shouldCheckLogin(state, getters) {
+    if (getters.isLogin) {
       return false
     }
     if (Cookies.get(TOKEN_COOKIE) == null) {
@@ -52,19 +52,40 @@ const mutations = {
 }
 
 const actions = {
-  async login({
+  async autoLogin({
     commit,
-    getters,
+    getters
   }) {
-    if (!getters.shouldCheckLogin()) {
+    if (getters.isLogin) {
       return
     }
-    let user = await api.call('/login/me')
+    let user = null
+    try {
+      user = await api.call('/login/me')
+    } catch (e) {
+      if (e.code !== 'Guard.Forbidden') {
+        throw e
+      }
+    }
     let token = Cookies.get(TOKEN_COOKIE)
     commit('login', {
       user,
       token
     })
+  },
+  async login({
+    commit,
+    getters,
+  }) {
+    if (getters.isLogin) {
+      return
+    }
+    location.assign('/api/login/github?state=/')
+  },
+  async logout({
+    commit
+  }) {
+    commit('logout')
   }
 }
 

@@ -5,7 +5,11 @@
 </template>
 
 <script>
-export default {}
+export default {
+  async created() {
+    this.$store.dispatch('autoLogin')
+  }
+}
 </script>
 
 <style>

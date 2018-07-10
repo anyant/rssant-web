@@ -1,10 +1,8 @@
 <template>
-  <div>
-      <DefaultLayout>
-        <h1>Welcome to RSS Ant</h1>
-        <h2>{{ msg }}</h2>
-      </DefaultLayout>
-  </div>
+  <DefaultLayout>
+    <h1>Welcome to RSS Ant</h1>
+    <h2>{{ msg }}</h2>
+  </DefaultLayout>
 </template>
 
 <script>
@@ -19,7 +17,7 @@ export default {
       msg: ''
     }
   },
-  async mounted() {
+  async created() {
     let response = await this.$api.get('/server')
     this.msg = `Server Ready: ${response.data.id}`
   }

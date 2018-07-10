@@ -1,15 +1,20 @@
 <template>
-  <div class="rssant-layout">
+  <div class="layout">
+    <Header></Header>
     <slot></slot>
   </div>
 </template>
 
 <script>
-export default {}
+import { Header } from '@/components/Header'
+
+export default {
+  components: { Header }
+}
 </script>
 
-<style lang="less">
-.rssant-layout {
+<style scoped lang="less">
+.layout {
   max-width: 920px;
   margin: 0 auto;
 }
