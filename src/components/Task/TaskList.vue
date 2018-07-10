@@ -1,5 +1,5 @@
 <template>
-  <div class="anyant-task-list">
+  <div class="rssant-task-list">
     <el-table :data="taskList" stripe>
       <el-table-column prop="id" label="ID">
         <template slot-scope="scope">

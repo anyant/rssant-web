@@ -1,5 +1,5 @@
 <template>
-  <div class="anyant-layout">
+  <div class="rssant-layout">
     <div class="header">
       <mu-icon-button @click="handleGoBack" class="goback">
         <i class="fa fa-arrow-left" aria-hidden="true"></i>
@@ -32,7 +32,7 @@ export default {
 </script>
 
 <style lang="less">
-.anyant-layout {
+.rssant-layout {
   max-width: 920px;
   margin: 0 auto;
 

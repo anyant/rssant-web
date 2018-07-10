@@ -1,7 +1,7 @@
 <template>
-  <div class="anyant-header">
+  <div class="rssant-header">
     <div class="logo" @click="handleLogoClick">
-      <span class="logo-any">Any</span><span class="logo-ant">Ant</span>
+      <span class="logo-rss">RSS</span><span class="logo-ant">Ant</span>
     </div>
     <div class="nav">
       <mu-tabs :value="activeTab" @change="handleTabChange" class="tabs">
@@ -11,34 +11,34 @@
       </mu-tabs>
     </div>
     <div class="actions">
-      <mu-float-button mini @click="openDialog">
+      <mu-button flat mini @click="openDialog">
         <i class="fa fa-plus"></i>
-      </mu-float-button>
+      </mu-button>
     </div>
     <AddFeedDialog :open="dialogOpen" :close="closeDialog" :save="handleSaveFeed"></AddFeedDialog>
     <div class="user">
       <div v-if="isLogin" class="user-menu">
-        <mu-flat-button class="user-menu-button" ref="userMenuButton" @click="toggleUserMenu">
-          <mu-avatar class="user-avatar" :src="user.avatar_url"></mu-avatar>
-          <span class="user-username">{{ user.username }}</span>
-        </mu-flat-button>
+        <mu-button flat class="user-menu-button" ref="userMenuButton" @click="toggleUserMenu">
+          <mu-avatar class="user-avatar" :src="currentUser.avatar_url"></mu-avatar>
+          <span class="user-username">{{ currentUser.username }}</span>
+        </mu-button>
         <mu-popover class="user-menu-list" :trigger="userMenuTrigger" :open="isUserMenuOpen">
           <mu-menu>
             <mu-menu-item title="Logout" @click="handleLogout"/>
           </mu-menu>
         </mu-popover>
       </div>
-      <mu-flat-button v-else @click="handleLogin" class="user-login">
+      <mu-button flat v-else @click="handleLogin" class="user-login">
         <i class="user-login-icon fa fa-github" aria-hidden="true"></i>
         <label class="user-login-label">GitHub登录</label>
-      </mu-flat-button >
+      </mu-button >
     </div>
   </div>
 </template>
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
-import { AddFeedDialog } from '@/components/Feed'
+import { AddFeedDialog } from './AddFeedDialog'
 
 export default {
   components: { AddFeedDialog },
@@ -50,7 +50,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['user', 'feedList']),
+    ...mapGetters(['isLogin', 'currentUser', 'feedList']),
     activeTab() {
       return this.$route.name
     }
@@ -109,7 +109,7 @@ export default {
 <style lang="less">
 @import '../../styles/common.less';
 
-.anyant-header {
+.rssant-header {
   height: 64px;
   padding-top: 8px;
   padding-bottom: 8px;
@@ -119,12 +119,12 @@ export default {
   display: flex;
 }
 
-.anyant-header {
+.rssant-header {
   .logo {
     min-width: 108px;
     cursor: pointer;
   }
-  .logo-any,
+  .logo-rss,
   .logo-ant {
     display: inline-block;
     font-size: 28px;
@@ -134,7 +134,7 @@ export default {
     font-weight: 600;
   }
 
-  .logo-any {
+  .logo-rss {
     color: #f44336;
   }
   .logo-ant {

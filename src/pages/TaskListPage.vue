@@ -1,15 +1,15 @@
 <template>
-  <HeaderLayout>
+  <DefaultLayout>
     <TaskList :task-list="taskList"></TaskList>
-  </HeaderLayout>
+  </DefaultLayout>
 </template>
 <script>
 import { mapGetters } from 'vuex'
-import { HeaderLayout } from '@/layouts'
+import { DefaultLayout } from '@/layouts'
 import { TaskList } from '@/components/Task'
 
 export default {
-  components: { HeaderLayout, TaskList },
+  components: { DefaultLayout, TaskList },
   data() {
     return { taskList: [], taskListFetched: false }
   },

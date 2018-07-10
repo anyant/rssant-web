@@ -1,5 +1,5 @@
 <template>
-  <div class="anyant-layout">
+  <div class="rssant-layout">
     <slot></slot>
   </div>
 </template>
@@ -9,7 +9,7 @@ export default {}
 </script>
 
 <style lang="less">
-.anyant-layout {
+.rssant-layout {
   max-width: 920px;
   margin: 0 auto;
 }

@@ -27,11 +27,9 @@ Vue.prototype.$notify = Notification
 Vue.prototype.$message = Message
 
 Vue.use(MuseUI)
-Vue.use(Notification)
 // muse-ui 的 Table 组件有性能问题，改用 element-ui
 Vue.component(Table.name, Table)
 Vue.component(TableColumn.name, TableColumn)
-
 
 window.app = new Vue({
   el: '#app',

@@ -1,10 +1,11 @@
 import StoryPage from '@/pages/StoryPage'
-import StoryListPage from '@/pages/StoryListPage'
+// import StoryListPage from '@/pages/StoryListPage'
 import UserPage from '@/pages/UserPage'
 import TaskListPage from '@/pages/TaskListPage'
 import TaskPage from '@/pages/TaskPage'
 import FeedListPage from '@/pages/FeedListPage'
 import FeedPage from '@/pages/FeedPage'
+import IndexPage from '@/pages/IndexPage'
 
 export default [{
     path: '/story/:storyId',
@@ -13,8 +14,8 @@ export default [{
   },
   {
     path: '/',
-    name: 'StoryList',
-    component: StoryListPage
+    name: 'Index',
+    component: IndexPage
   },
   {
     path: '/u/:userId',

@@ -1,5 +1,5 @@
 <template>
-  <div class="anyant-task">
+  <div class="rssant-task">
     <mu-sub-header class="task-info">
       <div>
         <mu-badge content="ID:"/>
@@ -67,7 +67,7 @@ export default {
 </script>
 
 <style lang="less">
-.anyant-task {
+.rssant-task {
   .task-info {
     line-height: 32px;
     margin-top: 16px;

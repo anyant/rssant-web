@@ -1,15 +1,22 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
+  <div>
+      <DefaultLayout>
+        <h1>Welcome to RSS Ant</h1>
+        <h2>{{ msg }}</h2>
+      </DefaultLayout>
   </div>
 </template>
 
 <script>
+import { DefaultLayout } from '@/layouts/'
+
 export default {
-  name: 'HelloWorld',
+  components: {
+    DefaultLayout
+  },
   data() {
     return {
-      msg: 'Welcome to RSS Ant'
+      msg: ''
     }
   },
   async mounted() {
@@ -22,6 +29,7 @@ export default {
 <style scoped>
 h1,
 h2 {
+  text-align: center;
   font-weight: normal;
 }
 </style>

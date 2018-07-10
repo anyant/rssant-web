@@ -41,7 +41,7 @@ export default {
   },
   methods: {
     async handleSave() {
-      if (!this.saveDisabled && this.save) {
+      if (!this.saveDisabled && !!this.save) {
         try {
           await this.save(this.feedUrl)
           this.$notify.success({ duration: 3000, message: '订阅添加成功～' })

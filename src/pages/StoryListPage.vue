@@ -1,15 +1,15 @@
 <template>
-  <HeaderLayout>
+  <DefaultLayout>
     StoryList
-  </HeaderLayout>
+  </DefaultLayout>
 </template>
 
 <script>
-import { HeaderLayout } from '@/layouts'
+import { DefaultLayout } from '@/layouts'
 
 export default {
   components: {
-    HeaderLayout
+    DefaultLayout
   }
 }
 </script>

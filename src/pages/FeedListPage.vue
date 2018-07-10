@@ -1,15 +1,15 @@
 <template>
-  <HeaderLayout>
+  <DefaultLayout>
     <FeedList :feedList="feedList" :delFeed="delFeed"></FeedList>
-  </HeaderLayout>
+  </DefaultLayout>
 </template>
 <script>
 import { mapGetters, mapActions } from 'vuex'
-import { HeaderLayout } from '@/layouts'
+import { DefaultLayout } from '@/layouts'
 import { FeedList } from '@/components/Feed'
 
 export default {
-  components: { HeaderLayout, FeedList },
+  components: { DefaultLayout, FeedList },
   data() {
     return {}
   },
