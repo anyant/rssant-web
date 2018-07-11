@@ -6,18 +6,20 @@
 <script>
 import { DefaultLayout } from '@/layouts'
 import { FeedList } from '@/components/Feed'
-import { mapGetters } from 'vuex'
 
 export default {
   components: { DefaultLayout, FeedList },
   data() {
-    return {}
-  },
-  computed: {
-    ...mapGetters(['isFeedListReady'])
+    return {
+      isFeedListReady: false
+    }
   },
   async created() {
-    await this.$store.dispatch('fetchFeedList')
+    try {
+      await this.$store.dispatch('fetchFeedList')
+    } finally {
+      this.isFeedListReady = true
+    }
   }
 }
 </script>

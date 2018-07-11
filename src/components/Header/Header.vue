@@ -89,7 +89,7 @@ export default {
           feed = await this.fetchFeed(feedId)
         } finally {
           numTry -= 1
-          if (feed.status === 'ready' || numTry <= 0) {
+          if (feed.status === 'ready' || feed.status === 'error' || numTry <= 0) {
             clearInterval(token)
           }
         }

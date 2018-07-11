@@ -4,10 +4,8 @@ import * as lodash from 'lodash-es'
 
 const state = {
   feedStore: {},
-  isFeedStoreReady: false,
   currentFeedId: null,
   storyStore: {},
-  isStoryStoreReady: false,
   currentStoryId: null
 }
 
@@ -20,21 +18,11 @@ const getters = {
       .value()
   },
 
-  isFeedListReady(state) {
-    return state.isFeedStoreReady
-  },
-
-  getFeed(state, feedId) {
-    if (!getters.isFeedListReady) {
-      return null
-    }
-    return state.feedStore[feedId]
+  getFeed(state) {
+    return feedId => state.feedStore[feedId]
   },
 
   currentFeed(state, getters) {
-    if (!getters.isFeedListReady) {
-      return null
-    }
     if (lodash.isNil(state.currentFeedId)) {
       return null
     }
@@ -48,14 +36,11 @@ const getters = {
       .value()
   },
 
-  isStoryListReady(state) {
-    return state.isStoryListReady
+  getStory(state) {
+    return storyId => state.storyStore[storyId]
   },
 
   currentStory(state, getters) {
-    if (!getters.isStoryListReady) {
-      return null
-    }
     if (lodash.isNil(state.currentStoryId)) {
       return null
     }
@@ -82,7 +67,6 @@ const mutations = {
       feedStore[feed.id] = feed
     })
     state.feedStore = feedStore
-    state.isFeedStoreReady = true
   },
 
   setStoryList(state, storyList) {
@@ -90,8 +74,7 @@ const mutations = {
     storyList.forEach(story => {
       storyStore[story.id] = story
     })
-    state.feedStore = storyStore
-    state.isStoryStoreReady = true
+    state.storyStore = storyStore
   },
 
   addStory(state, story) {

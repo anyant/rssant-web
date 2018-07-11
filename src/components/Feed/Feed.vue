@@ -1,25 +1,34 @@
 <template>
   <div>
-    <el-table :data="feedList">
-      <el-table-column prop="status" label="Status"></el-table-column>
-      <el-table-column prop="title" label="Title"></el-table-column>
-      <el-table-column prop="description" label="Description"></el-table-column>
-      <el-table-column prop="dtu" label="Update Time"></el-table-column>
-    </el-table>
+    <mu-list>
+      <mu-sub-header>{{ feed.name }} - {{ feed.dtu }}</mu-sub-header>
+      <div :key="story.id" v-for="story in storyList">
+        <mu-list-item>
+          {{ story.title }} - {{ story.dtu }}
+        </mu-list-item>
+        <mu-divider></mu-divider>
+      </div>
+    </mu-list>
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+import * as lodash from 'lodash-es'
+
 export default {
-  props: {
-    feedList: Array
-  },
   data() {
     return {}
+  },
+  computed: {
+    ...mapGetters(['storyList']),
+    feed() {
+      let feed = this.$store.getters.currentFeed
+      return lodash.isNil(feed) ? {} : feed
+    }
   }
 }
 </script>
 
 <style>
-
 </style>

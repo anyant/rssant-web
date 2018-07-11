@@ -11,7 +11,12 @@ const store = new Vuex.Store({
   modules: {
     user,
     feed,
-    task,
+    task
+  },
+  getters: {
+    route(state) {
+      return state.route
+    }
   }
 })
 
