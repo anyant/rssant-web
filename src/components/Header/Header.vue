@@ -7,6 +7,7 @@
     <div class="actions">
       <mu-button flat mini class="action create-feed" @click="openDialog">
         <i class="fa fa-plus"></i>
+        <span>订阅</span>
       </mu-button>
       <div class="action user">
         <div v-if="isLogin" class="user-menu">
@@ -17,7 +18,7 @@
               </mu-avatar>
             </mu-button>
             <mu-list slot="content">
-              <mu-list-item button @click="handleLogout">Logout</mu-list-item>
+              <mu-list-item button @click="handleLogout">退出登录</mu-list-item>
             </mu-list>
           </mu-menu>
         </div>
@@ -134,6 +135,13 @@ export default {
 
   .action {
     margin-left: 8px;
+  }
+}
+
+.create-feed {
+  span {
+    font-weight: 600;
+    margin-left: 4px;
   }
 }
 
