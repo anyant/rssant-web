@@ -28,6 +28,7 @@
         </mu-button>
       </div>
     </div>
+    <div v-loading.fullscreen.lock="loginLoading"></div>
     <AddFeedDialog :isOpen="isDialogOpen" :close="closeDialog" :save="handleCreateFeed"></AddFeedDialog>
   </div>
 </template>
@@ -42,7 +43,8 @@ export default {
     return {
       userMenuTrigger: null,
       isUserMenuOpen: false,
-      isDialogOpen: false
+      isDialogOpen: false,
+      loginLoading: false
     }
   },
   computed: {
@@ -54,6 +56,7 @@ export default {
       location.assign('/')
     },
     async handleLogin() {
+      this.loginLoading = true
       await this.login()
     },
     async handleLogout() {
@@ -184,6 +187,9 @@ export default {
     padding-left: 4px;
     font-size: 14px;
     font-weight: 700;
+  }
+  .login-loading {
+    color: #66bb6a;
   }
 }
 </style>

@@ -13,7 +13,8 @@ import {
 import {
   Message,
   Table,
-  TableColumn
+  TableColumn,
+  Loading
 } from 'element-ui'
 import router from './router'
 import store from './store'
@@ -25,7 +26,9 @@ sync(store, router)
 Vue.prototype.$api = api
 Vue.prototype.$notify = Notification
 Vue.prototype.$message = Message
+Vue.prototype.$loading = Loading.service
 
+Vue.use(Loading.directive)
 Vue.use(MuseUI)
 // muse-ui 的 Table 组件有性能问题，改用 element-ui
 Vue.component(Table.name, Table)

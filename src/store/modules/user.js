@@ -76,11 +76,14 @@ const actions = {
   async login({
     commit,
     getters,
-  }) {
+  }, redirectUrl) {
     if (getters.isLogin) {
       return
     }
-    location.assign('/api/login/github?state=/')
+    if (lodash.isNil(redirectUrl)) {
+      redirectUrl = '/'
+    }
+    location.assign(`/api/login/github?state=${redirectUrl}`)
   },
   async logout({
     commit
