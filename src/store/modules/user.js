@@ -7,7 +7,7 @@ const TOKEN_COOKIE = 'guard_token'
 const state = {
   loginUser: null,
   loginDate: null,
-  loginToken: null,
+  loginToken: null
 }
 
 const getters = {
@@ -29,14 +29,11 @@ const getters = {
       return true
     }
     return false
-  },
+  }
 }
 
 const mutations = {
-  login(state, {
-    user,
-    token
-  }) {
+  login(state, { user, token }) {
     state.loginUser = user
     state.loginToken = token
     state.loginDate = new Date()
@@ -52,10 +49,7 @@ const mutations = {
 }
 
 const actions = {
-  async autoLogin({
-    commit,
-    getters
-  }) {
+  async autoLogin({ commit, getters }) {
     if (getters.isLogin) {
       return
     }
@@ -73,10 +67,7 @@ const actions = {
       token
     })
   },
-  async login({
-    commit,
-    getters,
-  }, redirectUrl) {
+  async login({ commit, getters }, redirectUrl) {
     if (getters.isLogin) {
       return
     }
@@ -85,9 +76,7 @@ const actions = {
     }
     location.assign(`/api/login/github?state=${redirectUrl}`)
   },
-  async logout({
-    commit
-  }) {
+  async logout({ commit }) {
     commit('logout')
   }
 }

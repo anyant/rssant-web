@@ -1,43 +1,38 @@
 <template>
   <div>
-    <el-table :data="feedList">
-      <el-table-column prop="status" label="Status" min-width="90px"></el-table-column>
-      <el-table-column prop="feed.title" label="Title" min-width="160px"></el-table-column>
-      <el-table-column prop="url" label="URL" min-width="160px"></el-table-column>
-      <el-table-column prop="feed.description" label="Description" min-width="220px"></el-table-column>
-      <el-table-column prop="dtu" label="Update Time" min-width="200px"></el-table-column>
-      <el-table-column label="Delete" min-width="80px">
-        <template slot-scope="scope">
-          <mu-icon-button @click="handleDeleteFeed(scope.row.id)">
-            <i class="fa fa-times"></i>
-          </mu-icon-button>
-        </template>
-      </el-table-column>
-    </el-table>
+    <mu-list>
+      <div :key="index" v-for="(feed, index) in feedList">
+        <mu-list-item>
+          <div>
+            {{feed.status}} - {{ feed.name }} - {{ feed.url }} - {{ feed.dtu }}
+            <mu-button flat color="primary" @click="handleDelete(feed.id)">删除</mu-button>
+          </div>
+        </mu-list-item>
+        <mu-divider shallow-inset></mu-divider>
+      </div>
+    </mu-list>
   </div>
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex'
+
 export default {
-  props: {
-    feedList: Array,
-    delFeed: Function
-  },
   data() {
     return {}
   },
+  computed: {
+    ...mapGetters(['feedList'])
+  },
   methods: {
-    async handleDeleteFeed(feedId) {
-      try {
-        await this.delFeed(feedId)
-      } catch (e) {
-        this.$notify.error(e.message)
-      }
+    ...mapActions(['deleteFeed']),
+    async handleDelete(feedId) {
+      await this.deleteFeed(feedId)
+      this.$message('删除成功！')
     }
   }
 }
 </script>
 
-<style>
-
+<style scoped>
 </style>

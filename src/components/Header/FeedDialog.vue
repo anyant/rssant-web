@@ -20,15 +20,15 @@ export default {
       type: Function
     }
   },
-  computed: {
-    saveDisabled() {
-      return !this.feedUrl
-    }
-  },
   data() {
     return {
       feedUrl: null,
       errorText: null
+    }
+  },
+  computed: {
+    saveDisabled() {
+      return !this.feedUrl
     }
   },
   methods: {
@@ -38,7 +38,6 @@ export default {
       }
       try {
         await this.save(this.feedUrl)
-        this.$notify.success({ duration: 3000, message: '订阅添加成功～' })
         this.close()
         this.feedUrl = null
       } catch (e) {

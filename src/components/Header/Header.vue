@@ -17,7 +17,9 @@
                 <img :src="currentUser.avatar_url">
               </mu-avatar>
             </mu-button>
-            <mu-list slot="content">
+            <mu-list slot="content" class="user-menu-item">
+              <mu-list-item button>后台任务</mu-list-item>
+              <mu-divider></mu-divider>
               <mu-list-item button @click="handleLogout">退出登录</mu-list-item>
             </mu-list>
           </mu-menu>
@@ -29,16 +31,17 @@
       </div>
     </div>
     <div v-loading.fullscreen.lock="loginLoading"></div>
-    <AddFeedDialog :isOpen="isDialogOpen" :close="closeDialog" :save="handleCreateFeed"></AddFeedDialog>
+    <FeedDialog :isOpen="isDialogOpen" :close="closeDialog" :save="handleCreateFeed"></FeedDialog>
   </div>
 </template>
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
-import AddFeedDialog from './AddFeedDialog'
+import FeedDialog from './FeedDialog'
 
 export default {
-  components: { AddFeedDialog },
+  components: { FeedDialog },
+
   data() {
     return {
       userMenuTrigger: null,
@@ -47,34 +50,56 @@ export default {
       loginLoading: false
     }
   },
+
   computed: {
     ...mapGetters(['isLogin', 'currentUser', 'feedList'])
   },
+
   methods: {
-    ...mapActions(['login', 'logout', 'fetchFeedList', 'createFeed']),
+    ...mapActions(['login', 'logout', 'createFeed', 'fetchFeed']),
+
     handleLogoClick() {
       location.assign('/')
     },
+
     async handleLogin() {
       this.loginLoading = true
       await this.login()
     },
+
     async handleLogout() {
       await this.logout()
       this.closeUserMenu()
     },
+
     toggleUserMenu() {
       this.isUserMenuOpen = !this.isUserMenuOpen
     },
+
     closeUserMenu() {
       this.isUserMenuOpen = false
     },
+
     async handleCreateFeed(feedUrl) {
-      await this.createFeed({ url: feedUrl })
+      let feed = await this.createFeed({ url: feedUrl })
+      let feedId = feed.id
+      let numTry = 10
+      const token = setInterval(async () => {
+        try {
+          feed = await this.fetchFeed(feedId)
+        } finally {
+          numTry -= 1
+          if (feed.status === 'ready' || numTry <= 0) {
+            clearInterval(token)
+          }
+        }
+      }, 1000)
     },
+
     closeDialog() {
       this.isDialogOpen = false
     },
+
     openDialog() {
       this.isDialogOpen = true
     }
@@ -153,6 +178,10 @@ export default {
     height: 48px;
     line-height: 48px;
     display: flex;
+  }
+
+  .user-menu-item {
+    font-weight: 600;
   }
 
   .user-menu-button {

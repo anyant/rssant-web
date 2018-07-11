@@ -1,12 +1,12 @@
 <template>
   <DefaultLayout>
-    <FeedList :feedList="feedList" :delFeed="delFeed"></FeedList>
+    <FeedList v-loading="!isFeedListReady"></FeedList>
   </DefaultLayout>
 </template>
 <script>
-import { mapGetters, mapActions } from 'vuex'
 import { DefaultLayout } from '@/layouts'
 import { FeedList } from '@/components/Feed'
+import { mapGetters } from 'vuex'
 
 export default {
   components: { DefaultLayout, FeedList },
@@ -14,13 +14,10 @@ export default {
     return {}
   },
   computed: {
-    ...mapGetters(['feedList'])
+    ...mapGetters(['isFeedListReady'])
   },
-  methods: {
-    ...mapActions(['fetchFeedList', 'delFeed'])
-  },
-  async afterLogin() {
-    await this.fetchFeedList()
+  async created() {
+    await this.$store.dispatch('fetchFeedList')
   }
 }
 </script>
