@@ -7,18 +7,22 @@ const TOKEN_COOKIE = 'guard_token'
 const state = {
   loginUser: null,
   loginDate: null,
-  loginToken: null
+  loginToken: null,
+  loginLoading: true
 }
 
 const getters = {
   isLogin(state) {
     return !lodash.isNil(state.loginUser)
   },
+  loginLoading(state) {
+    return state.loginLoading
+  },
   currentUser(state) {
     return state.loginUser
   },
   shouldCheckLogin(state, getters) {
-    if (getters.isLogin) {
+    if (getters.loginLoading || getters.isLogin) {
       return false
     }
     if (Cookies.get(TOKEN_COOKIE) == null) {
@@ -33,6 +37,9 @@ const getters = {
 }
 
 const mutations = {
+  setLoginLoading(state, loginLoading) {
+    state.loginLoading = loginLoading
+  },
   login(state, { user, token }) {
     state.loginUser = user
     state.loginToken = token
@@ -60,6 +67,8 @@ const actions = {
       if (e.code !== 'Guard.Forbidden') {
         throw e
       }
+    } finally {
+      commit('setLoginLoading', false)
     }
     let token = Cookies.get(TOKEN_COOKIE)
     commit('login', {
@@ -67,7 +76,7 @@ const actions = {
       token
     })
   },
-  async login({ commit, getters }, redirectUrl) {
+  async login({ getters }, redirectUrl) {
     if (getters.isLogin) {
       return
     }

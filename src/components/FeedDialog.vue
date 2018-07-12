@@ -15,9 +15,6 @@ export default {
     },
     close: {
       type: Function
-    },
-    save: {
-      type: Function
     }
   },
   data() {
@@ -33,11 +30,11 @@ export default {
   },
   methods: {
     async handleSave() {
-      if (this.saveDisabled || !this.save) {
+      if (this.saveDisabled) {
         return
       }
       try {
-        await this.save(this.feedUrl)
+        await this.$store.dispatch('createFeed', { url: this.feedUrl })
         this.close()
         this.feedUrl = null
       } catch (e) {

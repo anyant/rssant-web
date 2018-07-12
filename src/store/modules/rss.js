@@ -22,7 +22,7 @@ const getters = {
     return feedId => state.feedStore[feedId]
   },
 
-  currentFeed(state, getters) {
+  currentFeed(state) {
     if (lodash.isNil(state.currentFeedId)) {
       return null
     }
@@ -40,7 +40,7 @@ const getters = {
     return storyId => state.storyStore[storyId]
   },
 
-  currentStory(state, getters) {
+  currentStory(state) {
     if (lodash.isNil(state.currentStoryId)) {
       return null
     }
@@ -91,12 +91,24 @@ const mutations = {
 }
 
 const actions = {
-  async createFeed({ commit }, { name, url }) {
+  async createFeed({ commit, dispatch }, { name, url }) {
     let feed = await api.call('/rss/create_feed', {
       name,
       url
     })
     commit('addFeed', feed)
+    let feedId = feed.id
+    let numTry = 10
+    const token = setInterval(async () => {
+      try {
+        feed = await dispatch('fetchFeed', feedId)
+      } finally {
+        numTry -= 1
+        if (feed.status === 'ready' || feed.status === 'error' || numTry <= 0) {
+          clearInterval(token)
+        }
+      }
+    }, 1000)
     return feed
   },
 
