@@ -5,17 +5,18 @@ import TaskListPage from '@/pages/TaskListPage'
 import TaskPage from '@/pages/TaskPage'
 import FeedListPage from '@/pages/FeedListPage'
 import FeedPage from '@/pages/FeedPage'
-import IndexPage from '@/pages/IndexPage'
+import ServerPage from '@/pages/ServerPage'
 
-export default [{
+export default [
+  {
     path: '/story/:storyId',
     name: 'Story',
     component: StoryPage
   },
   {
     path: '/',
-    name: 'Index',
-    component: IndexPage
+    name: 'FeedList',
+    component: FeedListPage
   },
   {
     path: '/u/:userId',
@@ -34,9 +35,9 @@ export default [{
     autoLogin: true
   },
   {
-    path: '/feed/',
-    name: 'FeedList',
-    component: FeedListPage
+    path: '/server/',
+    name: 'Server',
+    component: ServerPage
   },
   {
     path: '/feed/:feedId',
