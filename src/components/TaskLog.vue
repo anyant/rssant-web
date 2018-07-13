@@ -1,14 +1,11 @@
 <template>
-  <mu-stepper orientation="vertical" :linear="false">
-    <mu-step v-for="(item, i) in logs" :key="i" :icon-color="getColor(item)">
-      <mu-step-label>
-        {{ item.dt }}
-      </mu-step-label>
-      <mu-step-content>
-        <pre>{{ item.message }}</pre>
-      </mu-step-content>
-    </mu-step>
-  </mu-stepper>
+  <div class="logs">
+    <div class="log" v-for="(item, i) in logs" :key="i">
+      <mu-badge :content="item.level" :color="getColor(item)"></mu-badge>
+      <span class="log-dt">{{ item.dt }}</span>
+      <pre class="log-message">{{ item.message }}</pre>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -34,5 +31,18 @@ export default {
 }
 </script>
 
-<style>
+<style lang="less" scoped>
+.logs {
+  padding-left: 16px;
+  line-height: 24px;
+}
+
+.log-dt {
+  color: #666;
+  margin-left: 8px;
+}
+
+.log-message {
+  padding-left: 16px;
+}
 </style>
