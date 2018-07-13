@@ -8,7 +8,7 @@ const state = {
   loginUser: null,
   loginDate: null,
   loginToken: null,
-  loginLoading: true
+  loginLoading: false
 }
 
 const getters = {
@@ -49,9 +49,7 @@ const mutations = {
     Cookies.remove(TOKEN_COOKIE, {
       path: '/'
     })
-    state.loginUser = null
     state.loginToken = null
-    state.loginDate = null
   }
 }
 
@@ -61,6 +59,7 @@ const actions = {
       return
     }
     let user = null
+    commit('setLoginLoading', true)
     try {
       user = await api.call('/login/me')
     } catch (e) {
@@ -76,17 +75,19 @@ const actions = {
       token
     })
   },
-  async login({ getters }, redirectUrl) {
+  async login({ commit, getters }, redirectUrl) {
     if (getters.isLogin) {
       return
     }
     if (lodash.isNil(redirectUrl)) {
       redirectUrl = '/'
     }
+    commit('setLoginLoading', true)
     location.assign(`/api/login/github?state=${redirectUrl}`)
   },
   async logout({ commit }) {
     commit('logout')
+    location.assign('/')
   }
 }
 

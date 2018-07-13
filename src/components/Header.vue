@@ -5,25 +5,18 @@
       <slot></slot>
       <UserMenu class="user-menu"></UserMenu>
     </div>
-    <div v-loading.fullscreen.lock="loginLoading"></div>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 import Logo from './Logo'
 
 import UserMenu from './UserMenu'
 
 export default {
   components: { Logo, UserMenu },
-
   data() {
     return {}
-  },
-
-  computed: {
-    ...mapGetters(['loginLoading'])
   }
 }
 </script>
