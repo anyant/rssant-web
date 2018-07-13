@@ -1,34 +1,25 @@
 <template>
-  <DefaultLayout>
-    <TaskList :task-list="taskList"></TaskList>
-  </DefaultLayout>
+  <Layout>
+    <Header>
+      <template slot="left">
+        <GoBack></GoBack>
+        <HeaderTitle>任务列表</HeaderTitle>
+      </template>
+    </Header>
+    <TaskList></TaskList>
+  </Layout>
 </template>
 <script>
-import { mapGetters } from 'vuex'
-import { DefaultLayout } from '@/layouts'
-import { TaskList } from '@/components/Task'
+import Layout from '@/layouts/Layout'
+import Header from '@/components/Header'
+import GoBack from '@/components/GoBack'
+import TaskList from '@/components/TaskList'
+import HeaderTitle from '@/components/HeaderTitle'
 
 export default {
-  components: { DefaultLayout, TaskList },
-  data() {
-    return { taskList: [], taskListFetched: false }
-  },
-  computed: {
-    ...mapGetters(['isLogin'])
-  },
-  methods: {
-    async fetchTaskList() {
-      let taskList = await this.$api.get('/task/list')
-      taskList.forEach(x => {
-        this.taskList.push(x)
-      })
-      this.taskListFetched = true
-    }
-  },
-  async afterLogin() {
-    if (this.isLogin && !this.taskListFetched) {
-      await this.fetchTaskList()
-    }
+  components: { Layout, Header, GoBack, TaskList, HeaderTitle },
+  created() {
+    this.$store.dispatch('fetchTaskList')
   }
 }
 </script>

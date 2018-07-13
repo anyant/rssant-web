@@ -3,6 +3,7 @@ import FeedPage from '@/pages/FeedPage'
 import ServerPage from '@/pages/ServerPage'
 import StoryPage from '@/pages/StoryPage'
 import FeedDetailPage from '@/pages/FeedDetailPage'
+import TaskListPage from '@/pages/TaskListPage'
 
 export default [
   {
@@ -29,6 +30,11 @@ export default [
     path: '/feed/:feedId/detail',
     name: 'FeedDetail',
     component: FeedDetailPage
+  },
+  {
+    path: '/task',
+    name: 'TaskList',
+    component: TaskListPage
   }
   // {
   //   path: '/u/:userId',

@@ -8,6 +8,9 @@
     </Header>
     <AddFeedDialog></AddFeedDialog>
     <FeedList v-loading="!isFeedListReady"></FeedList>
+    <div class="not-login" v-if="(!isLogin) && (!loginLoading)">
+      <div>你还没有登录哦~</div>
+    </div>
   </Layout>
 </template>
 <script>
@@ -17,6 +20,7 @@ import AddFeedDialog from '@/components/AddFeedDialog'
 import AddFeedButton from '@/components/AddFeedButton'
 import Logo from '@/components/Logo'
 import FeedList from '@/components/FeedList'
+import { mapGetters } from 'vuex'
 
 export default {
   components: {
@@ -32,6 +36,9 @@ export default {
       isFeedListReady: false
     }
   },
+  computed: {
+    ...mapGetters(['isLogin', 'loginLoading'])
+  },
   async created() {
     try {
       await this.$store.dispatch('fetchFeedList')
@@ -42,5 +49,11 @@ export default {
 }
 </script>
 
-<style>
+<style lang="less" scoped>
+.not-login {
+  text-align: center;
+  margin-top: 60px;
+  font-size: 24px;
+}
 </style>
+

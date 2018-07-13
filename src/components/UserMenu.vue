@@ -8,7 +8,9 @@
           </mu-avatar>
         </mu-button>
         <mu-list slot="content" class="menu-item">
-          <mu-list-item button>后台任务</mu-list-item>
+          <router-link to="/task">
+            <mu-list-item button>后台任务</mu-list-item>
+          </router-link>
           <mu-divider></mu-divider>
           <mu-list-item button @click="logout()">退出登录</mu-list-item>
         </mu-list>
@@ -42,7 +44,6 @@ export default {
 }
 
 .menu {
-
   .avatar {
     padding-top: 6px;
     padding-bottom: 6px;

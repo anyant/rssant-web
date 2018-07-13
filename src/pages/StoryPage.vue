@@ -4,7 +4,7 @@
       <Header>
         <template slot="left">
           <GoBack></GoBack>
-          <div class="title">{{ storyTitle }}</div>
+          <HeaderTitle>{{ storyTitle }}</HeaderTitle>
         </template>
       </Header>
       <Story></Story>
@@ -18,9 +18,10 @@ import Layout from '@/layouts/Layout'
 import Header from '@/components/Header'
 import GoBack from '@/components/GoBack'
 import Story from '@/components/Story'
+import HeaderTitle from '@/components/HeaderTitle'
 
 export default {
-  components: { Layout, Story, Header, GoBack },
+  components: { Layout, Story, Header, GoBack, HeaderTitle },
   computed: {
     storyId() {
       return this.$route.params.storyId
@@ -37,13 +38,4 @@ export default {
 </script>
 
 <style scoped>
-.title {
-  margin-left: 8px;
-  display: inline-block;
-  font-size: 20px;
-  max-width: 20em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 </style>

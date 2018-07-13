@@ -3,7 +3,7 @@
     <Header>
       <template slot="left">
         <GoBack></GoBack>
-        <div class="feed-name">{{ feedName }}</div>
+        <HeaderTitle :font-size="22">{{ feedName }}</HeaderTitle>
       </template>
     </Header>
     <FeedDetail></FeedDetail>
@@ -15,9 +15,10 @@ import Layout from '@/layouts/Layout'
 import Header from '@/components/Header'
 import GoBack from '@/components/GoBack'
 import FeedDetail from '@/components/FeedDetail'
+import HeaderTitle from '@/components/HeaderTitle'
 
 export default {
-  components: { Layout, Header, GoBack, FeedDetail },
+  components: { Layout, Header, GoBack, FeedDetail, HeaderTitle },
 
   async created() {
     this.$store.dispatch('setCurrentFeed', this.feedId)
@@ -36,9 +37,4 @@ export default {
 </script>
 
 <style scoped>
-.feed-name {
-  margin-left: 8px;
-  display: inline-block;
-  font-size: 22px;
-}
 </style>

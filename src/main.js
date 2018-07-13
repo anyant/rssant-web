@@ -6,6 +6,7 @@ import {
 import MuseUI from 'muse-ui'
 import 'muse-ui/dist/muse-ui.css'
 import 'font-awesome/css/font-awesome.css'
+import 'typeface-roboto'
 import '@/styles/theme-rssant.less'
 import {
   Notification
