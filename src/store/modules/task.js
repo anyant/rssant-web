@@ -4,7 +4,8 @@ import * as lodash from 'lodash-es'
 
 const state = {
   taskStore: {},
-  currentTaskId: null
+  currentTaskId: null,
+  taskLogsStore: {}
 }
 
 const getters = {
@@ -15,14 +16,21 @@ const getters = {
       .reverse()
       .value()
   },
-  updateTask(state, task) {
-    Vue.set(state, task.id, task)
-  },
   currentTask(state) {
     if (lodash.isNil(state.currentTaskId)) {
       return null
     }
     return state.taskStore[state.currentTaskId]
+  },
+  currentTaskLogs(state) {
+    if (lodash.isNil(state.currentTaskId)) {
+      return []
+    }
+    let logs = state.taskLogsStore[state.currentTaskId]
+    if (lodash.isNil(logs)) {
+      logs = []
+    }
+    return logs
   }
 }
 
@@ -33,6 +41,12 @@ const mutations = {
       taskStore[task.id] = task
     })
     state.taskStore = taskStore
+  },
+  updateTask(state, task) {
+    Vue.set(state.taskStore, task.id, task)
+  },
+  updateTaskLogs(state, { taskId, logs }) {
+    Vue.set(state.taskLogsStore, taskId, logs)
   },
   setCurrentTask(state, taskId) {
     state.currentTaskId = taskId
@@ -48,8 +62,15 @@ const actions = {
     commit('setCurrentTask', taskId)
     let task = getters.currentTask
     if (lodash.isNil(task)) {
-      let task = await api.call('/task/get', { id: taskId })
-      commit('updateTask', task)
+      api.call('/task/get', { task_id: taskId }).then(task => {
+        commit('updateTask', task)
+      })
+    }
+    let logs = getters.currentTaskLogs
+    if (logs.length <= 0) {
+      api.call('/task/get_logs', { task_id: taskId, num_try: 1 }).then(logs => {
+        commit('updateTaskLogs', { taskId, logs })
+      })
     }
   }
 }

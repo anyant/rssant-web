@@ -1,44 +1,48 @@
 <template>
-  <GoBackLayout previous="TaskList" title="Task Logs">
-    <Task v-if="task" :task="task" :fetch-log="fetchLog"></Task>
-  </GoBackLayout>
+  <Layout>
+    <Header>
+      <template slot="left">
+        <GoBack></GoBack>
+        <HeaderTitle>{{currentTaskName}}</HeaderTitle>
+      </template>
+    </Header>
+    <Task></Task>
+  </Layout>
 </template>
 
 <script>
-import { GoBackLayout } from '@/layouts'
-import { Task } from '@/components/Task'
+import Layout from '@/layouts/Layout'
+import Header from '@/components/Header'
+import HeaderTitle from '@/components/HeaderTitle'
+import GoBack from '@/components/GoBack'
+import Task from '@/components/Task'
+import * as lodash from 'lodash-es'
+import { mapGetters } from 'vuex'
 
 export default {
-  components: { GoBackLayout, Task },
-  data() {
-    return {
-      task: null
-    }
+  components: {
+    Layout,
+    Header,
+    HeaderTitle,
+    GoBack,
+    Task
   },
   computed: {
+    ...mapGetters(['currentTask']),
     taskId() {
       return this.$route.params.taskId
-    }
-  },
-  methods: {
-    async fetchTask() {
-      let task = await this.$api.get('/task/get', {
-        params: { task_id: this.taskId }
-      })
-      this.task = task
     },
-    async fetchLog({ taskId, numRun }) {
-      let log = await this.$api.get('/task/log', {
-        params: {
-          task_id: taskId,
-          num_run: numRun
-        }
-      })
-      return log
+    currentTaskName() {
+      let task = this.currentTask
+      if (lodash.isNil(task)) {
+        return this.taskId
+      } else {
+        return task.name
+      }
     }
   },
-  async afterLogin() {
-    await this.fetchTask()
+  created() {
+    this.$store.dispatch('setCurrentTask', this.taskId)
   }
 }
 </script>

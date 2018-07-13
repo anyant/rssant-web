@@ -4,6 +4,7 @@ import ServerPage from '@/pages/ServerPage'
 import StoryPage from '@/pages/StoryPage'
 import FeedDetailPage from '@/pages/FeedDetailPage'
 import TaskListPage from '@/pages/TaskListPage'
+import TaskPage from '@/pages/TaskPage'
 
 export default [
   {
@@ -35,21 +36,10 @@ export default [
     path: '/task',
     name: 'TaskList',
     component: TaskListPage
+  },
+  {
+    path: '/task/:taskId',
+    name: 'Task',
+    component: TaskPage
   }
-  // {
-  //   path: '/u/:userId',
-  //   name: 'User',
-  //   component: UserPage
-  // },
-  // {
-  //   path: '/task/',
-  //   name: 'TaskList',
-  //   component: TaskListPage
-  // },
-  // {
-  //   path: '/task/:taskId',
-  //   name: 'Task',
-  //   component: TaskPage,
-  //   autoLogin: true
-  // },
 ]
