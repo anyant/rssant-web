@@ -2,13 +2,7 @@ import HomePage from '@/pages/HomePage'
 import FeedPage from '@/pages/FeedPage'
 import ServerPage from '@/pages/ServerPage'
 import StoryPage from '@/pages/StoryPage'
-
-// // import StoryListPage from '@/pages/StoryListPage'
-// import UserPage from '@/pages/UserPage'
-// import TaskListPage from '@/pages/TaskListPage'
-// import TaskPage from '@/pages/TaskPage'
-
-
+import FeedDetailPage from '@/pages/FeedDetailPage'
 
 export default [
   {
@@ -24,14 +18,18 @@ export default [
   {
     path: '/feed/:feedId',
     name: 'Feed',
-    component: FeedPage,
-    autoLogin: true
+    component: FeedPage
   },
   {
     path: '/story/:storyId',
     name: 'Story',
     component: StoryPage
   },
+  {
+    path: '/feed/:feedId/detail',
+    name: 'FeedDetail',
+    component: FeedDetailPage
+  }
   // {
   //   path: '/u/:userId',
   //   name: 'User',

@@ -30,6 +30,18 @@ const getters = {
     return state.feedStore[state.currentFeedId]
   },
 
+  currentFeedName(state, getters) {
+    let feed = getters.currentFeed
+    if (lodash.isNil(feed)) {
+      if (lodash.isNil(state.route)) {
+        return '加载中...'
+      } else {
+        return state.route.params.feedId
+      }
+    } else {
+      return feed.name
+    }
+  },
   storyList(state) {
     return lodash
       .chain(lodash.values(state.storyStore))

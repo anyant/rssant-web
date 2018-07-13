@@ -4,7 +4,7 @@
       <div :key="index" v-for="(feed, index) in feedList">
         <mu-list-item>
           <div class="feed">
-            <mu-badge :content="feed.status" :color="feedStatusColor(feed)"></mu-badge>
+            <FeedStatus :status="feed.status"></FeedStatus>
             <div class="feed-name" @click="handleFeedClick(feed.id)">
               <mu-ripple>
                 {{ feed.name }} - {{ feed.dtu }}
@@ -21,9 +21,10 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
-import * as lodash from 'lodash-es'
+import FeedStatus from '@/components/FeedStatus'
 
 export default {
+  components: { FeedStatus },
   data() {
     return {}
   },
@@ -32,17 +33,6 @@ export default {
   },
   methods: {
     ...mapActions(['deleteFeed']),
-    feedStatusColor(feed) {
-      let color = {
-        ready: 'success',
-        updating: 'primary',
-        error: 'error'
-      }[feed.status]
-      if (lodash.isNil(color)) {
-        color = 'grey'
-      }
-      return color
-    },
     async handleDelete(feedId) {
       await this.deleteFeed(feedId)
       this.$message('删除成功！')
