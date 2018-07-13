@@ -1,6 +1,8 @@
 <template>
   <div class="header">
-    <Logo></Logo>
+    <div class="left">
+      <slot name="left"></slot>
+    </div>
     <div class="actions">
       <slot></slot>
       <UserMenu class="user-menu"></UserMenu>
@@ -29,8 +31,22 @@ export default {
   align-items: center;
   justify-content: space-between;
   height: 64px;
-  padding: 8px;
+  padding: 8px 0;
   border-bottom: 1px solid #e9e9e9;
+}
+
+.left,
+.actions {
+  height: 48px;
+  line-height: 48px;
+  vertical-align: middle;
+}
+
+.left {
+  margin-right: 8px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
 }
 
 .actions {
@@ -38,8 +54,6 @@ export default {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  padding-top: 4px;
-  padding-bottom: 4px;
 }
 
 .user-menu {

@@ -6,7 +6,8 @@ const state = {
   feedStore: {},
   currentFeedId: null,
   storyStore: {},
-  currentStoryId: null
+  currentStoryId: null,
+  isAddFeedDialogOpen: false
 }
 
 const getters = {
@@ -87,6 +88,12 @@ const mutations = {
 
   setCurrentStory(state, storyId) {
     state.currentStoryId = storyId
+  },
+  closeAddFeedDialog(state) {
+    state.isAddFeedDialogOpen = false
+  },
+  openAddFeedDialog(state) {
+    state.isAddFeedDialogOpen = true
   }
 }
 
@@ -98,7 +105,7 @@ const actions = {
     })
     commit('addFeed', feed)
     let feedId = feed.id
-    let numTry = 10
+    let numTry = 30
     const token = setInterval(async () => {
       try {
         feed = await dispatch('fetchFeed', feedId)

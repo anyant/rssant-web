@@ -1,16 +1,16 @@
 <template>
-  <DefaultLayout>
+  <Layout>
     <h1>Welcome to RSS Ant</h1>
     <h2>{{ msg }}</h2>
-  </DefaultLayout>
+  </Layout>
 </template>
 
 <script>
-import { DefaultLayout } from '@/layouts/'
+import Layout from '@/layouts/Layout'
 
 export default {
   components: {
-    DefaultLayout
+    Layout
   },
   data() {
     return {

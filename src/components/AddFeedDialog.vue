@@ -8,15 +8,6 @@
 
 <script>
 export default {
-  props: {
-    isOpen: {
-      type: Boolean,
-      default: false
-    },
-    close: {
-      type: Function
-    }
-  },
   data() {
     return {
       feedUrl: null,
@@ -26,9 +17,15 @@ export default {
   computed: {
     saveDisabled() {
       return !this.feedUrl
+    },
+    isOpen() {
+      return this.$store.state.rss.isAddFeedDialogOpen
     }
   },
   methods: {
+    close() {
+      this.$store.commit('closeAddFeedDialog')
+    },
     async handleSave() {
       if (this.saveDisabled) {
         return

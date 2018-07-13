@@ -17,10 +17,15 @@ export default {
 
 <style scoped>
 .logo {
-  min-width: 108px;
+  width: 28 * 6 px;
+  min-width: 28 * 6 px;
   display: inline-block;
   cursor: pointer;
   font-size: 0;
+  height: 48px;
+  line-height: 48px;
+  padding-left: 8px;
+  padding-right: 8px;
 }
 
 .logo-rss,
@@ -34,7 +39,7 @@ export default {
 }
 
 .logo-rss {
-  color: #f44336;
+  color: #3c3c3c;
 }
 
 .logo-ant {
