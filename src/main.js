@@ -6,7 +6,7 @@ import 'muse-ui/dist/muse-ui.css'
 import 'font-awesome/css/font-awesome.css'
 import 'typeface-roboto'
 import '@/styles/theme-rssant.less'
-import { Notification } from '@/plugin/notify'
+import Notification from '@/plugin/notify'
 import { Message, Table, TableColumn, Loading } from 'element-ui'
 import moment from 'moment'
 import 'moment/locale/zh-cn'
@@ -40,3 +40,4 @@ window.app = new Vue({
   router,
   render: h => h(App)
 })
+window.app.debug = localStorage.getItem('debug') === '1'

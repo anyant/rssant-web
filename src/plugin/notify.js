@@ -25,6 +25,4 @@ for (let attr of ['success', 'warning', 'info', 'error']) {
 }
 AntNotification.close = ELNotification.close
 
-export {
-  AntNotification as Notification
-}
+export default AntNotification

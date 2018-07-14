@@ -1,12 +1,13 @@
 <template>
   <div id="app">
+    <div id="timeit"></div>
     <router-view/>
     <div v-loading.fullscreen.lock="loginLoading"></div>
   </div>
 </template>
 
 <script>
-import {mapGetters} from 'vuex'
+import { mapGetters } from 'vuex'
 
 export default {
   async created() {
@@ -18,5 +19,10 @@ export default {
 }
 </script>
 
-<style>
+<style lang="less" scoped>
+#timeit {
+  position: fixed;
+  top: 0;
+  left: 4px;
+}
 </style>

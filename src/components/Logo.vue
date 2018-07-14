@@ -7,9 +7,25 @@
 
 <script>
 export default {
+  data() {
+    return { debug: 0 }
+  },
   methods: {
     handleLogoClick() {
       this.$router.replace('/')
+      // 连续点击Logo 10次，切换debug模式
+      this.debug += 1
+      if (this.debug === 10) {
+        this.debug = 0
+        let debug = !(localStorage.getItem('debug') === '1')
+        localStorage.setItem('debug', debug ? '1' : '0')
+        window.app.debug = debug
+        this.$message.success(`RSSAnt debug mode: ${debug ? 'ON' : 'OFF'}`)
+      } else if (this.debug === 1) {
+        setTimeout(() => {
+          this.debug = 0
+        }, 3000)
+      }
     }
   }
 }
