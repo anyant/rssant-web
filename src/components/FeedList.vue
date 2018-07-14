@@ -35,6 +35,7 @@ export default {
       this.$message('删除成功！')
     },
     handleFeedClick(feedId) {
+      this.$store.commit('setStoryList', [])
       this.$router.push(`/feed/${feedId}`)
     }
   }

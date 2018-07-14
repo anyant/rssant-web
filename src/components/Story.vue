@@ -36,6 +36,7 @@ export default {
 .story {
   padding-left: 16px;
   padding-right: 32px;
+  margin-top: 32px;
 }
 
 .info {
