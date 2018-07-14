@@ -3,7 +3,7 @@
     <Header>
       <template slot="left">
         <GoBack></GoBack>
-        <HeaderTitle :font-size="22">{{ feedName }}</HeaderTitle>
+        <HeaderTitle :font-size="22">{{ feedTitle }}</HeaderTitle>
       </template>
       <mu-button flat mini class="goto-feed-detail" @click="gotoFeedDatail">
         <mu-icon value="details"></mu-icon>
@@ -15,7 +15,6 @@
 </template>
 
 <script>
-import * as lodash from 'lodash-es'
 import Layout from '@/layouts/Layout'
 import Header from '@/components/Header'
 import GoBack from '@/components/GoBack'
@@ -33,9 +32,8 @@ export default {
     feedId() {
       return this.$route.params.feedId
     },
-    feedName() {
-      let feed = this.$store.getters.currentFeed
-      return lodash.isNil(feed) ? this.feedId : feed.name
+    feedTitle() {
+      return this.$store.getters.currentFeedTitle
     }
   },
   methods: {

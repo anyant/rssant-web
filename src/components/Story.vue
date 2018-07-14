@@ -8,15 +8,15 @@
       <div class="info-item">
         <span class="info-item-name">原文：</span>
         <span class="info-item-content">
-          <a :href="currentStory.url" target="_blank">{{ currentStory.url }}</a>
+          <a :href="currentStory.link" target="_blank">{{ currentStory.link }}</a>
         </span>
       </div>
       <div class="info-item">
-        <span class="info-item-name">日期：</span>
-        <span class="info-item-content">{{currentStory.dtu}}</span>
+        <span class="info-item-name">更新时间：</span>
+        <span class="info-item-content">{{currentStory.dt_updated}}</span>
       </div>
     </div>
-    <div class="content" v-html="currentStory.data.summary"></div>
+    <div class="content" v-html="currentStory.summary"></div>
   </div>
 </template>
 

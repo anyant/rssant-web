@@ -3,7 +3,7 @@
     <Header>
       <template slot="left">
         <GoBack></GoBack>
-        <HeaderTitle :font-size="22">{{ feedName }}</HeaderTitle>
+        <HeaderTitle :font-size="22">{{ feedTitle }}</HeaderTitle>
       </template>
     </Header>
     <FeedDetail></FeedDetail>
@@ -29,8 +29,8 @@ export default {
     feedId() {
       return this.$route.params.feedId
     },
-    feedName() {
-      return this.$store.getters.currentFeedName
+    feedTitle() {
+      return this.$store.getters.currentFeedTitle
     }
   }
 }
