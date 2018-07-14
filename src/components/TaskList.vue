@@ -9,6 +9,9 @@
         </template>
       </el-table-column>
       <el-table-column prop="dtu" label="更新时间">
+        <span slot-scope="scope" class="time">
+          {{ scope.row.dtu | moment("YYYY-MM-DD HH:mm:ss") }} 约 {{ scope.row.dtu | moment("from") }}
+        </span>
       </el-table-column>
     </el-table>
   </div>
@@ -24,5 +27,9 @@ export default {
 }
 </script>
 
-<style>
+<style lang="less" scoped>
+.time {
+  color: gray;
+}
 </style>
+

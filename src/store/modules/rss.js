@@ -47,7 +47,8 @@ const getters = {
   storyList(state) {
     return lodash
       .chain(lodash.values(state.storyStore))
-      .sortBy('dtu')
+      .sortBy('dt_updated')
+      .reverse()
       .value()
   },
 

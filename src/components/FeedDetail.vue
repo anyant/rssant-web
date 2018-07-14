@@ -26,7 +26,7 @@
         供稿格式：{{feed.version}}
       </mu-list-item>
       <mu-list-item>
-        更新时间：{{feed.dt_updated}}
+        更新时间：{{ feed.dt_updated | moment('YYYY-MM-DD HH:mm') }} 约 {{ feed.dt_updated | moment('from') }}
       </mu-list-item>
     </mu-list>
     <pre>{{ feed.data }}</pre>
