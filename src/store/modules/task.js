@@ -55,7 +55,7 @@ const mutations = {
 
 const actions = {
   async fetchTaskList({ commit }) {
-    let taskList = await api.call('/task/query', {})
+    let taskList = await api.call('/task/query')
     commit('setTaskList', taskList)
   },
   async setCurrentTask({ commit, getters }, taskId) {

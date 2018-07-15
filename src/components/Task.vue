@@ -6,6 +6,10 @@
         <code>{{ task.id }}</code>
       </div>
       <div>
+        <mu-badge color="primary" content="状态：" />
+        <TaskState :state="task.state"></TaskState>
+      </div>
+      <div>
         <mu-badge color="primary" content="名称：" />
         <code>{{ task.name }}</code>
       </div>
@@ -20,9 +24,10 @@
 
 <script>
 import TaskLog from '@/components/TaskLog'
+import TaskState from '@/components/TaskState'
 
 export default {
-  components: { TaskLog },
+  components: { TaskLog, TaskState },
   computed: {
     task() {
       return this.$store.getters.currentTask
