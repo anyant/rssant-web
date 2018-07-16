@@ -4,6 +4,7 @@
       <template slot="left">
         <Logo></Logo>
       </template>
+      <mu-button @click="handleDeleteAllErrorFeeds">删除所有无效订阅</mu-button>
       <AddFeedButton></AddFeedButton>
     </Header>
     <AddFeedDialog></AddFeedDialog>
@@ -44,6 +45,12 @@ export default {
       await this.$store.dispatch('fetchFeedList')
     } finally {
       this.isFeedListReady = true
+    }
+  },
+  methods:{
+    async handleDeleteAllErrorFeeds(){
+      let msg = await this.$api.call('/rss/delete_error_feeds')
+      this.$message.success(msg)
     }
   }
 }
