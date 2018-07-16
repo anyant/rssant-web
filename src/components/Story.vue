@@ -13,26 +13,30 @@
       </div>
       <div class="info-item">
         <span class="info-item-name">更新时间：</span>
-        <span class="info-item-content">
+        <span class="info-item-content" v-if="currentStory.dt_updated">
           {{ currentStory.dt_updated | moment('YYYY-MM-DD HH:mm') }} 约 {{ currentStory.dt_updated | moment('from') }}
         </span>
       </div>
     </div>
-    <div class="content" v-html="currentStory.summary"></div>
+    <div class="content">
+        <StoryContent :content="currentStory.summary"></StoryContent>
+    </div>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
+import StoryContent from './StoryContent'
 
 export default {
+  components: { StoryContent },
   computed: {
     ...mapGetters(['currentStory'])
   }
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .story {
   padding-left: 16px;
   padding-right: 32px;

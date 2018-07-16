@@ -10,7 +10,7 @@
       </mu-list-item>
       <mu-list-item>
         主页：
-        <a :href="feed.url" target="_blank">{{feed.link}}</a>
+        <a :href="feed.link" target="_blank">{{feed.link}}</a>
       </mu-list-item>
       <mu-list-item>
         作者：{{feed.author}}

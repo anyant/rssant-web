@@ -74,6 +74,9 @@ export default {
   flex: 1;
   margin-left: 4px;
   cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .feed-title:hover {

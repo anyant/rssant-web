@@ -20,7 +20,11 @@ api.interceptors.response.use(
     if (window.app.debug) {
       let title = error.code
       if (lodash.isNil(title)) {
-        title = `${error.status}: ${error.statusText}`
+        if (lodash.isNil(error.response)) {
+          title = `Failed: ${error.config.method} ${error.config.url}`
+        } else {
+          title = `${error.response.status} ${error.response.statusText}`
+        }
       }
       let message = lodash.truncate(error.message, {
         length: 50,

@@ -1,6 +1,6 @@
 <template>
   <div class="story-list">
-    <div class="story" :key="story.id" v-for="story in storyList"  @click="handleStoryClick(story)">
+    <div class="story" :key="story.id" v-for="story in storyList" @click="handleStoryClick(story)">
       <span class="story-title">{{ story.title }}</span>
       <span class="story-time">{{ story.dt_updated | moment("from") }}</span>
     </div>
@@ -40,7 +40,7 @@ export default {
   cursor: pointer;
 }
 
-.story:hover{
+.story:hover {
   background-color: rgba(0, 0, 0, 0.1);
   border-bottom: 1px solid #fff;
 }
@@ -48,6 +48,9 @@ export default {
 .story-title {
   display: inline-block;
   flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .story-time {
