@@ -2,7 +2,7 @@
   <mu-dialog :open="isOpen" title="添加新订阅" @close="close" width="500">
     <mu-text-field v-model="feedUrl" label="请填入你想要订阅的供稿地址" label-float fullWidth :errorText="errorText" @focus="handleInputFocus" @keyup.enter.native="handleSave" />
     <input name='import-feeds' type="file">
-    <button type="button" @click="handleImportFeeds">提交</button>
+    <button type="button" @click="handleImportFeeds">批量导入</button>
     <mu-button flat slot="actions" color="primary" @click="handleSave" :disabled="saveDisabled">确定</mu-button>
     <mu-button flat slot="actions" @click="close">取消</mu-button>
   </mu-dialog>

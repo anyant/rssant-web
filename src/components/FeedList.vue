@@ -74,6 +74,7 @@ export default {
   flex: 1;
   margin-left: 4px;
   cursor: pointer;
+  max-width: 400px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

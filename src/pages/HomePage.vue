@@ -4,7 +4,7 @@
       <template slot="left">
         <Logo></Logo>
       </template>
-      <mu-button @click="handleDeleteAllErrorFeeds">删除所有无效订阅</mu-button>
+      <mu-button flat @click="handleDeleteAllErrorFeeds">删除所有无效订阅</mu-button>
       <AddFeedButton></AddFeedButton>
     </Header>
     <AddFeedDialog></AddFeedDialog>
