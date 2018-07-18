@@ -1,5 +1,5 @@
 <template>
-  <mu-badge :content="state" :color="color"></mu-badge>
+  <mu-badge :content="status" :color="color"></mu-badge>
 </template>
 
 <script>
@@ -7,7 +7,7 @@ import * as lodash from 'lodash-es'
 
 export default {
   props: {
-    state: {
+    status: {
       type: String,
       required: true
     }
@@ -19,7 +19,7 @@ export default {
         running: 'lime700',
         success: 'success',
         error: 'error'
-      }[this.state]
+      }[this.status]
       if (lodash.isNil(color)) {
         color = 'grey'
       }

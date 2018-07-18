@@ -3,7 +3,7 @@
     <el-table :data="taskList" stripe>
       <el-table-column prop="name" label="名称">
         <template slot-scope="scope">
-          <TaskState :state="scope.row.state"></TaskState>
+          <TaskStatus :status="scope.row.status"></TaskStatus>
           <router-link :to="{name: 'Task', params: {'taskId': scope.row.id}}">
             {{ scope.row.name }}
           </router-link>
@@ -20,10 +20,10 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import TaskState from '@/components/TaskState'
+import TaskStatus from '@/components/TaskStatus'
 
 export default {
-  components: { TaskState },
+  components: { TaskStatus },
   computed: {
     ...mapGetters(['taskList'])
   }
