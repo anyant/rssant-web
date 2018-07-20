@@ -7,7 +7,7 @@
       </div>
       <div>
         <mu-badge color="primary" content="状态：" />
-        <TaskStatus :state="task.state"></TaskStatus>
+        <TaskStatus :status="task.status"></TaskStatus>
       </div>
       <div>
         <mu-badge color="primary" content="名称：" />
