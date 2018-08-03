@@ -8,7 +8,8 @@
             {{ feed.title || feed.url + ' #' + feed.id }}
           </span>
         </mu-col>
-        <mu-col span="3" class="feed-right">
+        <mu-col span="4" class="feed-right">
+          <mu-badge class="feed-num-unread" color="grey" :content="feed.num_unread_storys.toString()"></mu-badge>
           <span class="feed-time">{{ feed.dt_updated | moment("from") }}</span>
           <mu-button flat color="primary" @click="handleDelete(feed.id)">删除</mu-button>
         </mu-col>
@@ -86,7 +87,14 @@ export default {
   background-color: rgba(0, 0, 0, 0.1);
 }
 
+.feed-num-unread {
+  margin-left: 4px;
+  margin-right: 8px;
+}
+
 .feed-time {
+  width: 60px;
+  text-align: right;
   display: inline-block;
   color: gray;
   margin-right: 4px;
