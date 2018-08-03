@@ -19,7 +19,7 @@
       </div>
     </div>
     <div class="content">
-        <StoryContent :content="currentStory.summary"></StoryContent>
+        <StoryContent :content="currentStory.content"></StoryContent>
     </div>
   </div>
 </template>

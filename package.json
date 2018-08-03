@@ -22,6 +22,7 @@
     "muse-ui": "^3.0.0-rc.5",
     "typeface-roboto": "0.0.54",
     "vue": "^2.5.2",
+    "vue-focus": "^2.1.0",
     "vue-moment": "^4.0.0",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1",

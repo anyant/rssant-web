@@ -1,6 +1,6 @@
 <template>
   <mu-dialog :open="isOpen" title="添加新订阅" @close="close" width="500">
-    <mu-text-field v-model="feedUrl" label="请填入你想要订阅的供稿地址" label-float fullWidth :errorText="errorText" @focus="handleInputFocus" @keyup.enter.native="handleSave" />
+    <mu-text-field ref="feedUrl" v-model="feedUrl" label="请填入你想要订阅的供稿地址" label-float fullWidth :errorText="errorText" @focus="handleInputFocus" @keyup.enter.native="handleSave" />
     <input name='import-feeds' type="file">
     <button type="button" @click="handleImportFeeds">批量导入</button>
     <mu-button flat slot="actions" color="primary" @click="handleSave" :disabled="saveDisabled">确定</mu-button>
@@ -24,9 +24,27 @@ export default {
       return this.$store.state.rss.isAddFeedDialogOpen
     }
   },
+  watch: {
+    isOpen: function(val) {
+      if (val) {
+        setTimeout(() => {
+          this.focus()
+        }, 300)
+      }
+    }
+  },
   methods: {
     close() {
       this.$store.commit('closeAddFeedDialog')
+    },
+    focus() {
+      // https://github.com/museui/muse-ui/issues/219
+      this.$nextTick(() => {
+        if (this.$refs.feedUrl) {
+          let el = this.$refs.feedUrl.$el
+          el.querySelector('input').focus()
+        }
+      })
     },
     async handleSave() {
       if (this.saveDisabled) {
