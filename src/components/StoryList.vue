@@ -1,5 +1,5 @@
 <template>
-  <div v-infinite-scroll="loadMore" infinite-scroll-disabled="loading" infinite-scroll-distance="600" class="story-list">
+  <div v-infinite-scroll="loadMore" :infinite-scroll-disabled="loading" :infinite-scroll-distance="600" class="story-list">
     <div class="story" :key="story.id" v-for="story in storyList" @click="handleStoryClick(story)">
       <span class="story-title">{{ story.title }}</span>
       <span class="story-time">{{ story.dt_updated | moment("from") }}</span>

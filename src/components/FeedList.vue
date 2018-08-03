@@ -1,5 +1,5 @@
 <template>
-  <div class="feed-list">
+  <div v-infinite-scroll="loadMore" :infinite-scroll-disabled="loading" infinite-scroll-distance="600" class="feed-list">
     <div :key="index" v-for="(feed, index) in feedList">
       <mu-row class="feed">
         <mu-col class="feed-left">
@@ -20,16 +20,21 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapState, mapActions } from 'vuex'
 import FeedStatus from '@/components/FeedStatus'
 
 export default {
   components: { FeedStatus },
   data() {
-    return {}
+    return {
+      loading: false
+    }
   },
   computed: {
-    ...mapGetters(['feedList'])
+    ...mapGetters(['feedList']),
+    ...mapState({
+      isFeedListReady: state => state.rss.isFeedListReady
+    })
   },
   methods: {
     ...mapActions(['deleteFeed']),
@@ -43,6 +48,22 @@ export default {
     handleFeedClick(feedId) {
       this.$store.commit('setStoryList', [])
       this.$router.push(`/feed/${feedId}`)
+    },
+    async loadMore() {
+      if (!this.isFeedListReady) {
+        let unwatch = this.$watch('isFeedListReady', val => {
+          unwatch()
+          if (val) {
+            this.loadMore()
+          }
+        })
+        return
+      }
+      this.loading = true
+      let pageSize = await this.$store.dispatch('fetchMoreFeedList')
+      if (pageSize <= 0) {
+        this.loading = false
+      }
     }
   }
 }
