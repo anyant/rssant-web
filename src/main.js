@@ -12,6 +12,7 @@ import moment from 'moment'
 import 'moment/locale/zh-cn'
 import VueMoment from 'vue-moment'
 import { focus } from 'vue-focus'
+import InfiniteScroll from 'vue-infinite-scroll'
 
 import router from './router'
 import store from './store'
@@ -32,6 +33,7 @@ Vue.component(Table.name, Table)
 Vue.component(TableColumn.name, TableColumn)
 
 Vue.directive('focus', focus)
+Vue.use(InfiniteScroll)
 
 Vue.use(VueMoment, {
   moment

@@ -31,8 +31,9 @@ export default {
       return lodash.isNil(story) ? this.storyId : story.title
     }
   },
-  created() {
-    this.$store.dispatch('setCurrentStory', this.storyId)
+  async created() {
+    window.scrollTo(0, 0)
+    await this.$store.dispatch('setCurrentStory', this.storyId)
   }
 }
 </script>

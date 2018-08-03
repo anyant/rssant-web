@@ -9,7 +9,7 @@
           </span>
         </mu-col>
         <mu-col span="4" class="feed-right">
-          <mu-badge class="feed-num-unread" color="grey" :content="feed.num_unread_storys.toString()"></mu-badge>
+          <mu-badge class="feed-num-unread" color="grey" :content="getNumUnread(feed)"></mu-badge>
           <span class="feed-time">{{ feed.dt_updated | moment("from") }}</span>
           <mu-button flat color="primary" @click="handleDelete(feed.id)">删除</mu-button>
         </mu-col>
@@ -33,6 +33,9 @@ export default {
   },
   methods: {
     ...mapActions(['deleteFeed']),
+    getNumUnread(feed) {
+      return feed.num_unread_storys === null ? '0' : feed.num_unread_storys.toString()
+    },
     async handleDelete(feedId) {
       await this.deleteFeed(feedId)
       this.$message('删除成功！')

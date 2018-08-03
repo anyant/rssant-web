@@ -6,6 +6,7 @@ const state = {
   feedStore: {},
   currentFeedId: null,
   storyStore: {},
+  storyNextCursor: null,
   currentStoryId: null,
   isAddFeedDialogOpen: false
 }
@@ -47,8 +48,7 @@ const getters = {
   storyList(state) {
     return lodash
       .chain(lodash.values(state.storyStore))
-      .sortBy('dt_updated')
-      .reverse()
+      .sortBy('dt_updated', 'id')
       .value()
   },
 
@@ -91,6 +91,16 @@ const mutations = {
       storyStore[story.id] = story
     })
     state.storyStore = storyStore
+  },
+
+  extendStoryList(state, storyList){
+    storyList.forEach(story => {
+      Vue.set(state.storyStore, story.id, story)
+    })
+  },
+
+  setStoryNextCursor(state, cursor) {
+    state.storyNextCursor = cursor
   },
 
   addStory(state, story) {
@@ -160,9 +170,22 @@ const actions = {
   },
 
   async fetchStoryList({ commit }, feedId) {
-    let result = await api.call('rss/get_story_list', { feed_id: feedId })
-    let storyList = result.storys
-    commit('setStoryList', storyList)
+    let result = await api.call('rss/get_story_list', {
+      feed_id: feedId,
+    })
+    commit('setStoryNextCursor', result.cursor)
+    commit('setStoryList', result.storys)
+    return result.page_size
+  },
+
+  async fetchMoreStoryList({state, commit}){
+    let result = await api.call('rss/get_story_list', {
+      feed_id: state.currentFeedId,
+      cursor: state.storyNextCursor,
+    })
+    commit('setStoryNextCursor', result.cursor)
+    commit('extendStoryList', result.storys)
+    return result.page_size
   },
 
   async setCurrentFeed({ commit, getters, dispatch }, feedId) {

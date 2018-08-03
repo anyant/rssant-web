@@ -26,7 +26,6 @@ export default {
 
   async created() {
     this.$store.dispatch('setCurrentFeed', this.feedId)
-    this.$store.dispatch('fetchStoryList', this.feedId)
   },
   computed: {
     feedId() {
