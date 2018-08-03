@@ -38,17 +38,21 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['isLogin', 'loginLoading'])
+    ...mapGetters(['isLogin', 'loginLoading', 'feedList'])
   },
   async created() {
-    try {
-      await this.$store.dispatch('fetchFeedList')
-    } finally {
+    if (this.feedList.length <= 0) {
+      try {
+        await this.$store.dispatch('fetchFeedList')
+      } finally {
+        this.isFeedListReady = true
+      }
+    }else{
       this.isFeedListReady = true
     }
   },
-  methods:{
-    async handleDeleteAllErrorFeeds(){
+  methods: {
+    async handleDeleteAllErrorFeeds() {
       let msg = await this.$api.call('/rss/delete_error_feeds')
       this.$message.success(msg)
     }
