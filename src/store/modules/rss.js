@@ -148,7 +148,8 @@ const actions = {
   },
 
   async fetchFeedList({ commit }) {
-    let feedList = await api.call('rss/get_feed_list')
+    let result = await api.call('rss/get_feed_list')
+    let feedList = result.feeds
     commit('setFeedList', feedList)
   },
 
@@ -159,7 +160,8 @@ const actions = {
   },
 
   async fetchStoryList({ commit }, feedId) {
-    let storyList = await api.call('rss/get_story_list', { feed_id: feedId })
+    let result = await api.call('rss/get_story_list', { feed_id: feedId })
+    let storyList = result.storys
     commit('setStoryList', storyList)
   },
 

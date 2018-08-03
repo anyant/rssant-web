@@ -4,10 +4,12 @@
       <mu-row class="feed">
         <mu-col class="feed-left">
           <FeedStatus :status="feed.status"></FeedStatus>
-          <span class="feed-title" @click="handleFeedClick(feed.id)">{{ feed.title || feed.id }}</span>
+          <span class="feed-title" @click="handleFeedClick(feed.id)">
+            {{ feed.title || feed.url + ' #' + feed.id }}
+          </span>
         </mu-col>
         <mu-col span="3" class="feed-right">
-          <span class="feed-time">{{ feed.dtu | moment("from") }}</span>
+          <span class="feed-time">{{ feed.dt_updated | moment("from") }}</span>
           <mu-button flat color="primary" @click="handleDelete(feed.id)">删除</mu-button>
         </mu-col>
       </mu-row>
