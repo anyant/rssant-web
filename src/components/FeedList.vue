@@ -93,7 +93,7 @@ export default {
 }
 
 .feed-time {
-  width: 60px;
+  width: 75px;
   text-align: right;
   display: inline-block;
   color: gray;
