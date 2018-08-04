@@ -13,6 +13,9 @@ import 'moment/locale/zh-cn'
 import VueMoment from 'vue-moment'
 import { focus } from 'vue-focus'
 import InfiniteScroll from 'vue-infinite-scroll'
+import VirtualScrollList from 'vue-virtual-scroll-list'
+import VueRecycList from 'vue-recyclist'
+import ClusterizeList from 'vue-clusterize'
 
 import router from './router'
 import store from './store'
@@ -34,6 +37,9 @@ Vue.component(TableColumn.name, TableColumn)
 
 Vue.directive('focus', focus)
 Vue.use(InfiniteScroll)
+Vue.component('virtual-scroll-list', VirtualScrollList)
+Vue.component('vue-recyclist', VueRecycList)
+Vue.component('clusterize-list', ClusterizeList)
 
 Vue.use(VueMoment, {
   moment

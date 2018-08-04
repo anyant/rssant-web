@@ -1,21 +1,23 @@
 <template>
-  <div v-infinite-scroll="loadMore" :infinite-scroll-disabled="loading" infinite-scroll-distance="600" class="feed-list">
-    <div :key="index" v-for="(feed, index) in feedList">
-      <mu-row class="feed">
-        <mu-col class="feed-left">
-          <FeedStatus :status="feed.status"></FeedStatus>
-          <span class="feed-title" @click="handleFeedClick(feed.id)">
-            {{ feed.title || feed.url + ' #' + feed.id }}
-          </span>
-        </mu-col>
-        <mu-col span="4" class="feed-right">
-          <mu-badge class="feed-num-unread" color="grey" :content="getNumUnread(feed)"></mu-badge>
-          <span class="feed-time">{{ feed.dt_updated | moment("from") }}</span>
-          <mu-button flat color="primary" @click="handleDelete(feed.id)">删除</mu-button>
-        </mu-col>
-      </mu-row>
-      <div class="divider"></div>
-    </div>
+  <div class="feed-list">
+    <virtual-scroll-list :tobottom="loadMore" :size="53" :remain="10">
+      <div :key="index" v-for="(feed, index) in feedList">
+        <mu-row class="feed">
+          <mu-col class="feed-left">
+            <FeedStatus :status="feed.status"></FeedStatus>
+            <span class="feed-title" @click="handleFeedClick(feed.id)">
+              {{ feed.title || feed.url + ' #' + feed.id }}
+            </span>
+          </mu-col>
+          <mu-col span="4" class="feed-right">
+            <mu-badge class="feed-num-unread" color="grey" :content="getNumUnread(feed)"></mu-badge>
+            <span class="feed-time">{{ feed.dt_updated | moment("from") }}</span>
+            <mu-button flat color="primary" @click="handleDelete(feed.id)">删除</mu-button>
+          </mu-col>
+        </mu-row>
+        <div class="divider"></div>
+      </div>
+    </virtual-scroll-list>
   </div>
 </template>
 
@@ -50,6 +52,7 @@ export default {
       this.$router.push(`/feed/${feedId}`)
     },
     async loadMore() {
+      console.log('loadMore')
       if (!this.isFeedListReady) {
         let unwatch = this.$watch('isFeedListReady', val => {
           unwatch()
@@ -72,9 +75,11 @@ export default {
 <style scoped>
 .feed-list {
   margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 .feed {
+  box-sizing: border-box;
   margin-left: 16px;
   margin-right: 16px;
   padding-top: 8px;

@@ -20,3 +20,11 @@ body {
   width: 100vw;
   overflow: hidden;
 }
+
+.clearfix {
+  &::after {
+    content: '';
+    display: block;
+    clear: both;
+  }
+}
