@@ -4,7 +4,7 @@
       <template slot="left">
         <Logo></Logo>
       </template>
-      <mu-button flat @click="handleDeleteAllErrorFeeds">删除所有无效订阅</mu-button>
+      <mu-button flat @click="loginByTest">测试账号登录</mu-button>
       <AddFeedButton></AddFeedButton>
     </Header>
     <AddFeedDialog></AddFeedDialog>
@@ -47,14 +47,13 @@ export default {
       } finally {
         this.isFeedListReady = true
       }
-    }else{
+    } else {
       this.isFeedListReady = true
     }
   },
   methods: {
-    async handleDeleteAllErrorFeeds() {
-      let msg = await this.$api.call('/rss/delete_error_feeds')
-      this.$message.success(msg)
+    async loginByTest() {
+      location.assign(`/api/login/test?state=/`)
     }
   }
 }
