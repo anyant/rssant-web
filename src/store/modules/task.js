@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import api from '@/plugin/api'
+import { API as api } from '@/plugin/api'
 import * as lodash from 'lodash-es'
 
 const state = {

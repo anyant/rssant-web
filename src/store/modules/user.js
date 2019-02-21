@@ -1,4 +1,4 @@
-import api from '@/plugin/api'
+import { API } from '@/plugin/api'
 import * as lodash from 'lodash-es'
 import * as Cookies from 'js-cookie'
 
@@ -61,7 +61,7 @@ const actions = {
     let user = null
     commit('setLoginLoading', true)
     try {
-      user = await api.call('/login/me')
+      user = await API.user.me()
     } catch (e) {
       if (e.code !== 'Guard.Forbidden') {
         throw e

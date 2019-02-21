@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import api from '@/plugin/api'
+import { API } from '@/plugin/api'
 import * as lodash from 'lodash-es'
 
 const state = {
@@ -137,7 +137,7 @@ const mutations = {
 
 const actions = {
   async createFeed({ commit, dispatch }, { url }) {
-    let feed = await api.call('/rss/create_feed', { url })
+    let feed = await API.feed.create({ url })
     commit('addFeed', feed)
     let feedId = feed.id
     let numTry = 30
@@ -155,8 +155,8 @@ const actions = {
   },
 
   async updateFeed({ commit }, { feedId, url }) {
-    let newFeed = await api.call('/rss/update_feed', {
-      feed_id: feedId,
+    let newFeed = await API.feed.update({
+      id: feedId,
       url: url
     })
     commit('updateFeed', newFeed)
@@ -164,55 +164,55 @@ const actions = {
   },
 
   async deleteFeed({ commit }, feedId) {
-    await api.call('/rss/delete_feed', {
-      feed_id: feedId
+    await API.feed.delete({
+      id: feedId
     })
     commit('deleteFeed', feedId)
   },
 
   async fetchFeedList({ commit }) {
-    let result = await api.call('rss/get_feed_list')
-    commit('setFeedList', result.feeds)
-    commit('setFeedNextCursor', result.cursor)
-    return result.page_size
+    let result = await API.feed.list()
+    commit('setFeedList', result.results)
+    commit('setFeedNextCursor', result.next)
+    return result.size
   },
 
   async fetchMoreFeedList({ state, commit }) {
     if (lodash.isEmpty(state.feedNextCursor)) {
       return 0
     }
-    let result = await api.call('rss/get_feed_list', { cursor: state.feedNextCursor })
-    commit('extendFeedList', result.feeds)
-    commit('setFeedNextCursor', result.cursor)
-    return result.page_size
+    let result = await API.feed.list({ cursor: state.feedNextCursor })
+    commit('extendFeedList', result.results)
+    commit('setFeedNextCursor', result.next)
+    return result.size
   },
 
   async fetchFeed({ commit }, feedId) {
-    let feed = await api.call('/rss/get_feed', { feed_id: feedId })
+    let feed = await API.feed.get({ id: feedId })
     commit('addFeed', feed)
     return feed
   },
 
   async fetchStoryList({ commit }, feedId) {
-    let result = await api.call('rss/get_story_list', {
+    let result = await API.story.list({
       feed_id: feedId
     })
     commit('setStoryNextCursor', result.cursor)
-    commit('setStoryList', result.storys)
-    return result.page_size
+    commit('setStoryList', result.results)
+    return result.size
   },
 
   async fetchMoreStoryList({ state, commit }) {
     if (lodash.isEmpty(state.storyNextCursor)) {
       return 0
     }
-    let result = await api.call('rss/get_story_list', {
+    let result = await API.story.list({
       feed_id: state.currentFeedId,
       cursor: state.storyNextCursor
     })
-    commit('setStoryNextCursor', result.cursor)
-    commit('extendStoryList', result.storys)
-    return result.page_size
+    commit('setStoryNextCursor', result.next)
+    commit('extendStoryList', result.results)
+    return result.size
   },
 
   async setCurrentFeed({ commit, getters, dispatch }, feedId) {
@@ -227,7 +227,7 @@ const actions = {
     commit('setCurrentStory', storyId)
     let currentStory = getters.currentStory
     if (lodash.isNil(currentStory) || lodash.isNil(currentStory.data)) {
-      let story = await api.call('/rss/get_story', { story_id: storyId })
+      let story = await API.story.get({ id: storyId })
       commit('addStory', story)
       dispatch('setCurrentFeed', story.feed_id)
     }

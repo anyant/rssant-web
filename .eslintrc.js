@@ -22,6 +22,8 @@ module.exports = {
   ],
   // add your custom rules here
   rules: {
+    // ignore non-camelcase
+    'camelcase': 'off',
     // allow async-await
     'generator-star-spacing': 'off',
     // allow debugger during development

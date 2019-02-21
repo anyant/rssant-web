@@ -10,7 +10,12 @@ module.exports = {
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    proxyTable: {
+      // proxy all requests starting with /api
+      '/api': {
+        target: 'http://127.0.0.1:6788',
+      },
+    },
 
     // Various Dev Server settings
     host: '127.0.0.1', // can be overwritten by process.env.HOST
@@ -42,13 +47,6 @@ module.exports = {
 
     cssSourceMap: true,
 
-    proxyTable: {
-      // proxy all requests starting with /api
-      '/api': {
-        target: 'http://127.0.0.1:6788',
-        changeOrigin: true
-      }
-    }
   },
 
   build: {

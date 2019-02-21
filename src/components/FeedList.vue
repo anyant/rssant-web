@@ -41,7 +41,7 @@ export default {
   methods: {
     ...mapActions(['deleteFeed']),
     getNumUnread(feed) {
-      return feed.num_unread_storys === null ? '0' : feed.num_unread_storys.toString()
+      return '0'
     },
     async handleDelete(feedId) {
       await this.deleteFeed(feedId)
