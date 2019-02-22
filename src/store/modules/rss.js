@@ -227,9 +227,9 @@ const actions = {
     commit('setCurrentStory', storyId)
     let currentStory = getters.currentStory
     if (lodash.isNil(currentStory) || lodash.isNil(currentStory.data)) {
-      let story = await API.story.get({ id: storyId })
+      let story = await API.story.get({ id: storyId, detail: true })
       commit('addStory', story)
-      dispatch('setCurrentFeed', story.feed_id)
+      dispatch('setCurrentFeed', story.feed.id)
     }
   }
 }

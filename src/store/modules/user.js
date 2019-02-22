@@ -83,7 +83,7 @@ const actions = {
       redirectUrl = '/'
     }
     commit('setLoginLoading', true)
-    location.assign(`/api/login/github?state=${redirectUrl}`)
+    location.assign(`/accounts/github/login?next=${redirectUrl}`)
   },
   async logout({ commit }) {
     commit('logout')
