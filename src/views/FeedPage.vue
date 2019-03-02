@@ -4,23 +4,27 @@
       <template v-slot:left>
         <NavTitle :font-size="22">{{ feed.title }}</NavTitle>
       </template>
+      <mu-button flat mini class="goto-feed-detail" @click="gotoFeedDatail">
+        <mu-icon value="details"></mu-icon>
+        <span>供稿详情</span>
+      </mu-button>
       <AddFeedButton></AddFeedButton>
     </Header>
-    <FeedDetail :feed="feed"></FeedDetail>
+    <StoryList></StoryList>
   </Layout>
 </template>
 
 <script>
 import * as lodash from 'lodash-es'
 
-import Layout from '@/layouts/Layout'
+import Layout from '@/components/Layout'
 import Header from '@/components/Header'
 import NavTitle from '@/components/NavTitle'
-import FeedDetail from '@/components/FeedDetail'
+import StoryList from '@/components/StoryList'
 import AddFeedButton from '@/components/AddFeedButton'
 
 export default {
-  components: { Layout, Header, NavTitle, FeedDetail, AddFeedButton },
+  components: { Layout, StoryList, Header, NavTitle, AddFeedButton },
   created() {
     this.$StoreAPI.feed.loadFeed({ feedId: this.feedId })
   },
@@ -38,9 +42,19 @@ export default {
       }
       return feed
     }
+  },
+  methods: {
+    gotoFeedDatail() {
+      this.$router.push(`/feed/${this.feedId}/detail`)
+    }
   }
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
+.goto-feed-detail {
+  span {
+    font-weight: 700;
+  }
+}
 </style>

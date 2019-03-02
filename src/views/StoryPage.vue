@@ -14,7 +14,7 @@
 
 <script>
 import * as lodash from 'lodash-es'
-import Layout from '@/layouts/Layout'
+import Layout from '@/components/Layout'
 import Header from '@/components/Header'
 import NavTitle from '@/components/NavTitle'
 import Story from '@/components/Story'

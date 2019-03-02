@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import Layout from '@/layouts/Layout'
+import Layout from '@/components/Layout'
 import Header from '@/components/Header'
 import HeaderTitle from '@/components/HeaderTitle'
 import GoBack from '@/components/GoBack'

@@ -1,7 +1,7 @@
-import HomePage from '@/pages/HomePage'
-import FeedPage from '@/pages/FeedPage'
-import StoryPage from '@/pages/StoryPage'
-import FeedDetailPage from '@/pages/FeedDetailPage'
+import HomePage from '@/views/HomePage'
+import FeedPage from '@/views/FeedPage'
+import StoryPage from '@/views/StoryPage'
+import FeedDetailPage from '@/views/FeedDetailPage'
 
 export default [
   {

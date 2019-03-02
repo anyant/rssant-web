@@ -1,27 +1,36 @@
 import Vue from 'vue'
-import App from './App'
-import { sync } from 'vuex-router-sync'
+// muse-ui
 import MuseUI from 'muse-ui'
 import 'muse-ui/dist/muse-ui.css'
-import 'font-awesome/css/font-awesome.css'
-import 'typeface-roboto'
-import '@/styles/theme-rssant.less'
-import Notification from '@/plugin/notify'
+// element-ui
 import { Message, Table, TableColumn, Loading } from 'element-ui'
+// moment
 import moment from 'moment'
 import 'moment/locale/zh-cn'
 import VueMoment from 'vue-moment'
+// styles
+import 'material-design-icons/iconfont/material-icons.css'
+import 'font-awesome/css/font-awesome.css'
+import 'typeface-roboto'
+// others
+import { sync } from 'vuex-router-sync'
 import VirtualScrollList from 'vue-virtual-scroll-list'
 
-import router from './router'
-import { STORE, StoreAPI } from './store'
-import API from './plugin/api'
+// rssant
+import App from './App'
+import router from '@/router'
+import { STORE, StoreAPI } from '@/store'
+import API from '@/plugin/api'
+import Notification from '@/plugin/notify'
+import '@/styles/theme-rssant.less'
 
 Vue.config.productionTip = false
 
 sync(STORE, router)
+
 Vue.prototype.$API = API
 Vue.prototype.$StoreAPI = StoreAPI
+
 Vue.prototype.$notify = Notification
 Vue.prototype.$message = Message
 Vue.prototype.$loading = Loading.service
@@ -34,9 +43,7 @@ Vue.component(TableColumn.name, TableColumn)
 // 无限滚动列表
 Vue.component('virtual-scroll-list', VirtualScrollList)
 
-Vue.use(VueMoment, {
-  moment
-})
+Vue.use(VueMoment, { moment })
 
 window.app = new Vue({
   el: '#app',

@@ -13,7 +13,7 @@
   </Layout>
 </template>
 <script>
-import Layout from '@/layouts/Layout'
+import Layout from '@/components/Layout'
 import Header from '@/components/Header'
 import AddFeedButton from '@/components/AddFeedButton'
 import Logo from '@/components/Logo'
