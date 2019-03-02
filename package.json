@@ -13,9 +13,8 @@
     "build": "node build/build.js"
   },
   "dependencies": {
-    "bulma": "^0.7.4",
-    "clusterize.js": "^0.18.1",
-    "element-ui": "^2.4.3",
+    "axios": "^0.18.0",
+    "element-ui": "^2.6.0",
     "font-awesome": "^4.7.0",
     "github-markdown-css": "^2.10.0",
     "js-cookie": "^2.2.0",
@@ -23,17 +22,12 @@
     "moment": "^2.22.2",
     "muse-ui": "^3.0.0-rc.5",
     "typeface-roboto": "0.0.54",
-    "vue": "^2.5.2",
-    "vue-clusterize": "^0.5.1",
-    "vue-focus": "^2.1.0",
-    "vue-infinite-scroll": "^2.0.2",
+    "vue": "^2.6.8",
     "vue-moment": "^4.0.0",
     "vue-router": "^3.0.1",
     "vue-virtual-scroll-list": "^1.2.7",
-    "vue-virtual-scroller": "^1.0.0-rc.2",
     "vuex": "^3.0.1",
-    "vuex-router-sync": "^5.0.0",
-    "weirb-client": "^0.1.1"
+    "vuex-router-sync": "^5.0.0"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",
@@ -96,9 +90,8 @@
     "uglifyjs-webpack-plugin": "^1.1.1",
     "url-loader": "^0.5.8",
     "vue-loader": "^13.3.0",
-    "vue-recyclist": "^1.0.8",
     "vue-style-loader": "^3.1.2",
-    "vue-template-compiler": "^2.5.2",
+    "vue-template-compiler": "^2.6.8",
     "webpack": "^3.6.0",
     "webpack-bundle-analyzer": "^2.9.0",
     "webpack-dev-server": "^2.9.1",

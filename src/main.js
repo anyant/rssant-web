@@ -11,7 +11,6 @@ import { Message, Table, TableColumn, Loading } from 'element-ui'
 import moment from 'moment'
 import 'moment/locale/zh-cn'
 import VueMoment from 'vue-moment'
-import { focus } from 'vue-focus'
 import VirtualScrollList from 'vue-virtual-scroll-list'
 
 import router from './router'
@@ -32,8 +31,7 @@ Vue.use(MuseUI)
 // muse-ui 的 Table 组件有性能问题，改用 element-ui
 Vue.component(Table.name, Table)
 Vue.component(TableColumn.name, TableColumn)
-
-Vue.directive('focus', focus)
+// 无限滚动列表
 Vue.component('virtual-scroll-list', VirtualScrollList)
 
 Vue.use(VueMoment, {
