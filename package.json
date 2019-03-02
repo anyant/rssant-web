@@ -13,6 +13,7 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "bulma": "^0.7.4",
     "clusterize.js": "^0.18.1",
     "element-ui": "^2.4.3",
     "font-awesome": "^4.7.0",
@@ -29,6 +30,7 @@
     "vue-moment": "^4.0.0",
     "vue-router": "^3.0.1",
     "vue-virtual-scroll-list": "^1.2.7",
+    "vue-virtual-scroller": "^1.0.0-rc.2",
     "vuex": "^3.0.1",
     "vuex-router-sync": "^5.0.0",
     "weirb-client": "^0.1.1"

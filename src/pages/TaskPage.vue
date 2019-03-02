@@ -1,7 +1,7 @@
 <template>
   <Layout>
     <Header>
-      <template slot="left">
+      <template v-slot:left>
         <GoBack></GoBack>
         <HeaderTitle>{{currentTaskName}}</HeaderTitle>
       </template>

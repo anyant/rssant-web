@@ -1,36 +1,42 @@
 <template>
   <Layout>
     <Header>
-      <template slot="left">
-        <GoBack></GoBack>
-        <HeaderTitle :font-size="22">{{ feedTitle }}</HeaderTitle>
+      <template v-slot:left>
+        <NavTitle :font-size="22">{{ feed.title }}</NavTitle>
       </template>
+      <AddFeedButton></AddFeedButton>
     </Header>
-    <FeedDetail></FeedDetail>
+    <FeedDetail :feed="feed"></FeedDetail>
   </Layout>
 </template>
 
 <script>
+import * as lodash from 'lodash-es'
+
 import Layout from '@/layouts/Layout'
 import Header from '@/components/Header'
-import GoBack from '@/components/GoBack'
+import NavTitle from '@/components/NavTitle'
 import FeedDetail from '@/components/FeedDetail'
-import HeaderTitle from '@/components/HeaderTitle'
+import AddFeedButton from '@/components/AddFeedButton'
 
 export default {
-  components: { Layout, Header, GoBack, FeedDetail, HeaderTitle },
-
-  async created() {
-    this.$store.dispatch('setCurrentFeed', this.feedId)
-    this.$store.dispatch('fetchStoryList', this.feedId)
+  components: { Layout, Header, NavTitle, FeedDetail, AddFeedButton },
+  created() {
+    this.$StoreAPI.feed.loadFeed({ feedId: this.feedId })
   },
-
   computed: {
     feedId() {
       return this.$route.params.feedId
     },
-    feedTitle() {
-      return this.$store.getters.currentFeedTitle
+    feed() {
+      let feed = this.$StoreAPI.feed.getFeed({ feedId: this.feedId })
+      if (lodash.isNil(feed)) {
+        feed = { id: this.feedId }
+      }
+      if (lodash.isEmpty(feed.title)) {
+        feed.title = 'Feed#' + this.feedId
+      }
+      return feed
     }
   }
 }

@@ -1,20 +1,22 @@
 <template>
-  <mu-button v-if="isLogin" flat mini class="add-feed" @click="openDialog">
+  <mu-button v-if="isLogined" flat mini class="add-feed" @click="openDialog">
     <mu-icon value="add"></mu-icon>
     <span>订阅</span>
   </mu-button>
 </template>
 
 <script>
+import { API as DialogAPI } from '@/components/AddFeedDialog'
+
 export default {
   computed: {
-    isLogin() {
-      return this.$store.getters.isLogin
+    isLogined() {
+      return this.$StoreAPI.user.isLogined()
     }
   },
   methods: {
     openDialog() {
-      this.$store.commit('openAddFeedDialog')
+      DialogAPI.open()
     }
   }
 }

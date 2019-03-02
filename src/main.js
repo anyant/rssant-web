@@ -12,19 +12,17 @@ import moment from 'moment'
 import 'moment/locale/zh-cn'
 import VueMoment from 'vue-moment'
 import { focus } from 'vue-focus'
-import InfiniteScroll from 'vue-infinite-scroll'
 import VirtualScrollList from 'vue-virtual-scroll-list'
-import VueRecycList from 'vue-recyclist'
-import ClusterizeList from 'vue-clusterize'
 
 import router from './router'
-import store from './store'
-import api from './plugin/api'
+import { STORE, StoreAPI } from './store'
+import API from './plugin/api'
 
 Vue.config.productionTip = false
 
-sync(store, router)
-Vue.prototype.$api = api
+sync(STORE, router)
+Vue.prototype.$API = API
+Vue.prototype.$StoreAPI = StoreAPI
 Vue.prototype.$notify = Notification
 Vue.prototype.$message = Message
 Vue.prototype.$loading = Loading.service
@@ -36,10 +34,7 @@ Vue.component(Table.name, Table)
 Vue.component(TableColumn.name, TableColumn)
 
 Vue.directive('focus', focus)
-Vue.use(InfiniteScroll)
 Vue.component('virtual-scroll-list', VirtualScrollList)
-Vue.component('vue-recyclist', VueRecycList)
-Vue.component('clusterize-list', ClusterizeList)
 
 Vue.use(VueMoment, {
   moment
@@ -47,7 +42,6 @@ Vue.use(VueMoment, {
 
 window.app = new Vue({
   el: '#app',
-  store,
   router,
   render: h => h(App)
 })

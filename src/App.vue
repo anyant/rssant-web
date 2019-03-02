@@ -2,19 +2,20 @@
   <div id="app">
     <div id="timeit"></div>
     <router-view/>
-    <div v-loading.fullscreen.lock="loginLoading"></div>
+    <AddFeedDialog></AddFeedDialog>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import AddFeedDialog from '@/components/AddFeedDialog'
 
 export default {
-  async created() {
-    this.$store.dispatch('autoLogin')
+  data() {
+    return {}
   },
-  computed: {
-    ...mapGetters(['loginLoading'])
+  components: { AddFeedDialog },
+  async created() {
+    this.$StoreAPI.user.autoLogin()
   }
 }
 </script>
@@ -24,5 +25,6 @@ export default {
   position: fixed;
   top: 0;
   left: 4px;
+  // z-index: 0;
 }
 </style>

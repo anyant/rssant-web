@@ -1,23 +1,10 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+/*
+命名：字段属性保持Python下划线不变，方法名使用小驼峰
+STORE: 维护状态稳定性和一致性
+StoreAPI: 提供对外接口
+*/
 
-import user from './modules/user'
-import rss from './modules/rss'
-import task from './modules/task'
+import STORE from './state'
+import StoreAPI from './api'
 
-Vue.use(Vuex)
-
-const store = new Vuex.Store({
-  modules: {
-    user,
-    rss,
-    task
-  },
-  getters: {
-    route(state) {
-      return state.route
-    }
-  }
-})
-
-export default store
+export { STORE, StoreAPI }

@@ -4,14 +4,10 @@
       <mu-menu placement="bottom" class="menu" open-on-hover>
         <mu-button flat class="avatar">
           <mu-avatar size="36">
-            <img :src="currentUser.avatar_url">
+            <img :src="avatar">
           </mu-avatar>
         </mu-button>
         <mu-list slot="content" class="menu-item">
-          <router-link to="/task">
-            <mu-list-item button>后台任务</mu-list-item>
-          </router-link>
-          <mu-divider></mu-divider>
           <mu-list-item button @click="logout()">退出登录</mu-list-item>
         </mu-list>
       </mu-menu>
@@ -24,14 +20,29 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import * as lodash from 'lodash-es'
+import logo from '@/assets/logo.png'
 
 export default {
   computed: {
-    ...mapGetters(['isLogin', 'currentUser'])
+    isLogin() {
+      return this.$StoreAPI.user.isLogined()
+    },
+    currentUser() {
+      return this.$StoreAPI.user.getLoginUser()
+    },
+    avatar() {
+      let user = this.$StoreAPI.user.getLoginUser()
+      if (lodash.isNil(user) || lodash.isEmpty(user.avatar_url)) {
+        return logo
+      } else {
+        return user.avatar_url
+      }
+    }
   },
   methods: {
-    ...mapActions(['login', 'logout'])
+    login() {},
+    logout() {}
   }
 }
 </script>
@@ -49,6 +60,9 @@ export default {
     padding-bottom: 6px;
     height: 48px;
     line-height: 48px;
+  }
+  .avatar img {
+    background: #fafafa;
   }
 
   .menu-item {

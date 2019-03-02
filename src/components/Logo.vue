@@ -1,5 +1,5 @@
 <template>
-  <div class="logo" @click="handleLogoClick">
+  <div class="logo" @click="onLogoClick">
     <span class="logo-rss">RSS</span>
     <span class="logo-ant">Ant</span>
   </div>
@@ -11,7 +11,7 @@ export default {
     return { debug: 0 }
   },
   methods: {
-    handleLogoClick() {
+    onLogoClick() {
       this.$router.replace('/')
       // 连续点击Logo 10次，切换debug模式
       this.debug += 1
@@ -30,8 +30,7 @@ export default {
   }
 }
 </script>
-
-<style scoped>
+<style lang="less" scoped>
 .logo {
   width: 28 * 6 px;
   min-width: 28 * 6 px;
@@ -42,6 +41,7 @@ export default {
   line-height: 48px;
   padding-left: 8px;
   padding-right: 8px;
+  z-index: 100;
 }
 
 .logo-rss,

@@ -1,43 +1,60 @@
 <template>
-  <mu-dialog :open="isOpen" title="添加新订阅" @close="close" width="500">
-    <mu-text-field ref="feedUrl" v-model="feedUrl" label="请填入你想要订阅的供稿地址" label-float fullWidth :errorText="errorText" @focus="handleInputFocus" @keyup.enter.native="handleSave" />
-    <input name='import-feeds' type="file">
-    <button type="button" @click="handleImportFeeds">批量导入</button>
-    <mu-button flat slot="actions" color="primary" @click="handleSave" :disabled="saveDisabled">确定</mu-button>
-    <mu-button flat slot="actions" @click="close">取消</mu-button>
+  <mu-dialog v-if="isOpen" :open="isOpen" @close="onClose" width="500">
+    <template v-slot:title>添加新订阅</template>
+    <mu-text-field
+      ref="feedUrl"
+      v-model="feedUrl"
+      label="请填入你想要订阅的供稿地址"
+      label-float
+      full-width
+      :error-text="errorText"
+      @focus="onFocus"
+      @keyup.enter.native="onSave"
+    />
+    <mu-button flat slot="actions" color="primary" @click="onSave" :disabled="isSaveDisabled">确定</mu-button>
+    <mu-button flat slot="actions" @click="onClose">取消</mu-button>
   </mu-dialog>
 </template>
 
 <script>
+/**
+ * API:
+ *    close()
+ *    open()
+ */
+import Vue from 'vue'
+
+const signal = new Vue()
+
+export const API = {
+  open() {
+    signal.$emit('open')
+  },
+  close() {
+    signal.$emit('close')
+  }
+}
+
 export default {
   data() {
     return {
+      signal: signal,
+      isOpen: false,
       feedUrl: null,
       errorText: null
     }
   },
   computed: {
-    saveDisabled() {
+    isSaveDisabled() {
       return !this.feedUrl
-    },
-    isOpen() {
-      return this.$store.state.rss.isAddFeedDialogOpen
     }
   },
-  watch: {
-    isOpen: function(val) {
-      if (val) {
-        setTimeout(() => {
-          this.focus()
-        }, 300)
-      }
-    }
+  created() {
+    this.signal.$on('close', this.onClose)
+    this.signal.$on('open', this.onOpen)
   },
   methods: {
-    close() {
-      this.$store.commit('closeAddFeedDialog')
-    },
-    focus() {
+    focusInput() {
       // https://github.com/museui/muse-ui/issues/219
       this.$nextTick(() => {
         if (this.$refs.feedUrl) {
@@ -46,50 +63,34 @@ export default {
         }
       })
     },
-    async handleSave() {
-      if (this.saveDisabled) {
+    onOpen() {
+      this.isOpen = true
+      setTimeout(() => {
+        this.onFocus()
+      }, 300)
+    },
+    onClose() {
+      this.isOpen = false
+    },
+    async onSave() {
+      if (this.isSaveDisabled) {
         return
       }
       try {
-        await this.$store.dispatch('createFeed', { url: this.feedUrl })
-        this.close()
+        await this.$StoreAPI.feed.createFeed({ url: this.feedUrl })
+        this.onClose()
         this.feedUrl = null
-      } catch (e) {
-        this.errorText = e.message
+      } catch (error) {
+        this.errorText = error.message
       }
     },
-    handleInputFocus() {
+    onFocus() {
       this.errorText = null
-    },
-    handleImportFeeds() {
-      let data = new FormData()
-      let input = document.getElementsByName('import-feeds')[0]
-      if (input.files.length <= 0) {
-        return
-      }
-      data.append('file', input.files[0])
-      let config = {
-        onUploadProgress: function(progressEvent) {
-          let percentCompleted = Math.round(progressEvent.loaded * 100 / progressEvent.total)
-          console.log(percentCompleted)
-        }
-      }
-      this.$api
-        .post('/rss/import_feeds', data, config)
-        .then(res => {
-          console.log(res)
-          this.close()
-          for (let feed of res.data) {
-            this.commit('AddFeed', feed)
-          }
-        })
-        .catch(err => {
-          this.errorText = err.message
-        })
+      this.focusInput()
     }
   }
 }
 </script>
 
-<style>
+<style lang="less" scoped>
 </style>

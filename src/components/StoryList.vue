@@ -1,43 +1,78 @@
 <template>
-  <div v-infinite-scroll="loadMore" :infinite-scroll-disabled="loading" :infinite-scroll-distance="600" class="story-list">
-    <div class="story" :key="story.id" v-for="story in storyList" @click="handleStoryClick(story)">
-      <span class="story-title">{{ story.title }}</span>
-      <span class="story-time">{{ story.dt_updated | moment("from") }}</span>
-    </div>
+  <div class="story-list" v-loading="isLoading">
+    <virtual-scroll-list
+      ref="scroll-list"
+      class="story-list-content"
+      :tobottom="onLoadNext"
+      :size="size"
+      :remain="remain"
+    >
+      <div class="story" :key="story.id" v-for="story in storyList" @click="onStoryClick(story)">
+        <span class="story-title">{{ story.title }}</span>
+        <span class="story-time">{{ timeAgo(story.dt_updated) }}</span>
+      </div>
+    </virtual-scroll-list>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import * as lodash from 'lodash-es'
+import moment from 'moment'
 
 export default {
   data() {
     return {
-      refreshing: false,
-      loading: true
+      isLoading: true,
+      size: 54,
+      remain: 6
     }
-  },
-  async created() {
-    if (this.storyList.length <= 0) {
-      await this.$store.dispatch('fetchStoryList', this.feedId)
-    }
-    this.loading = false
   },
   computed: {
-    ...mapGetters(['storyList']),
+    isLogined() {
+      return this.$StoreAPI.user.isLogined()
+    },
+    storyList() {
+      return this.$StoreAPI.story.getStoryList({ feedId: this.feedId })
+    },
     feedId() {
       return this.$route.params.feedId
     }
   },
+  async mounted() {
+    if (this.storyList.length > 0) {
+      this.isLoading = false
+    }
+    this.remain = Math.floor(this.$el.clientHeight / this.size)
+    try {
+      // this.remain + 1 才能滚动到底触发 onLoadNext
+      await this.$StoreAPI.story.loadInitStoryList({ feedId: this.feedId, size: this.remain + 1 })
+    } finally {
+      this.isLoading = false
+    }
+    // fix scroll list not update
+    this.$refs['scroll-list'].forceRender()
+  },
   methods: {
-    handleStoryClick(story) {
+    timeAgo(date) {
+      if (lodash.isEmpty(date)) {
+        return ''
+      }
+      return moment(date).fromNow()
+    },
+    onStoryClick(story) {
       this.$router.push(`/story/${story.id}`)
     },
-    async loadMore() {
-      this.loading = true
-      let pageSize = await this.$store.dispatch('fetchMoreStoryList')
-      if (pageSize > 0) {
-        this.loading = false
+    async onLoadNext() {
+      if (!this.$StoreAPI.story.hasNext({ feedId: this.feedId })) {
+        return
+      }
+      this.isLoading = true
+      try {
+        this.$StoreAPI.story.loadNextStoryList({ feedId: this.feedId })
+      } finally {
+        setTimeout(() => {
+          this.isLoading = false
+        }, 200)
       }
     }
   }
@@ -46,8 +81,15 @@ export default {
 
 <style lang="less" scoped>
 .story-list {
-  margin-top: 20px;
-  margin-bottom: 32px;
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-width: 720px;
+  min-width: 600px;
+  margin: 20px auto;
+  overflow-y: auto;
 }
 
 .story {

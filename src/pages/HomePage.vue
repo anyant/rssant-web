@@ -1,15 +1,13 @@
 <template>
   <Layout>
     <Header>
-      <template slot="left">
+      <template v-slot:left>
         <Logo></Logo>
       </template>
-      <mu-button flat @click="loginByTest">测试账号登录</mu-button>
       <AddFeedButton></AddFeedButton>
     </Header>
-    <AddFeedDialog></AddFeedDialog>
-    <FeedList v-loading="!isFeedListReady"></FeedList>
-    <div class="not-login" v-if="(!isLogin) && (!loginLoading)">
+    <FeedList></FeedList>
+    <div class="not-login" v-if="!isLogined">
       <div>你还没有登录哦~</div>
     </div>
   </Layout>
@@ -17,11 +15,9 @@
 <script>
 import Layout from '@/layouts/Layout'
 import Header from '@/components/Header'
-import AddFeedDialog from '@/components/AddFeedDialog'
 import AddFeedButton from '@/components/AddFeedButton'
 import Logo from '@/components/Logo'
 import FeedList from '@/components/FeedList'
-import { mapGetters } from 'vuex'
 
 export default {
   components: {
@@ -29,31 +25,14 @@ export default {
     Header,
     Logo,
     AddFeedButton,
-    AddFeedDialog,
     FeedList
   },
   data() {
-    return {
-      isFeedListReady: false
-    }
+    return {}
   },
   computed: {
-    ...mapGetters(['isLogin', 'loginLoading', 'feedList'])
-  },
-  async created() {
-    if (this.feedList.length <= 0) {
-      try {
-        await this.$store.dispatch('fetchFeedList')
-      } finally {
-        this.isFeedListReady = true
-      }
-    } else {
-      this.isFeedListReady = true
-    }
-  },
-  methods: {
-    async loginByTest() {
-      location.assign(`/api/login/test?state=/`)
+    isLogined() {
+      return this.$StoreAPI.user.isLogined()
     }
   }
 }

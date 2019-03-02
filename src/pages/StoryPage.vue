@@ -2,12 +2,12 @@
   <div>
     <Layout>
       <Header>
-        <template slot="left">
-          <GoBack></GoBack>
-          <HeaderTitle>{{ storyTitle }}</HeaderTitle>
+        <template v-slot:left>
+          <NavTitle>{{ story.title }}</NavTitle>
         </template>
+        <AddFeedButton></AddFeedButton>
       </Header>
-      <Story></Story>
+      <Story :story="story" v-loading="isLoading"></Story>
     </Layout>
   </div>
 </template>
@@ -16,24 +16,37 @@
 import * as lodash from 'lodash-es'
 import Layout from '@/layouts/Layout'
 import Header from '@/components/Header'
-import GoBack from '@/components/GoBack'
+import NavTitle from '@/components/NavTitle'
 import Story from '@/components/Story'
-import HeaderTitle from '@/components/HeaderTitle'
+import AddFeedButton from '@/components/AddFeedButton'
 
 export default {
-  components: { Layout, Story, Header, GoBack, HeaderTitle },
+  components: { Layout, Story, Header, NavTitle, AddFeedButton },
+  data() {
+    return { isLoading: true }
+  },
   computed: {
     storyId() {
       return this.$route.params.storyId
     },
-    storyTitle() {
-      let story = this.$store.getters.currentStory
-      return lodash.isNil(story) ? this.storyId : story.title
+    story() {
+      let story = this.$StoreAPI.story.getStory({ storyId: this.storyId })
+      if (lodash.isNil(story)) {
+        story = { id: this.storyId }
+      }
+      if (lodash.isEmpty(story.title)) {
+        story.title = 'Story#' + this.storyId
+      }
+      return story
     }
   },
   async created() {
     window.scrollTo(0, 0)
-    await this.$store.dispatch('setCurrentStory', this.storyId)
+    try {
+      await this.$StoreAPI.story.loadStory({ storyId: this.storyId, detail: true })
+    } finally {
+      this.isLoading = false
+    }
   }
 }
 </script>

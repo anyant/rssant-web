@@ -1,18 +1,25 @@
 <template>
-  <div class="feed-list">
-    <virtual-scroll-list :tobottom="loadMore" :size="53" :remain="10">
-      <div :key="index" v-for="(feed, index) in feedList">
+  <div class="feed-list" v-loading="isLoading">
+    <virtual-scroll-list
+      ref="scroll-list"
+      class="feed-list-content"
+      :tobottom="onLoadNext"
+      :size="size"
+      :remain="remain"
+    >
+      <div :key="feed.id" v-for="feed in feedList">
         <mu-row class="feed">
           <mu-col class="feed-left">
-            <FeedStatus :status="feed.status"></FeedStatus>
-            <span class="feed-title" @click="handleFeedClick(feed.id)">
-              {{ feed.title || feed.url + ' #' + feed.id }}
-            </span>
+            <mu-badge :content="feed.status" :color="statusColor(feed)"></mu-badge>
+            <span
+              class="feed-title"
+              @click="onFeedClick(feed.id)"
+            >{{ feed.title || feed.url + ' #' + feed.id }}</span>
           </mu-col>
           <mu-col span="4" class="feed-right">
-            <mu-badge class="feed-num-unread" color="grey" :content="getNumUnread(feed)"></mu-badge>
-            <span class="feed-time">{{ feed.dt_updated | moment("from") }}</span>
-            <mu-button flat color="primary" @click="handleDelete(feed.id)">删除</mu-button>
+            <mu-badge class="feed-num-unread" color="grey" :content="numUnread(feed)"></mu-badge>
+            <span class="feed-time">{{ timeAgo(feed.dt_updated) }}</span>
+            <mu-button flat color="primary" @click="onFeedDelete(feed.id)">删除</mu-button>
           </mu-col>
         </mu-row>
         <div class="divider"></div>
@@ -22,50 +29,77 @@
 </template>
 
 <script>
-import { mapGetters, mapState, mapActions } from 'vuex'
-import FeedStatus from '@/components/FeedStatus'
+import * as lodash from 'lodash-es'
+import moment from 'moment'
 
 export default {
-  components: { FeedStatus },
   data() {
-    return {
-      loading: false
-    }
+    return { isLoading: true, size: 53, remain: 6 }
   },
   computed: {
-    ...mapGetters(['feedList']),
-    ...mapState({
-      isFeedListReady: state => state.rss.isFeedListReady
-    })
+    isLogined() {
+      return this.$StoreAPI.user.isLogined()
+    },
+    feedList() {
+      return this.$StoreAPI.feed.getFeedList()
+    }
+  },
+  async mounted() {
+    if (this.feedList.length > 0) {
+      this.isLoading = false
+    }
+    this.remain = Math.floor(this.$el.clientHeight / this.size)
+    try {
+      // this.remain + 1 才能滚动到底触发 onLoadNext
+      await this.$StoreAPI.feed.loadInitFeedList({ size: this.remain + 1 })
+    } finally {
+      this.isLoading = false
+    }
+    // fix scroll list not update
+    this.$refs['scroll-list'].forceRender()
   },
   methods: {
-    ...mapActions(['deleteFeed']),
-    getNumUnread(feed) {
-      return '0'
+    numUnread(feed) {
+      if (lodash.isNil(feed.num_unread_storys)) {
+        return '0'
+      } else {
+        return '' + feed.num_unread_storys
+      }
     },
-    async handleDelete(feedId) {
-      await this.deleteFeed(feedId)
-      this.$message('删除成功！')
+    statusColor(feed) {
+      let color = {
+        ready: 'success',
+        updating: 'primary',
+        error: 'error'
+      }[feed.status]
+      if (lodash.isNil(color)) {
+        color = 'grey'
+      }
+      return color
     },
-    handleFeedClick(feedId) {
-      this.$store.commit('setStoryList', [])
+    timeAgo(date) {
+      if (lodash.isEmpty(date)) {
+        return ''
+      }
+      return moment(date).fromNow()
+    },
+    async onFeedDelete(feedId) {
+      await this.$StoreAPI.feed.deleteFeed({ feedId: feedId })
+    },
+    async onFeedClick(feedId) {
       this.$router.push(`/feed/${feedId}`)
     },
-    async loadMore() {
-      console.log('loadMore')
-      if (!this.isFeedListReady) {
-        let unwatch = this.$watch('isFeedListReady', val => {
-          unwatch()
-          if (val) {
-            this.loadMore()
-          }
-        })
+    async onLoadNext() {
+      if (!this.$StoreAPI.feed.hasNext()) {
         return
       }
-      this.loading = true
-      let pageSize = await this.$store.dispatch('fetchMoreFeedList')
-      if (pageSize <= 0) {
-        this.loading = false
+      this.isLoading = true
+      try {
+        await this.$StoreAPI.feed.loadNextFeedList()
+      } finally {
+        setTimeout(() => {
+          this.isLoading = false
+        }, 200)
       }
     }
   }
@@ -74,8 +108,15 @@ export default {
 
 <style scoped>
 .feed-list {
-  margin-top: 20px;
-  margin-bottom: 20px;
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-width: 720px;
+  min-width: 600px;
+  margin: 20px auto;
+  overflow-y: auto;
 }
 
 .feed {

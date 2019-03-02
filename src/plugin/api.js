@@ -27,29 +27,30 @@ client.interceptors.response.use(
     if (window.app.debug) {
       let time = response.headers['x-time']
       if (!lodash.isNil(time)) {
-        Timeit.show(time, response.config.url)
+        Timeit.show(time, response.config.method, response.config.url)
       }
     }
     return Promise.resolve(response.data)
   },
   function (error) {
-    if (window.app.debug) {
-      let title = error.code
-      if (lodash.isNil(title)) {
-        if (lodash.isNil(error.response)) {
-          title = `Failed: ${error.config.method} ${error.config.url}`
-        } else {
-          title = `${error.response.status} ${error.response.statusText}`
+    let title = null
+    if (lodash.isNil(error.response)) {
+      title = `Failed: ${error.config.method} ${error.config.url}`
+    } else {
+      title = `${error.response.status} ${error.response.statusText}`
+    }
+    let message = error.message
+    if (!lodash.isNil(error.response)) {
+      if (!lodash.isNil(error.response.data)) {
+        if (!lodash.isEmpty(error.response.data.message)) {
+          message = error.response.data.message
         }
       }
-      let message = lodash.truncate(error.message, {
-        length: 50,
-        separator: /,? +/
-      })
-      Notification.error({
-        title: title,
-        message: message
-      })
+    }
+    message = lodash.truncate(message, { length: 50, separator: /,? +/ })
+    Object.assign(error, { title, message })
+    if (window.app.debug) {
+      Notification.error({ title, message })
     }
     return Promise.reject(error)
   }
@@ -71,8 +72,8 @@ const API = {
     get({ id, detail }) {
       return client.get(`/feed/${id}`, { params: { detail } })
     },
-    update({ id, url }) {
-      return client.put(`/feed/${id}`, { url })
+    update({ id, title }) {
+      return client.put(`/feed/${id}`, { title })
     },
     delete({ id }) {
       return client.delete(`/feed/${id}`)
@@ -84,6 +85,12 @@ const API = {
     },
     get({ id, detail, data }) {
       return client.get(`/story/${id}`, { params: { detail, data } })
+    },
+    setReaded({ id, is_readed }) {
+      return client.put(`/story/${id}/readed`, { params: { is_readed } })
+    },
+    setFavorited({ id, is_favorited }) {
+      return client.put(`/story/${id}/favorited`, { params: { is_favorited } })
     }
   }
 }

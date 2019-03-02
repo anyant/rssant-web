@@ -1,38 +1,46 @@
 <template>
   <Layout>
     <Header>
-      <template slot="left">
-        <GoBack></GoBack>
-        <HeaderTitle :font-size="22">{{ feedTitle }}</HeaderTitle>
+      <template v-slot:left>
+        <NavTitle :font-size="22">{{ feed.title }}</NavTitle>
       </template>
       <mu-button flat mini class="goto-feed-detail" @click="gotoFeedDatail">
         <mu-icon value="details"></mu-icon>
         <span>供稿详情</span>
       </mu-button>
+      <AddFeedButton></AddFeedButton>
     </Header>
     <StoryList></StoryList>
   </Layout>
 </template>
 
 <script>
+import * as lodash from 'lodash-es'
+
 import Layout from '@/layouts/Layout'
 import Header from '@/components/Header'
-import GoBack from '@/components/GoBack'
-import HeaderTitle from '@/components/HeaderTitle'
+import NavTitle from '@/components/NavTitle'
 import StoryList from '@/components/StoryList'
+import AddFeedButton from '@/components/AddFeedButton'
 
 export default {
-  components: { Layout, StoryList, Header, GoBack, HeaderTitle },
-
-  async created() {
-    this.$store.dispatch('setCurrentFeed', this.feedId)
+  components: { Layout, StoryList, Header, NavTitle, AddFeedButton },
+  created() {
+    this.$StoreAPI.feed.loadFeed({ feedId: this.feedId })
   },
   computed: {
     feedId() {
       return this.$route.params.feedId
     },
-    feedTitle() {
-      return this.$store.getters.currentFeedTitle
+    feed() {
+      let feed = this.$StoreAPI.feed.getFeed({ feedId: this.feedId })
+      if (lodash.isNil(feed)) {
+        feed = { id: this.feedId }
+      }
+      if (lodash.isEmpty(feed.title)) {
+        feed.title = 'Feed#' + this.feedId
+      }
+      return feed
     }
   },
   methods: {
