@@ -9,9 +9,6 @@ module.exports = {
             '/accounts': {
                 target: 'http://127.0.0.1:6788',
             },
-            '/admin': {
-                target: 'http://127.0.0.1:6788',
-            },
         }
     },
 }

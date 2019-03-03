@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import * as lodash from 'lodash-es'
+import lodash from 'lodash'
 
 import Layout from '@/components/Layout'
 import Header from '@/components/Header'

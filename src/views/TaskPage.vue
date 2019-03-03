@@ -16,7 +16,7 @@ import Header from '@/components/Header'
 import HeaderTitle from '@/components/HeaderTitle'
 import GoBack from '@/components/GoBack'
 import Task from '@/components/Task'
-import * as lodash from 'lodash-es'
+import lodash from 'lodash'
 import { mapGetters } from 'vuex'
 
 export default {

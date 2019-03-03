@@ -1,7 +1,7 @@
 import Notification from './notify'
 import Timeit from './timeit'
 
-import * as lodash from 'lodash-es'
+import lodash from 'lodash'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 

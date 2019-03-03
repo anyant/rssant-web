@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import * as lodash from 'lodash-es'
+import lodash from 'lodash'
 import moment from 'moment'
 import 'github-markdown-css'
 

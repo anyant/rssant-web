@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import * as lodash from 'lodash-es'
+import lodash from 'lodash'
 import moment from 'moment'
 
 export default {
@@ -52,6 +52,8 @@ export default {
     try {
       // this.remain + 1 才能滚动到底触发 onLoadNext
       await this.$StoreAPI.feed.loadInitFeedList({ size: this.remain + 1 })
+    } catch (error) {
+      this.$message.error(error.message)
     } finally {
       this.isLoading = false
     }

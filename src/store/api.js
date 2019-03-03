@@ -1,4 +1,4 @@
-import * as lodash from 'lodash-es'
+import lodash from 'lodash'
 
 import { API } from '@/plugin/api'
 import STORE from './state'

@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import * as lodash from 'lodash-es'
+import lodash from 'lodash'
 import logo from '@/assets/logo.png'
 
 export default {

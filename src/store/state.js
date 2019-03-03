@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import * as lodash from 'lodash-es'
+import lodash from 'lodash'
 
 import {
     USER_LOGIN,
