@@ -2,6 +2,7 @@ import HomePage from '@/views/HomePage'
 import FeedPage from '@/views/FeedPage'
 import StoryPage from '@/views/StoryPage'
 import FeedDetailPage from '@/views/FeedDetailPage'
+import NotFoundPage from '@/views/NotFoundPage'
 
 export default [
   {
@@ -24,4 +25,5 @@ export default [
     name: 'FeedDetail',
     component: FeedDetailPage
   },
+  { path: '*', component: NotFoundPage }
 ]
