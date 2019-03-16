@@ -4,7 +4,7 @@ STORE: 维护状态稳定性和一致性
 StoreAPI: 提供对外接口
 */
 
-import STORE from './state'
+import { STORE, STATE, DAO } from './dao'
 import StoreAPI from './api'
 
-export { STORE, StoreAPI }
+export { STORE, STATE, DAO, StoreAPI }

@@ -4,6 +4,7 @@ import Timeit from './timeit'
 import lodash from 'lodash'
 import axios from 'axios'
 import Cookies from 'js-cookie'
+import URI from 'urijs'
 
 const BASE_URL = '/api/v1'
 
@@ -58,9 +59,28 @@ client.interceptors.response.use(
 
 const API = {
   user: {
-    me() {
-      return client.get('/user/me')
-    }
+    login({ account, password } = {}) {
+      return client.post('/user/login/', { account, password })
+    },
+    register({ username, email, password }) {
+      username = lodash.defaultTo(username, email)
+      return client.post('/auth/registration/', { username, email, password1: password, password2: password })
+    },
+    logout({ next } = {}) {
+      return client.post(`/auth/logout/`).then(() => {
+        window.location.assign(lodash.defaultTo(next, '/'))
+      })
+    },
+    loginGithub({ next, scope } = {}) {
+      let url = URI(BASE_URL + '/accounts/github/login/')
+        .search({ next, scope, process: 'login' })
+      window.location.assign(url)
+    },
+    connectGithub({ next, scope } = {}) {
+      let url = URI(BASE_URL + '/accounts/github/login/')
+        .search({ next, scope, process: 'connect' })
+      window.location.assign(url)
+    },
   },
   feed: {
     list({ detail, cursor, size } = {}) {

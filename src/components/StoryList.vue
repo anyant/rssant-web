@@ -1,5 +1,5 @@
 <template>
-  <div class="story-list" v-loading="isLoading">
+  <div class="story-list" v-loading="isLoading" element-loading-background="rgba(0, 0, 0, 0)">
     <virtual-scroll-list
       ref="scroll-list"
       class="story-list-content"

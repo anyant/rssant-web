@@ -1,5 +1,5 @@
 <template>
-  <div class="feed-list" v-loading="isLoading">
+  <div class="feed-list" v-loading="isLoading" element-loading-background="rgba(0, 0, 0, 0)">
     <virtual-scroll-list
       ref="scroll-list"
       class="feed-list-content"
@@ -34,7 +34,7 @@ import moment from 'moment'
 
 export default {
   data() {
-    return { isLoading: true, size: 53, remain: 6 }
+    return { isLoading: false, size: 53, remain: 6 }
   },
   computed: {
     isLogined() {
@@ -45,22 +45,26 @@ export default {
     }
   },
   async mounted() {
-    if (this.feedList.length > 0) {
-      this.isLoading = false
-    }
-    this.remain = Math.floor(this.$el.clientHeight / this.size)
-    try {
-      // this.remain + 1 才能滚动到底触发 onLoadNext
-      await this.$StoreAPI.feed.loadInitFeedList({ size: this.remain + 1 })
-    } catch (error) {
-      this.$message.error(error.message)
-    } finally {
-      this.isLoading = false
-    }
-    // fix scroll list not update
-    this.$refs['scroll-list'].forceRender()
+    this.$StoreAPI.user.onLogin(this.onLogin.bind(this))
   },
   methods: {
+    async onLogin() {
+      if (this.feedList.length > 0) {
+        this.isLoading = false
+      }
+      this.remain = Math.floor(this.$el.clientHeight / this.size)
+      this.isLoading = true
+      try {
+        // this.remain + 1 才能滚动到底触发 onLoadNext
+        await this.$StoreAPI.feed.loadInitFeedList({ size: this.remain + 1 })
+      } catch (error) {
+        this.$message.error(error.message)
+      } finally {
+        this.isLoading = false
+      }
+      // fix scroll list not update
+      this.$refs['scroll-list'].forceRender()
+    },
     numUnread(feed) {
       if (lodash.isNil(feed.num_unread_storys)) {
         return '0'

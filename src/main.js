@@ -2,8 +2,10 @@ import Vue from 'vue'
 // muse-ui
 import MuseUI from 'muse-ui'
 import 'muse-ui/dist/muse-ui.css'
+import Loading from 'muse-ui-loading'
+import 'muse-ui-loading/dist/muse-ui-loading.css'
 // element-ui
-import { Message, Table, TableColumn, Loading } from 'element-ui'
+import { Message, Table, TableColumn } from 'element-ui'
 // moment
 import moment from 'moment'
 import 'moment/locale/zh-cn'
@@ -33,10 +35,9 @@ Vue.prototype.$StoreAPI = StoreAPI
 
 Vue.prototype.$notify = Notification
 Vue.prototype.$message = Message
-Vue.prototype.$loading = Loading.service
 
-Vue.use(Loading.directive)
 Vue.use(MuseUI)
+Vue.use(Loading)
 // muse-ui 的 Table 组件有性能问题，改用 element-ui
 Vue.component(Table.name, Table)
 Vue.component(TableColumn.name, TableColumn)
