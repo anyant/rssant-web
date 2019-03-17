@@ -1,5 +1,5 @@
 <template>
-  <div class="feed-list" v-loading="isLoading" element-loading-background="rgba(0, 0, 0, 0)">
+  <div class="feed-list" v-loading="isLoading" data-mu-loading-overlay-color="rgba(0, 0, 0, 0)">
     <virtual-scroll-list
       ref="scroll-list"
       class="feed-list-content"
