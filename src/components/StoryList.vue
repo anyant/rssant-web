@@ -54,10 +54,10 @@ export default {
     if (this.storyList.length > 0) {
       this.isLoading = false
     }
-    this.remain = Math.floor(this.$el.clientHeight / this.size)
+    this.remain = this.$el.clientHeight / this.size
     try {
       // this.remain + 1 才能滚动到底触发 onLoadNext
-      await this.$StoreAPI.story.loadInitStoryList({ feedId: this.feedId, size: this.remain + 1 })
+      await this.$StoreAPI.story.loadInitStoryList({ feedId: this.feedId, size: Math.floor(this.remain) + 1 })
     } finally {
       this.isLoading = false
     }

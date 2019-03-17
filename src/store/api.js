@@ -100,6 +100,10 @@ const StoreAPI = {
             })
             DAO.FEED_REMOVE({ id: feedId })
         },
+        async importOPML({ file }) {
+            let data = await API.feed.importOPML({ file })
+            DAO.FEED_ADD_LIST(data.feeds)
+        },
         async setFeedReaded({ feedId }) {
             await API.feed.setReaded({ id: feedId })
             DAO.FEED_SET_READED({ id: feedId })
@@ -125,7 +129,8 @@ const StoreAPI = {
         async loadInitStoryList({ feedId, size } = {}) {
             let result = await API.story.list({
                 feed_id: feedId,
-                size: size
+                size: size,
+                is_readed: false,
             })
             DAO.STORY_ADD_LIST(result.results)
             DAO.STORY_SET_NEXT_CURSOR({ feedId, cursor: result.next })

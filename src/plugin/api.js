@@ -98,13 +98,22 @@ const API = {
     delete({ id }) {
       return client.delete(`/feed/${id}`)
     },
+    importOPML({ file }) {
+      var formData = new FormData()
+      formData.append("file", file)
+      return client.post(`/feed/opml/`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+    },
     setReaded({ id }) {
       return client.put(`/feed/${id}/readed`)
     },
   },
   story: {
-    list({ feed_id, detail, data, cursor, size } = {}) {
-      return client.get('/story/', { params: { feed_id, detail, data, cursor, size } })
+    list({ feed_id, detail, data, cursor, size, is_readed } = {}) {
+      return client.get('/story/', { params: { feed_id, detail, data, cursor, size, is_readed } })
     },
     get({ id, detail, data }) {
       return client.get(`/story/${id}`, { params: { detail, data } })

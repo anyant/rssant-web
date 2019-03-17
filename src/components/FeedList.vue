@@ -59,7 +59,7 @@ export default {
   data() {
     return {
       isLoading: false,
-      size: 53,
+      size: 57,
       remain: 6,
       isMenuOpen: false,
       menuOpenIndex: null
@@ -89,11 +89,11 @@ export default {
       if (this.feedList.length > 0) {
         this.isLoading = false
       }
-      this.remain = Math.floor(this.$el.clientHeight / this.size)
+      this.remain = this.$el.clientHeight / this.size
       this.isLoading = true
       try {
         // this.remain + 1 才能滚动到底触发 onLoadNext
-        await this.$StoreAPI.feed.loadInitFeedList({ size: this.remain + 1 })
+        await this.$StoreAPI.feed.loadInitFeedList({ size: Math.floor(this.remain) + 1 })
       } catch (error) {
         this.$message.error(error.message)
       } finally {
@@ -141,6 +141,9 @@ export default {
       if (!this.$StoreAPI.feed.hasNext()) {
         return
       }
+      if (this.isLoading) {
+        return
+      }
       this.isLoading = true
       try {
         await this.$StoreAPI.feed.loadNextFeedList()
@@ -171,8 +174,8 @@ export default {
   box-sizing: border-box;
   margin-left: 16px;
   margin-right: 16px;
-  padding-top: 8px;
-  padding-bottom: 8px;
+  padding-top: 4px;
+  padding-bottom: 4px;
   border-bottom: 1px solid rgba(9, 9, 9, 0.1);
 }
 

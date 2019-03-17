@@ -11,8 +11,35 @@
       @focus="onFocus"
       @keyup.enter.native="onSave"
     />
-    <mu-button flat slot="actions" color="primary" @click="onSave" :disabled="isSaveDisabled">确定</mu-button>
-    <mu-button flat slot="actions" @click="onClose">取消</mu-button>
+    <mu-button class="button-save" color="primary" @click="onSave" :disabled="isSaveDisabled">确定</mu-button>
+    <div class="import-wrapper">
+      <label for="import-feed-file" class="import-feed-label">从文件导入:</label>
+      <form style="display: none;" ref="importFeedForm">
+        <input
+          type="file"
+          name="import-feed-file"
+          ref="importFeedFile"
+          style="display: none;"
+          @change="onImportFileChange"
+        >
+      </form>
+      <mu-button
+        class="button-import"
+        color="success"
+        flat
+        @click="onImportClick('OPML')"
+        v-loading="importOPMLLoading"
+        data-mu-loading-size="24"
+      >XML/OPML</mu-button>
+      <mu-button
+        class="button-import"
+        color="success"
+        flat
+        @click="onImportClick('Bookmark')"
+        v-loading="importBookmarkLoading"
+        data-mu-loading-size="24"
+      >浏览器书签</mu-button>
+    </div>
   </mu-dialog>
 </template>
 
@@ -23,6 +50,7 @@
  *    open()
  */
 import Vue from 'vue'
+import lodash from 'lodash'
 
 const signal = new Vue()
 
@@ -41,7 +69,11 @@ export default {
       signal: signal,
       isOpen: false,
       feedUrl: null,
-      errorText: null
+      errorText: null,
+      importFile: null,
+      importFileTarget: null,
+      importOPMLLoading: false,
+      importBookmarkLoading: false
     }
   },
   computed: {
@@ -87,10 +119,77 @@ export default {
     onFocus() {
       this.errorText = null
       this.focusInput()
+    },
+    onImportClick(target) {
+      let el = this.$refs.importFeedFile
+      if (!lodash.isNil(el)) {
+        this.importFileTarget = target
+        el.click()
+      } else {
+        this.importFileTarget = null
+      }
+    },
+    onImportFileChange() {
+      let el = this.$refs.importFeedFile
+      if (lodash.isNil(el) || el.files.length <= 0) {
+        return
+      }
+      let file = el.files[0]
+      try {
+        if (this.importFileTarget === 'OPML') {
+          this.onImportOPML(file)
+        } else if (this.importFileTarget === 'Bookmark') {
+          this.onImportBookmark(file)
+        } else {
+          this.importFileTarget = null
+        }
+      } finally {
+        let form = this.$refs.importFeedForm
+        form.reset()
+      }
+    },
+    onImportOPML(file) {
+      this.importOPMLLoading = true
+      this.$StoreAPI.feed
+        .importOPML({ file })
+        .then(() => {
+          this.$message.success('导入XML/OPML文件成功')
+          this.onClose()
+        })
+        .catch(error => {
+          this.$message.error({
+            message: '导入XML/OPML文件失败: ' + error.message,
+            duration: 10000
+          })
+        })
+        .finally(() => {
+          this.importOPMLLoading = false
+        })
+    },
+    onImportBookmark(file) {
+      this.$message.error('暂不支持从书签导入')
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
+.button-save.disabled {
+  background-color: lighten(#2196f3, 20%);
+  color: #f3f3f3;
+}
+.import-wrapper {
+  margin-top: 42px;
+  margin-bottom: 8px;
+}
+.import-feed-label {
+  display: inline-block;
+  font-size: 14px;
+  color: #9b9b9b;
+  vertical-align: middle;
+}
+.button-import {
+  margin-left: 16px;
+  border: solid 1px #e6e6e6;
+}
 </style>
