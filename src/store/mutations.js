@@ -51,6 +51,19 @@ const FEED = {
     FEED_REMOVE(state, { id }) {
         Vue.delete(state.feed.feeds, id)
     },
+    FEED_SET_READED(state, { id }) {
+        state.feed.feeds[id].num_unread_storys = 0
+        let storyIds = state.story.feedStoryMap[id]
+        if (lodash.isNil(storyIds)) {
+            return
+        }
+        lodash.keys(storyIds).forEach(storyId => {
+            let story = state.story.storys[storyId]
+            if (!lodash.isNil(story)) {
+                story.is_readed = true
+            }
+        })
+    },
 }
 
 const STORY = {
@@ -76,6 +89,14 @@ const STORY = {
     },
     STORY_SET_READED(state, { id, is_readed }) {
         state.story.storys[id].is_readed = is_readed;
+    },
+    STORY_SET_ALL_READED(state) {
+        lodash.values(state.feed.feeds).forEach(feed => {
+            feed.num_unread_storys = 0
+        })
+        lodash.values(state.story.storys).forEach(story => {
+            story.is_readed = true
+        })
     },
     STORY_SET_FAVORITED(state, { id, is_favorited }) {
         state.story.storys[id].is_favorited = is_favorited;

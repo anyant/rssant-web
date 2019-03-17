@@ -100,6 +100,10 @@ const StoreAPI = {
             })
             DAO.FEED_REMOVE({ id: feedId })
         },
+        async setFeedReaded({ feedId }) {
+            await API.feed.setReaded({ id: feedId })
+            DAO.FEED_SET_READED({ id: feedId })
+        },
         isLoading() {
             return STATE.feed.isLoading
         },
@@ -142,6 +146,10 @@ const StoreAPI = {
         async setStoryReaded({ storyId, is_readed }) {
             await API.story.setReaded({ id: storyId, is_readed: is_readed })
             DAO.STORY_SET_READED({ id: storyId, is_readed })
+        },
+        async setStoryAllReaded() {
+            await API.story.setAllReaded()
+            DAO.STORY_SET_ALL_READED()
         },
         async setStoryFavorited({ storyId, is_favorited }) {
             await API.story.setFavorited({ id: storyId, is_favorited: is_favorited })

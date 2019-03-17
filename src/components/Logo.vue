@@ -10,6 +10,9 @@ export default {
   data() {
     return { debug: 0 }
   },
+  mounted() {
+    this.onDebug()
+  },
   methods: {
     onLogoClick() {
       this.$router.replace('/')
@@ -20,11 +23,36 @@ export default {
         let debug = !(localStorage.getItem('debug') === '1')
         localStorage.setItem('debug', debug ? '1' : '0')
         window.app.debug = debug
+        this.onDebug()
         this.$message.success(`RSSAnt debug mode: ${debug ? 'ON' : 'OFF'}`)
       } else if (this.debug === 1) {
         setTimeout(() => {
           this.debug = 0
         }, 3000)
+      }
+    },
+    onDebug() {
+      let debug = localStorage.getItem('debug') === '1'
+      if (debug) {
+        const styles = `
+          * {
+            outline: 1px solid pink !important;
+          }
+        `
+        var css = document.createElement('style')
+        css.id = 'rssant-debug-style'
+        css.type = 'text/css'
+        if (css.styleSheet) {
+          css.styleSheet.cssText = styles
+        } else {
+          css.appendChild(document.createTextNode(styles))
+        }
+        document.getElementsByTagName('head')[0].appendChild(css)
+      } else {
+        var css = document.querySelector('#rssant-debug-style')
+        if (css) {
+          css.parentNode.removeChild(css)
+        }
       }
     }
   }

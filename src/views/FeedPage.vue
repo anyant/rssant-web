@@ -2,15 +2,15 @@
   <Layout>
     <Header>
       <template v-slot:left>
-        <NavTitle :font-size="22">{{ feed.title }}</NavTitle>
+        <NavTitle>{{ feed.title }}</NavTitle>
       </template>
       <mu-button flat mini class="goto-feed-detail" @click="gotoFeedDatail">
         <mu-icon value="details"></mu-icon>
-        <span>供稿详情</span>
+        <span>详情</span>
       </mu-button>
       <mu-button flat mini class="set-feed-readed" @click="setFeedReaded">
         <mu-icon value="done_all"></mu-icon>
-        <span>全标已读</span>
+        <span>已读</span>
       </mu-button>
       <AddFeedButton></AddFeedButton>
     </Header>
@@ -51,8 +51,8 @@ export default {
     gotoFeedDatail() {
       this.$router.push(`/feed/${this.feedId}/detail`)
     },
-    setFeedReaded(){
-
+    async setFeedReaded() {
+      await this.$StoreAPI.feed.setFeedReaded({ feedId: this.feedId })
     }
   }
 }
@@ -65,5 +65,4 @@ export default {
     font-weight: 700;
   }
 }
-
 </style>

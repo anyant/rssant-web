@@ -37,7 +37,6 @@ export default {
 .left,
 .actions {
   height: 48px;
-  line-height: 48px;
   vertical-align: middle;
 }
 

@@ -45,6 +45,7 @@ export default {
 .title {
   margin-left: 8px;
   margin-right: 8px;
+  line-height: 48px;
   display: inline-block;
   max-width: 400px;
   white-space: nowrap;

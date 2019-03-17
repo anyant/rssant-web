@@ -35,7 +35,7 @@
               </mu-button>
               <mu-list slot="content" class="menu-items">
                 <mu-list-item button @click="onFeedReaded(feed.id)">
-                  <mu-list-item-title>全标已读</mu-list-item-title>
+                  <mu-list-item-title>已读</mu-list-item-title>
                 </mu-list-item>
                 <mu-list-item button @click="onFeedDelete(feed.id)">
                   <mu-list-item-title class="menu-delete-feed">删除</mu-list-item-title>
@@ -127,6 +127,7 @@ export default {
       return moment(date).fromNow()
     },
     async onFeedReaded(feedId) {
+      await this.$StoreAPI.feed.setFeedReaded({ feedId: feedId })
       this.onMenuClose()
     },
     async onFeedDelete(feedId) {
@@ -177,6 +178,7 @@ export default {
 
 .feed-left,
 .feed-right {
+  height: 48px;
   display: flex;
   align-items: center;
 }

@@ -97,7 +97,10 @@ const API = {
     },
     delete({ id }) {
       return client.delete(`/feed/${id}`)
-    }
+    },
+    setReaded({ id }) {
+      return client.put(`/feed/${id}/readed`)
+    },
   },
   story: {
     list({ feed_id, detail, data, cursor, size } = {}) {
@@ -108,6 +111,9 @@ const API = {
     },
     setReaded({ id, is_readed }) {
       return client.put(`/story/${id}/readed`, { is_readed })
+    },
+    setAllReaded() {
+      return client.put(`/story/all/readed`)
     },
     setFavorited({ id, is_favorited }) {
       return client.put(`/story/${id}/favorited`, { is_favorited })

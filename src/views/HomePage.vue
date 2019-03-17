@@ -4,6 +4,10 @@
       <template v-slot:left>
         <Logo></Logo>
       </template>
+      <mu-button v-if="isLogined" flat mini class="set-all-readed" @click="setAllReaded">
+        <mu-icon value="done_all"></mu-icon>
+        <span>已读</span>
+      </mu-button>
       <AddFeedButton></AddFeedButton>
     </Header>
     <FeedList></FeedList>
@@ -34,6 +38,11 @@ export default {
     isLogined() {
       return this.$StoreAPI.user.isLogined()
     }
+  },
+  methods: {
+    setAllReaded() {
+      this.$StoreAPI.story.setStoryAllReaded()
+    }
   }
 }
 </script>
@@ -43,6 +52,11 @@ export default {
   text-align: center;
   margin-top: 60px;
   font-size: 24px;
+}
+.set-all-readed {
+  span {
+    font-weight: 700;
+  }
 }
 </style>
 
