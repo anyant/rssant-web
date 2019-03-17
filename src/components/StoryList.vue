@@ -7,9 +7,21 @@
       :size="size"
       :remain="remain"
     >
-      <div class="story" :key="story.id" v-for="story in storyList" @click="onStoryClick(story)">
+      <div
+        class="story"
+        :key="story.id"
+        v-for="story in storyList"
+        :style="{opacity: story.is_readed ? 0.5: 1.0}"
+        @click="onStoryClick(story)"
+      >
         <span class="story-title">{{ story.title }}</span>
         <span class="story-time">{{ timeAgo(story.dt_updated) }}</span>
+        <mu-button class="story-favorite" icon @click.stop="toggleFavorite(story)">
+          <mu-icon
+            :value="story.is_favorited?'star':'star_border'"
+            :color="story.is_favorited?'#F39C12':'#999'"
+          ></mu-icon>
+        </mu-button>
       </div>
     </virtual-scroll-list>
   </div>
@@ -62,6 +74,20 @@ export default {
     onStoryClick(story) {
       this.$router.push(`/story/${story.id}`)
     },
+    toggleFavorite(story) {
+      let is_favorited = story.is_favorited
+      // toggle
+      story.is_favorited = !is_favorited
+      this.$StoreAPI.story
+        .setStoryFavorited({
+          storyId: story.id,
+          is_favorited: !is_favorited
+        })
+        .catch(() => {
+          // rollback
+          story.is_favorited = is_favorited
+        })
+    },
     async onLoadNext() {
       if (!this.$StoreAPI.story.hasNext({ feedId: this.feedId })) {
         return
@@ -95,7 +121,7 @@ export default {
 .story {
   display: flex;
   align-items: center;
-  padding: 16px 16px;
+  padding: 4px 4px;
   margin: 0 16px;
   border-bottom: 1px solid rgba(9, 9, 9, 0.1);
   cursor: pointer;
@@ -117,5 +143,9 @@ export default {
 .story-time {
   display: inline-block;
   color: gray;
+}
+
+.story-favorite {
+  margin-left: 8px;
 }
 </style>

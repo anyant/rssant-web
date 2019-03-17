@@ -107,10 +107,10 @@ const API = {
       return client.get(`/story/${id}`, { params: { detail, data } })
     },
     setReaded({ id, is_readed }) {
-      return client.put(`/story/${id}/readed`, { params: { is_readed } })
+      return client.put(`/story/${id}/readed`, { is_readed })
     },
     setFavorited({ id, is_favorited }) {
-      return client.put(`/story/${id}/favorited`, { params: { is_favorited } })
+      return client.put(`/story/${id}/favorited`, { is_favorited })
     }
   }
 }

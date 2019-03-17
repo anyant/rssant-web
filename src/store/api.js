@@ -141,11 +141,11 @@ const StoreAPI = {
         },
         async setStoryReaded({ storyId, is_readed }) {
             await API.story.setReaded({ id: storyId, is_readed: is_readed })
-            DAO.STORY_SET_READED({ is_readed })
+            DAO.STORY_SET_READED({ id: storyId, is_readed })
         },
         async setStoryFavorited({ storyId, is_favorited }) {
             await API.story.setFavorited({ id: storyId, is_favorited: is_favorited })
-            DAO.STORY_SET_FAVORITED({ is_favorited })
+            DAO.STORY_SET_FAVORITED({ id: storyId, is_favorited })
         },
         getStoryList({ feedId }) {
             let storyIds = STATE.story.feedStoryMap[feedId]

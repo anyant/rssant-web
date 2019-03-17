@@ -8,6 +8,10 @@
         <mu-icon value="details"></mu-icon>
         <span>供稿详情</span>
       </mu-button>
+      <mu-button flat mini class="set-feed-readed" @click="setFeedReaded">
+        <mu-icon value="done_all"></mu-icon>
+        <span>全标已读</span>
+      </mu-button>
       <AddFeedButton></AddFeedButton>
     </Header>
     <StoryList></StoryList>
@@ -46,15 +50,20 @@ export default {
   methods: {
     gotoFeedDatail() {
       this.$router.push(`/feed/${this.feedId}/detail`)
+    },
+    setFeedReaded(){
+
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
+.set-feed-readed,
 .goto-feed-detail {
   span {
     font-weight: 700;
   }
 }
+
 </style>

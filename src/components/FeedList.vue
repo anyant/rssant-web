@@ -7,7 +7,7 @@
       :size="size"
       :remain="remain"
     >
-      <div :key="feed.id" v-for="feed in feedList">
+      <div :key="feed.id" v-for="(feed, index) in feedList">
         <mu-row class="feed">
           <mu-col class="feed-left">
             <mu-badge :content="feed.status" :color="statusColor(feed)"></mu-badge>
@@ -17,9 +17,31 @@
             >{{ feed.title || feed.url + ' #' + feed.id }}</span>
           </mu-col>
           <mu-col span="4" class="feed-right">
-            <mu-badge class="feed-num-unread" color="grey" :content="numUnread(feed)"></mu-badge>
+            <mu-badge
+              class="feed-num-unread"
+              color="grey"
+              :content="numUnread(feed)"
+              :style="{visibility: parseInt(numUnread(feed)) > 0 ? 'visible': 'hidden'}"
+            ></mu-badge>
             <span class="feed-time">{{ timeAgo(feed.dt_updated) }}</span>
-            <mu-button flat color="primary" @click="onFeedDelete(feed.id)">删除</mu-button>
+            <mu-menu
+              :open="isMenuOpen && menuOpenIndex === index"
+              @close="onMenuClose(index)"
+              @open="onMenuOpen(index)"
+              placement="bottom-end"
+            >
+              <mu-button class="operator" icon>
+                <mu-icon value="more_horiz"></mu-icon>
+              </mu-button>
+              <mu-list slot="content" class="menu-items">
+                <mu-list-item button @click="onFeedReaded(feed.id)">
+                  <mu-list-item-title>全标已读</mu-list-item-title>
+                </mu-list-item>
+                <mu-list-item button @click="onFeedDelete(feed.id)">
+                  <mu-list-item-title class="menu-delete-feed">删除</mu-list-item-title>
+                </mu-list-item>
+              </mu-list>
+            </mu-menu>
           </mu-col>
         </mu-row>
         <div class="divider"></div>
@@ -29,12 +51,19 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import lodash from 'lodash'
 import moment from 'moment'
 
 export default {
   data() {
-    return { isLoading: false, size: 53, remain: 6 }
+    return {
+      isLoading: false,
+      size: 53,
+      remain: 6,
+      isMenuOpen: false,
+      menuOpenIndex: null
+    }
   },
   computed: {
     isLogined() {
@@ -48,6 +77,14 @@ export default {
     this.$StoreAPI.user.onLogin(this.onLogin.bind(this))
   },
   methods: {
+    onMenuClose(index) {
+      this.isMenuOpen = false
+      this.menuOpenIndex = null
+    },
+    onMenuOpen(index) {
+      this.isMenuOpen = true
+      this.menuOpenIndex = index
+    },
     async onLogin() {
       if (this.feedList.length > 0) {
         this.isLoading = false
@@ -89,8 +126,12 @@ export default {
       }
       return moment(date).fromNow()
     },
+    async onFeedReaded(feedId) {
+      this.onMenuClose()
+    },
     async onFeedDelete(feedId) {
       await this.$StoreAPI.feed.deleteFeed({ feedId: feedId })
+      this.onMenuClose()
     },
     async onFeedClick(feedId) {
       this.$router.push(`/feed/${feedId}`)
@@ -112,7 +153,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="less">
 .feed-list {
   position: fixed;
   top: 64px;
@@ -174,5 +215,13 @@ export default {
   display: inline-block;
   color: gray;
   margin-right: 4px;
+}
+
+.operator {
+  margin-left: 8px;
+}
+
+.menu-delete-feed {
+  color: #e67e22;
 }
 </style>

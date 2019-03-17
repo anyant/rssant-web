@@ -23,7 +23,7 @@ import AddFeedButton from '@/components/AddFeedButton'
 export default {
   components: { Layout, Story, Header, NavTitle, AddFeedButton },
   data() {
-    return { isLoading: true }
+    return { isLoading: false, isLoaded: false }
   },
   computed: {
     storyId() {
@@ -42,10 +42,19 @@ export default {
   },
   async created() {
     window.scrollTo(0, 0)
+    setTimeout(() => {
+      if (!this.isLoaded) {
+        this.isLoading = true
+      }
+    }, 300)
     try {
       await this.$StoreAPI.story.loadStory({ storyId: this.storyId, detail: true })
     } finally {
+      this.isLoaded = true
       this.isLoading = false
+    }
+    if (!this.story.is_readed) {
+      this.$StoreAPI.story.setStoryReaded({ storyId: this.storyId, is_readed: true })
     }
   }
 }
