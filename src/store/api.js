@@ -104,6 +104,10 @@ const StoreAPI = {
             let data = await API.feed.importOPML({ file })
             DAO.FEED_ADD_LIST(data.feeds)
         },
+        async importBookmark({ file }) {
+            let data = await API.feed.importBookmark({ file })
+            DAO.FEED_ADD_LIST(data.feeds)
+        },
         async setFeedReaded({ feedId }) {
             await API.feed.setReaded({ id: feedId })
             DAO.FEED_SET_READED({ id: feedId })

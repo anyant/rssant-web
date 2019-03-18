@@ -107,6 +107,15 @@ const API = {
         }
       })
     },
+    importBookmark({ file }) {
+      var formData = new FormData()
+      formData.append("file", file)
+      return client.post(`/feed/bookmark/`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+    },
     setReaded({ id }) {
       return client.put(`/feed/${id}/readed`)
     },

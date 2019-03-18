@@ -167,7 +167,22 @@ export default {
         })
     },
     onImportBookmark(file) {
-      this.$message.error('暂不支持从书签导入')
+      this.importBookmarkLoading = true
+      this.$StoreAPI.feed
+        .importBookmark({ file })
+        .then(() => {
+          this.$message.success('导入书签文件成功')
+          this.onClose()
+        })
+        .catch(error => {
+          this.$message.error({
+            message: '导入书签文件失败: ' + error.message,
+            duration: 10000
+          })
+        })
+        .finally(() => {
+          this.importBookmarkLoading = false
+        })
     }
   }
 }
