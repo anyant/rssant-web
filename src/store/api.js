@@ -126,7 +126,8 @@ const StoreAPI = {
             return STATE.feed.feeds[feedId]
         },
         hasNext() {
-            return STATE.feed.cursor.hasNext
+            let cursor = STATE.feed.cursor.next
+            return !lodash.isEmpty(cursor)
         }
     },
     story: {
@@ -182,8 +183,8 @@ const StoreAPI = {
             return STATE.story.storys[storyId]
         },
         hasNext({ feedId }) {
-            let hasNext = STATE.story.cursor.hasNext[feedId]
-            return lodash.isNil(hasNext) || hasNext
+            let cursor = STATE.story.cursor.next[feedId]
+            return !lodash.isEmpty(cursor)
         }
     }
 }

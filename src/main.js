@@ -16,7 +16,7 @@ import 'font-awesome/css/font-awesome.css'
 import 'typeface-roboto'
 // others
 import { sync } from 'vuex-router-sync'
-import VirtualScrollList from 'vue-virtual-scroll-list'
+import Mescroll from "mescroll.js/mescroll.vue";
 
 // rssant
 import App from './App'
@@ -41,8 +41,8 @@ Vue.use(Loading)
 // muse-ui 的 Table 组件有性能问题，改用 element-ui
 Vue.component(Table.name, Table)
 Vue.component(TableColumn.name, TableColumn)
-// 无限滚动列表
-Vue.component('virtual-scroll-list', VirtualScrollList)
+// 上拉刷新下拉加载滚动列表
+Vue.component('mescroll', Mescroll)
 
 Vue.use(VueMoment, { moment })
 

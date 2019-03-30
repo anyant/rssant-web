@@ -7,9 +7,7 @@ export default {
     },
     feed: {
         cursor: {
-            hasPrev: true,
             prev: null,
-            hasNext: true,
             next: null,
         },
         feeds: {
@@ -18,9 +16,7 @@ export default {
     story: {
         cursor: {
             prev: {},
-            hasPrev: {},
             next: {},
-            hasNext: {},
         },
         storys: {
         },

@@ -16,6 +16,7 @@
     "js-cookie": "^2.2.0",
     "lodash": "^4.17.11",
     "material-design-icons": "^3.0.1",
+    "mescroll.js": "^1.4.1",
     "moment": "^2.22.2",
     "muse-ui": "^3.0.0-rc.5",
     "muse-ui-loading": "^0.2.0",
@@ -24,7 +25,6 @@
     "vue": "^2.6.6",
     "vue-moment": "^4.0.0",
     "vue-router": "^3.0.1",
-    "vue-virtual-scroll-list": "^1.2.7",
     "vuex": "^3.0.1",
     "vuex-router-sync": "^5.0.0"
   },

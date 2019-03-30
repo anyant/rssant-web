@@ -1,16 +1,20 @@
 <template>
-  <div class="feed-list" v-loading="isLoading" data-mu-loading-overlay-color="rgba(0, 0, 0, 0)">
-    <virtual-scroll-list
-      ref="scroll-list"
+  <div
+    class="feed-list"
+    v-loading="isLoginLoading"
+    data-mu-loading-overlay-color="rgba(0, 0, 0, 0)"
+  >
+    <mescroll
+      ref="mescroll"
       class="feed-list-content"
-      :tobottom="onLoadNext"
-      :size="size"
-      :remain="remain"
+      :down="mescrollDown"
+      :up="mescrollUp"
+      @init="mescrollInit"
     >
       <div :key="feed.id" v-for="(feed, index) in feedList">
         <mu-row class="feed">
           <mu-col class="feed-left">
-            <mu-badge :content="feed.status" :color="statusColor(feed)"></mu-badge>
+            <span class="feed-status" :class="statusColor(feed)"></span>
             <span
               class="feed-title"
               @click="onFeedClick(feed.id)"
@@ -46,7 +50,7 @@
         </mu-row>
         <div class="divider"></div>
       </div>
-    </virtual-scroll-list>
+    </mescroll>
   </div>
 </template>
 
@@ -57,12 +61,34 @@ import moment from 'moment'
 
 export default {
   data() {
+    let pageSize = window.innerHeight - 64 - 40
+    let itemSize = 49
+    let numPageItems = Math.ceil(pageSize / itemSize)
     return {
-      isLoading: false,
-      size: 57,
-      remain: 6,
+      isLoginLoading: true,
       isMenuOpen: false,
-      menuOpenIndex: null
+      menuOpenIndex: null,
+      mescroll: null,
+      isLoading: false,
+      loadingPromise: null,
+      pageSize: pageSize,
+      itemSize: itemSize,
+      numPageItems: numPageItems,
+      mescrollDown: {
+        auto: false,
+        callback: this.onMescrolDown.bind(this)
+      },
+      mescrollUp: {
+        auto: false,
+        callback: this.onMescrolUp.bind(this), //上拉加载回调
+        onScroll: this.onScroll.bind(this), //滚动事件回调
+        page: {
+          num: 0, //当前页
+          size: numPageItems //每页数据条数,默认10
+        },
+        htmlNodata: '<p class="upwarp-nodata">没有更多了</p>',
+        noMoreSize: Math.ceil(numPageItems * 0.7)
+      }
     }
   },
   computed: {
@@ -71,6 +97,9 @@ export default {
     },
     feedList() {
       return this.$StoreAPI.feed.getFeedList()
+    },
+    offsetAll() {
+      return this.feedList.length * this.itemSize
     }
   },
   async mounted() {
@@ -85,22 +114,9 @@ export default {
       this.isMenuOpen = true
       this.menuOpenIndex = index
     },
-    async onLogin() {
-      if (this.feedList.length > 0) {
-        this.isLoading = false
-      }
-      this.remain = this.$el.clientHeight / this.size
-      this.isLoading = true
-      try {
-        // this.remain + 1 才能滚动到底触发 onLoadNext
-        await this.$StoreAPI.feed.loadInitFeedList({ size: Math.floor(this.remain) + 1 })
-      } catch (error) {
-        this.$message.error(error.message)
-      } finally {
-        this.isLoading = false
-      }
-      // fix scroll list not update
-      this.$refs['scroll-list'].forceRender()
+    onLogin() {
+      this.isLoginLoading = false
+      this.loadInitFeedList()
     },
     numUnread(feed) {
       if (lodash.isNil(feed.num_unread_storys)) {
@@ -110,15 +126,8 @@ export default {
       }
     },
     statusColor(feed) {
-      let color = {
-        ready: 'success',
-        updating: 'primary',
-        error: 'error'
-      }[feed.status]
-      if (lodash.isNil(color)) {
-        color = 'grey'
-      }
-      return color
+      let statusClass = 'feed-status-' + lodash.defaultTo(feed.status, 'pending')
+      return [statusClass]
     },
     timeAgo(date) {
       if (lodash.isEmpty(date)) {
@@ -137,21 +146,71 @@ export default {
     async onFeedClick(feedId) {
       this.$router.push(`/feed/${feedId}`)
     },
-    async onLoadNext() {
-      if (!this.$StoreAPI.feed.hasNext()) {
+    mescrollInit(mescroll) {
+      this.mescroll = mescroll
+    },
+    onMescrolDown(mescroll) {
+      setTimeout(() => {
+        mescroll.endSuccess()
+      }, 500)
+    },
+    onMescrolUp(page, mescroll) {
+      this.loadNextFeedList(mescroll)
+    },
+    onScroll(mescroll, y, isUp) {
+      if (this.isLoading || !isUp) {
         return
       }
-      if (this.isLoading) {
+      let hasNext = this.$StoreAPI.feed.hasNext()
+      if (!hasNext) {
         return
       }
+      let delta = (this.offsetAll - y) / this.pageSize
+      if (delta < 2) {
+        this.loadNextFeedList()
+      }
+    },
+    loadInitFeedList() {
       this.isLoading = true
-      try {
-        await this.$StoreAPI.feed.loadNextFeedList()
-      } finally {
-        setTimeout(() => {
+      let promise = this.$StoreAPI.feed.loadInitFeedList({ size: this.numPageItems })
+      this.loadingPromise = promise
+      promise
+        .catch(error => {
+          this.$message.error(error.message)
+        })
+        .finally(() => {
           this.isLoading = false
-        }, 200)
+        })
+    },
+    loadNextFeedList(mescroll) {
+      let promise = null
+      if (this.isLoading) {
+        promise = this.loadingPromise
+      } else {
+        let hasNext = this.$StoreAPI.feed.hasNext()
+        if (!hasNext) {
+          if (!lodash.isNil(mescroll)) {
+            mescroll.endSuccess(0, false)
+          }
+          return
+        }
+        this.isLoading = true
+        promise = this.$StoreAPI.feed.loadNextFeedList({ size: this.numPageItems })
+        this.loadingPromise = promise
       }
+      if (!lodash.isNil(mescroll)) {
+        promise
+          .then(() => {
+            let hasNext = this.$StoreAPI.feed.hasNext()
+            mescroll.endSuccess(hasNext ? this.numPageItems : 0, hasNext)
+          })
+          .catch(() => {
+            mescroll.endErr()
+          })
+      }
+      promise.finally(() => {
+        this.isLoading = false
+      })
     }
   }
 }
@@ -174,9 +233,9 @@ export default {
   box-sizing: border-box;
   margin-left: 16px;
   margin-right: 16px;
-  padding-top: 4px;
-  padding-bottom: 4px;
   border-bottom: 1px solid rgba(9, 9, 9, 0.1);
+  height: 48px;
+  overflow: hidden;
 }
 
 .feed-left,
@@ -188,6 +247,27 @@ export default {
 
 .feed-right {
   justify-content: flex-end;
+}
+
+.feed-status {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background: grey;
+}
+
+.feed-status.feed-status-ready {
+  background: #66bb6a;
+}
+.feed-status.feed-status-updating {
+  background: #2196f3;
+}
+.feed-status.feed-status-error {
+  background: #f44336;
+}
+.feed-status.feed-status-pending {
+  background: grey;
 }
 
 .feed-title {

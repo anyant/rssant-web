@@ -1,11 +1,11 @@
 <template>
-  <div class="story-list" v-loading="isLoading" data-mu-loading-overlay-color="rgba(0, 0, 0, 0)">
-    <virtual-scroll-list
-      ref="scroll-list"
+  <div class="story-list" data-mu-loading-overlay-color="rgba(0, 0, 0, 0)">
+    <mescroll
+      ref="mescroll"
       class="story-list-content"
-      :tobottom="onLoadNext"
-      :size="size"
-      :remain="remain"
+      :down="mescrollDown"
+      :up="mescrollUp"
+      @init="mescrollInit"
     >
       <div
         class="story"
@@ -23,7 +23,7 @@
           ></mu-icon>
         </mu-button>
       </div>
-    </virtual-scroll-list>
+    </mescroll>
   </div>
 </template>
 
@@ -33,10 +33,30 @@ import moment from 'moment'
 
 export default {
   data() {
+    let pageSize = window.innerHeight - 64 - 40
+    let itemSize = 57
+    let numPageItems = Math.ceil(pageSize / itemSize)
     return {
       isLoading: true,
-      size: 54,
-      remain: 6
+      loadingPromise: null,
+      pageSize: pageSize,
+      itemSize: itemSize,
+      numPageItems: numPageItems,
+      mescrollDown: {
+        auto: false,
+        callback: this.onMescrolDown.bind(this)
+      },
+      mescrollUp: {
+        auto: false,
+        callback: this.onMescrolUp.bind(this), //上拉加载回调
+        onScroll: this.onScroll.bind(this), //滚动事件回调
+        page: {
+          num: 0, //当前页
+          size: numPageItems //每页数据条数,默认10
+        },
+        htmlNodata: '<p class="upwarp-nodata">没有更多了</p>',
+        noMoreSize: Math.ceil(numPageItems * 0.7)
+      }
     }
   },
   computed: {
@@ -48,21 +68,22 @@ export default {
     },
     feedId() {
       return this.$route.params.feedId
+    },
+    offsetAll() {
+      return this.storyList.length * this.itemSize
     }
   },
   async mounted() {
     if (this.storyList.length > 0) {
       this.isLoading = false
     }
-    this.remain = this.$el.clientHeight / this.size
-    try {
-      // this.remain + 1 才能滚动到底触发 onLoadNext
-      await this.$StoreAPI.story.loadInitStoryList({ feedId: this.feedId, size: Math.floor(this.remain) + 1 })
-    } finally {
+    this.isLoading = true
+    let promise = this.$StoreAPI.story.loadInitStoryList({ feedId: this.feedId, size: this.numPageItems })
+    this.loadingPromise = promise
+    promise.finally(() => {
       this.isLoading = false
-    }
-    // fix scroll list not update
-    this.$refs['scroll-list'].forceRender()
+      this.loadingPromise = null
+    })
   },
   methods: {
     timeAgo(date) {
@@ -88,18 +109,61 @@ export default {
           story.is_favorited = is_favorited
         })
     },
-    async onLoadNext() {
-      if (!this.$StoreAPI.story.hasNext({ feedId: this.feedId })) {
+    mescrollInit(mescroll) {
+      this.mescroll = mescroll
+    },
+    onMescrolDown(mescroll) {
+      setTimeout(() => {
+        mescroll.endSuccess()
+      }, 500)
+    },
+    onMescrolUp(page, mescroll) {
+      this.onLoadNext(mescroll)
+    },
+    onScroll(mescroll, y, isUp) {
+      if (this.isLoading || !isUp) {
         return
       }
-      this.isLoading = true
-      try {
-        this.$StoreAPI.story.loadNextStoryList({ feedId: this.feedId })
-      } finally {
-        setTimeout(() => {
-          this.isLoading = false
-        }, 200)
+      let hasNext = this.$StoreAPI.story.hasNext({ feedId: this.feedId })
+      if (!hasNext) {
+        return
       }
+      let delta = (this.offsetAll - y) / this.pageSize
+      if (delta < 2) {
+        this.onLoadNext()
+      }
+    },
+    async onLoadNext(mescroll) {
+      let hasNext = this.$StoreAPI.story.hasNext({ feedId: this.feedId })
+      if (!hasNext) {
+        if (!lodash.isNil(mescroll)) {
+          mescroll.endSuccess(0, false)
+        }
+        return
+      }
+      let promise = null
+      if (this.isLoading) {
+        promise = this.loadingPromise
+      } else {
+        this.isLoading = true
+        promise = this.$StoreAPI.story.loadNextStoryList({ feedId: this.feedId, size: this.numPageItems })
+        this.loadingPromise = promise
+      }
+      if (!lodash.isNil(mescroll)) {
+        promise
+          .then(() => {
+            let hasNext = this.$StoreAPI.story.hasNext({ feedId: this.feedId })
+            console.log(`endSuccess hasNext=${hasNext}`)
+            mescroll.endSuccess(hasNext ? this.numPageItems : 0, hasNext)
+          })
+          .catch(() => {
+            mescroll.endErr()
+          })
+      }
+      promise.finally(() => {
+        this.isLoading = false
+        this.loadingPromise = null
+      })
     }
   }
 }
