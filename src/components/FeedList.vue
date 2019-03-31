@@ -8,15 +8,15 @@
       @init="mescrollInit"
     >
       <div :key="feed.id" v-for="(feed, index) in feedList">
-        <mu-row class="feed">
-          <mu-col class="feed-left">
+        <div class="feed">
+          <div class="feed-left">
             <span class="feed-status" :class="statusColor(feed)"></span>
             <span
               class="feed-title"
               @click="onFeedClick(feed.id)"
             >{{ feed.title || feed.url + ' #' + feed.id }}</span>
-          </mu-col>
-          <mu-col span="4" class="feed-right">
+          </div>
+          <div class="feed-right">
             <mu-badge
               class="feed-num-unread"
               color="grey"
@@ -42,8 +42,8 @@
                 </mu-list-item>
               </mu-list>
             </mu-menu>
-          </mu-col>
-        </mu-row>
+          </div>
+        </div>
         <div class="divider"></div>
       </div>
     </mescroll>
@@ -230,11 +230,14 @@ export default {
 
 .feed {
   box-sizing: border-box;
-  margin-left: 16px;
-  margin-right: 16px;
-  border-bottom: 1px solid rgba(9, 9, 9, 0.1);
+  display: flex;
+  padding-left: 8px;
+  padding-right: 8px;
+  border-bottom: 1px solid rgba(9, 9, 9, 0.05);
   height: 48px;
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .feed-left,
@@ -244,8 +247,12 @@ export default {
   align-items: center;
 }
 
+.feed-left {
+  flex: 1;
+}
 .feed-right {
   justify-content: flex-end;
+  min-width: 175px;
 }
 
 .feed-status {
@@ -278,7 +285,6 @@ export default {
   flex: 1;
   margin-left: 4px;
   cursor: pointer;
-  max-width: 400px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
