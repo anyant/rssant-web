@@ -195,7 +195,7 @@ export default {
   align-items: center;
   padding: 4px 4px;
   margin: 0 16px;
-  border-bottom: 1px solid rgba(9, 9, 9, 0.1);
+  border-bottom: 1px solid rgba(9, 9, 9, 0.05);
   cursor: pointer;
 }
 
