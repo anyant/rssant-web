@@ -10,6 +10,7 @@ export default {
             prev: null,
             next: null,
         },
+        scrollTop: null,
         feeds: {
         },
     },
@@ -18,6 +19,7 @@ export default {
             prev: {},
             next: {},
         },
+        scrollTop: {},
         storys: {
         },
         feedStoryMap: {

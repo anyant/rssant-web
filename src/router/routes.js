@@ -8,12 +8,12 @@ export default [
   {
     path: '/',
     name: 'Home',
-    component: HomePage
+    component: HomePage,
   },
   {
     path: '/feed/:feedId',
     name: 'Feed',
-    component: FeedPage
+    component: FeedPage,
   },
   {
     path: '/story/:storyId',

@@ -34,6 +34,15 @@ export default {
   data() {
     return {}
   },
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.$StoreAPI.$emit('beforeRouteEnter')
+    })
+  },
+  beforeRouteLeave(to, from, next) {
+    this.$StoreAPI.$emit('beforeRouteLeave')
+    next()
+  },
   computed: {
     isLogined() {
       return this.$StoreAPI.user.isLogined()

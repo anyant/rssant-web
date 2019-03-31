@@ -11,6 +11,7 @@ const StoreAPI = {
     state: STATE,
     $emit: EventBus.$emit.bind(EventBus),
     $on: EventBus.$on.bind(EventBus),
+    $once: EventBus.$once.bind(EventBus),
     user: {
         onLogin(callback) {
             if (this.isLogined()) {
@@ -128,6 +129,12 @@ const StoreAPI = {
         hasNext() {
             let cursor = STATE.feed.cursor.next
             return !lodash.isEmpty(cursor)
+        },
+        setScrollTop({ scrollTop }) {
+            DAO.FEED_SET_SCROLL_TOP({ scrollTop })
+        },
+        getScrollTop() {
+            return lodash.defaultTo(STATE.feed.scrollTop, 0)
         }
     },
     story: {
@@ -185,6 +192,12 @@ const StoreAPI = {
         hasNext({ feedId }) {
             let cursor = STATE.story.cursor.next[feedId]
             return !lodash.isEmpty(cursor)
+        },
+        setScrollTop({ feedId, scrollTop }) {
+            DAO.STORY_SET_SCROLL_TOP({ feedId, scrollTop })
+        },
+        getScrollTop({ feedId }) {
+            return lodash.defaultTo(STATE.story.scrollTop[feedId], 0)
         }
     }
 }

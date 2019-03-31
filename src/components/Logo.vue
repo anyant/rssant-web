@@ -33,13 +33,14 @@ export default {
     },
     onDebug() {
       let debug = localStorage.getItem('debug') === '1'
+      var css = null
       if (debug) {
         const styles = `
           * {
             outline: 1px solid pink !important;
           }
         `
-        var css = document.createElement('style')
+        css = document.createElement('style')
         css.id = 'rssant-debug-style'
         css.type = 'text/css'
         if (css.styleSheet) {
@@ -49,7 +50,7 @@ export default {
         }
         document.getElementsByTagName('head')[0].appendChild(css)
       } else {
-        var css = document.querySelector('#rssant-debug-style')
+        css = document.querySelector('#rssant-debug-style')
         if (css) {
           css.parentNode.removeChild(css)
         }

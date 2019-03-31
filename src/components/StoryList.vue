@@ -1,5 +1,5 @@
 <template>
-  <div class="story-list" data-mu-loading-overlay-color="rgba(0, 0, 0, 0)">
+  <div class="story-list">
     <mescroll
       ref="mescroll"
       class="story-list-content"
@@ -36,6 +36,7 @@ export default {
     let pageSize = window.innerHeight - 64 - 40
     let itemSize = 57
     let numPageItems = Math.ceil(pageSize / itemSize)
+    this.$StoreAPI.$once('beforeRouteLeave', this.beforeRouteLeave.bind(this))
     return {
       isLoading: true,
       loadingPromise: null,
@@ -44,18 +45,18 @@ export default {
       numPageItems: numPageItems,
       mescrollDown: {
         auto: false,
-        callback: this.onMescrolDown.bind(this)
+        callback: this.onMescrolDown
       },
       mescrollUp: {
         auto: false,
-        callback: this.onMescrolUp.bind(this), //上拉加载回调
-        onScroll: this.onScroll.bind(this), //滚动事件回调
+        callback: this.onMescrolUp, // 上拉加载回调
+        onScroll: this.onScroll, // 滚动事件回调
         page: {
-          num: 0, //当前页
-          size: numPageItems //每页数据条数,默认10
+          num: 0, // 当前页
+          size: numPageItems // 每页数据条数
         },
         htmlNodata: '<p class="upwarp-nodata">没有更多了</p>',
-        noMoreSize: Math.ceil(numPageItems * 0.7)
+        noMoreSize: Math.ceil(numPageItems * 0.5)
       }
     }
   },
@@ -76,6 +77,7 @@ export default {
   async mounted() {
     if (this.storyList.length > 0) {
       this.isLoading = false
+      return
     }
     this.isLoading = true
     let promise = this.$StoreAPI.story.loadInitStoryList({ feedId: this.feedId, size: this.numPageItems })
@@ -86,6 +88,12 @@ export default {
     })
   },
   methods: {
+    beforeRouteLeave() {
+      this.$StoreAPI.story.setScrollTop({
+        feedId: this.feedId,
+        scrollTop: this.mescroll.getScrollTop()
+      })
+    },
     timeAgo(date) {
       if (lodash.isEmpty(date)) {
         return ''
@@ -111,6 +119,7 @@ export default {
     },
     mescrollInit(mescroll) {
       this.mescroll = mescroll
+      mescroll.setScrollTop(this.$StoreAPI.story.getScrollTop({ feedId: this.feedId }))
     },
     onMescrolDown(mescroll) {
       setTimeout(() => {
@@ -153,7 +162,6 @@ export default {
         promise
           .then(() => {
             let hasNext = this.$StoreAPI.story.hasNext({ feedId: this.feedId })
-            console.log(`endSuccess hasNext=${hasNext}`)
             mescroll.endSuccess(hasNext ? this.numPageItems : 0, hasNext)
           })
           .catch(() => {

@@ -1,9 +1,5 @@
 <template>
-  <div
-    class="feed-list"
-    v-loading="isLoginLoading"
-    data-mu-loading-overlay-color="rgba(0, 0, 0, 0)"
-  >
+  <div class="feed-list">
     <mescroll
       ref="mescroll"
       class="feed-list-content"
@@ -55,7 +51,6 @@
 </template>
 
 <script>
-import Vue from 'vue'
 import lodash from 'lodash'
 import moment from 'moment'
 
@@ -64,8 +59,8 @@ export default {
     let pageSize = window.innerHeight - 64 - 40
     let itemSize = 49
     let numPageItems = Math.ceil(pageSize / itemSize)
+    this.$StoreAPI.$once('beforeRouteLeave', this.beforeRouteLeave.bind(this))
     return {
-      isLoginLoading: true,
       isMenuOpen: false,
       menuOpenIndex: null,
       mescroll: null,
@@ -74,17 +69,18 @@ export default {
       pageSize: pageSize,
       itemSize: itemSize,
       numPageItems: numPageItems,
+      currentScrollTop: 0,
       mescrollDown: {
         auto: false,
         callback: this.onMescrolDown.bind(this)
       },
       mescrollUp: {
         auto: false,
-        callback: this.onMescrolUp.bind(this), //上拉加载回调
-        onScroll: this.onScroll.bind(this), //滚动事件回调
+        callback: this.onMescrolUp.bind(this), // 上拉加载回调
+        onScroll: this.onScroll.bind(this), // 滚动事件回调
         page: {
-          num: 0, //当前页
-          size: numPageItems //每页数据条数,默认10
+          num: 0, // 当前页
+          size: numPageItems // 每页数据条数
         },
         htmlNodata: '<p class="upwarp-nodata">没有更多了</p>',
         noMoreSize: Math.ceil(numPageItems * 0.7)
@@ -106,6 +102,9 @@ export default {
     this.$StoreAPI.user.onLogin(this.onLogin.bind(this))
   },
   methods: {
+    beforeRouteLeave() {
+      this.$StoreAPI.feed.setScrollTop({ scrollTop: this.mescroll.getScrollTop() })
+    },
     onMenuClose(index) {
       this.isMenuOpen = false
       this.menuOpenIndex = null
@@ -115,7 +114,6 @@ export default {
       this.menuOpenIndex = index
     },
     onLogin() {
-      this.isLoginLoading = false
       this.loadInitFeedList()
     },
     numUnread(feed) {
@@ -148,6 +146,7 @@ export default {
     },
     mescrollInit(mescroll) {
       this.mescroll = mescroll
+      mescroll.setScrollTop(this.$StoreAPI.feed.getScrollTop())
     },
     onMescrolDown(mescroll) {
       setTimeout(() => {

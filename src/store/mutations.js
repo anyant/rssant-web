@@ -64,6 +64,9 @@ const FEED = {
             }
         })
     },
+    FEED_SET_SCROLL_TOP(state, { scrollTop }) {
+        state.feed.scrollTop = scrollTop
+    },
 }
 
 const STORY = {
@@ -100,6 +103,9 @@ const STORY = {
     },
     STORY_SET_FAVORITED(state, { id, is_favorited }) {
         state.story.storys[id].is_favorited = is_favorited;
+    },
+    STORY_SET_SCROLL_TOP(state, { feedId, scrollTop }) {
+        Vue.set(state.story.scrollTop, feedId, scrollTop)
     },
 }
 
