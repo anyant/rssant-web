@@ -56,7 +56,7 @@ import moment from 'moment'
 
 export default {
   data() {
-    let pageSize = window.innerHeight - 64 - 40
+    let pageSize = window.innerHeight - 64 - 20
     let itemSize = 49
     let numPageItems = Math.ceil(pageSize / itemSize)
     this.$StoreAPI.$once('beforeRouteLeave', this.beforeRouteLeave.bind(this))
@@ -222,9 +222,9 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  max-width: 720px;
+  max-width: 840px;
   min-width: 600px;
-  margin: 20px auto;
+  margin: 10px auto;
   overflow-y: auto;
 }
 

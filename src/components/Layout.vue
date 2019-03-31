@@ -10,7 +10,7 @@ export default {}
 
 <style lang="less" scoped>
 .layout {
-  max-width: 720px;
+  max-width: 840px;
   min-width: 600px;
   margin: 0 auto;
 }
