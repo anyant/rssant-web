@@ -107,7 +107,7 @@
 
 <script>
 import lodash from 'lodash'
-import logo from '@/assets/logo.png'
+import defaultAvatar from '@/assets/avatar.png'
 import API from '@/plugin/api'
 
 export default {
@@ -140,7 +140,7 @@ export default {
     avatar() {
       let user = this.$StoreAPI.user.getLoginUser()
       if (lodash.isNil(user) || lodash.isEmpty(user.avatar_url)) {
-        return logo
+        return defaultAvatar
       } else {
         return user.avatar_url
       }
