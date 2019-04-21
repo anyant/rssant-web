@@ -1,5 +1,5 @@
 <template>
-  <div class="story">
+  <MoLayout header class="story">
     <MoBackHeader border>
       <template v-slot:title>蚁阅今天发布了很多总共十六个字</template>
       <mu-button icon class="action-favorited">
@@ -25,15 +25,16 @@
     <div class="content">
       <div class="markdown-body" v-html="story.content"></div>
     </div>
-  </div>
+  </MoLayout>
 </template>
 
 <script>
 import 'github-markdown-css'
+import MoLayout from '@/components/MoLayout.vue';
 import MoBackHeader from '@/components/MoBackHeader'
 
 export default {
-  components: { MoBackHeader },
+  components: { MoBackHeader, MoLayout },
   data() {
     return {
       story: {

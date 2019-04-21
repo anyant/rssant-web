@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <MoLayout header>
     <MoBackHeader border>
       <template v-slot:title>添加新订阅</template>
     </MoBackHeader>
@@ -37,16 +37,17 @@
         <MoAntGreenButton class="import-bookmark">浏览器书签</MoAntGreenButton>
       </div>
     </div>
-  </div>
+  </MoLayout>
 </template>
 
 <script>
+import MoLayout from '@/components/MoLayout.vue'
 import MoBackHeader from '@/components/MoBackHeader.vue'
 import MoAntGreenButton from '@/components/MoAntGreenButton.vue'
 import { antBlue } from '@/plugin/common'
 
 export default {
-  components: { MoBackHeader, MoAntGreenButton },
+  components: { MoLayout, MoBackHeader, MoAntGreenButton },
   data() {
     return {
       antBlue,
@@ -81,22 +82,13 @@ export default {
 <style lang="less" scoped>
 @import '~@/styles/common';
 
-.header,
 .main {
   padding-left: 16 * @pr;
   padding-right: 16 * @pr;
-  background: #ffffff;
-}
-
-.main {
-  position: absolute;
-  width: 100%;
-  top: 48 * @pr;
-  bottom: 0;
 }
 
 .feed-url {
-  margin-top: 66 * @pr;
+  margin-top: 64 * @pr;
 }
 
 .button-wrapper {

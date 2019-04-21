@@ -1,23 +1,23 @@
 <template>
-  <MoListLayout>
-    <MoBackHeader>
+  <MoLayout grey header>
+    <MoBackHeader border>
       <template v-slot:title>蘑菇 (5)</template>
       <mu-button icon class="action-readed">
         <mu-icon value="done"></mu-icon>
       </mu-button>
     </MoBackHeader>
-    <div>
-      <MoFeedStoryItem v-for="x in [1,2,3,4,5,6,7,8,9]" :key="x" :readed="x < 4">{{ x }}</MoFeedStoryItem>
+    <div class="feed-story-list">
+      <MoFeedStoryItem v-for="x in [1,2,3,4,5,6,7,8,9,1,2,3,4,5,6]" :key="x" :readed="x < 4">{{ x }}</MoFeedStoryItem>
     </div>
-  </MoListLayout>
+  </MoLayout>
 </template>
 <script>
 import MoBackHeader from '@/components/MoBackHeader'
-import MoListLayout from '@/components/MoListLayout'
+import MoLayout from '@/components/MoLayout'
 import MoFeedStoryItem from '@/components/MoFeedStoryItem.vue'
 
 export default {
-  components: { MoBackHeader, MoListLayout, MoFeedStoryItem },
+  components: { MoBackHeader, MoLayout, MoFeedStoryItem },
   data() {
     return {}
   }
@@ -26,10 +26,6 @@ export default {
 
 <style lang="less" scoped>
 @import '~@/styles/common';
-
-.header {
-  padding: 8 * @pr 16 * @pr;
-}
 
 .action-readed {
   position: relative;
@@ -42,5 +38,9 @@ export default {
 .feed-story-item {
   position: relative;
   margin-top: 8 * @pr;
+}
+
+.feed-story-list {
+  padding-bottom: 8 * @pr;
 }
 </style>

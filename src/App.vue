@@ -21,6 +21,8 @@ export default {
 </script>
 
 <style lang="less">
+@import '~@/styles/common';
+
 #timeit {
   position: fixed;
   top: 0;
@@ -28,7 +30,8 @@ export default {
 }
 
 #app {
-  max-width: 640px;
+  min-width: 300 * @pr;
+  max-width: 640 * @pr;
   margin: 0 auto;
 }
 </style>

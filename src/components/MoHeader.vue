@@ -17,10 +17,15 @@ export default {
 @import '~@/styles/common';
 
 .header {
-  display: flex;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  max-width: 640 * @pr;
   z-index: 100;
+  display: flex;
   height: 48 * @pr;
-
+  padding-left: 16 * @pr;
+  padding-right: 16 * @pr;
   align-items: center;
   justify-content: space-between;
   background: #ffffff;

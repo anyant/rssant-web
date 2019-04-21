@@ -1,5 +1,5 @@
 <template>
-  <MoListLayout>
+  <MoLayout grey header>
     <MoHeader>
       <div class="title">蚁阅</div>
       <div class="right">
@@ -84,16 +84,16 @@
         </div>
       </mu-ripple>
     </div>
-  </MoListLayout>
+  </MoLayout>
 </template>
 <script>
 import MoHeader from '@/components/MoHeader'
-import MoListLayout from '@/components/MoListLayout'
+import MoLayout from '@/components/MoLayout'
 import defaultAvatar from '@/assets/avatar.png'
 import { antRippleGrey } from '@/plugin/common'
 
 export default {
-  components: { MoHeader, MoListLayout },
+  components: { MoHeader, MoLayout },
   data() {
     return {
       rippleColor: antRippleGrey,
@@ -105,10 +105,6 @@ export default {
 
 <style lang="less" scoped>
 @import '~@/styles/common';
-
-.header {
-  padding: 8 * @pr 16 * @pr;
-}
 
 .title {
   color: @antTextBlack;
@@ -136,8 +132,8 @@ export default {
 .item {
   position: relative;
   background: #fff;
-  margin-top: 8px;
-  height: 48px;
+  margin-top: 8 * @pr;
+  height: 48 * @pr;
   padding-left: 16 * @pr;
   padding-right: 16 * @pr;
   display: flex;
@@ -154,7 +150,7 @@ export default {
 .item-icon {
   display: inline-block;
   font-size: 20 * @pr;
-  width: 22px;
+  width: 22 * @pr;
 }
 
 .item-title {

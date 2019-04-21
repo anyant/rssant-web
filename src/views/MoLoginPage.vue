@@ -1,5 +1,5 @@
 <template>
-  <div class="login">
+  <MoLayout class="login">
     <div class="title">蚁阅 - 你还没有登录哦~</div>
     <mu-text-field
       full-width
@@ -33,16 +33,17 @@
     <div class="thirdpart">
       <MoThirdpartLogin></MoThirdpartLogin>
     </div>
-  </div>
+  </MoLayout>
 </template>
 
 <script>
 import { antGreen, antTextGrey } from '@/plugin/common'
+import MoLayout from '@/components/MoLayout'
 import MoAntGreenButton from '@/components/MoAntGreenButton'
 import MoThirdpartLogin from '@/components/MoThirdpartLogin'
 
 export default {
-  components: { MoAntGreenButton, MoThirdpartLogin },
+  components: { MoAntGreenButton, MoThirdpartLogin, MoLayout },
   data() {
     return {
       antGreen,

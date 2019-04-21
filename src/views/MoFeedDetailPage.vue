@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <MoLayout header>
     <MoBackHeader border>
       <template v-slot:title>Hacker News</template>
     </MoBackHeader>
@@ -10,14 +10,15 @@
         <span v-else class="item-value">{{ item.value }}</span>
       </div>
     </div>
-  </div>
+  </MoLayout>
 </template>
 
 <script>
+import MoLayout from '@/components/MoLayout.vue'
 import MoBackHeader from '@/components/MoBackHeader'
 
 export default {
-  components: { MoBackHeader },
+  components: { MoBackHeader, MoLayout },
   data() {
     return {
       feedInfo: [
@@ -76,16 +77,10 @@ export default {
 <style lang="less" scoped>
 @import '~@/styles/common';
 
-.header {
-  padding: 8 * @pr 16 * @pr;
-}
-
 .feed-info {
   padding-left: 16 * @pr;
   padding-right: 16 * @pr;
   padding-bottom: 16 * @pr;
-  background: #fff;
-  min-height: calc(100vh - 48 * @pr);
 }
 
 .item {
@@ -101,11 +96,6 @@ export default {
   width: 64 * @pr;
   margin-right: 24 * @pr;
   font-size: 15 * @pr;
-}
-
-.item-name,
-.item-value {
-  color: #333;
 }
 
 .item-value,
