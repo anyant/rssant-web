@@ -20,10 +20,15 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 #timeit {
   position: fixed;
   top: 0;
   left: 4px;
+}
+
+#app {
+  max-width: 640px;
+  margin: 0 auto;
 }
 </style>

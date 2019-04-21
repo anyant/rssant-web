@@ -26,6 +26,11 @@ import API from '@/plugin/api'
 import Notification from '@/plugin/notify'
 import '@/styles/theme-rssant.less'
 
+// REM layout
+import initREM from '@/plugin/rem'
+
+initREM(true, 32, 1);
+
 Vue.config.productionTip = false
 
 sync(STORE, router)

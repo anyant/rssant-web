@@ -8,9 +8,19 @@
 @antRed  : #f44336;
 
 // 黑白灰
-@antTextBlack: #000000;           //文字黑
-@antTextGrey: #999999;            // 文字灰
-@antTextWhiteGrey: #A6A6A6;       // 文字浅灰
-@antTextWhite: #FFFFFF;           // 文字白
-@antBackGrey: rgba(9, 9, 9, 5%);  // 背景浅灰
-@antLineGrey: #E6E6E6;            // 线条浅灰
+@antTextBlack    : #000000; // 文字黑
+@antTextGrey     : #999999; // 文字灰
+@antTextWhiteGrey: #A6A6A6; // 文字浅灰
+@antTextWhite    : #FFFFFF; // 文字白
+@antRippleGrey   :#090909; // 涟漪黑
+@antBackGrey     : rgba(#090909, 5%); // 背景浅灰
+@antLineGrey     : #E9E9E9; // 线条浅灰
+
+// helper
+.clearfix {
+  &::after {
+    content: '';
+    display: block;
+    clear  : both;
+  }
+}
