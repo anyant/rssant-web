@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="story">
     <MoBackHeader border>
       <template v-slot:title>蚁阅今天发布了很多总共十六个字</template>
       <mu-button icon class="action-favorited">
@@ -72,6 +72,10 @@ export default {
   padding: 8 * @pr 16 * @pr;
 }
 
+.story {
+  background: #fff;
+}
+
 .action-favorited {
   position: relative;
   right: -4 * @pr;
@@ -101,7 +105,7 @@ export default {
 }
 
 .story-link {
-  color: darken(@antBlue, 10%);
+  color: @antBlue;
   font-size: 14 * @pr;
 }
 

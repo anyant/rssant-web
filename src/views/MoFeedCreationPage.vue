@@ -22,7 +22,7 @@
           :disabled="isSaveDisabled"
         >确定</mu-button>
       </div>
-      <label for="import-feed-file" class="import-feed-label">或从文件导入:</label>
+      <label for="import-feed-file" class="import-feed-label">或从文件导入</label>
       <form style="display: none;" ref="importFeedForm">
         <input
           type="file"
@@ -96,7 +96,6 @@ export default {
 }
 
 .feed-url {
-  text-align: center;
   margin-top: 66 * @pr;
 }
 
@@ -117,6 +116,7 @@ export default {
 .button-save.disabled {
   background: lighten(@antBlue, 10%);
   color: #fff;
+  opacity: 0.8;
 }
 
 .import-feed-label {

@@ -6,8 +6,8 @@ import MoLoginPage from '@/views/MoLoginPage'
 import MoRegisterPage from '@/views/MoRegisterPage'
 import MoFeedCreationPage from '@/views/MoFeedCreationPage'
 import MoStoryPage from '@/views/MoStoryPage'
+import MoFeedDetailPage from '@/views/MoFeedDetailPage'
 
-import FeedDetailPage from '@/views/FeedDetailPage'
 import NotFoundPage from '@/views/NotFoundPage'
 
 export default [
@@ -54,7 +54,7 @@ export default [
   {
     path: '/feed/:feedId/detail',
     name: 'FeedDetail',
-    component: FeedDetailPage
+    component: MoFeedDetailPage
   },
   { path: '*', component: NotFoundPage }
 ]

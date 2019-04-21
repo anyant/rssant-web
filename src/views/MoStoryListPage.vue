@@ -5,7 +5,7 @@
       <mu-button icon class="action-readed">
         <mu-icon value="done"></mu-icon>
       </mu-button>
-      <mu-button icon class="action-detail">
+      <mu-button icon class="action-detail" @click="()=>{this.$router.push('/feed/123/detail')}">
         <mu-icon value="info_outline"></mu-icon>
       </mu-button>
     </MoBackHeader>

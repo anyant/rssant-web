@@ -3,7 +3,7 @@
     <MoHeader>
       <div class="title">蚁阅</div>
       <div class="right">
-        <mu-button icon class="action-add">
+        <mu-button icon class="action-add" @click="()=>{this.$router.push('/feed-creation')}">
           <mu-icon value="add"></mu-icon>
         </mu-button>
         <mu-button icon class="action-menu">
