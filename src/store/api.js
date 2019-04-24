@@ -1,33 +1,23 @@
-import Vue from 'vue'
-import lodash from 'lodash'
+import _ from 'lodash'
 
 import { API } from '@/plugin/api'
 import { DAO, STATE } from './dao'
 
-const EventBus = new Vue()
-export { EventBus }
-
 const StoreAPI = {
     state: STATE,
-    $emit: EventBus.$emit.bind(EventBus),
-    $on: EventBus.$on.bind(EventBus),
-    $once: EventBus.$once.bind(EventBus),
     user: {
-        onLogin(callback) {
-            if (this.isLogined()) {
-                callback()
-            } else {
-                EventBus.$on('user.login', callback)
-            }
-        },
         async login({ account, password } = {}) {
-            let user = null
-            try {
-                user = await API.user.login({ account, password })
-            } finally {
-                DAO.USER_LOGIN(user)
+            if (!_.isNil(account)) {
+                if (STATE.user.loading.isFinished) {
+                    STATE.user.loading.reset()
+                }
             }
-            EventBus.$emit('user.login')
+            await STATE.user.loading.begin(async () => {
+                await API.user.login({ account, password })
+                    .then(user => {
+                        DAO.USER_LOGIN(user)
+                    })
+            })
         },
         async register({ username, email, password }) {
             await API.user.register({ username, email, password })
@@ -43,37 +33,36 @@ const StoreAPI = {
             API.user.connectGithub({ next, scope })
         },
         isLoading() {
-            return STATE.user.isLoading
+            return STATE.user.loading.isLoading
         },
         isLogined() {
-            return (!STATE.user.isLoading) && (!lodash.isNil(STATE.user.loginUser))
+            return !_.isNil(STATE.user.loginUser)
         },
         getLoginUser() {
             return STATE.user.loginUser
         }
     },
     feed: {
-        async loadInitFeedList({ size } = {}) {
-            let result = await API.feed.list({ size })
-            DAO.FEED_ADD_LIST(result.results)
-            DAO.FEED_SET_NEXT_CURSOR(result.next)
-        },
-        async loadNextFeedList({ size } = {}) {
-            let cursor = STATE.feed.cursor.next
-            if (lodash.isEmpty(cursor)) {
-                return
-            }
-            let result = await API.feed.list({ cursor: cursor, size: size })
-            DAO.FEED_ADD_LIST(result.results)
-            DAO.FEED_SET_NEXT_CURSOR(result.next)
+        async sync() {
+            await STATE.feed.loading.begin(async () => {
+                let hints = _.values(STATE.feed.feeds).map(x => {
+                    return { id: x.id, dt_updated: x.dt_updated }
+                })
+                await API.feed.query({ hints }).then(result => {
+                    DAO.FEED_SYNC({
+                        updatedFeeds: result.results,
+                        deletedFeedIds: result.deleted_ids
+                    })
+                })
+            })
         },
         async loadFeed({ feedId, detail }) {
             let feed = await API.feed.get({ id: feedId, detail })
-            DAO.FEED_ADD_DETAIL(feed)
+            DAO.FEED_ADD_OR_UPDATE(feed)
         },
         async createFeed({ url }) {
             let feed = await API.feed.create({ url })
-            DAO.FEED_ADD(feed)
+            DAO.FEED_ADD_OR_UPDATE(feed)
             const feedId = feed.id
             let numTry = 30
             const token = setInterval(async () => {
@@ -83,7 +72,7 @@ const StoreAPI = {
                     numTry -= 1
                     if (feed.status === 'ready' || feed.status === 'error' || numTry <= 0) {
                         clearInterval(token)
-                        DAO.FEED_UPDATE(feed)
+                        DAO.FEED_ADD_OR_UPDATE(feed)
                     }
                 }
             }, 1000)
@@ -93,7 +82,7 @@ const StoreAPI = {
                 id: feedId,
                 title: title
             })
-            DAO.FEED_UPDATE(newFeed)
+            DAO.FEED_ADD_OR_UPDATE(newFeed)
         },
         async deleteFeed({ feedId }) {
             await API.feed.delete({
@@ -109,33 +98,19 @@ const StoreAPI = {
             let data = await API.feed.importBookmark({ file })
             DAO.FEED_ADD_LIST(data.feeds)
         },
-        async setFeedReaded({ feedId }) {
-            await API.feed.setReaded({ id: feedId })
-            DAO.FEED_SET_READED({ id: feedId })
+        async setFeedReaded({ feedId, offset }) {
+            await API.feed.setReaded({ id: feedId, offset })
+            DAO.FEED_SET_READED({ id: feedId, offset })
         },
         isLoading() {
-            return STATE.feed.isLoading
+            return STATE.feed.loading.isLoading
         },
         getFeedList() {
-            return lodash
-                .chain(lodash.values(STATE.feed.feeds))
-                .sortBy('dt_updated', 'id')
-                .reverse()
-                .value()
+            return STATE.feed.feedList
         },
         getFeed({ feedId }) {
             return STATE.feed.feeds[feedId]
         },
-        hasNext() {
-            let cursor = STATE.feed.cursor.next
-            return !lodash.isEmpty(cursor)
-        },
-        setScrollTop({ scrollTop }) {
-            DAO.FEED_SET_SCROLL_TOP({ scrollTop })
-        },
-        getScrollTop() {
-            return lodash.defaultTo(STATE.feed.scrollTop, 0)
-        }
     },
     story: {
         async loadInitStoryList({ feedId, size } = {}) {
@@ -149,7 +124,7 @@ const StoreAPI = {
         },
         async loadNextStoryList({ feedId, size } = {}) {
             let cursor = STATE.story.cursor.next[feedId]
-            if (lodash.isEmpty(cursor)) {
+            if (_.isEmpty(cursor)) {
                 return
             }
             let result = await API.story.list({ feed_id: feedId, cursor: cursor, size: size })
@@ -174,14 +149,14 @@ const StoreAPI = {
         },
         getStoryList({ feedId }) {
             let storyIds = STATE.story.feedStoryMap[feedId]
-            if (lodash.isNil(storyIds)) {
+            if (_.isNil(storyIds)) {
                 return []
             }
-            storyIds = lodash.keys(storyIds)
-            let storys = lodash.map(storyIds, storyId => {
+            storyIds = _.keys(storyIds)
+            let storys = _.map(storyIds, storyId => {
                 return STATE.story.storys[storyId]
             })
-            return lodash
+            return _
                 .chain(storys)
                 .sortBy('dt_updated', 'id')
                 .value()
@@ -191,13 +166,13 @@ const StoreAPI = {
         },
         hasNext({ feedId }) {
             let cursor = STATE.story.cursor.next[feedId]
-            return !lodash.isEmpty(cursor)
+            return !_.isEmpty(cursor)
         },
         setScrollTop({ feedId, scrollTop }) {
             DAO.STORY_SET_SCROLL_TOP({ feedId, scrollTop })
         },
         getScrollTop({ feedId }) {
-            return lodash.defaultTo(STATE.story.scrollTop[feedId], 0)
+            return _.defaultTo(STATE.story.scrollTop[feedId], 0)
         }
     }
 }

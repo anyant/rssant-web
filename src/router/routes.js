@@ -15,6 +15,7 @@ export default [
     path: '/',
     name: 'Home',
     component: MoHomePage,
+    meta: { loginRequired: true },
   },
   {
     path: '/login',
@@ -30,31 +31,37 @@ export default [
     path: '/feed-creation',
     name: 'FeedCreation',
     component: MoFeedCreationPage,
+    meta: { loginRequired: true },
   },
   {
     path: '/mushroom',
     name: 'FeedMushroom',
     component: MoFeedMushroomPage,
+    meta: { loginRequired: true },
   },
   {
     path: '/leaves',
     name: 'FeedLeaves',
     component: MoFeedLeavesPage,
+    meta: { loginRequired: true },
   },
   {
     path: '/feed/:feedId',
     name: 'StoryList',
     component: MoStoryListPage,
+    meta: { loginRequired: true },
   },
   {
     path: '/story/:storyId',
     name: 'Story',
-    component: MoStoryPage
+    component: MoStoryPage,
+    meta: { loginRequired: true },
   },
   {
     path: '/feed/:feedId/detail',
     name: 'FeedDetail',
-    component: MoFeedDetailPage
+    component: MoFeedDetailPage,
+    meta: { loginRequired: true },
   },
   { path: '*', component: NotFoundPage }
 ]

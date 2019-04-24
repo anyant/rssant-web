@@ -63,8 +63,14 @@ export default {
   },
   methods: {
     login() {
-      this.loginForm.errorText = '登录失败'
-      this.$router.replace('/')
+      this.$StoreAPI.user
+        .login({ account: this.loginForm.account, password: this.loginForm.password })
+        .then(() => {
+          this.$router.replace('/')
+        })
+        .catch(error => {
+          this.loginForm.errorText = error.message
+        })
     },
     clearErrorText() {
       this.loginForm.errorText = null

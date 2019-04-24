@@ -14,9 +14,7 @@ export default {
     return {}
   },
   components: { AddFeedDialog },
-  async created() {
-    this.$StoreAPI.user.login().catch(() => {})
-  }
+  async created() {}
 }
 </script>
 

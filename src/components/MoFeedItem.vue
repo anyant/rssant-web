@@ -1,19 +1,37 @@
 <template>
-  <mu-ripple :color="rippleColor" class="feed-item" :class="{ 'feed-item-readed': readed }" @click="()=>{this.$router.push('/feed/123')}">
-    <div class="feed-title">V2EX - 创意 - 技术</div>
-    <div class="feed-num-unread">99+</div>
-    <div class="feed-date">10:35</div>
+  <mu-ripple
+    :color="rippleColor"
+    class="feed-item"
+    :class="{ 'feed-item-readed': readed }"
+    @click="()=>{this.$router.push('/feed/123')}"
+  >
+    <div class="feed-title">{{ title }}</div>
+    <div class="feed-num-unread">{{ numUnread }}</div>
+    <div class="feed-date">{{ dateText }}</div>
   </mu-ripple>
 </template>
 
 <script>
+import _ from 'lodash'
+
 import { antRippleGrey } from '@/plugin/common'
+import { formatDate } from '@/plugin/datefmt'
 
 export default {
   props: {
-    readed: {
-      type: Boolean,
-      default: false
+    title: String,
+    numUnread: {
+      type: Number,
+      default: 0
+    },
+    date: Date
+  },
+  computed: {
+    readed() {
+      return _.isNil(this.numUnread) || this.numUnread <= 0
+    },
+    dateText() {
+      return formatDate(this.date)
     }
   },
   data() {
@@ -70,7 +88,7 @@ export default {
 
 .feed-date {
   flex-shrink: 0;
-  width: 36 * @pr;
+  width: 64 * @pr;
   font-size: 12 * @pr;
   text-align: right;
   white-space: nowrap;

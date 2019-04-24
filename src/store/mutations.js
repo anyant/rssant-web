@@ -1,10 +1,9 @@
 import Vue from 'vue'
-import lodash from 'lodash'
+import _ from 'lodash'
 
 
 const USER = {
     USER_LOGIN(state, loginUser) {
-        state.user.isLoading = false
         state.user.loginUser = loginUser
     },
 }
@@ -13,7 +12,7 @@ function _story_add(state, story) {
     Vue.set(state.story.storys, story.id, story)
     let feedId = story.feed.id
     let feedStoryIds = state.story.feedStoryMap[feedId]
-    if (lodash.isNil(feedStoryIds)) {
+    if (_.isNil(feedStoryIds)) {
         Vue.set(state.story.feedStoryMap, feedId, {})
         feedStoryIds = state.story.feedStoryMap[feedId]
     }
@@ -22,50 +21,30 @@ function _story_add(state, story) {
 
 
 const FEED = {
-    FEED_ADD_LIST(state, feedList) {
-        feedList.forEach(feed => {
+    FEED_SYNC(state, {updatedFeeds, deletedFeedIds}) {
+        _.defaultTo(deletedFeedIds, []).forEach(feedId => {
+            Vue.delete(state.feed.feeds, feedId)
+        })
+        _.defaultTo(updatedFeeds, []).forEach(feed => {
             Vue.set(state.feed.feeds, feed.id, feed)
         });
+        let feedList = _.chain(_.values(state.feed.feeds))
+            .sortBy('dt_updated', 'id')
+            .reverse()
+            .value()
+        state.feed.feedList = feedList
     },
-    FEED_SET_PREV_CURSOR(state, cursor) {
-        state.feed.cursor.prev = cursor
-        if (lodash.isNil(cursor)) {
-            state.feed.cursor.hasPrev = false
-        }
-    },
-    FEED_SET_NEXT_CURSOR(state, cursor) {
-        state.feed.cursor.next = cursor
-        if (lodash.isNil(cursor)) {
-            state.feed.cursor.hasNext = false
-        }
-    },
-    FEED_ADD(state, feed) {
-        Vue.set(state.feed.feeds, feed.id, feed)
-    },
-    FEED_UPDATE(state, feed) {
-        Vue.set(state.feed.feeds, feed.id, feed)
-    },
-    FEED_ADD_DETAIL(state, feed) {
+    FEED_ADD_OR_UPDATE(state, feed) {
         Vue.set(state.feed.feeds, feed.id, feed)
     },
     FEED_REMOVE(state, { id }) {
         Vue.delete(state.feed.feeds, id)
+        state.feed.feedList = _.filter(state.feed.feedList, feed => feed.id !== id)
     },
-    FEED_SET_READED(state, { id }) {
-        state.feed.feeds[id].num_unread_storys = 0
-        let storyIds = state.story.feedStoryMap[id]
-        if (lodash.isNil(storyIds)) {
-            return
-        }
-        lodash.keys(storyIds).forEach(storyId => {
-            let story = state.story.storys[storyId]
-            if (!lodash.isNil(story)) {
-                story.is_readed = true
-            }
-        })
-    },
-    FEED_SET_SCROLL_TOP(state, { scrollTop }) {
-        state.feed.scrollTop = scrollTop
+    FEED_SET_READED(state, { id, offset }) {
+        let feed = state.feed.feeds[id]
+        feed.story_offset = offset
+        feed.num_unread_storys = feed.total_storys - offset
     },
 }
 
@@ -77,13 +56,13 @@ const STORY = {
     },
     STORY_SET_PREV_CURSOR(state, { feedId, cursor }) {
         Vue.set(state.story.cursor.prev, feedId, cursor)
-        if (lodash.isNil(cursor)) {
+        if (_.isNil(cursor)) {
             Vue.set(state.story.cursor.hasPrev, feedId, false)
         }
     },
     STORY_SET_NEXT_CURSOR(state, { feedId, cursor }) {
         Vue.set(state.story.cursor.next, feedId, cursor)
-        if (lodash.isNil(cursor)) {
+        if (_.isNil(cursor)) {
             Vue.set(state.story.cursor.hasNext, feedId, false)
         }
     },
@@ -94,10 +73,10 @@ const STORY = {
         state.story.storys[id].is_readed = is_readed;
     },
     STORY_SET_ALL_READED(state) {
-        lodash.values(state.feed.feeds).forEach(feed => {
+        _.values(state.feed.feeds).forEach(feed => {
             feed.num_unread_storys = 0
         })
-        lodash.values(state.story.storys).forEach(story => {
+        _.values(state.story.storys).forEach(story => {
             story.is_readed = true
         })
     },

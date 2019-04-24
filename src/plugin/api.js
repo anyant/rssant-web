@@ -1,7 +1,7 @@
 import Notification from './notify'
 import Timeit from './timeit'
 
-import lodash from 'lodash'
+import _ from 'lodash'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import URI from 'urijs'
@@ -14,8 +14,8 @@ const client = axios.create({
 
 client.interceptors.request.use(function (config) {
   let csrftoken = Cookies.get('csrftoken')
-  if (!lodash.isNil(csrftoken)) {
-    if (lodash.isNil(config.headers)) {
+  if (!_.isNil(csrftoken)) {
+    if (_.isNil(config.headers)) {
       config.headers = {}
     }
     config.headers['X-CSRFToken'] = csrftoken
@@ -27,7 +27,7 @@ client.interceptors.response.use(
   function (response) {
     if (window.app.debug) {
       let time = response.headers['x-time']
-      if (!lodash.isNil(time)) {
+      if (!_.isNil(time)) {
         Timeit.show(time, response.config.method, response.config.url)
       }
     }
@@ -35,20 +35,20 @@ client.interceptors.response.use(
   },
   function (error) {
     let title = null
-    if (lodash.isNil(error.response)) {
+    if (_.isNil(error.response)) {
       title = `Failed: ${error.config.method} ${error.config.url}`
     } else {
       title = `${error.response.status} ${error.response.statusText}`
     }
     let message = error.message
-    if (!lodash.isNil(error.response)) {
-      if (!lodash.isNil(error.response.data)) {
-        if (!lodash.isEmpty(error.response.data.message)) {
+    if (!_.isNil(error.response)) {
+      if (!_.isNil(error.response.data)) {
+        if (!_.isEmpty(error.response.data.message)) {
           message = error.response.data.message
         }
       }
     }
-    message = lodash.truncate(message, { length: 50, separator: /,? +/ })
+    message = _.truncate(message, { length: 50, separator: /,? +/ })
     Object.assign(error, { title, message })
     if (window.app.debug) {
       Notification.error({ title, message })
@@ -63,12 +63,12 @@ const API = {
       return client.post('/user/login/', { account, password })
     },
     register({ username, email, password }) {
-      username = lodash.defaultTo(username, email)
+      username = _.defaultTo(username, email)
       return client.post('/auth/registration/', { username, email, password1: password, password2: password })
     },
     logout({ next } = {}) {
       return client.post(`/auth/logout/`).then(() => {
-        window.location.assign(lodash.defaultTo(next, '/'))
+        window.location.assign(_.defaultTo(next, '/'))
       })
     },
     loginGithub({ next, scope } = {}) {
@@ -83,8 +83,8 @@ const API = {
     },
   },
   feed: {
-    list({ detail, cursor, size } = {}) {
-      return client.get('/feed/', { params: { detail, cursor, size } })
+    query({ detail, hints } = {}) {
+      return client.post('/feed/query', { detail, hints })
     },
     create({ url }) {
       return client.post('/feed/', { url })
@@ -98,43 +98,52 @@ const API = {
     delete({ id }) {
       return client.delete(`/feed/${id}`)
     },
+    setReaded({ id, offset }) {
+      return client.put(`/feed/${id}/readed`, { offset })
+    },
+    setAllReaded({ ids } = {}) {
+      return client.put(`/feed/all/readed`, { ids })
+    },
     importOPML({ file }) {
       var formData = new FormData()
       formData.append("file", file)
-      return client.post(`/feed/opml/`, formData, {
+      return client.post(`/feed/opml`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       })
+    },
+    exportOPML({ download } = {}) {
+      return client.get(`/feed/opml`, { params: { download } })
     },
     importBookmark({ file }) {
       var formData = new FormData()
       formData.append("file", file)
-      return client.post(`/feed/bookmark/`, formData, {
+      return client.post(`/feed/bookmark`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       })
     },
-    setReaded({ id }) {
-      return client.put(`/feed/${id}/readed`)
-    },
   },
   story: {
-    list({ feed_id, detail, data, cursor, size, is_readed } = {}) {
-      return client.get('/story/', { params: { feed_id, detail, data, cursor, size, is_readed } })
+    query({ feed_id, detail, offset, size } = {}) {
+      return client.get('/story/query', { params: { feed_id, detail, offset, size } })
     },
-    get({ id, detail, data }) {
-      return client.get(`/story/${id}`, { params: { detail, data } })
+    get({ feed_id, offset, detail }) {
+      return client.get(`/story/${feed_id}:${offset}`, { params: { detail } })
     },
-    setReaded({ id, is_readed }) {
-      return client.put(`/story/${id}/readed`, { is_readed })
+    listWatched({ detail } = {}) {
+      return client.get('/story/watched', { params: { detail } })
     },
-    setAllReaded() {
-      return client.put(`/story/all/readed`)
+    listFavorited({ detail } = {}) {
+      return client.get('/story/favorited', { params: { detail } })
     },
-    setFavorited({ id, is_favorited }) {
-      return client.put(`/story/${id}/favorited`, { is_favorited })
+    setWatched({ feed_id, offset, is_watched }) {
+      return client.put(`/story/${feed_id}:${offset}/watched`, { is_watched })
+    },
+    setFavorited({ feed_id, offset, is_favorited }) {
+      return client.put(`/story/${feed_id}:${offset}/favorited`, { is_favorited })
     }
   }
 }

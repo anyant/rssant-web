@@ -99,6 +99,9 @@ export default {
       rippleColor: antRippleGrey,
       avatar: defaultAvatar
     }
+  },
+  mounted() {
+    this.$StoreAPI.feed.sync()
   }
 }
 </script>

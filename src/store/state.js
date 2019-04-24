@@ -1,28 +1,24 @@
+import Loading from '@/plugin/loading'
+
 export default {
     user: {
-        isLoading: true,
+        loading: new Loading(),
         loginUser: null,
         loginToken: null,
         loginDate: null,
     },
     feed: {
-        cursor: {
-            prev: null,
-            next: null,
-        },
-        scrollTop: null,
-        feeds: {
-        },
+        loading: new Loading(),
+        feeds: {},
+        feedList: [],
+        feedStoryMap: {},
+        offsetLow: {},
+        offsetHigh: {},
     },
     story: {
-        cursor: {
-            prev: {},
-            next: {},
-        },
-        scrollTop: {},
-        storys: {
-        },
-        feedStoryMap: {
-        }
+        storys: {},
     },
+    page: {
+        scrollTop: {},
+    }
 }

@@ -7,7 +7,13 @@
       </mu-button>
     </MoBackHeader>
     <div class="feed-list">
-      <MoFeedItem v-for="x in [1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8]" :key="x" :readed="x > 4">{{ x }}</MoFeedItem>
+      <MoFeedItem
+        v-for="feed in feedList"
+        :key="feed.id"
+        :title="feed.title"
+        :num-unread="feed.num_unread"
+        :date="feed.dt_updated"
+      ></MoFeedItem>
     </div>
   </MoLayout>
 </template>
@@ -20,6 +26,14 @@ export default {
   components: { MoBackHeader, MoLayout, MoFeedItem },
   data() {
     return {}
+  },
+  mounted() {
+    this.$StoreAPI.feed.sync()
+  },
+  computed: {
+    feedList() {
+      return this.$StoreAPI.feed.getFeedList()
+    }
   }
 }
 </script>
