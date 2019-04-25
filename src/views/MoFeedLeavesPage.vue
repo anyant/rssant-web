@@ -1,7 +1,7 @@
 <template>
   <MoLayout grey header>
     <MoBackHeader border>
-      <template v-slot:title>绿叶 (999+)</template>
+      <template v-slot:title>绿叶{{ numFeedsText }}</template>
       <mu-button icon class="action-readed">
         <mu-icon value="done"></mu-icon>
       </mu-button>
@@ -11,8 +11,9 @@
         v-for="feed in feedList"
         :key="feed.id"
         :title="feed.title"
-        :num-unread="feed.num_unread"
+        :number="feed.num_unread_storys"
         :date="feed.dt_updated"
+        :link="`/feed/${feed.id}`"
       ></MoFeedItem>
     </div>
   </MoLayout>
@@ -33,6 +34,14 @@ export default {
   computed: {
     feedList() {
       return this.$StoreAPI.feed.getFeedList()
+    },
+    numFeedsText() {
+      let n = this.feedList.length
+      if (n <= 0) {
+        return ''
+      } else {
+        return ` (${n})`
+      }
     }
   }
 }

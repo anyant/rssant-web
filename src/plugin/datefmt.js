@@ -1,6 +1,5 @@
 import _ from 'lodash'
-import moment from 'moment'
-
+import datefn from 'date-fns'
 
 
 /**
@@ -8,18 +7,24 @@ import moment from 'moment'
  * 04-24 10:35
  * 2019-04-24
  */
-function formatDate(date) {
+function formatDate(date, now) {
     if (_.isNil(date) || _.isEmpty(date)) {
         return ''
     }
-    date = moment(date)
-    let now = moment()
-    if (date.isSame(now, 'day')) {
-        return date.format('HH:ss')
-    } else if (date.isSame(now, 'year')) {
-        return date.format('MM-DD HH:ss')
+    date = new Date(date)
+    if (_.isNil(now)) {
+        now = new Date()
+    }
+    if (datefn.isSameDay(now, date)) {
+        return datefn.format(date, 'HH:ss')
+    } else if (datefn.isSameDay(now, datefn.addDays(date, 1))) {
+        return datefn.format(date, '昨天HH:ss')
+    } else if (datefn.isSameDay(now, datefn.addDays(date, 2))) {
+        return datefn.format(date, '前天HH:ss')
+    } else if (datefn.isSameYear(now, date)) {
+        return datefn.format(date, 'MM-DD HH:ss')
     } else {
-        return date.format('YYYY-MM-DD')
+        return datefn.format(date, 'YYYY-MM-DD')
     }
 }
 

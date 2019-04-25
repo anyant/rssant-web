@@ -2,18 +2,14 @@
   <div id="app">
     <div id="timeit"></div>
     <router-view/>
-    <AddFeedDialog></AddFeedDialog>
   </div>
 </template>
 
 <script>
-import AddFeedDialog from '@/components/AddFeedDialog'
-
 export default {
   data() {
     return {}
   },
-  components: { AddFeedDialog },
   async created() {}
 }
 </script>

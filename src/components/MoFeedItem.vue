@@ -3,10 +3,10 @@
     :color="rippleColor"
     class="feed-item"
     :class="{ 'feed-item-readed': readed }"
-    @click="()=>{this.$router.push('/feed/123')}"
+    @click="onClick"
   >
     <div class="feed-title">{{ title }}</div>
-    <div class="feed-num-unread">{{ numUnread }}</div>
+    <div class="feed-num-unread">{{ numberText }}</div>
     <div class="feed-date">{{ dateText }}</div>
   </mu-ripple>
 </template>
@@ -20,23 +20,38 @@ import { formatDate } from '@/plugin/datefmt'
 export default {
   props: {
     title: String,
-    numUnread: {
+    number: {
       type: Number,
       default: 0
     },
-    date: Date
+    date: String,
+    link: String
   },
   computed: {
     readed() {
-      return _.isNil(this.numUnread) || this.numUnread <= 0
+      return _.isNil(this.number) || this.number <= 0
     },
     dateText() {
       return formatDate(this.date)
+    },
+    numberText() {
+      if (_.isNil(this.number)) {
+        return ''
+      }
+      if (this.number > 9999) {
+        return '9999'
+      }
+      return this.number.toString()
     }
   },
   data() {
     return {
       rippleColor: antRippleGrey
+    }
+  },
+  methods: {
+    onClick() {
+      this.$router.push(this.link)
     }
   }
 }
