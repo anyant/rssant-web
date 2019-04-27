@@ -1,6 +1,7 @@
 import MoHomePage from '@/views/MoHomePage'
 import MoFeedMushroomPage from '@/views/MoFeedMushroomPage'
 import MoFeedLeavesPage from '@/views/MoFeedLeavesPage'
+import MoFeedDeadwoodPage from '@/views/MoFeedDeadwoodPage'
 import MoStoryListPage from '@/views/MoStoryListPage'
 import MoLoginPage from '@/views/MoLoginPage'
 import MoRegisterPage from '@/views/MoRegisterPage'
@@ -43,6 +44,12 @@ export default [
     path: '/leaves',
     name: 'FeedLeaves',
     component: MoFeedLeavesPage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: '/deadwood',
+    name: 'FeedDeadwood',
+    component: MoFeedDeadwoodPage,
     meta: { loginRequired: true },
   },
   {

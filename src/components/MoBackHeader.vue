@@ -44,11 +44,10 @@ export default {
 
 .title {
   margin-left: -2 * @pr;
-  max-width: 280 * @pr;
   font-size: 16 * @pr;
   font-weight: bold;
-  white-space: nowrap;
   overflow: hidden;
+  white-space: nowrap;
   text-overflow: ellipsis;
 }
 
@@ -57,5 +56,10 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.left {
+  white-space: nowrap;
+  overflow: hidden;
 }
 </style>

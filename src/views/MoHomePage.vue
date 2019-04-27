@@ -25,7 +25,7 @@
           <span class="item-title">蘑菇</span>
         </div>
         <div class="item-right">
-          <span class="item-number">5</span>
+          <span class="item-number">{{ numMushrooms }}</span>
           <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
         </div>
       </mu-ripple>
@@ -39,7 +39,7 @@
           <span class="item-title">绿叶</span>
         </div>
         <div class="item-right">
-          <span class="item-number">999+</span>
+          <span class="item-number">{{ numLeaves }}</span>
           <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
         </div>
       </mu-ripple>
@@ -49,7 +49,7 @@
           <span class="item-title">收藏</span>
         </div>
         <div class="item-right">
-          <span class="item-number">5</span>
+          <span class="item-number"></span>
           <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
         </div>
       </mu-ripple>
@@ -59,17 +59,21 @@
           <span class="item-title">菌圃</span>
         </div>
         <div class="item-right">
-          <span class="item-number">5</span>
+          <span class="item-number"></span>
           <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
         </div>
       </mu-ripple>
-      <mu-ripple :color="rippleColor" class="item item-deadwood">
+      <mu-ripple
+        :color="rippleColor"
+        class="item item-deadwood"
+        @click="()=>{this.$router.push('/deadwood')}"
+      >
         <div class="item-left">
           <i class="item-icon fa fa-leaf" aria-hidden="true"></i>
           <span class="item-title">枯木</span>
         </div>
         <div class="item-right">
-          <span class="item-number">5</span>
+          <span class="item-number">{{ numDeadwoods }}</span>
           <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
         </div>
       </mu-ripple>
@@ -79,7 +83,7 @@
           <span class="item-title">废墟</span>
         </div>
         <div class="item-right">
-          <span class="item-number">5</span>
+          <span class="item-number"></span>
           <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
         </div>
       </mu-ripple>
@@ -100,8 +104,19 @@ export default {
       avatar: defaultAvatar
     }
   },
+  computed: {
+    numMushrooms() {
+      return this.$API.feed.mushrooms.length
+    },
+    numLeaves() {
+      return this.$API.feed.leaves.length
+    },
+    numDeadwoods() {
+      return this.$API.feed.deadwoods.length
+    }
+  },
   mounted() {
-    this.$StoreAPI.feed.sync()
+    this.$API.feed.sync()
   }
 }
 </script>

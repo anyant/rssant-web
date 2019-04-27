@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import routes from './routes'
 
-import { StoreAPI } from '@/store'
+import { API } from '@/store'
 
 Vue.use(Router)
 
@@ -20,9 +20,9 @@ router.beforeEach((to, from, next) => {
   })
   const goNext = () => next()
   if (loginRequired) {
-    StoreAPI.user.login().then(goNext).catch(goLogin)
+    API.user.login().then(goNext).catch(goLogin)
   } else {
-    StoreAPI.user.login().finally(goNext)
+    API.user.login().finally(goNext)
   }
 })
 

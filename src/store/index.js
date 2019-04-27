@@ -1,10 +1,22 @@
 /*
 命名：字段属性保持Python下划线不变，方法名使用小驼峰
 STORE: 维护状态稳定性和一致性
-StoreAPI: 提供对外接口
+API: 提供对外接口
 */
 
-import { STORE, STATE, DAO } from './dao'
-import StoreAPI from './api'
+import StoreBuilder from './builder'
+import user from './user'
+import feed from './feed'
+import page from './page'
+import story from './story'
 
-export { STORE, STATE, DAO, StoreAPI }
+const builder = new StoreBuilder()
+builder.mount('user', user)
+builder.mount('feed', feed)
+builder.mount('page', page)
+builder.mount('story', story)
+
+const [Store, API] = builder.build()
+
+window.StoreAPI = API
+export { Store, API }

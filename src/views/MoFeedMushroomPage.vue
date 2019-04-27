@@ -1,13 +1,20 @@
 <template>
   <MoLayout grey header>
     <MoBackHeader border>
-      <template v-slot:title>蘑菇 (5)</template>
+      <template v-slot:title>蘑菇{{ numFeedsText }}</template>
       <mu-button icon class="action-readed">
         <mu-icon value="done"></mu-icon>
       </mu-button>
     </MoBackHeader>
     <div class="feed-story-list">
-      <MoFeedStoryItem v-for="x in [1,2,3,4,5,6,7,8,9,1,2,3,4,5,6]" :key="x" :readed="x < 4">{{ x }}</MoFeedStoryItem>
+      <MoFeedItem
+        v-for="feed in feedList"
+        :key="feed.id"
+        :title="feed.title"
+        :number="feed.num_unread_storys"
+        :date="feed.dt_updated"
+        :link="`/feed/${feed.id}`"
+      ></MoFeedItem>
     </div>
   </MoLayout>
 </template>
@@ -15,11 +22,28 @@
 import MoBackHeader from '@/components/MoBackHeader'
 import MoLayout from '@/components/MoLayout'
 import MoFeedStoryItem from '@/components/MoFeedStoryItem.vue'
+import MoFeedItem from '@/components/MoFeedItem.vue'
 
 export default {
-  components: { MoBackHeader, MoLayout, MoFeedStoryItem },
+  components: { MoBackHeader, MoLayout, MoFeedStoryItem, MoFeedItem },
   data() {
     return {}
+  },
+  mounted() {
+    this.$API.feed.sync()
+  },
+  computed: {
+    feedList() {
+      return this.$API.feed.mushrooms
+    },
+    numFeedsText() {
+      let n = this.feedList.length
+      if (n <= 0) {
+        return ''
+      } else {
+        return ` (${n})`
+      }
+    }
   }
 }
 </script>
@@ -35,6 +59,7 @@ export default {
   color: @antTextBlack;
 }
 
+.feed-item,
 .feed-story-item {
   position: relative;
   margin-top: 8 * @pr;

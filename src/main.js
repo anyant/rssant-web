@@ -21,8 +21,7 @@ import Mescroll from "mescroll.js/mescroll.vue";
 // rssant
 import App from './App'
 import router from '@/router'
-import { STORE, StoreAPI } from '@/store'
-import API from '@/plugin/api'
+import { Store, API } from '@/store'
 import Notification from '@/plugin/notify'
 import '@/styles/theme-rssant.less'
 
@@ -33,13 +32,13 @@ initREM(true, 32, 1);
 
 Vue.config.productionTip = false
 
-sync(STORE, router)
+sync(Store, router)
 
 Vue.prototype.$API = API
-Vue.prototype.$StoreAPI = StoreAPI
 
 Vue.prototype.$notify = Notification
 Vue.prototype.$message = Message
+
 
 Vue.use(MuseUI)
 Vue.use(Loading)
