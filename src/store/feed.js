@@ -21,23 +21,17 @@ function groupFeedList(feedList) {
             deadwoods.push(feed)
             return
         }
-        if (_.isEmpty(feed.dt_last_story_published) || _.isEmpty(feed.dt_first_story_published)) {
+        if (_.isEmpty(feed.dt_latest_story_published)) {
             deadwoods.push(feed)
             return
         }
         let now = new Date()
-        let dt_last = new Date(feed.dt_last_story_published)
-        if (Math.abs(differenceInDays(now, dt_last)) > 18 * 30) {
+        let dt_latest = new Date(feed.dt_latest_story_published)
+        if (Math.abs(differenceInDays(now, dt_latest)) > 18 * 30) {
             deadwoods.push(feed)
             return
         }
-        let dt_first = new Date(feed.dt_first_story_published)
-        let days = Math.abs(differenceInDays(dt_first, dt_last))
-        if (days < 3) {
-            days = 3
-        }
-        let DPS = days / feed.total_storys
-        if (DPS > 3) {
+        if (feed.story_publish_period > 7) {
             mushrooms.push(feed)
         } else {
             leaves.push(feed)
