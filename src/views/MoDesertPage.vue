@@ -1,12 +1,12 @@
 <template>
   <MoLayout grey header>
     <MoBackHeader border>
-      <template v-slot:title>绿叶{{ numFeedsText }}</template>
+      <template v-slot:title>沙漠{{ numFeedsText }}</template>
       <mu-button icon class="action-readed">
         <mu-icon value="done"></mu-icon>
       </mu-button>
     </MoBackHeader>
-    <div class="feed-list">
+    <div class="feed-story-list">
       <MoFeedItem
         v-for="feed in feedList"
         :key="feed.id"
@@ -21,10 +21,11 @@
 <script>
 import MoBackHeader from '@/components/MoBackHeader'
 import MoLayout from '@/components/MoLayout'
+import MoFeedStoryItem from '@/components/MoFeedStoryItem.vue'
 import MoFeedItem from '@/components/MoFeedItem.vue'
 
 export default {
-  components: { MoBackHeader, MoLayout, MoFeedItem },
+  components: { MoBackHeader, MoLayout, MoFeedStoryItem, MoFeedItem },
   data() {
     return {}
   },
@@ -33,7 +34,7 @@ export default {
   },
   computed: {
     feedList() {
-      return this.$API.feed.leaves
+      return this.$API.feed.desert
     },
     numFeedsText() {
       let n = this.feedList.length
@@ -58,11 +59,13 @@ export default {
   color: @antTextBlack;
 }
 
-.feed-item {
+.feed-item,
+.feed-story-item {
+  position: relative;
   margin-top: 8 * @pr;
 }
 
-.feed-list {
+.feed-story-list {
   padding-bottom: 8 * @pr;
 }
 </style>

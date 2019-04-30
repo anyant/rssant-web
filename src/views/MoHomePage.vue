@@ -1,94 +1,108 @@
 <template>
-  <MoLayout grey header>
-    <MoHeader>
-      <div class="title">蚁阅</div>
-      <div class="right">
-        <mu-button icon class="action-add" @click="()=>{this.$router.push('/feed-creation')}">
-          <mu-icon value="add"></mu-icon>
-        </mu-button>
-        <mu-button icon class="action-menu">
-          <mu-icon value="menu"></mu-icon>
-        </mu-button>
-        <mu-avatar size="32" class="user" @click="()=>{this.$router.push('/login')}">
-          <img :src="avatar">
-        </mu-avatar>
+  <keep-alive>
+    <MoLayout grey header>
+      <MoHeader>
+        <div class="title">蚁阅</div>
+        <div class="right">
+          <mu-button icon class="action-add" @click="()=>{this.$router.push('/feed-creation')}">
+            <mu-icon value="add"></mu-icon>
+          </mu-button>
+          <mu-button icon class="action-menu">
+            <mu-icon value="menu"></mu-icon>
+          </mu-button>
+          <mu-avatar size="32" class="user" @click="()=>{this.$router.push('/login')}">
+            <img :src="avatar">
+          </mu-avatar>
+        </div>
+      </MoHeader>
+      <div>
+        <mu-ripple
+          :color="rippleColor"
+          class="item item-mushrooms"
+          @click="()=>{this.$router.push('/mushrooms')}"
+        >
+          <div class="item-left">
+            <i class="item-icon fa fa-trophy" aria-hidden="true"></i>
+            <span class="item-title">蘑菇</span>
+          </div>
+          <div class="item-right">
+            <span class="item-number">{{ numMushrooms }}</span>
+            <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
+          </div>
+        </mu-ripple>
+        <mu-ripple
+          :color="rippleColor"
+          class="item item-jungle"
+          @click="()=>{this.$router.push('/jungle')}"
+        >
+          <div class="item-left">
+            <i class="item-icon fa fa-leaf" aria-hidden="true"></i>
+            <span class="item-title">丛林</span>
+          </div>
+          <div class="item-right">
+            <span class="item-number">{{ numJungle }}</span>
+            <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
+          </div>
+        </mu-ripple>
+        <mu-ripple
+          :color="rippleColor"
+          class="item item-garden"
+          @click="()=>{this.$router.push('/garden')}"
+        >
+          <div class="item-left">
+            <i class="item-icon fa fa-rss" aria-hidden="true"></i>
+            <span class="item-title">菌圃</span>
+          </div>
+          <div class="item-right">
+            <span class="item-number">{{ numGarden }}</span>
+            <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
+          </div>
+        </mu-ripple>
+        <mu-ripple
+          :color="rippleColor"
+          class="item item-desert"
+          @click="()=>{this.$router.push('/desert')}"
+        >
+          <div class="item-left">
+            <i class="item-icon fa fa-leaf" aria-hidden="true"></i>
+            <span class="item-title">沙漠</span>
+          </div>
+          <div class="item-right">
+            <span class="item-number">{{ numDesert }}</span>
+            <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
+          </div>
+        </mu-ripple>
+        <mu-ripple
+          :color="rippleColor"
+          class="item item-trash"
+          @click="()=>{this.$router.push('/trash')}"
+        >
+          <div class="item-left">
+            <i class="item-icon fa fa-exclamation-triangle" aria-hidden="true"></i>
+            <span class="item-title">废墟</span>
+          </div>
+          <div class="item-right">
+            <span class="item-number">{{ numTrash }}</span>
+            <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
+          </div>
+        </mu-ripple>
+        <mu-ripple
+          :color="rippleColor"
+          class="item item-favorited"
+          @click="()=>{this.$router.push('/favorited')}"
+        >
+          <div class="item-left">
+            <i class="item-icon fa fa-star" aria-hidden="true"></i>
+            <span class="item-title">收藏</span>
+          </div>
+          <div class="item-right">
+            <span class="item-number">{{ numFavorited }}</span>
+            <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
+          </div>
+        </mu-ripple>
       </div>
-    </MoHeader>
-    <div>
-      <mu-ripple
-        :color="rippleColor"
-        class="item item-mushroom"
-        @click="()=>{this.$router.push('/mushroom')}"
-      >
-        <div class="item-left">
-          <i class="item-icon fa fa-trophy" aria-hidden="true"></i>
-          <span class="item-title">蘑菇</span>
-        </div>
-        <div class="item-right">
-          <span class="item-number">{{ numMushrooms }}</span>
-          <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
-        </div>
-      </mu-ripple>
-      <mu-ripple
-        :color="rippleColor"
-        class="item item-leaves"
-        @click="()=>{this.$router.push('/leaves')}"
-      >
-        <div class="item-left">
-          <i class="item-icon fa fa-leaf" aria-hidden="true"></i>
-          <span class="item-title">绿叶</span>
-        </div>
-        <div class="item-right">
-          <span class="item-number">{{ numLeaves }}</span>
-          <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
-        </div>
-      </mu-ripple>
-      <mu-ripple :color="rippleColor" class="item item-favorited">
-        <div class="item-left">
-          <i class="item-icon fa fa-star" aria-hidden="true"></i>
-          <span class="item-title">收藏</span>
-        </div>
-        <div class="item-right">
-          <span class="item-number"></span>
-          <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
-        </div>
-      </mu-ripple>
-      <mu-ripple :color="rippleColor" class="item item-feedlist">
-        <div class="item-left">
-          <i class="item-icon fa fa-rss" aria-hidden="true"></i>
-          <span class="item-title">菌圃</span>
-        </div>
-        <div class="item-right">
-          <span class="item-number"></span>
-          <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
-        </div>
-      </mu-ripple>
-      <mu-ripple
-        :color="rippleColor"
-        class="item item-deadwood"
-        @click="()=>{this.$router.push('/deadwood')}"
-      >
-        <div class="item-left">
-          <i class="item-icon fa fa-leaf" aria-hidden="true"></i>
-          <span class="item-title">枯木</span>
-        </div>
-        <div class="item-right">
-          <span class="item-number">{{ numDeadwoods }}</span>
-          <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
-        </div>
-      </mu-ripple>
-      <mu-ripple :color="rippleColor" class="item item-trash">
-        <div class="item-left">
-          <i class="item-icon fa fa-exclamation-triangle" aria-hidden="true"></i>
-          <span class="item-title">废墟</span>
-        </div>
-        <div class="item-right">
-          <span class="item-number"></span>
-          <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
-        </div>
-      </mu-ripple>
-    </div>
-  </MoLayout>
+    </MoLayout>
+  </keep-alive>
 </template>
 <script>
 import MoHeader from '@/components/MoHeader'
@@ -106,17 +120,28 @@ export default {
   },
   computed: {
     numMushrooms() {
-      return this.$API.feed.mushrooms.length
+      return this.$API.story.mushrooms.length
     },
-    numLeaves() {
-      return this.$API.feed.leaves.length
+    numJungle() {
+      return this.$API.feed.jungle.length
     },
-    numDeadwoods() {
-      return this.$API.feed.deadwoods.length
+    numGarden() {
+      return this.$API.feed.garden.length
+    },
+    numDesert() {
+      return this.$API.feed.desert.length
+    },
+    numTrash() {
+      return ''
+    },
+    numFavorited() {
+      return ''
     }
   },
-  mounted() {
-    this.$API.feed.sync()
+  async mounted() {
+    await this.$API.feed.sync()
+    let mushroomFeedIds = this.$API.feed.recentGarden.map(feed => feed.id)
+    await this.$API.story.loadMushrooms({ feedIds: mushroomFeedIds, days: 14 })
   }
 }
 </script>
@@ -191,15 +216,15 @@ export default {
   font-size: 20 * @pr;
 }
 
-.item-mushroom .item-icon {
+.item-mushrooms .item-icon {
   color: @antGold;
 }
 
-.item-leaves .item-icon {
+.item-jungle .item-icon {
   color: @antGreen;
 }
 
-.item-favorited .item-icon {
+.item-garden .item-icon {
   color: @antBlue;
 }
 </style>

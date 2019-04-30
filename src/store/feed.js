@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import Vue from 'vue'
-import { differenceInDays } from 'date-fns'
+import { differenceInDays, isAfter, subDays } from 'date-fns'
 import Loading from '@/plugin/loading'
 import { API } from '@/plugin/api'
 
@@ -13,47 +13,59 @@ function sortFeedList(feedList) {
 }
 
 function groupFeedList(feedList) {
-    let mushrooms = []
-    let leaves = []
-    let deadwoods = []
+    // garden 菌圃    更新周期>=3的订阅
+    // jungle 丛林    更新周期<3的订阅
+    // desert 沙漠    最近18个月未更新的订阅
+    // trash  废墟    无效/无法访问的订阅
+    let garden = []
+    let jungle = []
+    let desert = []
+    let trash = []
+    const MONTH_18 = 18 * 30
     feedList.forEach(feed => {
+        if (feed.status === 'error') {
+            trash.push(feed)
+            return
+        }
         if (feed.total_storys <= 0) {
-            deadwoods.push(feed)
+            desert.push(feed)
             return
         }
         if (_.isEmpty(feed.dt_latest_story_published)) {
-            deadwoods.push(feed)
+            desert.push(feed)
             return
         }
         let now = new Date()
         let dt_latest = new Date(feed.dt_latest_story_published)
-        if (Math.abs(differenceInDays(now, dt_latest)) > 18 * 30) {
-            deadwoods.push(feed)
+        if (Math.abs(differenceInDays(now, dt_latest)) > MONTH_18) {
+            desert.push(feed)
             return
         }
-        if (feed.story_publish_period > 7) {
-            mushrooms.push(feed)
+        if (feed.story_publish_period >= 3) {
+            garden.push(feed)
         } else {
-            leaves.push(feed)
+            jungle.push(feed)
         }
     })
-    return { mushrooms, leaves, deadwoods }
+    return { garden, jungle, desert, trash }
 }
 
 function updateFeedList(state) {
-    let { mushrooms, leaves, deadwoods } = groupFeedList(_.values(state.feeds))
-    state.mushrooms = sortFeedList(mushrooms)
-    state.leaves = sortFeedList(leaves)
-    state.deadwoods = sortFeedList(deadwoods)
+    let { garden, jungle, desert, trash } = groupFeedList(_.values(state.feeds))
+    state.garden = sortFeedList(garden)
+    state.jungle = sortFeedList(jungle)
+    state.desert = sortFeedList(desert)
+    state.trash = sortFeedList(trash)
 }
 
 export default {
     state: {
         loading: new Loading(),
         feeds: {},
-        mushrooms: [],
-        leaves: [],
-        deadwoods: [],
+        garden: [],
+        jungle: [],
+        desert: [],
+        trash: [],
     },
     mutations: {
         SYNC(state, { updatedFeeds, deletedFeedIds }) {
@@ -83,20 +95,31 @@ export default {
         isLoading(state) {
             return state.loading.isLoading
         },
-        mushrooms(state) {
-            return state.mushrooms
+        garden(state) {
+            return state.garden
         },
-        leaves(state) {
-            return state.leaves
+        jungle(state) {
+            return state.jungle
         },
-        deadwoods(state) {
-            return state.deadwoods
+        desert(state) {
+            return state.desert
+        },
+        trash(state) {
+            return state.trash
+        },
+        recentGarden(state) {
+            const dt_recent = subDays(new Date(), 14)
+            return state.garden.filter(feed => {
+                let dt_latest = new Date(feed.dt_latest_story_published)
+                return isAfter(dt_latest, dt_recent)
+            })
         },
         get(state) {
             return feedId => {
                 return state.feeds[feedId]
             }
         },
+
     },
     actions: {
         async sync(DAO) {

@@ -1,7 +1,7 @@
 <template>
   <MoLayout grey header>
     <MoBackHeader border>
-      <template v-slot:title>枯木{{ numFeedsText }}</template>
+      <template v-slot:title>菌圃{{ numFeedsText }}</template>
       <mu-button icon class="action-readed">
         <mu-icon value="done"></mu-icon>
       </mu-button>
@@ -34,7 +34,7 @@ export default {
   },
   computed: {
     feedList() {
-      return this.$API.feed.deadwoods
+      return this.$API.feed.garden
     },
     numFeedsText() {
       let n = this.feedList.length

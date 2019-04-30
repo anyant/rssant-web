@@ -6,6 +6,7 @@ import { API } from '@/plugin/api'
 export default {
     state: {
         storys: {},
+        mushrooms: []
     },
     mutations: {
         SET_FAVORITED(state, { id, is_favorited }) {
@@ -31,7 +32,18 @@ export default {
             storys.forEach(story => {
                 Vue.set(feedStorys, story.offset, story)
             })
-        }
+        },
+        ADD_OR_UPDATE_MUSHROOMS(state, storys) {
+            storys.forEach(story => {
+                let feedStorys = state.storys[story.feed.id]
+                if (_.isNil(feedStorys)) {
+                    Vue.set(state.storys, story.feed.id, {})
+                    feedStorys = state.storys[story.feed.id]
+                }
+                Vue.set(feedStorys, story.offset, story)
+            })
+            state.mushrooms = storys
+        },
     },
     getters: {
         get(state) {
@@ -47,6 +59,9 @@ export default {
                 }
                 return _.chain(_.values(feedStorys)).sortBy('offset').value()
             }
+        },
+        mushrooms(state) {
+            return state.mushrooms
         }
     },
     actions: {
@@ -65,6 +80,10 @@ export default {
         async loadList(DAO, { feedId, offset, detail, size }) {
             let data = await API.story.query({ feed_id: feedId, offset, detail, size })
             DAO.ADD_OR_UPDATE_LIST({ feedId, storys: data.results })
+        },
+        async loadMushrooms(DAO, { feedIds, days, detail }) {
+            let data = await API.story.queryRecent({ feed_ids: feedIds, days, detail })
+            DAO.ADD_OR_UPDATE_MUSHROOMS(data.results)
         }
     }
 }

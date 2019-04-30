@@ -1,7 +1,7 @@
 import MoHomePage from '@/views/MoHomePage'
-import MoFeedMushroomPage from '@/views/MoFeedMushroomPage'
-import MoFeedLeavesPage from '@/views/MoFeedLeavesPage'
-import MoFeedDeadwoodPage from '@/views/MoFeedDeadwoodPage'
+import MoGardenPage from '@/views/MoGardenPage'
+import MoJunglePage from '@/views/MoJunglePage'
+import MoDesertPage from '@/views/MoDesertPage'
 import MoStoryListPage from '@/views/MoStoryListPage'
 import MoLoginPage from '@/views/MoLoginPage'
 import MoRegisterPage from '@/views/MoRegisterPage'
@@ -35,21 +35,21 @@ export default [
     meta: { loginRequired: true },
   },
   {
-    path: '/mushroom',
-    name: 'FeedMushroom',
-    component: MoFeedMushroomPage,
+    path: '/garden',
+    name: 'Garden',
+    component: MoGardenPage,
     meta: { loginRequired: true },
   },
   {
-    path: '/leaves',
-    name: 'FeedLeaves',
-    component: MoFeedLeavesPage,
+    path: '/jungle',
+    name: 'Jungle',
+    component: MoJunglePage,
     meta: { loginRequired: true },
   },
   {
-    path: '/deadwood',
-    name: 'FeedDeadwood',
-    component: MoFeedDeadwoodPage,
+    path: '/desert',
+    name: 'Desert',
+    component: MoDesertPage,
     meta: { loginRequired: true },
   },
   {

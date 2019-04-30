@@ -130,6 +130,9 @@ const API = {
     query({ feed_id, detail, offset, size } = {}) {
       return client.get('/story/query', { params: { feed_id, detail, offset, size } })
     },
+    queryRecent({ feed_ids, days, detail } = {}) {
+      return client.post('/story/recent', { feed_ids, days, detail })
+    },
     get({ feed_id, offset, detail }) {
       return client.get(`/story/${feed_id}:${offset}`, { params: { detail } })
     },
