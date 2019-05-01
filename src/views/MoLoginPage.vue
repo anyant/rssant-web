@@ -63,7 +63,7 @@ export default {
   },
   methods: {
     login() {
-      this.$StoreAPI.user
+      this.$API.user
         .login({ account: this.loginForm.account, password: this.loginForm.password })
         .then(() => {
           this.$router.replace('/')

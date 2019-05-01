@@ -33,14 +33,23 @@
         >
       </form>
       <div class="import-wrapper">
-        <MoAntGreenButton class="import-opml">XML/OPML</MoAntGreenButton>
-        <MoAntGreenButton class="import-bookmark">浏览器书签</MoAntGreenButton>
+        <MoAntGreenButton
+          class="import-opml"
+          @click="onImportClick('OPML')"
+          v-loading="importOPMLLoading"
+        >XML/OPML</MoAntGreenButton>
+        <MoAntGreenButton
+          class="import-bookmark"
+          @click="onImportClick('Bookmark')"
+          v-loading="importBookmarkLoading"
+        >浏览器书签</MoAntGreenButton>
       </div>
     </div>
   </MoLayout>
 </template>
 
 <script>
+import _ from 'lodash'
 import MoLayout from '@/components/MoLayout.vue'
 import MoBackHeader from '@/components/MoBackHeader.vue'
 import MoAntGreenButton from '@/components/MoAntGreenButton.vue'
@@ -65,16 +74,88 @@ export default {
     }
   },
   methods: {
-    async onSave() {
+    onSave() {
       if (this.isSaveDisabled) {
         return
       }
-      this.errorText = '创建失败'
+      this.$API.feed
+        .create({ url: this.feedUrl })
+        .then(() => {
+          this.feedUrl = null
+          this.$toast.success('添加成功')
+          this.$router.back()
+        })
+        .catch(error => {
+          this.errorText = error.message
+        })
     },
     onFocus() {
       this.errorText = null
     },
-    onImportFileChange() {}
+    onImportClick(target) {
+      let el = this.$refs.importFeedFile
+      if (!_.isNil(el)) {
+        this.importFileTarget = target
+        el.click()
+      } else {
+        this.importFileTarget = null
+      }
+    },
+    onImportFileChange() {
+      let el = this.$refs.importFeedFile
+      if (_.isNil(el) || el.files.length <= 0) {
+        return
+      }
+      let file = el.files[0]
+      try {
+        if (this.importFileTarget === 'OPML') {
+          this.onImportOPML(file)
+        } else if (this.importFileTarget === 'Bookmark') {
+          this.onImportBookmark(file)
+        } else {
+          this.importFileTarget = null
+        }
+      } finally {
+        let form = this.$refs.importFeedForm
+        form.reset()
+      }
+    },
+    onImportOPML(file) {
+      this.importOPMLLoading = true
+      this.$API.feed
+        .importOPML({ file })
+        .then(() => {
+          this.$toast.success('导入XML/OPML文件成功')
+          this.$router.back()
+        })
+        .catch(error => {
+          this.$toast.error({
+            message: '导入XML/OPML文件失败: ' + error.message,
+            time: 10000
+          })
+        })
+        .finally(() => {
+          this.importOPMLLoading = false
+        })
+    },
+    onImportBookmark(file) {
+      this.importBookmarkLoading = true
+      this.$API.feed
+        .importBookmark({ file })
+        .then(() => {
+          this.$toast.success('导入书签文件成功')
+          this.$router.back()
+        })
+        .catch(error => {
+          this.$toast.error({
+            message: '导入书签文件失败: ' + error.message,
+            time: 10000
+          })
+        })
+        .finally(() => {
+          this.importBookmarkLoading = false
+        })
+    }
   }
 }
 </script>

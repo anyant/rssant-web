@@ -81,6 +81,12 @@ export default {
             Vue.set(state.feeds, feed.id, feed)
             updateFeedList(state)
         },
+        ADD_OR_UPDATE_LIST(state, feedList) {
+            feedList.forEach(feed => {
+                Vue.set(state.feeds, feed.id, feed)
+            })
+            updateFeedList(state)
+        },
         REMOVE(state, { id }) {
             Vue.delete(state.feeds, id)
             updateFeedList(state)
@@ -119,13 +125,15 @@ export default {
                 return state.feeds[feedId]
             }
         },
-
     },
     actions: {
         async sync(DAO) {
             await DAO.state.loading.begin(async () => {
-                let hints = _.values(DAO.state.feeds).map(x => {
-                    return { id: x.id, dt_updated: x.dt_updated }
+                let hints = []
+                _.values(DAO.state.feeds).forEach(x => {
+                    if (!_.isEmpty(x.dt_updated)) {
+                        hints.push({ id: x.id, dt_updated: x.dt_updated })
+                    }
                 })
                 await API.feed.query({ hints }).then(result => {
                     DAO.SYNC({
@@ -171,11 +179,11 @@ export default {
         },
         async importOPML(DAO, { file }) {
             let data = await API.feed.importOPML({ file })
-            DAO.ADD_LIST(data.feeds)
+            DAO.ADD_OR_UPDATE_LIST(data.results)
         },
         async importBookmark(DAO, { file }) {
             let data = await API.feed.importBookmark({ file })
-            DAO.ADD_LIST(data.feeds)
+            DAO.ADD_OR_UPDATE_LIST(data.results)
         },
         async setReaded(DAO, { feedId, offset }) {
             await API.feed.setReaded({ id: feedId, offset })

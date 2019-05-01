@@ -22,7 +22,7 @@ router.beforeEach((to, from, next) => {
   if (loginRequired) {
     API.user.login().then(goNext).catch(goLogin)
   } else {
-    API.user.login().finally(goNext)
+    API.user.login().catch(() => null).finally(goNext)
   }
 })
 
