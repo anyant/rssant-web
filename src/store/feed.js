@@ -58,6 +58,13 @@ function updateFeedList(state) {
     state.trash = sortFeedList(trash)
 }
 
+function fixTitle(feed) {
+    if (_.isEmpty(feed.title)) {
+        feed.title = `#${feed.id}`
+    }
+    return feed
+}
+
 export default {
     state: {
         loading: new Loading(),
@@ -73,17 +80,17 @@ export default {
                 Vue.delete(state.feeds, feedId)
             })
             _.defaultTo(updatedFeeds, []).forEach(feed => {
-                Vue.set(state.feeds, feed.id, feed)
+                Vue.set(state.feeds, feed.id, fixTitle(feed))
             });
             updateFeedList(state)
         },
         ADD_OR_UPDATE(state, feed) {
-            Vue.set(state.feeds, feed.id, feed)
+            Vue.set(state.feeds, feed.id, fixTitle(feed))
             updateFeedList(state)
         },
         ADD_OR_UPDATE_LIST(state, feedList) {
             feedList.forEach(feed => {
-                Vue.set(state.feeds, feed.id, feed)
+                Vue.set(state.feeds, feed.id, fixTitle(feed))
             })
             updateFeedList(state)
         },
