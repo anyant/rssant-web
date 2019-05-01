@@ -1,4 +1,5 @@
 import MoHomePage from '@/views/MoHomePage'
+import MoMushroomsPage from '@/views/MoMushroomsPage'
 import MoGardenPage from '@/views/MoGardenPage'
 import MoJunglePage from '@/views/MoJunglePage'
 import MoDesertPage from '@/views/MoDesertPage'
@@ -32,6 +33,12 @@ export default [
     path: '/feed-creation',
     name: 'FeedCreation',
     component: MoFeedCreationPage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: '/mushrooms',
+    name: 'Mushrooms',
+    component: MoMushroomsPage,
     meta: { loginRequired: true },
   },
   {

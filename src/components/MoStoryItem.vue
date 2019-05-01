@@ -1,7 +1,6 @@
 <template>
   <div class="story-item">
-    <mu-ripple
-      :color="rippleColor"
+    <div
       class="story-header"
       :class="{ 'story-header-readed': isReaded }"
       @click="()=>{this.isOpened = !this.isOpened}"
@@ -11,7 +10,7 @@
       <mu-button icon class="story-favorited" @click.stop="toggleFavorited">
         <mu-icon value="star_border" :color="starColor"></mu-icon>
       </mu-button>
-    </mu-ripple>
+    </div>
     <div class="story-preview" v-if="isOpened">
       <div class="story-preview-title" v-if="previewTitle">{{ title }}</div>
       <div class="story-preview-summary">{{ summary }}</div>
@@ -24,7 +23,7 @@
 
 <script>
 import _ from 'lodash'
-import { antRippleGrey, antGold } from '@/plugin/common'
+import { antGold } from '@/plugin/common'
 import { formatDate } from '@/plugin/datefmt'
 
 export default {
@@ -44,8 +43,7 @@ export default {
   },
   data() {
     return {
-      isOpened: false,
-      rippleColor: antRippleGrey
+      isOpened: false
     }
   },
   computed: {

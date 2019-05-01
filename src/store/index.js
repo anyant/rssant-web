@@ -9,12 +9,14 @@ import user from './user'
 import feed from './feed'
 import page from './page'
 import story from './story'
+import root from './root'
 
 const builder = new StoreBuilder()
 builder.mount('user', user)
 builder.mount('feed', feed)
 builder.mount('page', page)
 builder.mount('story', story)
+builder.root(root)
 
 const [Store, API] = builder.build()
 

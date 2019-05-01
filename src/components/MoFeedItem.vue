@@ -1,20 +1,13 @@
 <template>
-  <mu-ripple
-    :color="rippleColor"
-    class="feed-item"
-    :class="{ 'feed-item-readed': readed }"
-    @click="onClick"
-  >
+  <div class="feed-item" :class="{ 'feed-item-readed': readed }" @click="onClick">
     <div class="feed-title">{{ title }}</div>
     <div class="feed-num-unread">{{ numberText }}</div>
     <div class="feed-date">{{ dateText }}</div>
-  </mu-ripple>
+  </div>
 </template>
 
 <script>
 import _ from 'lodash'
-
-import { antRippleGrey } from '@/plugin/common'
 import { formatDate } from '@/plugin/datefmt'
 
 export default {
@@ -45,9 +38,7 @@ export default {
     }
   },
   data() {
-    return {
-      rippleColor: antRippleGrey
-    }
+    return {}
   },
   methods: {
     onClick() {

@@ -34,12 +34,17 @@ export default {
 <style lang="less" scoped>
 @import '~@/styles/common';
 
+.header {
+  padding-left: 0;
+}
+
 .back {
   position: relative;
-  left: -10 * @pr;
-  display: inline-block;
+  margin-left: 6 * @pr;
+  margin-right: 8 * @pr;
   width: 32 * @pr;
   height: 32 * @pr;
+  color: @antTextBlack;
 }
 
 .title {

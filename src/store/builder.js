@@ -8,10 +8,15 @@ class StoreBuilder {
 
     constructor() {
         this.drivers = []
+        this.rootDriver = null
     }
 
     mount(name, stateDriver) {
         this.drivers.push([name, stateDriver])
+    }
+
+    root(rootDriver) {
+        this.rootDriver = rootDriver
     }
 
     build() {
@@ -49,6 +54,13 @@ class StoreBuilder {
                 }
             })
         })
+        if (!_.isNil(this.rootDriver)) {
+            _.entries(this.rootDriver).forEach(([actionnName, actionnFunc]) => {
+                API[actionnName] = function (payload) {
+                    return actionnFunc(API, payload)
+                }
+            })
+        }
         const STORE = new Vuex.Store({
             state: rootState,
             getters: rootGetters,

@@ -138,10 +138,8 @@ export default {
       return ''
     }
   },
-  async mounted() {
-    await this.$API.feed.sync()
-    let mushroomFeedIds = this.$API.feed.recentGarden.map(feed => feed.id)
-    await this.$API.story.loadMushrooms({ feedIds: mushroomFeedIds, days: 14 })
+  mounted() {
+    this.$API.syncFeedLoadMushrooms()
   }
 }
 </script>

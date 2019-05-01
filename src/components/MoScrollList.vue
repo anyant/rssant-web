@@ -59,7 +59,7 @@ export default {
           num: 0, // 当前页
           size: numPageItems // 每页数据条数
         },
-        htmlNodata: '<p class="upwarp-nodata">没有更多了</p>',
+        htmlNodata: '<div class="upwarp-nodata">没有更多了</div>',
         noMoreSize: Math.ceil(numPageItems * 0.5)
       },
       mescroll: null

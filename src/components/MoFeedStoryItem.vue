@@ -1,29 +1,38 @@
 <template>
-  <mu-ripple
-    :color="rippleColor"
-    class="feed-story-item"
-    :class="{ 'feed-story-item-readed': readed }"
-    @click="()=>{this.$router.push('/story/123')}"
-  >
-    <div class="feed-title">V2EX - 创意技术分享</div>
-    <div class="story-title">蚁阅今天发布 - 总共有十四个字总共有十四个字</div>
-    <div class="story-date">10:35</div>
-  </mu-ripple>
+  <div class="feed-story-item" :class="{ 'feed-story-item-readed': isReaded }" @click="goStory">
+    <div class="feed-title" @click.stop="goFeed">{{ feedTitle }}</div>
+    <div class="story-title">{{ storyTitle }}</div>
+    <div class="story-date">{{ dateText }}</div>
+  </div>
 </template>
 
 <script>
-import { antRippleGrey } from '@/plugin/common'
+import _ from 'lodash'
+import { formatDate } from '@/plugin/datefmt'
 
 export default {
   props: {
-    readed: {
-      type: Boolean,
-      default: false
-    }
+    feedId: Number,
+    offset: Number,
+    feedTitle: String,
+    storyTitle: String,
+    storyDate: String,
+    isReaded: Boolean
   },
   data() {
-    return {
-      rippleColor: antRippleGrey
+    return {}
+  },
+  computed: {
+    dateText() {
+      return formatDate(this.storyDate)
+    }
+  },
+  methods: {
+    goFeed() {
+      this.$router.push(`/feed/${this.feedId}`)
+    },
+    goStory() {
+      this.$router.push(`/story/${this.feedId}:${this.offset}`)
     }
   }
 }
@@ -71,7 +80,8 @@ export default {
 
 .story-date {
   flex-shrink: 0;
-  width: 36 * @pr;
+  width: 64 * @pr;
+  margin-left: 4 * @pr;
   font-size: 12 * @pr;
   text-align: right;
   white-space: nowrap;
