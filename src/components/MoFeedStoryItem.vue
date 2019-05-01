@@ -32,7 +32,7 @@ export default {
       this.$router.push(`/feed/${this.feedId}`)
     },
     goStory() {
-      this.$router.push(`/story/${this.feedId}:${this.offset}`)
+      this.$router.push(`/story/${this.feedId}-${this.offset}`)
     }
   }
 }

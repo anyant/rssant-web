@@ -1,12 +1,14 @@
 import _ from 'lodash'
 import Vue from 'vue'
+import Loading from '@/plugin/loading'
 import { API } from '@/plugin/api'
 
 
 export default {
     state: {
         storys: {},
-        mushrooms: []
+        mushrooms: [],
+        mushroomsLoading: new Loading()
     },
     mutations: {
         SET_FAVORITED(state, { id, is_favorited }) {
@@ -82,8 +84,10 @@ export default {
             DAO.ADD_OR_UPDATE_LIST({ feedId, storys: data.results })
         },
         async loadMushrooms(DAO, { feedIds, days, detail }) {
-            let data = await API.story.queryRecent({ feed_ids: feedIds, days, detail })
-            DAO.ADD_OR_UPDATE_MUSHROOMS(data.results)
+            DAO.state.mushroomsLoading.begin(async () => {
+                let data = await API.story.queryRecent({ feed_ids: feedIds, days, detail })
+                DAO.ADD_OR_UPDATE_MUSHROOMS(data.results)
+            })
         }
     }
 }

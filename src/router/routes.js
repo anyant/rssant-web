@@ -66,7 +66,7 @@ export default [
     meta: { loginRequired: true },
   },
   {
-    path: '/story/:storyId',
+    path: '/story/:feedId-:offset',
     name: 'Story',
     component: MoStoryPage,
     meta: { loginRequired: true },

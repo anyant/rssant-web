@@ -1,10 +1,6 @@
 <template>
   <div class="story-item">
-    <div
-      class="story-header"
-      :class="{ 'story-header-readed': isReaded }"
-      @click="()=>{this.isOpened = !this.isOpened}"
-    >
+    <div class="story-header" :class="{ 'story-header-readed': isReaded }" @click="onOpen">
       <div class="story-title">{{ title }}</div>
       <div class="story-date">{{ dateText }}</div>
       <mu-button icon class="story-favorited" @click.stop="toggleFavorited">
@@ -32,6 +28,10 @@ export default {
       type: Boolean,
       default: false
     },
+    isOpened: {
+      type: Boolean,
+      default: false
+    },
     isFavorited: {
       type: Boolean,
       default: false
@@ -42,9 +42,7 @@ export default {
     link: String
   },
   data() {
-    return {
-      isOpened: false
-    }
+    return {}
   },
   computed: {
     previewTitle() {
@@ -70,6 +68,9 @@ export default {
         return
       }
       window.open(this.link, '_blank')
+    },
+    onOpen() {
+      this.$emit('open')
     }
   }
 }

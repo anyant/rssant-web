@@ -134,7 +134,7 @@ const API = {
       return client.post('/story/recent', { feed_ids, days, detail })
     },
     get({ feed_id, offset, detail }) {
-      return client.get(`/story/${feed_id}:${offset}`, { params: { detail } })
+      return client.get(`/story/${feed_id}-${offset}`, { params: { detail } })
     },
     listWatched({ detail } = {}) {
       return client.get('/story/watched', { params: { detail } })

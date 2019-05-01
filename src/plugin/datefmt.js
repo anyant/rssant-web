@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import datefn from 'date-fns'
+import moment from 'moment'
 
 
 /**
@@ -7,7 +8,7 @@ import datefn from 'date-fns'
  * 04-24 10:35
  * 2019-04-24
  */
-function formatDate(date, now) {
+export function formatDate(date, now) {
     if (_.isNil(date) || _.isEmpty(date)) {
         return ''
     }
@@ -29,4 +30,14 @@ function formatDate(date, now) {
 }
 
 
-export { formatDate }
+export function formatFullDate(date) {
+    if (_.isNil(date) || _.isEmpty(date)) {
+        return ''
+    }
+    date = moment(date)
+    let dateStr = date.format('YYYY-MM-DD HH:mm')
+    let dateAgo = date.fromNow()
+    return `${dateStr} 约 ${dateAgo}`
+}
+
+

@@ -23,11 +23,13 @@
         v-for="story in storyList"
         :key="story.offset"
         :isReaded="story.offset <= feed.story_offset"
+        :isOpened="story.offset === openedOffset"
         :title="story.title"
         :summary="story.summary"
         :date="story.dt_published"
         :link="story.link"
         :isFavorited="story.is_favorited"
+        @open="openStory(story.offset)"
       ></MoStoryItem>
     </MoScrollList>
   </MoLayout>
@@ -42,7 +44,9 @@ import MoScrollList from '@/components/MoScrollList'
 export default {
   components: { MoBackHeader, MoLayout, MoStoryItem, MoScrollList },
   data() {
-    return {}
+    return {
+      openedOffset: null
+    }
   },
   computed: {
     feedId() {
@@ -66,6 +70,9 @@ export default {
   methods: {
     loadStorys({ offset, size }) {
       return this.$API.story.loadList({ feedId: this.feedId, offset: offset, detail: true, size: size })
+    },
+    openStory(offset) {
+      this.openedOffset = offset
     }
   }
 }
