@@ -84,7 +84,7 @@ export default {
             DAO.ADD_OR_UPDATE_LIST({ feedId, storys: data.results })
         },
         async loadMushrooms(DAO, { feedIds, days, detail }) {
-            DAO.state.mushroomsLoading.begin(async () => {
+            await DAO.state.mushroomsLoading.begin(async () => {
                 let data = await API.story.queryRecent({ feed_ids: feedIds, days, detail })
                 DAO.ADD_OR_UPDATE_MUSHROOMS(data.results)
             })

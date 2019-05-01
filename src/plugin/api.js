@@ -98,8 +98,8 @@ const API = {
     delete({ id }) {
       return client.delete(`/feed/${id}`)
     },
-    setReaded({ id, offset }) {
-      return client.put(`/feed/${id}/readed`, { offset })
+    setStoryOffset({ id, offset }) {
+      return client.put(`/feed/${id}/offset`, { offset })
     },
     setAllReaded({ ids } = {}) {
       return client.put(`/feed/all/readed`, { ids })

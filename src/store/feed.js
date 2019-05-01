@@ -98,11 +98,18 @@ export default {
             Vue.delete(state.feeds, id)
             updateFeedList(state)
         },
-        SET_READED(state, { id, offset }) {
+        SET_STORY_OFFSET(state, { id, offset }) {
             let feed = state.feeds[id]
             feed.story_offset = offset
             feed.num_unread_storys = feed.total_storys - offset
         },
+        SET_ALL_READED(state, { feedIds }) {
+            feedIds.forEach(feedId => {
+                let feed = state.feeds[feedId]
+                feed.story_offset = feed.total_storys
+                feed.num_unread_storys = 0
+            })
+        }
     },
     getters: {
         isLoading(state) {
@@ -192,9 +199,15 @@ export default {
             let data = await API.feed.importBookmark({ file })
             DAO.ADD_OR_UPDATE_LIST(data.results)
         },
-        async setReaded(DAO, { feedId, offset }) {
-            await API.feed.setReaded({ id: feedId, offset })
-            DAO.SET_READED({ id: feedId, offset })
+        async setStoryOffset(DAO, { feedId, offset }) {
+            if (DAO.get(feedId).story_offset !== offset) {
+                await API.feed.setStoryOffset({ id: feedId, offset })
+                DAO.SET_STORY_OFFSET({ id: feedId, offset })
+            }
         },
+        async setAllReaded(DAO, { feedIds }) {
+            await API.feed.setAllReaded({ ids: feedIds })
+            DAO.SET_ALL_READED({ feedIds })
+        }
     }
 }

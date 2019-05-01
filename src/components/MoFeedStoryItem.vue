@@ -7,7 +7,6 @@
 </template>
 
 <script>
-import _ from 'lodash'
 import { formatDate } from '@/plugin/datefmt'
 
 export default {

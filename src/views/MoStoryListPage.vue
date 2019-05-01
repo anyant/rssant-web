@@ -2,7 +2,7 @@
   <MoLayout grey header>
     <MoBackHeader border>
       <template v-slot:title>{{ feed && feed.title }}</template>
-      <mu-button icon class="action-readed">
+      <mu-button icon class="action-readed" @click="setAllReaded">
         <mu-icon value="done"></mu-icon>
       </mu-button>
       <mu-button icon class="action-detail" @click="()=>{this.$router.push('/feed/123/detail')}">
@@ -12,7 +12,6 @@
     <MoScrollList
       v-if="feed"
       class="story-list"
-      vid="story/list"
       :itemSize="48"
       :items="storyList"
       :init-offset="feed.story_offset"
@@ -22,14 +21,14 @@
       <MoStoryItem
         v-for="story in storyList"
         :key="story.offset"
-        :isReaded="story.offset <= feed.story_offset"
-        :isOpened="story.offset === openedOffset"
+        :isReaded="isReaded(story)"
+        :isReading="isReading(story)"
         :title="story.title"
         :summary="story.summary"
         :date="story.dt_published"
         :link="story.link"
         :isFavorited="story.is_favorited"
-        @open="openStory(story.offset)"
+        @read="onRead(story)"
       ></MoStoryItem>
     </MoScrollList>
   </MoLayout>
@@ -44,9 +43,7 @@ import MoScrollList from '@/components/MoScrollList'
 export default {
   components: { MoBackHeader, MoLayout, MoStoryItem, MoScrollList },
   data() {
-    return {
-      openedOffset: null
-    }
+    return {}
   },
   computed: {
     feedId() {
@@ -60,6 +57,18 @@ export default {
     },
     storyList() {
       return this.$API.story.getListByFeed(this.feedId)
+    },
+    isReaded() {
+      let feed = this.feed
+      return story => {
+        return story.offset < feed.story_offset
+      }
+    },
+    isReading() {
+      let feed = this.feed
+      return story => {
+        return story.offset === feed.story_offset - 1
+      }
     }
   },
   mounted() {
@@ -71,8 +80,11 @@ export default {
     loadStorys({ offset, size }) {
       return this.$API.story.loadList({ feedId: this.feedId, offset: offset, detail: true, size: size })
     },
-    openStory(offset) {
-      this.openedOffset = offset
+    onRead(story) {
+      this.$API.feed.setStoryOffset({ feedId: story.feed.id, offset: story.offset + 1 })
+    },
+    setAllReaded() {
+      this.$API.feed.setStoryOffset({ feedId: this.feed.id, offset: this.feed.total_storys })
     }
   }
 }
@@ -97,9 +109,5 @@ export default {
 
 .story-item {
   margin-top: 8 * @pr;
-}
-
-.story-list {
-  padding-bottom: 8 * @pr;
 }
 </style>

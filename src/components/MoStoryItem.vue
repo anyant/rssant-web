@@ -1,13 +1,17 @@
 <template>
   <div class="story-item">
     <div class="story-header" :class="{ 'story-header-readed': isReaded }" @click="onOpen">
-      <div class="story-title">{{ title }}</div>
+      <div class="story-title">{{ title || link }}</div>
       <div class="story-date">{{ dateText }}</div>
       <mu-button icon class="story-favorited" @click.stop="toggleFavorited">
         <mu-icon value="star_border" :color="starColor"></mu-icon>
       </mu-button>
     </div>
-    <div class="story-preview" v-if="isOpened">
+    <div
+      class="story-preview"
+      v-if="isOpened"
+      :class="{'story-preview-readed': isReaded && !isReading}"
+    >
       <div class="story-preview-title" v-if="previewTitle">{{ title }}</div>
       <div class="story-preview-summary">{{ summary }}</div>
       <mu-button icon class="story-preview-link" @click.stop="goLink">
@@ -28,7 +32,7 @@ export default {
       type: Boolean,
       default: false
     },
-    isOpened: {
+    isReading: {
       type: Boolean,
       default: false
     },
@@ -42,7 +46,9 @@ export default {
     link: String
   },
   data() {
-    return {}
+    return {
+      isOpened: false
+    }
   },
   computed: {
     previewTitle() {
@@ -70,7 +76,8 @@ export default {
       window.open(this.link, '_blank')
     },
     onOpen() {
-      this.$emit('open')
+      this.isOpened = !this.isOpened
+      this.$emit('read')
     }
   }
 }
@@ -103,6 +110,10 @@ export default {
   .story-favorited {
     color: @antTextWhiteGrey;
   }
+}
+
+.story-preview-readed {
+  opacity: 0.42;
 }
 
 .story-title {

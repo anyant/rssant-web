@@ -7,7 +7,9 @@
       :up="mescrollUp"
       @init="mescrollInit"
     >
-      <slot></slot>
+      <div class="item-list">
+        <slot></slot>
+      </div>
     </mescroll>
   </div>
 </template>
@@ -17,7 +19,6 @@ import _ from 'lodash'
 
 export default {
   props: {
-    vid: String,
     itemSize: {
       type: Number,
       required: true
@@ -66,12 +67,6 @@ export default {
     }
   },
   computed: {
-    pageState() {
-      if (_.isNil(this.vid)) {
-        return null
-      }
-      return this.$API.page.of(this.vid)
-    },
     offsetAll() {
       return this.items.length * this.itemSize
     },
@@ -95,9 +90,6 @@ export default {
       let lastOffset = this.items[this.items.length - 1].offset
       return lastOffset < this.total - 1
     }
-  },
-  destroyed() {
-    this.pageState.set('scrollTop', this.mescroll.getScrollTop())
   },
   methods: {
     endSuccess(prevItemsLength) {
@@ -132,7 +124,8 @@ export default {
       let prevItemsLength = this.items.length
       let firstOffset = this.items[0].offset
       this.isPrevLoading = true
-      this.load({ offset: firstOffset - this.numPageItems, size: this.numPageItems }).finally(() => {
+      let offset = Math.max(0, firstOffset - this.numPageItems)
+      this.load({ offset, size: this.numPageItems }).finally(() => {
         this.isPrevLoading = false
         this.endSuccess(prevItemsLength)
         this.mescroll.endDownScroll()
@@ -153,12 +146,6 @@ export default {
     mescrollInit(mescroll) {
       this.mescroll = mescroll
       this.loadInit()
-      if (!_.isNil(this.pageState)) {
-        let scrollTop = this.pageState.get('scrollTop')
-        if (!_.isNil(scrollTop)) {
-          mescroll.setScrollTop(scrollTop)
-        }
-      }
     },
     onMescrolDown(mescroll) {
       this.loadPrev()
@@ -180,10 +167,16 @@ export default {
 </script>
 
 <style lang="less" scoped>
+@import '~@/styles/common';
+
 .mescroll {
   position: fixed;
   top: 48px;
   bottom: 0;
   height: auto;
+}
+
+.item-list {
+  padding-bottom: 8 * @pr;
 }
 </style>

@@ -21,9 +21,12 @@
   </MoLayout>
 </template>
 <script>
+import _ from 'lodash'
 import MoBackHeader from '@/components/MoBackHeader'
 import MoLayout from '@/components/MoLayout'
 import MoFeedStoryItem from '@/components/MoFeedStoryItem.vue'
+
+const VID = '/mushrooms'
 
 export default {
   components: { MoBackHeader, MoLayout, MoFeedStoryItem },
@@ -31,9 +34,17 @@ export default {
     return {}
   },
   mounted() {
-    this.$API.syncFeedLoadMushrooms()
+    this.$API.syncFeedLoadMushrooms().then(() => {
+      let scrollTop = this.pageState.get('scrollTop')
+      if (!_.isNil(scrollTop)) {
+        window.scrollTo(0, scrollTop)
+      }
+    })
   },
   computed: {
+    pageState() {
+      return this.$API.page.of(VID)
+    },
     mushrooms() {
       return this.$API.story.mushrooms
     },
@@ -50,10 +61,18 @@ export default {
     getFeedTitle(feedId) {
       return this.$API.feed.get(feedId).title
     },
-    isReaded(story){
+    isReaded(story) {
       let feed = this.$API.feed.get(story.feed.id)
-      return story.offset > feed.story_offset
+      return story.offset < feed.story_offset
     }
+  },
+  beforeRouteLeave(to, from, next) {
+    let scrollTop = window.scrollY
+    if (scrollTop > 0) {
+      this.pageState.set('scrollTop', scrollTop)
+      this.pageState.commit()
+    }
+    next()
   }
 }
 </script>
