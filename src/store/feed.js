@@ -7,7 +7,11 @@ import { API } from '@/plugin/api'
 
 function sortFeedList(feedList) {
     return _.chain(feedList)
-        .sortBy('dt_updated', 'id')
+        .sortBy([
+            function (x) { return x.num_unread_storys > 0 },
+            function (x) { return new Date(x.dt_updated) },
+            'id'
+        ])
         .reverse()
         .value()
 }
@@ -48,6 +52,10 @@ function groupFeedList(feedList) {
         }
     })
     return { garden, jungle, desert, trash }
+}
+
+function numUnreadFeedsOf(feeds) {
+    return feeds.filter(feed => feed.num_unread_storys > 0).length
 }
 
 function updateFeedList(state) {
@@ -118,14 +126,26 @@ export default {
         garden(state) {
             return state.garden
         },
+        numUnreadGarden(state) {
+            return numUnreadFeedsOf(state.garden)
+        },
         jungle(state) {
             return state.jungle
+        },
+        numUnreadJungle(state) {
+            return numUnreadFeedsOf(state.jungle)
         },
         desert(state) {
             return state.desert
         },
+        numUnreadDesert(state) {
+            return numUnreadFeedsOf(state.desert)
+        },
         trash(state) {
             return state.trash
+        },
+        numUnreadTrash(state) {
+            return numUnreadFeedsOf(state.garden)
         },
         recentGarden(state) {
             const dt_recent = subDays(new Date(), 14)
@@ -206,8 +226,13 @@ export default {
             }
         },
         async setAllReaded(DAO, { feedIds }) {
-            await API.feed.setAllReaded({ ids: feedIds })
-            DAO.SET_ALL_READED({ feedIds })
+            feedIds = feedIds.filter(feedId => {
+                return DAO.get(feedId).num_unread_storys > 0
+            })
+            if (feedIds.length > 0) {
+                await API.feed.setAllReaded({ ids: feedIds })
+                DAO.SET_ALL_READED({ feedIds })
+            }
         }
     }
 }

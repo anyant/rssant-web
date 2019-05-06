@@ -27,13 +27,13 @@ class StoreBuilder {
         this.drivers.forEach(([name, stateDriver]) => {
             rootState[name] = stateDriver.state
             API[name] = {}
-            let DAO = {}
+            let DAO = { API }
             Object.defineProperty(DAO, 'state', {
                 get: function () { return STORE.state[name] }
             })
             _.entries(stateDriver.getters).forEach(([getterName, getterFunc]) => {
                 let key = name + '/' + getterName
-                rootGetters[key] = (state) => getterFunc(state[name])
+                rootGetters[key] = (state) => getterFunc(state[name], API)
                 Object.defineProperty(DAO, getterName, {
                     get: function () { return STORE.getters[key] }
                 });

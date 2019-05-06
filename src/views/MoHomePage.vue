@@ -120,16 +120,17 @@ export default {
   },
   computed: {
     numMushrooms() {
-      return this.$API.story.mushrooms.length
+      let n = this.$API.story.numUnreadMushrooms
+      return n > 0 ? n : ''
     },
     numJungle() {
-      return this.$API.feed.jungle.length
+      return this.numTextOf(this.$API.feed.numUnreadJungle)
     },
     numGarden() {
-      return this.$API.feed.garden.length
+      return this.numTextOf(this.$API.feed.numUnreadGarden)
     },
     numDesert() {
-      return this.$API.feed.desert.length
+      return this.numTextOf(this.$API.feed.numUnreadDesert)
     },
     numTrash() {
       return ''
@@ -140,6 +141,11 @@ export default {
   },
   mounted() {
     this.$API.syncFeedLoadMushrooms()
+  },
+  methods: {
+    numTextOf(n) {
+      return n > 0 ? n : ''
+    }
   }
 }
 </script>

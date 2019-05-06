@@ -51,12 +51,9 @@ export default {
       return this.$API.feed[this.group]
     },
     numFeedsText() {
-      let n = this.feedList.length
-      if (n <= 0) {
-        return ''
-      } else {
-        return ` (${n})`
-      }
+      let key = 'numUnread' + _.startCase(this.group)
+      let n = this.$API.feed[key]
+      return n > 0 ? ` (${n})` : ''
     }
   },
   mounted() {

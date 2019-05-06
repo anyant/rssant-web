@@ -62,8 +62,29 @@ export default {
                 return _.chain(_.values(feedStorys)).sortBy('offset').value()
             }
         },
-        mushrooms(state) {
-            return state.mushrooms
+        mushrooms(state, API) {
+            return _.chain(state.mushrooms)
+                .sortBy([
+                    function (x) { return !API.story.isReaded(x) },
+                    function (x) { return new Date(x.dt_published) },
+                    function (x) { return x.feed.id },
+                    'offset'
+                ])
+                .reverse()
+                .value()
+        },
+        numUnreadMushrooms(state, API) {
+            function notRead(story) {
+                let feed = API.feed.get(story.feed.id)
+                return story.offset >= feed.story_offset
+            }
+            return state.mushrooms.filter(notRead).length
+        },
+        isReaded(state, API) {
+            return story => {
+                let feed = API.feed.get(story.feed.id)
+                return story.offset < feed.story_offset
+            }
         }
     },
     actions: {

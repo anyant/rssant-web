@@ -49,7 +49,7 @@ export default {
       return this.$API.story.mushrooms
     },
     numMushrooms() {
-      let n = this.mushrooms.length
+      let n = this.$API.story.numUnreadMushrooms
       if (n <= 0) {
         return ''
       } else {
@@ -62,8 +62,7 @@ export default {
       return this.$API.feed.get(feedId).title
     },
     isReaded(story) {
-      let feed = this.$API.feed.get(story.feed.id)
-      return story.offset < feed.story_offset
+      return this.$API.story.isReaded(story)
     }
   },
   beforeRouteLeave(to, from, next) {
