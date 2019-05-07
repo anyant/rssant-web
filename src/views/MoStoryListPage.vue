@@ -5,7 +5,7 @@
       <mu-button icon class="action-readed" @click="setAllReaded">
         <mu-icon value="done"></mu-icon>
       </mu-button>
-      <mu-button icon class="action-detail" @click="()=>{this.$router.push('/feed/123/detail')}">
+      <mu-button icon class="action-detail" @click="goFeedDetail">
         <mu-icon value="info_outline"></mu-icon>
       </mu-button>
     </MoBackHeader>
@@ -85,6 +85,9 @@ export default {
     },
     setAllReaded() {
       this.$API.feed.setStoryOffset({ feedId: this.feed.id, offset: this.feed.total_storys })
+    },
+    goFeedDetail() {
+      this.$router.push(`/feed/${this.feedId}/detail`)
     }
   }
 }

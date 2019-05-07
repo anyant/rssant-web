@@ -1,12 +1,17 @@
 <template>
   <MoLayout header>
     <MoBackHeader border>
-      <template v-slot:title>Hacker News</template>
+      <template v-slot:title>{{ feedTitle }}</template>
     </MoBackHeader>
     <div class="feed-info">
       <div class="item" v-for="item in feedInfo" :key="item.name">
         <span class="item-name">{{ item.name }}</span>
-        <a v-if="item.link" class="item-link" :href="item.value" target="_blank">{{ item.value }}</a>
+        <a
+          v-if="item.type === 'link'"
+          class="item-link"
+          :href="item.value"
+          target="_blank"
+        >{{ item.value }}</a>
         <span v-else class="item-value">{{ item.value }}</span>
       </div>
     </div>
@@ -14,61 +19,134 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import MoLayout from '@/components/MoLayout.vue'
 import MoBackHeader from '@/components/MoBackHeader'
+import { formatFullDate } from '@/plugin/datefmt'
+
+const FEED_FIELDS = [
+  {
+    name: '名称',
+    key: 'title'
+  },
+  {
+    name: '状态',
+    key: 'status',
+    type: 'status'
+  },
+  {
+    name: '主页',
+    key: 'link',
+    type: 'link'
+  },
+  {
+    name: '简介',
+    key: 'description'
+  },
+  {
+    name: '作者',
+    key: 'author'
+  },
+  {
+    name: '供稿地址',
+    key: 'url',
+    type: 'link'
+  },
+  {
+    name: '供稿格式',
+    key: 'version'
+  },
+  {
+    name: '未读故事',
+    key: 'num_unread_storys',
+    type: 'number'
+  },
+  {
+    name: '故事总数',
+    key: 'total_storys',
+    type: 'number'
+  },
+  {
+    name: '发布周期',
+    key: 'story_publish_period',
+    process: function(value) {
+      if (_.isNil(value) || value < 1) {
+        return '小于 1 天'
+      }
+      return `约 ${value} 天`
+    }
+  },
+  {
+    name: '最新故事发布时间',
+    key: 'dt_latest_story_published',
+    type: 'datetime'
+  },
+  {
+    name: '历史故事发布时间',
+    key: 'dt_early_story_published',
+    type: 'datetime'
+  },
+  {
+    name: '创建时间',
+    key: 'dt_created',
+    type: 'datetime'
+  },
+  {
+    name: '更新时间',
+    key: 'dt_updated',
+    type: 'datetime'
+  },
+  {
+    name: '检查时间',
+    key: 'dt_checked',
+    type: 'datetime'
+  },
+  {
+    name: '同步时间',
+    key: 'dt_synced',
+    type: 'datetime'
+  }
+]
 
 export default {
   components: { MoBackHeader, MoLayout },
   data() {
-    return {
-      feedInfo: [
-        {
-          name: '名称',
-          value: 'Hacker News'
-        },
-        {
-          name: '状态',
-          value: 'ready'
-        },
-        {
-          name: '主页',
-          value: 'https://news.ycombinator.com/',
-          link: true
-        },
-        {
-          name: '简介',
-          value: 'Links for the intellectually curious, ranked by readers.'
-        },
-        {
-          name: '作者',
-          value: '未知'
-        },
-        {
-          name: '供稿地址',
-          value: 'https://news.ycombinator.com/rss',
-          link: true
-        },
-        {
-          name: '供稿格式',
-          value: 'rss20'
-        },
-        {
-          name: '创建时间',
-          value: '2019-04-01 01:01 约 21 天前'
-        },
-        {
-          name: '更新时间',
-          value: '2019-04-21 20:07 约 几秒前'
-        },
-        {
-          name: '检查时间',
-          value: '2019-04-21 20:07 约 几秒前'
-        },
-        {
-          name: '同步时间',
-          value: '2019-04-21 20:07 约 几秒前'
+    return {}
+  },
+  mounted() {
+    this.$API.feed.load({ feedId: this.feedId, detail: true })
+  },
+  computed: {
+    feedId() {
+      return this.$route.params.feedId
+    },
+    feed() {
+      return this.$API.feed.get(this.feedId)
+    },
+    feedTitle() {
+      return _.isNil(this.feed) ? '' : this.feed.title
+    },
+    feedInfo() {
+      let feed = this.feed
+      if (_.isNil(feed)) {
+        feed = { id: this.feedId, title: this.feedTitle }
+      }
+      let info = []
+      FEED_FIELDS.forEach(field => {
+        let item = {
+          name: field.name,
+          type: field.type,
+          value: feed[field.key]
         }
-      ]
+        if (!_.isNil(field.process)) {
+          item.value = field.process(item.value)
+        }
+        if (field.type === 'datetime') {
+          item.value = formatFullDate(item.value)
+        }
+        info.push(item)
+      })
+      return info
     }
   }
 }
