@@ -12,6 +12,7 @@
     <MoScrollList
       v-if="feed"
       class="story-list"
+      :vid="`/feed/${feedId}`"
       :itemSize="48"
       :items="storyList"
       :init-offset="feed.story_offset"
@@ -27,6 +28,7 @@
         :summary="story.summary"
         :date="story.dt_published"
         :link="story.link"
+        :router-link="`/story/${story.feed.id}-${story.offset}`"
         :isFavorited="story.is_favorited"
         @read="onRead(story)"
       ></MoStoryItem>

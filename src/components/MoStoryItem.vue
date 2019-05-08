@@ -43,7 +43,8 @@ export default {
     title: String,
     date: String,
     summary: String,
-    link: String
+    link: String,
+    routerLink: String
   },
   data() {
     return {
@@ -70,10 +71,11 @@ export default {
       this.$emit('toggleFavorited')
     },
     goLink() {
-      if (_.isEmpty(this.link)) {
-        return
+      if (!_.isEmpty(this.link) && (_.isEmpty(this.summary) || this.summary.length <= 20)) {
+        window.open(this.link, '_blank')
+      } else if (!_.isEmpty(this.routerLink)) {
+        this.$router.push(this.routerLink)
       }
-      window.open(this.link, '_blank')
     },
     onOpen() {
       this.isOpened = !this.isOpened
