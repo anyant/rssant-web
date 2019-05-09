@@ -1,7 +1,7 @@
 <template>
   <MoLayout grey header>
     <MoBackHeader border>
-      <template v-slot:title>{{ feed && feed.title }}</template>
+      <template v-slot:title>{{ numUnreadText }}{{ feedTitle }}</template>
       <mu-button icon class="action-readed" @click="setAllReaded">
         <mu-icon value="done"></mu-icon>
       </mu-button>
@@ -57,6 +57,13 @@ export default {
     feedTitle() {
       return _.isNil(this.feed) ? '' : this.feed.title
     },
+    numUnreadText() {
+      if (_.isNil(this.feed)) {
+        return ''
+      }
+      let num = this.feed.num_unread_storys
+      return num > 0 ? `#${num}# ` : ''
+    },
     storyList() {
       return this.$API.story.getListByFeed(this.feedId)
     },
@@ -83,7 +90,9 @@ export default {
       return this.$API.story.loadList({ feedId: this.feedId, offset: offset, detail: true, size: size })
     },
     onRead(story) {
-      this.$API.feed.setStoryOffset({ feedId: story.feed.id, offset: story.offset + 1 })
+      if (!this.isReaded(story)) {
+        this.$API.feed.setStoryOffset({ feedId: story.feed.id, offset: story.offset + 1 })
+      }
     },
     setAllReaded() {
       this.$API.feed.setStoryOffset({ feedId: this.feed.id, offset: this.feed.total_storys })

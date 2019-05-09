@@ -31,6 +31,9 @@ export default {
       this.$router.push(`/feed/${this.feedId}`)
     },
     goStory() {
+      if (!this.isReaded) {
+        this.$API.feed.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
+      }
       this.$router.push(`/story/${this.feedId}-${this.offset}`)
     }
   }

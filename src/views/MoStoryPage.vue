@@ -1,7 +1,7 @@
 <template>
   <MoLayout header class="story">
     <MoBackHeader border>
-      <template v-slot:title v-if="feed">{{ feed.title }}</template>
+      <template v-slot:title>{{ headerTitle }}</template>
       <mu-button icon class="action-favorited">
         <mu-icon value="star_border"></mu-icon>
       </mu-button>
@@ -47,6 +47,17 @@ export default {
     },
     story() {
       return this.$API.story.get({ feedId: this.feedId, offset: this.offset })
+    },
+    headerTitle() {
+      if (!_.isNil(this.story) && !_.isNil(this.feed)) {
+        return `${this.feed.title} - ${this.story.title}`
+      } else if (!_.isNil(this.story)) {
+        return this.story.title
+      } else if (!_.isNil(this.feed)) {
+        return this.feed.title
+      } else {
+        return `#${this.feedId}-${this.offset}`
+      }
     },
     dateText() {
       if (_.isNil(this.story)) {
