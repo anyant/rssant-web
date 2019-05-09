@@ -2,6 +2,9 @@
   <MoLayout header>
     <MoBackHeader border>
       <template v-slot:title>{{ feedTitle }}</template>
+      <mu-button icon class="action-delete" @click="deleteFeed">
+        <mu-icon class="action-icon" value="delete"></mu-icon>
+      </mu-button>
     </MoBackHeader>
     <div class="feed-info">
       <div class="item" v-for="item in feedInfo" :key="item.name">
@@ -148,6 +151,25 @@ export default {
       })
       return info
     }
+  },
+  methods: {
+    deleteFeed() {
+      this.$confirm(`删除订阅 “${this.feedTitle}” ？`, '提示', {
+        type: 'warning'
+      }).then(({ result }) => {
+        if (result) {
+          this.$API.feed
+            .delete({ feedId: this.feedId })
+            .then(() => {
+              this.$toast.success('删除成功')
+              this.$router.go(-2)
+            })
+            .catch(error => {
+              this.$toast.message('删除失败: ' + error.message)
+            })
+        }
+      })
+    }
   }
 }
 </script>
@@ -186,5 +208,19 @@ export default {
 
 .item-link {
   color: @antBlue;
+}
+
+.action-icon {
+  display: inline-block;
+  font-size: 20 * @pr;
+  width: 22 * @pr;
+}
+
+.action-delete {
+  position: relative;
+  width: 32 * @pr;
+  height: 32 * @pr;
+  color: @antTextBlack;
+  margin-left: 16 * @pr;
 }
 </style>

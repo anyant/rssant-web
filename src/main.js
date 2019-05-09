@@ -2,8 +2,10 @@ import Vue from 'vue'
 // muse-ui
 import MuseUI from 'muse-ui'
 import 'muse-ui/dist/muse-ui.css'
+import 'muse-ui-message/dist/muse-ui-message.css';
 import Loading from 'muse-ui-loading'
 import Toast from 'muse-ui-toast'
+import MuseMessage from 'muse-ui-message';
 import 'muse-ui-loading/dist/muse-ui-loading.css'
 // element-ui
 import { Message, Table, TableColumn } from 'element-ui'
@@ -42,6 +44,7 @@ Vue.prototype.$message = Message
 
 Vue.use(MuseUI)
 Vue.use(Loading)
+Vue.use(MuseMessage)
 Vue.use(Toast, {
   time: 3000,
   close: false
