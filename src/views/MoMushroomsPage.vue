@@ -2,7 +2,7 @@
   <MoLayout grey header>
     <MoBackHeader border>
       <template v-slot:title>蘑菇{{ numMushrooms }}</template>
-      <mu-button icon class="action-readed">
+      <mu-button icon class="action-readed" @click="setAllReaded">
         <mu-icon value="done"></mu-icon>
       </mu-button>
     </MoBackHeader>
@@ -63,6 +63,16 @@ export default {
     },
     isReaded(story) {
       return this.$API.story.isReaded(story)
+    },
+    setAllReaded() {
+      let feedIds = new Set()
+      this.mushrooms.forEach(story => {
+        if (!this.isReaded(story)) {
+          feedIds.add(story.feed.id)
+        }
+      })
+      feedIds = Array.from(feedIds)
+      this.$API.feed.setAllReaded({ feedIds })
     }
   },
   beforeRouteLeave(to, from, next) {
