@@ -6,18 +6,20 @@
         <mu-icon value="done"></mu-icon>
       </mu-button>
     </MoBackHeader>
-    <div class="feed-story-list">
-      <MoFeedStoryItem
-        v-for="story in mushrooms"
-        :key="`${story.feed.id}:${story.offset}`"
-        :feedId="story.feed.id"
-        :offset="story.offset"
-        :feedTitle="getFeedTitle(story.feed.id)"
-        :storyTitle="story.title"
-        :storyDate="story.dt_published"
-        :isReaded="isReaded(story)"
-      ></MoFeedStoryItem>
-    </div>
+    <keep-alive>
+      <div class="feed-story-list">
+        <MoFeedStoryItem
+          v-for="story in mushrooms"
+          :key="`${story.feed.id}:${story.offset}`"
+          :feedId="story.feed.id"
+          :offset="story.offset"
+          :feedTitle="getFeedTitle(story.feed.id)"
+          :storyTitle="story.title"
+          :storyDate="story.dt_published"
+          :isReaded="isReaded(story)"
+        ></MoFeedStoryItem>
+      </div>
+    </keep-alive>
   </MoLayout>
 </template>
 <script>
@@ -26,25 +28,26 @@ import MoBackHeader from '@/components/MoBackHeader'
 import MoLayout from '@/components/MoLayout'
 import MoFeedStoryItem from '@/components/MoFeedStoryItem.vue'
 
-const VID = '/mushrooms'
-
 export default {
   components: { MoBackHeader, MoLayout, MoFeedStoryItem },
+  props: {
+    vid: {
+      type: String,
+      default: '/mushrooms'
+    }
+  },
   data() {
     return {}
   },
   mounted() {
     this.$API.syncFeedLoadMushrooms().then(() => {
-      let scrollTop = this.pageState.get('scrollTop')
+      let scrollTop = this.$pageState.get('scrollTop')
       if (!_.isNil(scrollTop)) {
         window.scrollTo(0, scrollTop)
       }
     })
   },
   computed: {
-    pageState() {
-      return this.$API.page.of(VID)
-    },
     mushrooms() {
       return this.$API.story.mushrooms
     },
@@ -75,13 +78,9 @@ export default {
       this.$API.feed.setAllReaded({ feedIds })
     }
   },
-  beforeRouteLeave(to, from, next) {
-    let scrollTop = window.scrollY
-    if (scrollTop > 0) {
-      this.pageState.set('scrollTop', scrollTop)
-      this.pageState.commit()
-    }
-    next()
+  savePageState() {
+    this.$pageState.set('scrollTop', window.scrollY)
+    this.$pageState.commit()
   }
 }
 </script>

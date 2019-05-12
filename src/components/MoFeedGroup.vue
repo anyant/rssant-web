@@ -6,16 +6,18 @@
         <mu-icon value="done"></mu-icon>
       </mu-button>
     </MoBackHeader>
-    <div class="feed-list">
-      <MoFeedItem
-        v-for="feed in feedList"
-        :key="feed.id"
-        :title="feed.title"
-        :number="feed.num_unread_storys"
-        :date="feed.dt_updated"
-        :link="`/feed/${feed.id}`"
-      ></MoFeedItem>
-    </div>
+    <keep-alive>
+      <div class="feed-list">
+        <MoFeedItem
+          v-for="feed in feedList"
+          :key="feed.id"
+          :title="feed.title"
+          :number="feed.num_unread_storys"
+          :date="feed.dt_updated"
+          :link="`/feed/${feed.id}`"
+        ></MoFeedItem>
+      </div>
+    </keep-alive>
   </MoLayout>
 </template>
 <script>
@@ -27,10 +29,6 @@ import MoFeedItem from '@/components/MoFeedItem.vue'
 export default {
   components: { MoBackHeader, MoLayout, MoFeedItem },
   props: {
-    vid: {
-      type: String,
-      required: true
-    },
     title: {
       type: String,
       required: true
@@ -44,9 +42,6 @@ export default {
     return {}
   },
   computed: {
-    pageState() {
-      return this.$API.page.of(this.vid)
-    },
     feedList() {
       return this.$API.feed[this.group]
     },
@@ -58,21 +53,17 @@ export default {
   },
   mounted() {
     this.$API.feed.sync().then(() => {
-      let scrollTop = this.pageState.get('scrollTop')
+      let scrollTop = this.$pageState.get('scrollTop')
       if (!_.isNil(scrollTop)) {
         window.scrollTo(0, scrollTop)
       }
     })
   },
+  savePageState() {
+    this.$pageState.set('scrollTop', window.scrollY)
+    this.$pageState.commit()
+  },
   methods: {
-    beforeRouteLeave(to, from, next) {
-      let scrollTop = window.scrollY
-      if (scrollTop > 0) {
-        this.pageState.set('scrollTop', scrollTop)
-        this.pageState.commit()
-      }
-      next()
-    },
     setAllReaded() {
       let feedIds = this.feedList.map(x => x.id)
       this.$API.feed.setAllReaded({ feedIds })

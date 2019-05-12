@@ -4,9 +4,23 @@ import Loading from '@/plugin/loading'
 import { API } from '@/plugin/api'
 
 
+function sortMushrooms(mushrooms, API) {
+    return _.chain(mushrooms)
+        .sortBy([
+            function (x) { return !API.story.isReaded(x) },
+            function (x) { return new Date(x.dt_published) },
+            function (x) { return x.feed.id },
+            'offset'
+        ])
+        .reverse()
+        .value()
+}
+
+
 export default {
     state: {
         storys: {},
+        mushroomsSorted: false,
         mushrooms: [],
         mushroomsLoading: new Loading()
     },
@@ -46,6 +60,10 @@ export default {
             })
             state.mushrooms = storys
         },
+        SET_SORTED_MUSHROOMS(state, storys) {
+            state.mushroomsSorted = true
+            state.mushrooms = storys
+        }
     },
     getters: {
         get(state) {
@@ -62,16 +80,8 @@ export default {
                 return _.chain(_.values(feedStorys)).sortBy('offset').value()
             }
         },
-        mushrooms(state, API) {
-            return _.chain(state.mushrooms)
-                .sortBy([
-                    function (x) { return !API.story.isReaded(x) },
-                    function (x) { return new Date(x.dt_published) },
-                    function (x) { return x.feed.id },
-                    'offset'
-                ])
-                .reverse()
-                .value()
+        mushrooms(state) {
+            return state.mushrooms
         },
         numUnreadMushrooms(state, API) {
             function notRead(story) {
@@ -109,6 +119,12 @@ export default {
                 let data = await API.story.queryRecent({ feed_ids: feedIds, days, detail })
                 DAO.ADD_OR_UPDATE_MUSHROOMS(data.results)
             })
+        },
+        sortMushrooms(DAO) {
+            if (!DAO.state.mushroomsSorted) {
+                let mushrooms = sortMushrooms(DAO.state.mushrooms, DAO.API)
+                DAO.SET_SORTED_MUSHROOMS(mushrooms)
+            }
         }
     }
 }

@@ -25,6 +25,7 @@ import Mescroll from "mescroll.js/mescroll.vue";
 import App from './App'
 import router from '@/router'
 import { Store, API } from '@/store'
+import { pageMixin } from '@/plugin/page'
 import Notification from '@/plugin/notify'
 import '@/styles/theme-rssant.less'
 
@@ -41,6 +42,8 @@ Vue.prototype.$API = API
 
 Vue.prototype.$notify = Notification
 Vue.prototype.$message = Message
+
+Vue.mixin(pageMixin)
 
 Vue.use(MuseUI)
 Vue.use(Loading)

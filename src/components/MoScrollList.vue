@@ -107,7 +107,7 @@ export default {
       }
     },
     loadInit() {
-      if (this.total > 0 && this.items.length <= 0) {
+      if (this.total > 0 && this.items.length <= this.numPageItems) {
         if (this.hasNext) {
           this.load({ offset: this.initOffset, size: this.numPageItems })
             .then(() => {
@@ -121,6 +121,15 @@ export default {
         }
       } else {
         this.endSuccess()
+        let scrollTop = 0
+        for (let item of this.items) {
+          if (item.offset < this.initOffset) {
+            scrollTop += this.itemSize
+          } else {
+            break
+          }
+        }
+        this.mescroll.setScrollTop(scrollTop)
       }
     },
     loadPrev() {

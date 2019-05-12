@@ -5,9 +5,9 @@ API: 提供对外接口
 */
 
 import StoreBuilder from './builder'
+import { pageDriver as page } from '@/plugin/page'
 import user from './user'
 import feed from './feed'
-import page from './page'
 import story from './story'
 import root from './root'
 

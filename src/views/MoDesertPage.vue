@@ -1,14 +1,11 @@
 <template>
-  <MoFeedGroup ref="sub" vid="/desert" title="沙漠" group="desert"></MoFeedGroup>
+  <MoFeedGroup vid="/desert" title="沙漠" group="desert"></MoFeedGroup>
 </template>
 <script>
 import MoFeedGroup from '@/components/MoFeedGroup'
 
 export default {
-  components: { MoFeedGroup },
-  beforeRouteLeave(to, from, next) {
-    this.$refs.sub.beforeRouteLeave(to, from, next)
-  }
+  components: { MoFeedGroup }
 }
 </script>
 

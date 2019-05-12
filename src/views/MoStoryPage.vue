@@ -98,7 +98,8 @@ export default {
 }
 
 .info-title {
-  font-size: 16 * @pr;
+  font-size: 18 * @pr;
+  font-weight: 500;
 }
 
 .info-item {
