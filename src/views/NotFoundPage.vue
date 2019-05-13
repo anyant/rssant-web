@@ -2,7 +2,7 @@
   <section>
     <h2>页面不存在</h2>
     <p>
-      <a href="/">返回首页</a>
+      <router-link to="/">返回首页</router-link>
     </p>
   </section>
 </template>

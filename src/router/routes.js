@@ -3,6 +3,7 @@ import MoMushroomsPage from '@/views/MoMushroomsPage'
 import MoGardenPage from '@/views/MoGardenPage'
 import MoJunglePage from '@/views/MoJunglePage'
 import MoDesertPage from '@/views/MoDesertPage'
+import MoTrashPage from '@/views/MoTrashPage'
 import MoStoryListPage from '@/views/MoStoryListPage'
 import MoLoginPage from '@/views/MoLoginPage'
 import MoRegisterPage from '@/views/MoRegisterPage'
@@ -57,6 +58,12 @@ export default [
     path: '/desert',
     name: 'Desert',
     component: MoDesertPage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: '/trash',
+    name: 'Trash',
+    component: MoTrashPage,
     meta: { loginRequired: true },
   },
   {

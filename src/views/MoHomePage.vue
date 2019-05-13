@@ -26,7 +26,10 @@
             <span class="item-title">蘑菇</span>
           </div>
           <div class="item-right">
-            <span class="item-number">{{ numMushrooms }}</span>
+            <span class="item-number">
+              {{ numMushrooms }}
+              <span class="item-number-total">/ {{ numTotalMushrooms }}</span>
+            </span>
             <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
           </div>
         </mu-ripple>
@@ -40,7 +43,10 @@
             <span class="item-title">丛林</span>
           </div>
           <div class="item-right">
-            <span class="item-number">{{ numJungle }}</span>
+            <span class="item-number">
+              {{ numJungle }}
+              <span class="item-number-total">/ {{ numTotalJungle }}</span>
+            </span>
             <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
           </div>
         </mu-ripple>
@@ -54,7 +60,10 @@
             <span class="item-title">菌圃</span>
           </div>
           <div class="item-right">
-            <span class="item-number">{{ numGarden }}</span>
+            <span class="item-number">
+              {{ numGarden }}
+              <span class="item-number-total">/ {{ numTotalGarden }}</span>
+            </span>
             <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
           </div>
         </mu-ripple>
@@ -68,7 +77,9 @@
             <span class="item-title">沙漠</span>
           </div>
           <div class="item-right">
-            <span class="item-number">{{ numDesert }}</span>
+            <span class="item-number">
+              <span class="item-number-total">{{ numTotalDesert }}</span>
+            </span>
             <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
           </div>
         </mu-ripple>
@@ -82,7 +93,9 @@
             <span class="item-title">废墟</span>
           </div>
           <div class="item-right">
-            <span class="item-number">{{ numTrash }}</span>
+            <span class="item-number">
+              <span class="item-number-total">{{ numTotalTrash }}</span>
+            </span>
             <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
           </div>
         </mu-ripple>
@@ -120,20 +133,28 @@ export default {
   },
   computed: {
     numMushrooms() {
-      let n = this.$API.story.numUnreadMushrooms
-      return n > 0 ? n : ''
+      return this.$API.story.numUnreadMushrooms
+    },
+    numTotalMushrooms() {
+      return this.$API.story.mushrooms.length
     },
     numJungle() {
-      return this.numTextOf(this.$API.feed.numUnreadJungle)
+      return this.$API.feed.numUnreadJungle
+    },
+    numTotalJungle() {
+      return this.$API.feed.jungle.length
     },
     numGarden() {
-      return this.numTextOf(this.$API.feed.numUnreadGarden)
+      return this.$API.feed.numUnreadGarden
     },
-    numDesert() {
-      return this.numTextOf(this.$API.feed.numUnreadDesert)
+    numTotalGarden() {
+      return this.$API.feed.garden.length
     },
-    numTrash() {
-      return ''
+    numTotalDesert() {
+      return this.numTextOf(this.$API.feed.desert.length)
+    },
+    numTotalTrash() {
+      return this.numTextOf(this.$API.feed.trash.length)
     },
     numFavorited() {
       return ''
@@ -209,10 +230,14 @@ export default {
 
 .item-number {
   display: inline-block;
-  width: 48 * @pr;
+  width: 96 * @pr;
   font-size: 15 * @pr;
-  margin-right: 40 * @pr;
+  margin-right: 48 * @pr;
   text-align: right;
+}
+
+.item-number-total {
+  color: @antTextGrey;
 }
 
 .item-icon-right {

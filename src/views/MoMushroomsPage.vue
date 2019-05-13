@@ -1,7 +1,11 @@
 <template>
   <MoLayout grey header>
     <MoBackHeader border>
-      <template v-slot:title>蘑菇{{ numMushrooms }}</template>
+      <template v-slot:title>
+        蘑菇
+        <span class="num-unread">{{ numUnreadMushrooms }}</span>
+        <span class="num-total">/ {{ mushrooms.length }}</span>
+      </template>
       <mu-button icon class="action-readed" @click="setAllReaded">
         <mu-icon value="done"></mu-icon>
       </mu-button>
@@ -51,13 +55,8 @@ export default {
     mushrooms() {
       return this.$API.story.mushrooms
     },
-    numMushrooms() {
-      let n = this.$API.story.numUnreadMushrooms
-      if (n <= 0) {
-        return ''
-      } else {
-        return ` (${n})`
-      }
+    numUnreadMushrooms() {
+      return this.$API.story.numUnreadMushrooms
     }
   },
   methods: {
@@ -104,5 +103,15 @@ export default {
 
 .feed-story-list {
   padding-bottom: 8 * @pr;
+}
+
+.num-unread {
+  margin-left: 8 * @pr;
+  margin-right: 4 * @pr;
+}
+
+.num-total {
+  color: @antTextGrey;
+  font-weight: normal;
 }
 </style>

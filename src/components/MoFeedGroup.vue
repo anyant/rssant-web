@@ -1,7 +1,16 @@
 <template>
   <MoLayout grey header>
     <MoBackHeader border>
-      <template v-slot:title>{{title}}{{ numFeedsText }}</template>
+      <template v-slot:title>
+        {{title}}
+        <template v-if="showNumUnread">
+          <span class="num-unread">{{ numUnreadFeeds }}</span>
+          <span class="num-total">/ {{ feedList.length }}</span>
+        </template>
+        <template v-else>
+          <span class="num-total-only">{{ feedList.length }}</span>
+        </template>
+      </template>
       <mu-button icon class="action-readed" @click="setAllReaded">
         <mu-icon value="done"></mu-icon>
       </mu-button>
@@ -36,6 +45,10 @@ export default {
     group: {
       type: String,
       required: true
+    },
+    showNumUnread: {
+      type: Boolean,
+      default: true
     }
   },
   data() {
@@ -45,10 +58,9 @@ export default {
     feedList() {
       return this.$API.feed[this.group]
     },
-    numFeedsText() {
+    numUnreadFeeds() {
       let key = 'numUnread' + _.startCase(this.group)
-      let n = this.$API.feed[key]
-      return n > 0 ? ` (${n})` : ''
+      return this.$API.feed[key]
     }
   },
   mounted() {
@@ -89,5 +101,17 @@ export default {
 
 .feed-list {
   padding-bottom: 8 * @pr;
+}
+
+.num-unread,
+.num-total-only {
+  margin-left: 8 * @pr;
+  margin-right: 4 * @pr;
+}
+
+.num-total,
+.num-total-only {
+  color: @antTextGrey;
+  font-weight: normal;
 }
 </style>

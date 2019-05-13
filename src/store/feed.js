@@ -145,7 +145,7 @@ export default {
             return state.trash
         },
         numUnreadTrash(state) {
-            return numUnreadFeedsOf(state.garden)
+            return numUnreadFeedsOf(state.trash)
         },
         recentGarden(state) {
             const dt_recent = subDays(new Date(), 14)
