@@ -16,7 +16,7 @@
         </div>
       </MoHeader>
       <div>
-        <mu-ripple
+        <div
           :color="rippleColor"
           class="item item-mushrooms"
           @click="()=>{this.$router.push('/mushrooms')}"
@@ -32,8 +32,8 @@
             </span>
             <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
           </div>
-        </mu-ripple>
-        <mu-ripple
+        </div>
+        <div
           :color="rippleColor"
           class="item item-jungle"
           @click="()=>{this.$router.push('/jungle')}"
@@ -49,8 +49,8 @@
             </span>
             <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
           </div>
-        </mu-ripple>
-        <mu-ripple
+        </div>
+        <div
           :color="rippleColor"
           class="item item-garden"
           @click="()=>{this.$router.push('/garden')}"
@@ -66,8 +66,8 @@
             </span>
             <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
           </div>
-        </mu-ripple>
-        <mu-ripple
+        </div>
+        <div
           :color="rippleColor"
           class="item item-desert"
           @click="()=>{this.$router.push('/desert')}"
@@ -82,8 +82,8 @@
             </span>
             <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
           </div>
-        </mu-ripple>
-        <mu-ripple
+        </div>
+        <div
           :color="rippleColor"
           class="item item-trash"
           @click="()=>{this.$router.push('/trash')}"
@@ -98,8 +98,8 @@
             </span>
             <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
           </div>
-        </mu-ripple>
-        <mu-ripple
+        </div>
+        <div
           :color="rippleColor"
           class="item item-favorited"
           @click="()=>{this.$router.push('/favorited')}"
@@ -112,7 +112,7 @@
             <span class="item-number">{{ numFavorited }}</span>
             <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
           </div>
-        </mu-ripple>
+        </div>
       </div>
     </MoLayout>
   </keep-alive>

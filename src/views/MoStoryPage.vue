@@ -37,7 +37,7 @@ export default {
   },
   computed: {
     feedId() {
-      return parseInt(this.$route.params.feedId)
+      return this.$route.params.feedId
     },
     offset() {
       return parseInt(this.$route.params.offset)

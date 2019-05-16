@@ -11,7 +11,7 @@ import { formatDate } from '@/plugin/datefmt'
 
 export default {
   props: {
-    feedId: Number,
+    feedId: String,
     offset: Number,
     feedTitle: String,
     storyTitle: String,

@@ -143,10 +143,10 @@ const API = {
       return client.get('/story/favorited', { params: { detail } })
     },
     setWatched({ feed_id, offset, is_watched }) {
-      return client.put(`/story/${feed_id}:${offset}/watched`, { is_watched })
+      return client.put(`/story/${feed_id}-${offset}/watched`, { is_watched })
     },
     setFavorited({ feed_id, offset, is_favorited }) {
-      return client.put(`/story/${feed_id}:${offset}/favorited`, { is_favorited })
+      return client.put(`/story/${feed_id}-${offset}/favorited`, { is_favorited })
     }
   }
 }
