@@ -66,6 +66,7 @@ export default {
   height: 8 * @pr;
   border-radius: 4px;
   margin-right: 8 * @pr;
+  flex-shrink: 0;
 }
 
 .title {
