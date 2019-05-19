@@ -73,6 +73,14 @@ function fixTitle(feed) {
     return feed
 }
 
+function addOrUpdateCreation(state, creation) {
+    let old = state.creations[creation.id]
+    if (!_.isNil(old) && _.isEmpty(creation.message)) {
+        creation.message = old.message
+    }
+    Vue.set(state.creations, creation.id, creation)
+}
+
 export default {
     state: {
         loading: new Loading(),
@@ -94,11 +102,11 @@ export default {
             updateFeedList(state)
         },
         ADD_OR_UPDATE_CREATION(state, creation) {
-            Vue.set(state.creations, creation.id, creation)
+            addOrUpdateCreation(state, creation)
         },
         ADD_OR_UPDATE_CREATION_LIST(state, creationList) {
             creationList.forEach(creation => {
-                Vue.set(state.creations, creation.id, creation)
+                addOrUpdateCreation(state, creation)
             })
         },
         ADD_OR_UPDATE(state, feed) {
@@ -195,23 +203,31 @@ export default {
                         deletedFeedIds: result.deleted_ids
                     })
                 })
+                await API.feed.queryCreationList().then(result => {
+                    DAO.ADD_OR_UPDATE_CREATION_LIST(result.feed_creations)
+                })
             })
         },
         async load(DAO, { feedId, detail }) {
             let feed = await API.feed.get({ id: feedId, detail })
             DAO.ADD_OR_UPDATE(feed)
         },
+        async loadCreation(DAO, { creationId, detail }) {
+            let creation = await API.feed.getCreation({ id: creationId, detail })
+            DAO.ADD_OR_UPDATE_CREATION(creation)
+        },
         async create(DAO, { url }) {
             let result = await API.feed.create({ url })
             if (result.is_ready && !_.isNil(result.feed)) {
                 DAO.ADD_OR_UPDATE(result.feed)
-                return
+                return true
             }
             DAO.ADD_OR_UPDATE_CREATION(result.feed_creation)
             const creationId = result.feed_creation.id
             let numTry = 30
             const token = setInterval(() => {
                 API.feed.getCreation({ id: creationId }).then(creation => {
+                    DAO.ADD_OR_UPDATE_CREATION(creation)
                     if (creation.status === 'ready') {
                         clearInterval(token)
                         DAO.API.feed.load({ feedId: creation.feed_id })
@@ -222,6 +238,7 @@ export default {
                     numTry -= 1
                 })
             }, 1000)
+            return false
         },
         async update(DAO, { feedId, title }) {
             let newFeed = await API.feed.update({

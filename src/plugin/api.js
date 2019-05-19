@@ -89,11 +89,11 @@ const API = {
     create({ url }) {
       return client.post('/feed/creation', { url })
     },
-    getCreation({ id }) {
-      return client.get(`/feed/creation/${id}`)
+    getCreation({ id, detail }) {
+      return client.get(`/feed/creation/${id}`, { params: { detail } })
     },
-    queryCreation() {
-      return client.get('/feed/creation')
+    queryCreationList({ detail } = {}) {
+      return client.get('/feed/creation', { params: { detail } })
     },
     get({ id, detail }) {
       return client.get(`/feed/${id}`, { params: { detail } })

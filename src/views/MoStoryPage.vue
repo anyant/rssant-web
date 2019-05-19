@@ -2,8 +2,9 @@
   <MoLayout header class="story">
     <MoBackHeader border>
       <template v-slot:title>{{ headerTitle }}</template>
-      <mu-button icon class="action-favorited">
-        <mu-icon value="star_border"></mu-icon>
+      <mu-button icon class="action-favorited" @click="toggleFavorited">
+        <mu-icon v-if="isFavorited" value="star" :color="starColor"></mu-icon>
+        <mu-icon v-else value="star_border" :color="starColor"></mu-icon>
       </mu-button>
     </MoBackHeader>
     <div class="story-info" v-if="story">
@@ -26,6 +27,7 @@
 <script>
 import _ from 'lodash'
 import 'github-markdown-css'
+import { antGold } from '@/plugin/common'
 import MoLayout from '@/components/MoLayout.vue'
 import MoBackHeader from '@/components/MoBackHeader'
 import { formatFullDate } from '@/plugin/datefmt'
@@ -41,6 +43,16 @@ export default {
     },
     offset() {
       return parseInt(this.$route.params.offset)
+    },
+    isFavorited() {
+      return !_.isNil(this.story) && this.story.is_favorited
+    },
+    starColor() {
+      if (this.isFavorited) {
+        return antGold
+      } else {
+        return null
+      }
     },
     feed() {
       return this.$API.feed.get(this.feedId)
@@ -72,6 +84,12 @@ export default {
     }
     if (_.isNil(this.story) || _.isEmpty(this.story.content)) {
       this.$API.story.load({ feedId: this.feedId, offset: this.offset, detail: true })
+    }
+  },
+  methods: {
+    toggleFavorited() {
+      let is_favorited = !this.isFavorited
+      this.$API.story.setFavorited({ feedId: this.feedId, offset: this.offset, is_favorited })
     }
   }
 }

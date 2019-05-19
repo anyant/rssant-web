@@ -1,5 +1,8 @@
 import MoHomePage from '@/views/MoHomePage'
 import MoMushroomsPage from '@/views/MoMushroomsPage'
+import MoFavoritedPage from '@/views/MoFavoritedPage'
+import MoCreationListPage from '@/views/MoCreationListPage'
+import MoCreationDetailPage from '@/views/MoCreationDetailPage'
 import MoGardenPage from '@/views/MoGardenPage'
 import MoJunglePage from '@/views/MoJunglePage'
 import MoDesertPage from '@/views/MoDesertPage'
@@ -40,6 +43,24 @@ export default [
     path: '/mushrooms',
     name: 'Mushrooms',
     component: MoMushroomsPage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: '/favorited',
+    name: 'Favorited',
+    component: MoFavoritedPage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: '/creation/',
+    name: 'CreationList',
+    component: MoCreationListPage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: '/creation/:creationId',
+    name: 'CreationDetail',
+    component: MoCreationDetailPage,
     meta: { loginRequired: true },
   },
   {

@@ -85,6 +85,38 @@
         </div>
         <div
           :color="rippleColor"
+          class="item item-favorited"
+          @click="()=>{this.$router.push('/favorited')}"
+        >
+          <div class="item-left">
+            <i class="item-icon fa fa-star" aria-hidden="true"></i>
+            <span class="item-title">收藏</span>
+          </div>
+          <div class="item-right">
+            <span class="item-number">
+              <span class="item-number-total">{{ numFavorited }}</span>
+            </span>
+            <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
+          </div>
+        </div>
+        <div
+          :color="rippleColor"
+          class="item item-creations"
+          @click="()=>{this.$router.push('/creation/')}"
+        >
+          <div class="item-left">
+            <i class="item-icon fa fa-eye" aria-hidden="true"></i>
+            <span class="item-title">种籽</span>
+          </div>
+          <div class="item-right">
+            <span class="item-number">
+              <span class="item-number-total">{{ numTotalCreations }}</span>
+            </span>
+            <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
+          </div>
+        </div>
+        <div
+          :color="rippleColor"
           class="item item-trash"
           @click="()=>{this.$router.push('/trash')}"
         >
@@ -96,20 +128,6 @@
             <span class="item-number">
               <span class="item-number-total">{{ numTotalTrash }}</span>
             </span>
-            <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
-          </div>
-        </div>
-        <div
-          :color="rippleColor"
-          class="item item-favorited"
-          @click="()=>{this.$router.push('/favorited')}"
-        >
-          <div class="item-left">
-            <i class="item-icon fa fa-star" aria-hidden="true"></i>
-            <span class="item-title">收藏</span>
-          </div>
-          <div class="item-right">
-            <span class="item-number">{{ numFavorited }}</span>
             <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
           </div>
         </div>
@@ -156,8 +174,11 @@ export default {
     numTotalTrash() {
       return this.numTextOf(this.$API.feed.trash.length)
     },
+    numTotalCreations() {
+      return this.numTextOf(this.$API.feed.creations.length)
+    },
     numFavorited() {
-      return ''
+      return this.numTextOf(this.$API.story.favorited.length)
     }
   },
   mounted() {

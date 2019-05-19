@@ -31,6 +31,7 @@
         :router-link="`/story/${story.feed.id}-${story.offset}`"
         :isFavorited="story.is_favorited"
         @read="onRead(story)"
+        @toggleFavorited="toggleFavorited(story)"
       ></MoStoryItem>
     </MoScrollList>
   </MoLayout>
@@ -80,10 +81,11 @@ export default {
       }
     }
   },
-  mounted() {
+  async mounted() {
     if (_.isNil(this.feed)) {
-      this.$API.feed.load({ feedId: this.feedId })
+      await this.$API.feed.load({ feedId: this.feedId })
     }
+    await this.$API.syncFeedLoadMushrooms()
   },
   methods: {
     loadStorys({ offset, size }) {
@@ -99,6 +101,10 @@ export default {
     },
     goFeedDetail() {
       this.$router.push(`/feed/${this.feedId}/detail`)
+    },
+    toggleFavorited(story) {
+      let is_favorited = !story.is_favorited
+      this.$API.story.setFavorited({ feedId: story.feed.id, offset: story.offset, is_favorited })
     }
   }
 }

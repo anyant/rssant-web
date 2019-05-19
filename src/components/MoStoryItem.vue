@@ -4,7 +4,8 @@
       <div class="story-title">{{ title || link }}</div>
       <div class="story-date">{{ dateText }}</div>
       <mu-button icon class="story-favorited" @click.stop="toggleFavorited">
-        <mu-icon value="star_border" :color="starColor"></mu-icon>
+        <mu-icon v-if="isFavorited" value="star" :color="starColor"></mu-icon>
+        <mu-icon v-else value="star_border" :color="starColor"></mu-icon>
       </mu-button>
     </div>
     <div

@@ -4,5 +4,6 @@ export default {
         let mushroomFeedIds = API.feed.recentGarden.map(feed => feed.id)
         await API.story.loadMushrooms({ feedIds: mushroomFeedIds, days: 14 })
         API.story.sortMushrooms()
+        await API.story.loadFavorited()
     }
 }

@@ -80,9 +80,13 @@ export default {
       }
       this.$API.feed
         .create({ url: this.feedUrl })
-        .then(() => {
+        .then(is_ready => {
           this.feedUrl = null
-          this.$toast.success('添加成功')
+          if (is_ready) {
+            this.$toast.success('添加成功')
+          } else {
+            this.$toast.info('已加入查找队列，稍后即可阅读')
+          }
           this.$router.back()
         })
         .catch(error => {

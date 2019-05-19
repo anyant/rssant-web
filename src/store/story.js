@@ -17,19 +17,33 @@ function sortMushrooms(mushrooms, API) {
 }
 
 
+function addOrUpdateList(state, storys) {
+    storys.forEach(story => {
+        let feedStorys = state.storys[story.feed.id]
+        if (_.isNil(feedStorys)) {
+            Vue.set(state.storys, story.feed.id, {})
+            feedStorys = state.storys[story.feed.id]
+        }
+        Vue.set(feedStorys, story.offset, story)
+    })
+}
+
+
+
 export default {
     state: {
         storys: {},
         mushroomsSorted: false,
         mushrooms: [],
-        mushroomsLoading: new Loading()
+        mushroomsLoading: new Loading(),
+        favoritedLoading: new Loading(),
     },
     mutations: {
-        SET_FAVORITED(state, { id, is_favorited }) {
-            state.storys[id].is_favorited = is_favorited;
+        SET_FAVORITED(state, { feed_id, offset, is_favorited }) {
+            state.storys[feed_id][offset].is_favorited = is_favorited;
         },
-        SET_WATCHED(state, { id, is_watched }) {
-            state.storys[id].is_watched = is_watched;
+        SET_WATCHED(state, { feed_id, offset, is_watched }) {
+            state.storys[feed_id][offset].is_watched = is_watched;
         },
         ADD_OR_UPDATE(state, story) {
             let feedStorys = state.storys[story.feed.id]
@@ -40,24 +54,21 @@ export default {
             Vue.set(feedStorys, story.offset, story)
         },
         ADD_OR_UPDATE_LIST(state, { feedId, storys }) {
-            let feedStorys = state.storys[feedId]
-            if (_.isNil(feedStorys)) {
-                Vue.set(state.storys, feedId, {})
-                feedStorys = state.storys[feedId]
+            if (_.isEmpty(feedId)) {
+                addOrUpdateList(state, storys)
+            } else {
+                let feedStorys = state.storys[feedId]
+                if (_.isNil(feedStorys)) {
+                    Vue.set(state.storys, feedId, {})
+                    feedStorys = state.storys[feedId]
+                }
+                storys.forEach(story => {
+                    Vue.set(feedStorys, story.offset, story)
+                })
             }
-            storys.forEach(story => {
-                Vue.set(feedStorys, story.offset, story)
-            })
         },
         ADD_OR_UPDATE_MUSHROOMS(state, storys) {
-            storys.forEach(story => {
-                let feedStorys = state.storys[story.feed.id]
-                if (_.isNil(feedStorys)) {
-                    Vue.set(state.storys, story.feed.id, {})
-                    feedStorys = state.storys[story.feed.id]
-                }
-                Vue.set(feedStorys, story.offset, story)
-            })
+            addOrUpdateList(state, storys)
             state.mushrooms = storys
         },
         SET_SORTED_MUSHROOMS(state, storys) {
@@ -90,6 +101,17 @@ export default {
             }
             return state.mushrooms.filter(notRead).length
         },
+        favorited(state) {
+            let favorited = []
+            _.values(state.storys).forEach(feedStorys => {
+                _.values(feedStorys).forEach(story => {
+                    if (story.is_favorited) {
+                        favorited.push(story)
+                    }
+                })
+            })
+            return _.orderBy(favorited, ['dt_created', 'id'], ['desc', 'desc'])
+        },
         isReaded(state, API) {
             return story => {
                 let feed = API.feed.get(story.feed.id)
@@ -118,6 +140,12 @@ export default {
             await DAO.state.mushroomsLoading.begin(async () => {
                 let data = await API.story.queryRecent({ feed_ids: feedIds, days, detail })
                 DAO.ADD_OR_UPDATE_MUSHROOMS(data.storys)
+            })
+        },
+        async loadFavorited(DAO) {
+            await DAO.state.favoritedLoading.begin(async () => {
+                let data = await API.story.listFavorited()
+                DAO.ADD_OR_UPDATE_LIST({ storys: data.storys })
             })
         },
         sortMushrooms(DAO) {
