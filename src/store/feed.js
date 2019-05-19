@@ -76,6 +76,7 @@ function fixTitle(feed) {
 export default {
     state: {
         loading: new Loading(),
+        creations: {},
         feeds: {},
         garden: [],
         jungle: [],
@@ -91,6 +92,14 @@ export default {
                 Vue.set(state.feeds, feed.id, fixTitle(feed))
             });
             updateFeedList(state)
+        },
+        ADD_OR_UPDATE_CREATION(state, creation) {
+            Vue.set(state.creations, creation.id, creation)
+        },
+        ADD_OR_UPDATE_CREATION_LIST(state, creationList) {
+            creationList.forEach(creation => {
+                Vue.set(state.creations, creation.id, creation)
+            })
         },
         ADD_OR_UPDATE(state, feed) {
             Vue.set(state.feeds, feed.id, fixTitle(feed))
@@ -122,6 +131,17 @@ export default {
     getters: {
         isLoading(state) {
             return state.loading.isLoading
+        },
+        creations(state) {
+            return _.chain(_.values(state.creations))
+                .sortBy('dt_created', 'status')
+                .reverse()
+                .value()
+        },
+        getCreation(state) {
+            return creationId => {
+                return state.creations[creationId]
+            }
         },
         garden(state) {
             return state.garden
@@ -171,7 +191,7 @@ export default {
                 })
                 await API.feed.query({ hints }).then(result => {
                     DAO.SYNC({
-                        updatedFeeds: result.results,
+                        updatedFeeds: result.feeds,
                         deletedFeedIds: result.deleted_ids
                     })
                 })
@@ -182,20 +202,25 @@ export default {
             DAO.ADD_OR_UPDATE(feed)
         },
         async create(DAO, { url }) {
-            let feed = await API.feed.create({ url })
-            DAO.ADD_OR_UPDATE(feed)
-            const feedId = feed.id
+            let result = await API.feed.create({ url })
+            if (result.is_ready && !_.isNil(result.feed)) {
+                DAO.ADD_OR_UPDATE(result.feed)
+                return
+            }
+            DAO.ADD_OR_UPDATE_CREATION(result.feed_creation)
+            const creationId = result.feed_creation.id
             let numTry = 30
-            const token = setInterval(async () => {
-                try {
-                    feed = await API.feed.get({ id: feedId })
-                } finally {
-                    numTry -= 1
-                    if (feed.status === 'ready' || feed.status === 'error' || numTry <= 0) {
+            const token = setInterval(() => {
+                API.feed.getCreation({ id: creationId }).then(creation => {
+                    if (creation.status === 'ready') {
                         clearInterval(token)
-                        DAO.ADD_OR_UPDATE(feed)
+                        DAO.API.feed.load({ feedId: creation.feed_id })
+                    } else if (creation.status === 'error' || numTry <= 0) {
+                        clearInterval(token)
                     }
-                }
+                }).finally(() => {
+                    numTry -= 1
+                })
             }, 1000)
         },
         async update(DAO, { feedId, title }) {
@@ -213,11 +238,13 @@ export default {
         },
         async importOPML(DAO, { file }) {
             let data = await API.feed.importOPML({ file })
-            DAO.ADD_OR_UPDATE_LIST(data.results)
+            DAO.ADD_OR_UPDATE_LIST(data.feeds)
+            DAO.ADD_OR_UPDATE_CREATION_LIST(data.feed_creations)
         },
         async importBookmark(DAO, { file }) {
             let data = await API.feed.importBookmark({ file })
-            DAO.ADD_OR_UPDATE_LIST(data.results)
+            DAO.ADD_OR_UPDATE_LIST(data.feeds)
+            DAO.ADD_OR_UPDATE_CREATION_LIST(data.feed_creations)
         },
         async setStoryOffset(DAO, { feedId, offset }) {
             if (DAO.get(feedId).story_offset !== offset) {
