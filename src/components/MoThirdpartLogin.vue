@@ -1,7 +1,7 @@
 <template>
   <div class="thirdpart-login">
     <span class="label">第三方登录注册:</span>
-    <mu-ripple class="button">
+    <mu-ripple class="button" @click="loginGithub">
       <i class="button-icon fa fa-github"></i>
       <span class="button-text">GitHub</span>
     </mu-ripple>
@@ -9,7 +9,13 @@
 </template>
 
 <script>
-export default {}
+export default {
+  methods: {
+    loginGithub() {
+      this.$API.user.loginGithub()
+    }
+  }
+}
 </script>
 
 <style lang="less" scoped>

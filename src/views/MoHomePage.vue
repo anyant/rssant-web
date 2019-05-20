@@ -2,7 +2,7 @@
   <keep-alive>
     <MoLayout grey header>
       <MoHeader>
-        <div class="title">蚁阅</div>
+        <MoDebugTool class="title">蚁阅</MoDebugTool>
         <div class="right">
           <mu-button icon class="action-add" @click="()=>{this.$router.push('/feed-creation')}">
             <mu-icon value="add"></mu-icon>
@@ -138,11 +138,12 @@
 <script>
 import MoHeader from '@/components/MoHeader'
 import MoLayout from '@/components/MoLayout'
+import MoDebugTool from '@/components/MoDebugTool'
 import defaultAvatar from '@/assets/avatar.png'
 import { antRippleGrey } from '@/plugin/common'
 
 export default {
-  components: { MoHeader, MoLayout },
+  components: { MoHeader, MoLayout, MoDebugTool },
   data() {
     return {
       rippleColor: antRippleGrey,

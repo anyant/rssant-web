@@ -65,4 +65,3 @@ window.app = new Vue({
   router,
   render: h => h(App)
 })
-window.app.debug = localStorage.getItem('debug') === '1'
