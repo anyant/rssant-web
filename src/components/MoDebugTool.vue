@@ -27,6 +27,7 @@ export default {
     applyDebug(debug) {
       window._RSSANT_DEBUG = debug
       let message = `RSSAnt debug mode: ${debug ? 'ON' : 'OFF'}`
+      // eslint-disable-next-line
       console.log(message)
       this.$toast.success(message)
       let css = null
