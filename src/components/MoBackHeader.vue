@@ -4,9 +4,9 @@
       <mu-button icon class="back" @click="goBack">
         <mu-icon size="32" value="keyboard_arrow_left"></mu-icon>
       </mu-button>
-      <span class="title">
+      <div class="title">
         <slot name="title"></slot>
-      </span>
+      </div>
     </div>
     <div class="right">
       <slot></slot>
@@ -54,6 +54,7 @@ export default {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  color: @antTextBlack;
 }
 
 .left,

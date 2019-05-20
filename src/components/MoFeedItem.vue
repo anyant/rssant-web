@@ -88,7 +88,7 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: clip;
-  background: @antTextWhiteGrey;
+  background: @antTextLight;
   color: @antTextWhite;
 }
 

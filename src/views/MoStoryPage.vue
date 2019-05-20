@@ -147,5 +147,6 @@ export default {
 
 .markdown-body {
   font-size: 15 * @pr;
+  color: @antTextSemi;
 }
 </style>

@@ -15,7 +15,7 @@
           </mu-avatar>
         </div>
       </MoHeader>
-      <div>
+      <div class="items">
         <div
           :color="rippleColor"
           class="item item-mushrooms"
@@ -221,7 +221,7 @@ export default {
 
 .item {
   position: relative;
-  background: #fff;
+  background: @antBackWhite;
   margin-top: 8 * @pr;
   height: 48 * @pr;
   padding-left: 16 * @pr;
@@ -248,6 +248,7 @@ export default {
   font-size: 15 * @pr;
   font-weight: bold;
   margin-left: 8 * @pr;
+  color: @antTextBlack;
 }
 
 .item-number {

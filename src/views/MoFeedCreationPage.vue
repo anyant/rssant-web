@@ -201,7 +201,7 @@ export default {
   margin-top: 80 * @pr;
   margin-bottom: 16 * @pr;
   font-size: 14 * @pr;
-  color: @antTextWhiteGrey;
+  color: @antTextLight;
   text-align: center;
 }
 

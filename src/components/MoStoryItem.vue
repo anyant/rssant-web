@@ -111,7 +111,7 @@ export default {
   .story-title,
   .story-date,
   .story-favorited {
-    color: @antTextWhiteGrey;
+    color: @antTextLight;
   }
 }
 

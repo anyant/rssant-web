@@ -16,7 +16,7 @@
           :feedTitle="getFeedTitle(story.feed.id)"
           :storyTitle="story.title"
           :storyDate="story.dt_published"
-          :isReaded="isReaded(story)"
+          :isReaded="false"
         ></MoFeedStoryItem>
       </div>
     </keep-alive>
@@ -52,9 +52,6 @@ export default {
   methods: {
     getFeedTitle(feedId) {
       return this.$API.feed.get(feedId).title
-    },
-    isReaded(story) {
-      return this.$API.story.isReaded(story)
     }
   },
   savePageState() {

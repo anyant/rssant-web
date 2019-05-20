@@ -29,7 +29,7 @@ export default {
 
 .label {
   font-size: 15 * @pr;
-  color: @antTextWhiteGrey;
+  color: @antTextLight;
 }
 
 .button {

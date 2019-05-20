@@ -28,6 +28,7 @@ import { Store, API } from '@/store'
 import { pageMixin } from '@/plugin/page'
 import Notification from '@/plugin/notify'
 import '@/styles/theme-rssant.less'
+import '@/plugin/theme'
 
 // REM layout
 import initREM from '@/plugin/rem'
