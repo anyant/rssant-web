@@ -117,8 +117,7 @@ export default {
 
 .info-title {
   font-size: 18 * @pr;
-  font-weight: 500;
-  color: @antTextBlack;
+  font-weight: bold;
 }
 
 .info-item {
