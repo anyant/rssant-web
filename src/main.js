@@ -66,3 +66,11 @@ window.app = new Vue({
   router,
   render: h => h(App)
 })
+
+// remove spinner: https://pathgather.github.io/please-wait/
+document.addEventListener('DOMContentLoaded', function () {
+  let spiner = document.getElementById('rssant-spinner')
+  if (spiner !== undefined && spiner !== null) {
+    spiner.remove()
+  }
+});
