@@ -85,7 +85,7 @@ export default {
         return false
       }
       if (this.items.length <= 0) {
-        return this.initOffset < this.total - 1
+        return this.initOffset < this.total
       }
       let lastOffset = this.items[this.items.length - 1].offset
       return lastOffset < this.total - 1
@@ -114,23 +114,24 @@ export default {
               this.loadNext()
             })
             .finally(this.endSuccess)
-        } else if (this.hasPrev) {
+          return
+        } else if (this.hasPrev && this.items.length <= 0) {
           let size = Math.ceil(this.numPageItems * 0.8)
           let offset = Math.max(0, this.initOffset - size)
           this.load({ offset, size }).finally(this.endSuccess)
+          return
         }
-      } else {
-        this.endSuccess()
-        let scrollTop = 0
-        for (let item of this.items) {
-          if (item.offset < this.initOffset) {
-            scrollTop += this.itemSize
-          } else {
-            break
-          }
-        }
-        this.mescroll.setScrollTop(scrollTop)
       }
+      this.endSuccess()
+      let scrollTop = 0
+      for (let item of this.items) {
+        if (item.offset < this.initOffset) {
+          scrollTop += this.itemSize
+        } else {
+          break
+        }
+      }
+      this.mescroll.setScrollTop(scrollTop)
     },
     loadPrev() {
       if (this.isPrevLoading || !this.hasPrev || this.items.length <= 0) {
