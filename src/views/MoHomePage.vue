@@ -146,11 +146,18 @@ export default {
   components: { MoHeader, MoLayout, MoDebugTool },
   data() {
     return {
-      rippleColor: antRippleGrey,
-      avatar: defaultAvatar
+      rippleColor: antRippleGrey
     }
   },
   computed: {
+    avatar() {
+      let user = this.$API.user.loginUser
+      if (_.isNil(user) || _.isEmpty(user.avatar_url)) {
+        return defaultAvatar
+      } else {
+        return user.avatar_url
+      }
+    },
     numMushrooms() {
       return this.$API.story.numUnreadMushrooms
     },
