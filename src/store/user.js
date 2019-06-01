@@ -42,6 +42,9 @@ export default {
         async register(DAO, { username, email, password }) {
             await API.user.register({ username, email, password })
         },
+        async confirmEmail(DAO, { key }) {
+            await API.user.confirmEmail({ key })
+        },
         logout(DAO, { next } = {}) {
             API.user.logout({ next })
         },

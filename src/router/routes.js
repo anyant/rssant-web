@@ -13,6 +13,7 @@ import MoRegisterPage from '@/views/MoRegisterPage'
 import MoFeedCreationPage from '@/views/MoFeedCreationPage'
 import MoStoryPage from '@/views/MoStoryPage'
 import MoFeedDetailPage from '@/views/MoFeedDetailPage'
+import MoAccountConfirmEmail from '@/views/MoAccountConfirmEmail'
 
 import NotFoundPage from '@/views/NotFoundPage'
 
@@ -32,6 +33,11 @@ export default [
     path: '/register',
     name: 'Register',
     component: MoRegisterPage,
+  },
+  {
+    path: '/account-confirm-email/:key',
+    name: 'AccountConfirmEmail',
+    component: MoAccountConfirmEmail,
   },
   {
     path: '/feed-creation',

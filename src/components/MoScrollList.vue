@@ -188,9 +188,10 @@ export default {
 
 .mescroll {
   position: fixed;
-  top: 48px;
+  top: 48 * @pr;
   bottom: 0;
   height: auto;
+  max-width: 640 * @pr;
 }
 
 .item-list {

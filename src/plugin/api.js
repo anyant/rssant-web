@@ -64,7 +64,38 @@ const API = {
     },
     register({ username, email, password }) {
       username = _.defaultTo(username, email)
-      return client.post('/auth/registration/', { username, email, password1: password, password2: password })
+      return client.post('/auth/registration/', {
+        username, email,
+        password1: password,
+        password2: password
+      }).catch(error => {
+        if (error.response && error.response.status === 400) {
+          let emailErrorMessages = []
+          let passwordErrorMessages = []
+          let data = error.response.data
+          if (!_.isEmpty(data.email)) {
+            emailErrorMessages.push(data.email)
+          }
+          if (!_.isEmpty(data.username)) {
+            emailErrorMessages.push(data.username)
+          }
+          if (!_.isEmpty(data.password1)) {
+            if (_.isArray(data.password1)) {
+              passwordErrorMessages = passwordErrorMessages.concat(data.password1)
+            } else {
+              passwordErrorMessages.push(data.password1)
+            }
+          }
+          error.response.data = {
+            email: emailErrorMessages.slice(0, 1).join(' '),
+            password: passwordErrorMessages.slice(0, 1).join(' '),
+          }
+        }
+        throw error
+      })
+    },
+    confirmEmail({ key }) {
+      return client.post('auth/registration/verify-email/', { key })
     },
     logout({ next } = {}) {
       return client.post(`/auth/logout/`).then(() => {

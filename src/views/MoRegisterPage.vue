@@ -25,6 +25,8 @@
         class="button-register"
         :color="antGreen"
         :disabled="isRegisterDisabled"
+        data-mu-loading-size="24"
+        v-loading="isRegisterLoading"
       >注册</mu-button>
     </div>
     <div class="login">
@@ -48,6 +50,7 @@ export default {
     return {
       antGreen,
       antTextGrey,
+      isRegisterLoading: false,
       registerForm: {
         email: null,
         password: null,
@@ -64,7 +67,45 @@ export default {
   },
   methods: {
     register() {
-      this.registerForm.passwordErrorText = '注册失败'
+      this.isRegisterLoading = true
+      this.$API.user
+        .register({
+          email: this.registerForm.email,
+          password: this.registerForm.password
+        })
+        .then(() => {
+          this.$toast.success({ message: '注册成功，请查收邮件验证邮箱！', time: 5000 })
+          this.$API.user
+            .login({
+              account: this.registerForm.email,
+              password: this.registerForm.password
+            })
+            .then(() => {
+              this.$router.replace('/')
+            })
+            .catch(() => {
+              this.$router.replace('/login')
+            })
+        })
+        .catch(error => {
+          if (!_.isNil(error.response) && error.response.status == 400) {
+            let data = error.response.data
+            if (!_.isEmpty(data.email)) {
+              this.registerForm.emailErrorText = data.email
+            }
+            if (!_.isEmpty(data.password)) {
+              this.registerForm.passwordErrorText = data.password
+            }
+            if (_.isEmpty(data.email) && _.isEmpty(data.password)) {
+              this.registerForm.passwordErrorText = error.message
+            }
+          } else {
+            this.registerForm.passwordErrorText = error.message
+          }
+        })
+        .finally(() => {
+          this.isRegisterLoading = false
+        })
     },
     clearErrorText() {
       this.registerForm.emailErrorText = null
