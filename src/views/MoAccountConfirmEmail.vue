@@ -35,7 +35,7 @@ export default {
           this.$router.replace('/login')
         }
       })
-      .catch(error => {
+      .catch(() => {
         this.isError = true
       })
   }

@@ -39,6 +39,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import { antGreen, antTextGrey } from '@/plugin/common'
 import MoLayout from '@/components/MoLayout'
 import MoAntGreenButton from '@/components/MoAntGreenButton'
@@ -88,7 +89,7 @@ export default {
             })
         })
         .catch(error => {
-          if (!_.isNil(error.response) && error.response.status == 400) {
+          if (!_.isNil(error.response) && error.response.status === 400) {
             let data = error.response.data
             if (!_.isEmpty(data.email)) {
               this.registerForm.emailErrorText = data.email
