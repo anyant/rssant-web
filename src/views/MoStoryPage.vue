@@ -150,3 +150,11 @@ export default {
   color: @antTextSemi;
 }
 </style>
+
+<style lang="less">
+@import '~@/styles/common';
+
+.markdown-body img {
+  height: auto;  // FIX: img标签指定了高度导致异常拉伸的问题
+}
+</style>
