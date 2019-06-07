@@ -26,6 +26,7 @@
         :isReading="isReading(story)"
         :title="story.title"
         :summary="story.summary"
+        :content="story.content"
         :date="story.dt_published"
         :link="story.link"
         :router-link="`/story/${story.feed.id}-${story.offset}`"

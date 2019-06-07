@@ -44,6 +44,7 @@ export default {
     title: String,
     date: String,
     summary: String,
+    content: String,
     link: String,
     routerLink: String
   },
@@ -72,15 +73,19 @@ export default {
       this.$emit('toggleFavorited')
     },
     goLink() {
-      if (!_.isEmpty(this.link) && (_.isEmpty(this.summary) || this.summary.length <= 20)) {
+      if (!_.isEmpty(this.link) && (_.isEmpty(this.content) || this.content.length <= 20)) {
         window.open(this.link, '_blank')
       } else if (!_.isEmpty(this.routerLink)) {
         this.$router.push(this.routerLink)
       }
     },
     onOpen() {
-      this.isOpened = !this.isOpened
       this.$emit('read')
+      if (_.isEmpty(this.summary)) {
+        this.goLink()
+      } else {
+        this.isOpened = !this.isOpened
+      }
     }
   }
 }

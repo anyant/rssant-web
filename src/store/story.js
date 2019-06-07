@@ -24,10 +24,17 @@ function addOrUpdateList(state, storys) {
             Vue.set(state.storys, story.feed.id, {})
             feedStorys = state.storys[story.feed.id]
         }
-        Vue.set(feedStorys, story.offset, story)
+        addOrUpdateStory(feedStorys, story)
     })
 }
 
+
+function addOrUpdateStory(feedStorys, story) {
+    let old = feedStorys[story.offset]
+    if (_.isNil(old) || !_.isEmpty(story.content)) {
+        Vue.set(feedStorys, story.offset, story)
+    }
+}
 
 
 export default {
@@ -51,7 +58,7 @@ export default {
                 Vue.set(state.storys, story.feed.id, {})
                 feedStorys = state.storys[story.feed.id]
             }
-            Vue.set(feedStorys, story.offset, story)
+            addOrUpdateStory(feedStorys, story)
         },
         ADD_OR_UPDATE_LIST(state, { feedId, storys }) {
             if (_.isEmpty(feedId)) {
@@ -63,7 +70,7 @@ export default {
                     feedStorys = state.storys[feedId]
                 }
                 storys.forEach(story => {
-                    Vue.set(feedStorys, story.offset, story)
+                    addOrUpdateStory(feedStorys, story)
                 })
             }
         },
@@ -97,6 +104,9 @@ export default {
         numUnreadMushrooms(state, API) {
             function notRead(story) {
                 let feed = API.feed.get(story.feed.id)
+                if (_.isNil(feed)) {
+                    return true
+                }
                 return story.offset >= feed.story_offset
             }
             return state.mushrooms.filter(notRead).length
