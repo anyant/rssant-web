@@ -41,6 +41,8 @@ export default {
       type: Boolean,
       default: false
     },
+    feedId: String,
+    offset: Number,
     title: String,
     date: String,
     summary: String,
@@ -79,9 +81,12 @@ export default {
         this.$router.push(this.routerLink)
       }
     },
-    onOpen() {
+    async onOpen() {
+      if (_.isEmpty(this.summary) && _.isEmpty(this.content)) {
+        await this.$API.story.load({ feedId: this.feedId, offset: this.offset, detail: true })
+      }
       this.$emit('read')
-      if (_.isEmpty(this.summary)) {
+      if (_.isEmpty(this.summary) && !this.isOpened) {
         this.goLink()
       } else {
         this.isOpened = !this.isOpened

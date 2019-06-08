@@ -24,6 +24,8 @@
         :key="story.offset"
         :isReaded="isReaded(story)"
         :isReading="isReading(story)"
+        :feedId="feedId"
+        :offset="story.offset"
         :title="story.title"
         :summary="story.summary"
         :content="story.content"
