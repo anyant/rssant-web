@@ -173,7 +173,8 @@ const API = {
       })
     },
     exportOPML({ download } = {}) {
-      return client.get(`/feed/opml`, { params: { download } })
+      download = download ? 'true' : 'false'
+      window.open(BASE_URL + `/feed/opml?download=${download}`, '_blank')
     },
     importBookmark({ file }) {
       var formData = new FormData()

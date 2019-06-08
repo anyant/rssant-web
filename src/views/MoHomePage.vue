@@ -7,9 +7,16 @@
           <mu-button icon class="action-add" @click="()=>{this.$router.push('/feed-creation')}">
             <mu-icon value="add"></mu-icon>
           </mu-button>
-          <mu-button icon class="action-menu">
-            <mu-icon value="menu"></mu-icon>
-          </mu-button>
+          <mu-menu placement="bottom" class="action-menu" popover-class="menu-popover">
+            <mu-button icon class="action-menu-button">
+              <mu-icon value="menu"></mu-icon>
+            </mu-button>
+            <mu-list slot="content" class="menu-list">
+              <mu-list-item button @click="exportOPML">
+                <mu-list-item-title>导出订阅</mu-list-item-title>
+              </mu-list-item>
+            </mu-list>
+          </mu-menu>
           <mu-avatar size="32" class="user" @click="()=>{this.$router.push('/account')}">
             <img :src="avatar">
           </mu-avatar>
@@ -196,10 +203,25 @@ export default {
   methods: {
     numTextOf(n) {
       return n > 0 ? n : ''
+    },
+    exportOPML() {
+      this.$API.feed.exportOPML({ download: true })
     }
   }
 }
 </script>
+
+<style lang="less">
+@import '~@/styles/common';
+
+.menu-popover {
+  top: 48 * @pr !important;
+}
+
+.menu-popover .menu-list .mu-item {
+  height: 40 * @pr;
+}
+</style>
 
 <style lang="less" scoped>
 @import '~@/styles/common';
@@ -220,11 +242,20 @@ export default {
 }
 
 .action-add,
-.action-menu {
+.action-menu,
+.action-menu-button {
   width: 32 * @pr;
   height: 32 * @pr;
   margin-right: 16 * @pr;
   color: @antTextBlack;
+}
+
+.menu-list {
+  padding: 0 0;
+}
+
+.menu-list .mu-item-title {
+  font-size: 15 * @pr;
 }
 
 .item {

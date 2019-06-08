@@ -258,6 +258,9 @@ export default {
             DAO.ADD_OR_UPDATE_LIST(data.feeds)
             DAO.ADD_OR_UPDATE_CREATION_LIST(data.feed_creations)
         },
+        exportOPML(DAO, { download } = {}) {
+            API.feed.exportOPML({ download })
+        },
         async importBookmark(DAO, { file }) {
             let data = await API.feed.importBookmark({ file })
             DAO.ADD_OR_UPDATE_LIST(data.feeds)
