@@ -45,6 +45,15 @@ export default {
         async confirmEmail(DAO, { key }) {
             await API.user.confirmEmail({ key })
         },
+        async changePassword(DAO, { password }) {
+            await API.user.changePassword({ password })
+        },
+        async resetPassword(DAO, { email }) {
+            await API.user.resetPassword({ email })
+        },
+        async confirmResetPassword(DAO, { token, uid, new_password }) {
+            await API.user.confirmResetPassword({ token, uid, new_password })
+        },
         logout(DAO, { next } = {}) {
             API.user.logout({ next })
         },

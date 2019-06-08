@@ -57,6 +57,25 @@ client.interceptors.response.use(
   }
 )
 
+
+function convertDjangoErrorMessage(error, fields) {
+  if (!error.response || error.response.status !== 400) {
+    return error.message
+  }
+  let data = error.response.data
+  let message = []
+  for (let field of fields) {
+    if (_.isArray(data[field])) {
+      message = message.concat(data[field])
+    } else if (_.isEmpty(data[field])) {
+      message.push(data[field])
+    }
+  }
+  message = message.slice(0, 1).join(' ')
+  return message
+}
+
+
 const API = {
   user: {
     login({ account, password } = {}) {
@@ -70,32 +89,35 @@ const API = {
         password2: password
       }).catch(error => {
         if (error.response && error.response.status === 400) {
-          let emailErrorMessages = []
-          let passwordErrorMessages = []
-          let data = error.response.data
-          if (!_.isEmpty(data.email)) {
-            emailErrorMessages.push(data.email)
-          }
-          if (!_.isEmpty(data.username)) {
-            emailErrorMessages.push(data.username)
-          }
-          if (!_.isEmpty(data.password1)) {
-            if (_.isArray(data.password1)) {
-              passwordErrorMessages = passwordErrorMessages.concat(data.password1)
-            } else {
-              passwordErrorMessages.push(data.password1)
-            }
-          }
+          let emailMessage = convertDjangoErrorMessage(error, ['email', 'username'])
+          let passwordMessage = convertDjangoErrorMessage(error, ['password1', 'password2'])
           error.response.data = {
-            email: emailErrorMessages.slice(0, 1).join(' '),
-            password: passwordErrorMessages.slice(0, 1).join(' '),
+            email: emailMessage,
+            password: passwordMessage,
           }
         }
         throw error
       })
     },
     confirmEmail({ key }) {
-      return client.post('auth/registration/verify-email/', { key })
+      return client.post('/auth/registration/verify-email/', { key })
+    },
+    changePassword({ password }) {
+      return client.post('/auth/password/change/', { password1: password, password2: password })
+    },
+    resetPassword({ email }) {
+      return client.post('/auth/password/reset/', { email }).catch(error => {
+        error.message = convertDjangoErrorMessage(error, ['email'])
+        throw error
+      })
+    },
+    confirmResetPassword({ token, uid, new_password }) {
+      return client.post('/auth/password/reset/confirm/', {
+        token, uid, new_password1: new_password, new_password2: new_password
+      }).catch(error => {
+        error.message = convertDjangoErrorMessage(error, ['new_password1', 'new_password2', 'token', 'uid'])
+        throw error
+      })
     },
     logout({ next } = {}) {
       return client.post(`/auth/logout/`).then(() => {

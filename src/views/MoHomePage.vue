@@ -10,7 +10,7 @@
           <mu-button icon class="action-menu">
             <mu-icon value="menu"></mu-icon>
           </mu-button>
-          <mu-avatar size="32" class="user" @click="()=>{this.$router.push('/login')}">
+          <mu-avatar size="32" class="user" @click="()=>{this.$router.push('/account')}">
             <img :src="avatar">
           </mu-avatar>
         </div>

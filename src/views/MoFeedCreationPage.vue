@@ -1,6 +1,6 @@
 <template>
   <MoLayout header>
-    <MoBackHeader border>
+    <MoBackHeader>
       <template v-slot:title>添加新订阅</template>
     </MoBackHeader>
     <div class="main">

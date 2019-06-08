@@ -13,7 +13,10 @@ import MoRegisterPage from '@/views/MoRegisterPage'
 import MoFeedCreationPage from '@/views/MoFeedCreationPage'
 import MoStoryPage from '@/views/MoStoryPage'
 import MoFeedDetailPage from '@/views/MoFeedDetailPage'
-import MoAccountConfirmEmail from '@/views/MoAccountConfirmEmail'
+import MoAccountConfirmEmailPage from '@/views/MoAccountConfirmEmailPage'
+import MoResetPasswordPage from '@/views/MoResetPasswordPage'
+import MoResetPasswordConfirmPage from '@/views/MoResetPasswordConfirmPage'
+import MoAccountPage from '@/views/MoAccountPage'
 
 import NotFoundPage from '@/views/NotFoundPage'
 
@@ -37,7 +40,23 @@ export default [
   {
     path: '/account-confirm-email/:key',
     name: 'AccountConfirmEmail',
-    component: MoAccountConfirmEmail,
+    component: MoAccountConfirmEmailPage,
+  },
+  {
+    path: '/reset-password',
+    name: 'ResetPassword',
+    component: MoResetPasswordPage,
+  },
+  {
+    path: '/reset-password/:uid',
+    name: 'ResetPasswordConfirm',
+    component: MoResetPasswordConfirmPage,
+  },
+  {
+    path: '/account',
+    name: 'Account',
+    component: MoAccountPage,
+    meta: { loginRequired: true },
   },
   {
     path: '/feed-creation',
