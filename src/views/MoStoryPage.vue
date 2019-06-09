@@ -155,6 +155,35 @@ export default {
 @import '~@/styles/common';
 
 .markdown-body img {
-  height: auto;  // FIX: img标签指定了高度导致异常拉伸的问题
+  height: auto; // FIX: img标签指定了高度导致异常拉伸的问题
+}
+
+.markdown-body hr {
+  height: 1px;
+}
+
+// 代码块样式优化
+.markdown-body figure.highlight {
+  position: relative;
+  margin: 1em 0;
+
+  tbody,
+  tr,
+  td {
+    display: block;
+    width: 100%;
+  }
+
+  tr {
+    border: none;
+  }
+
+  td.gutter {
+    display: none;
+  }
+
+  td.code {
+    padding: 0;
+  }
 }
 </style>
