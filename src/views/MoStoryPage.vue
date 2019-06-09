@@ -163,7 +163,8 @@ export default {
 }
 
 // 代码块样式优化
-.markdown-body figure.highlight {
+.markdown-body figure,
+.markdown-body .highlight {
   position: relative;
   margin: 1em 0;
 
