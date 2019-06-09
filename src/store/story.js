@@ -81,6 +81,12 @@ export default {
         SET_SORTED_MUSHROOMS(state, storys) {
             state.mushroomsSorted = true
             state.mushrooms = storys
+        },
+        DELETE_STORYS_OF_FEED(state, feedId) {
+            Vue.delete(state.storys, feedId)
+            state.mushrooms = state.mushrooms.filter(x => {
+                return x.feed.id !== feedId
+            })
         }
     },
     getters: {
@@ -125,6 +131,9 @@ export default {
         isReaded(state, API) {
             return story => {
                 let feed = API.feed.get(story.feed.id)
+                if (_.isNil(feed)) {
+                    return false
+                }
                 return story.offset < feed.story_offset
             }
         }

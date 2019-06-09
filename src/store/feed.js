@@ -252,6 +252,7 @@ export default {
                 id: feedId
             })
             DAO.REMOVE({ id: feedId })
+            DAO.API.story.DELETE_STORYS_OF_FEED(feedId)
         },
         async importOPML(DAO, { file }) {
             let data = await API.feed.importOPML({ file })
