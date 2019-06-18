@@ -5,14 +5,16 @@
     </MoBackHeader>
     <div class="main">
       <mu-text-field
-        class="feed-url"
-        ref="feedUrl"
-        v-model="feedUrl"
-        placeholder="请填入你想要订阅的网址"
+        class="import-text"
+        ref="importText"
+        v-model="importText"
+        placeholder="请随意输入链接或含有链接的文本"
         full-width
+        multi-line
+        :rows="1"
+        :rows-max="6"
         :error-text="errorText"
         @focus="onFocus"
-        @keyup.enter.native="onSave"
       />
       <div class="button-wrapper">
         <mu-button
@@ -23,6 +25,10 @@
         >确定</mu-button>
       </div>
       <label for="import-feed-file" class="import-feed-label">或从文件导入</label>
+      <div class="import-feed-info">
+        <span>支持XML/OPML, 浏览器书签和HTML</span>
+        <span>或任意格式含有链接的文本文件</span>
+      </div>
       <form style="display: none;" ref="importFeedForm">
         <input
           type="file"
@@ -34,15 +40,10 @@
       </form>
       <div class="import-wrapper">
         <MoAntGreenButton
-          class="import-opml"
-          @click="onImportClick('OPML')"
-          v-loading="importOPMLLoading"
-        >XML/OPML</MoAntGreenButton>
-        <MoAntGreenButton
-          class="import-bookmark"
-          @click="onImportClick('Bookmark')"
-          v-loading="importBookmarkLoading"
-        >浏览器书签</MoAntGreenButton>
+          class="import-file"
+          @click="onImportClick"
+          v-loading="importFileLoading"
+        >导入文件</MoAntGreenButton>
       </div>
     </div>
   </MoLayout>
@@ -60,35 +61,73 @@ export default {
   data() {
     return {
       antBlue,
-      feedUrl: null,
+      importText: null,
       errorText: null,
       importFile: null,
       importFileTarget: null,
-      importOPMLLoading: false,
-      importBookmarkLoading: false
+      importFileLoading: false
     }
   },
   computed: {
     isSaveDisabled() {
-      return !this.feedUrl
+      return !this.importText
     }
   },
   methods: {
+    handleFeedImportedResult({ isImport, numFeedCreations, numCreatedFeeds, numExistedFeeds }) {
+      if (numFeedCreations <= 0 && numCreatedFeeds <= 0) {
+        let message = ''
+        if (numExistedFeeds <= 0) {
+          message = '未找到任何订阅'
+        } else if (numExistedFeeds === 1 && !isImport) {
+          message = '订阅已存在'
+        } else {
+          message = `共 ${numExistedFeeds} 个订阅均已存在`
+        }
+        if (isImport) {
+          this.$toast.warning({ message: message, time: 10000 })
+        } else {
+          this.errorText = message
+        }
+        return
+      }
+      let importMessage = isImport ? '导入文件成功，' : ''
+      this.importText = null
+      if (numFeedCreations <= 0 && numCreatedFeeds > 0) {
+        var message = `${isImport ? '导入' : '添加'}成功, 找到 ${numCreatedFeeds} 个新订阅`
+        if (numExistedFeeds > 0) {
+          message = message + `，已存在 ${numExistedFeeds} 个订阅`
+        }
+        this.$toast.success({ message: importMessage + message, time: 10000 })
+      } else if (numFeedCreations > 0 && numCreatedFeeds <= 0) {
+        if (numExistedFeeds > 0) {
+          var message = `已存在 ${numExistedFeeds} 个订阅，还有 ${numFeedCreations} 个链接正在查找中，稍后即可阅读`
+        } else {
+          var message = `共 ${numFeedCreations} 个链接正在查找中，稍后即可阅读`
+        }
+        this.$toast.success({ message: importMessage + message, time: 10000 })
+      } else {
+        var message = `找到 ${numCreatedFeeds} 个新订阅，还有 ${numFeedCreations} 个链接正在查找中，稍后即可阅读`
+        if (numExistedFeeds > 0) {
+          message = `已存在 ${numExistedFeeds} 个订阅，` + message
+        }
+        this.$toast.info({ message: importMessage + message, time: 10000 })
+      }
+      this.$router.back()
+    },
+    onFeedSavedResult(result) {
+      return this.handleFeedImportedResult({ isImport: false, ...result })
+    },
+    onFeedImportedResult(result) {
+      return this.handleFeedImportedResult({ isImport: true, ...result })
+    },
     onSave() {
       if (this.isSaveDisabled) {
         return
       }
       this.$API.feed
-        .create({ url: this.feedUrl })
-        .then(is_ready => {
-          this.feedUrl = null
-          if (is_ready) {
-            this.$toast.success('添加成功')
-          } else {
-            this.$toast.info('已加入查找队列，稍后即可阅读')
-          }
-          this.$router.back()
-        })
+        .import({ text: this.importText })
+        .then(this.onFeedSavedResult.bind(this))
         .catch(error => {
           this.errorText = error.message
         })
@@ -96,13 +135,10 @@ export default {
     onFocus() {
       this.errorText = null
     },
-    onImportClick(target) {
+    onImportClick() {
       let el = this.$refs.importFeedFile
       if (!_.isNil(el)) {
-        this.importFileTarget = target
         el.click()
-      } else {
-        this.importFileTarget = null
       }
     },
     onImportFileChange() {
@@ -112,52 +148,25 @@ export default {
       }
       let file = el.files[0]
       try {
-        if (this.importFileTarget === 'OPML') {
-          this.onImportOPML(file)
-        } else if (this.importFileTarget === 'Bookmark') {
-          this.onImportBookmark(file)
-        } else {
-          this.importFileTarget = null
-        }
+        this.onImportFile(file)
       } finally {
         let form = this.$refs.importFeedForm
         form.reset()
       }
     },
-    onImportOPML(file) {
-      this.importOPMLLoading = true
+    onImportFile(file) {
+      this.importFileLoading = true
       this.$API.feed
-        .importOPML({ file })
-        .then(() => {
-          this.$toast.success('导入XML/OPML文件成功')
-          this.$router.back()
-        })
+        .importFile({ file })
+        .then(this.onFeedImportedResult.bind(this))
         .catch(error => {
           this.$toast.error({
-            message: '导入XML/OPML文件失败: ' + error.message,
+            message: '导入文件失败: ' + error.message,
             time: 10000
           })
         })
         .finally(() => {
-          this.importOPMLLoading = false
-        })
-    },
-    onImportBookmark(file) {
-      this.importBookmarkLoading = true
-      this.$API.feed
-        .importBookmark({ file })
-        .then(() => {
-          this.$toast.success('导入书签文件成功')
-          this.$router.back()
-        })
-        .catch(error => {
-          this.$toast.error({
-            message: '导入书签文件失败: ' + error.message,
-            time: 10000
-          })
-        })
-        .finally(() => {
-          this.importBookmarkLoading = false
+          this.importFileLoading = false
         })
     }
   }
@@ -172,7 +181,7 @@ export default {
   padding-right: 16 * @pr;
 }
 
-.feed-url {
+.import-text {
   margin-top: 64 * @pr;
 }
 
@@ -211,12 +220,16 @@ export default {
   justify-content: center;
 }
 
-.import-opml,
-.import-bookmark {
-  width: 124 * @pr;
+.import-feed-info {
+  color: @antTextGrey;
+  text-align: center;
+  span {
+    display: inline-block;
+  }
 }
 
-.import-bookmark {
-  margin-left: 24 * @pr;
+.import-file {
+  width: 152 * @pr;
+  margin-top: 16 * @pr;
 }
 </style>

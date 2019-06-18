@@ -45,6 +45,8 @@ client.interceptors.response.use(
       if (!_.isNil(error.response.data)) {
         if (!_.isEmpty(error.response.data.message)) {
           message = error.response.data.message
+        } else if (!_.isEmpty(error.response.data.detail)) {
+          message = error.response.data.detail
         }
       }
     }
@@ -139,9 +141,6 @@ const API = {
     query({ detail, hints } = {}) {
       return client.post('/feed/query', { detail, hints })
     },
-    create({ url }) {
-      return client.post('/feed/creation', { url })
-    },
     getCreation({ id, detail }) {
       return client.get(`/feed/creation/${id}`, { params: { detail } })
     },
@@ -163,10 +162,13 @@ const API = {
     setAllReaded({ ids } = {}) {
       return client.put(`/feed/all/readed`, { ids })
     },
-    importOPML({ file }) {
+    import({ text }) {
+      return client.post('/feed/import', { text })
+    },
+    importFile({ file }) {
       var formData = new FormData()
       formData.append("file", file)
-      return client.post(`/feed/opml`, formData, {
+      return client.post(`/feed/import/file`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -174,16 +176,7 @@ const API = {
     },
     exportOPML({ download } = {}) {
       download = download ? 'true' : 'false'
-      window.open(BASE_URL + `/feed/opml?download=${download}`, '_blank')
-    },
-    importBookmark({ file }) {
-      var formData = new FormData()
-      formData.append("file", file)
-      return client.post(`/feed/bookmark`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      })
+      window.open(BASE_URL + `/feed/export/opml?download=${download}`, '_blank')
     },
   },
   story: {
