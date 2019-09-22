@@ -1,7 +1,10 @@
 FROM node:lts-alpine as build
+
+ARG NPM_REGISTERY=""
+
 WORKDIR /app
 COPY package*.json ./
-RUN npm install --loglevel info
+RUN npm install --loglevel info ${NPM_REGISTERY}
 COPY . .
 RUN npm run build
 
