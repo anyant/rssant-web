@@ -78,7 +78,8 @@ export default {
         return this.initOffset > 0
       }
       let firstOffset = this.items[0].offset
-      return firstOffset > 0
+      let lastOffset = this.items[this.items.length - 1].offset
+      return firstOffset > 0 || lastOffset - firstOffset + 1 > this.items.length
     },
     hasNext() {
       if (this.total <= 0) {
@@ -139,7 +140,13 @@ export default {
         return
       }
       let prevItemsLength = this.items.length
+      let lastOffset = this.items[this.items.length - 1].offset
       let firstOffset = this.items[0].offset
+      let index = 1
+      while (index < this.items.length && lastOffset - firstOffset > this.items.length - index) {
+        firstOffset = this.items[index].offset
+        index++
+      }
       this.isPrevLoading = true
       let offset = Math.max(0, firstOffset - this.numPageItems)
       this.load({ offset, size: this.numPageItems }).finally(() => {
