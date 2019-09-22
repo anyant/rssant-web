@@ -11,7 +11,11 @@
       <div class="info-title">{{ story.title }}</div>
       <div class="info-item">
         <span class="info-item-name">原文：</span>
-        <a class="info-item-content story-link" :href="story.link" target="_blank">{{ story.link }}</a>
+        <a
+          class="info-item-content story-link"
+          :href="story.link"
+          target="_blank"
+        >{{ storyLinkUnquoted }}</a>
       </div>
       <div class="info-item">
         <span class="info-item-name">发布时间：</span>
@@ -59,6 +63,9 @@ export default {
     },
     story() {
       return this.$API.story.get({ feedId: this.feedId, offset: this.offset })
+    },
+    storyLinkUnquoted() {
+      return decodeURI(this.story.link)
     },
     headerTitle() {
       if (!_.isNil(this.story) && !_.isNil(this.feed)) {

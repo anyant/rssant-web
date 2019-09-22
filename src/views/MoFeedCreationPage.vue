@@ -93,21 +93,22 @@ export default {
       }
       let importMessage = isImport ? '导入文件成功，' : ''
       this.importText = null
+      var message = ''
       if (numFeedCreations <= 0 && numCreatedFeeds > 0) {
-        var message = `${isImport ? '导入' : '添加'}成功, 找到 ${numCreatedFeeds} 个新订阅`
+        message = `${isImport ? '导入' : '添加'}成功, 找到 ${numCreatedFeeds} 个新订阅`
         if (numExistedFeeds > 0) {
           message = message + `，已存在 ${numExistedFeeds} 个订阅`
         }
         this.$toast.success({ message: importMessage + message, time: 10000 })
       } else if (numFeedCreations > 0 && numCreatedFeeds <= 0) {
         if (numExistedFeeds > 0) {
-          var message = `已存在 ${numExistedFeeds} 个订阅，还有 ${numFeedCreations} 个链接正在查找中，稍后即可阅读`
+          message = `已存在 ${numExistedFeeds} 个订阅，还有 ${numFeedCreations} 个链接正在查找中，稍后即可阅读`
         } else {
-          var message = `共 ${numFeedCreations} 个链接正在查找中，稍后即可阅读`
+          message = `共 ${numFeedCreations} 个链接正在查找中，稍后即可阅读`
         }
         this.$toast.success({ message: importMessage + message, time: 10000 })
       } else {
-        var message = `找到 ${numCreatedFeeds} 个新订阅，还有 ${numFeedCreations} 个链接正在查找中，稍后即可阅读`
+        message = `找到 ${numCreatedFeeds} 个新订阅，还有 ${numFeedCreations} 个链接正在查找中，稍后即可阅读`
         if (numExistedFeeds > 0) {
           message = `已存在 ${numExistedFeeds} 个订阅，` + message
         }
