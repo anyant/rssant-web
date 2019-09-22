@@ -1,6 +1,5 @@
 import _ from 'lodash'
 import datefn from 'date-fns'
-import moment from 'moment'
 
 
 /**
@@ -17,13 +16,13 @@ export function formatDate(date, now) {
         now = new Date()
     }
     if (datefn.isSameDay(now, date)) {
-        return datefn.format(date, 'HH:ss')
+        return datefn.format(date, 'HH:mm')
     } else if (datefn.isSameDay(now, datefn.addDays(date, 1))) {
-        return datefn.format(date, '昨天HH:ss')
+        return datefn.format(date, '昨天HH:mm')
     } else if (datefn.isSameDay(now, datefn.addDays(date, 2))) {
-        return datefn.format(date, '前天HH:ss')
+        return datefn.format(date, '前天HH:mm')
     } else if (datefn.isSameYear(now, date)) {
-        return datefn.format(date, 'MM-DD HH:ss')
+        return datefn.format(date, 'MM-DD HH:mm')
     } else {
         return datefn.format(date, 'YYYY-MM-DD')
     }
@@ -34,10 +33,18 @@ export function formatFullDate(date) {
     if (_.isNil(date) || _.isEmpty(date)) {
         return ''
     }
-    date = moment(date)
-    let dateStr = date.format('YYYY-MM-DD HH:mm')
-    let dateAgo = date.fromNow()
-    return `${dateStr} 约 ${dateAgo}`
+    date = new Date(date)
+    let now = new Date()
+    let dateStr = datefn.format(date, 'YYYY-MM-DD HH:mm:ss')
+    if (datefn.isSameDay(now, date)) {
+        dateStr = `${dateStr} 今天`
+    } else if (datefn.isSameDay(now, datefn.addDays(date, 1))) {
+        dateStr = `${dateStr} 昨天`
+    } else {
+        let days = datefn.differenceInDays(now, date);
+        dateStr = `${dateStr} 约 ${days} 天前`
+    }
+    return dateStr
 }
 
 

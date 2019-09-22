@@ -18,7 +18,7 @@ import MoResetPasswordPage from '@/views/MoResetPasswordPage'
 import MoResetPasswordConfirmPage from '@/views/MoResetPasswordConfirmPage'
 import MoAccountPage from '@/views/MoAccountPage'
 
-import NotFoundPage from '@/views/NotFoundPage'
+import MoNotFoundPage from '@/views/MoNotFoundPage'
 
 export default [
   {
@@ -130,5 +130,5 @@ export default [
     component: MoFeedDetailPage,
     meta: { loginRequired: true },
   },
-  { path: '*', component: NotFoundPage }
+  { path: '*', component: MoNotFoundPage }
 ]
