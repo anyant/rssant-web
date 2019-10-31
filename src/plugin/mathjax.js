@@ -4,6 +4,7 @@ function initMathjax() {
     window.MathJax = {
         AuthorInit: function () {
         },
+        messageStyle: 'none',
         elements: ['story-markdown-body'],
         tex2jax: {
             inlineMath: [['$', '$'], ["\\(", "\\)"]],
