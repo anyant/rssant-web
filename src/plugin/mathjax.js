@@ -5,6 +5,8 @@ function initMathjax() {
         AuthorInit: function () {
         },
         messageStyle: 'none',
+        showMathMenu: false,
+        showMathMenuMSIE: false,
         elements: ['story-markdown-body'],
         tex2jax: {
             inlineMath: [['$', '$'], ["\\(", "\\)"]],
