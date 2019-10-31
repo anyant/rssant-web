@@ -23,7 +23,7 @@
       </div>
     </div>
     <div class="content" v-if="story">
-      <div class="markdown-body" v-html="story.content"></div>
+      <div id="story-markdown-body" class="markdown-body"  v-story="storyContent"></div>
     </div>
   </MoLayout>
 </template>
@@ -83,6 +83,12 @@ export default {
         return ''
       }
       return formatFullDate(this.story.dt_published)
+    },
+    storyContent() {
+      if (_.isNil(this.story)) {
+        return ''
+      }
+      return this.story.content
     }
   },
   mounted() {

@@ -20,6 +20,7 @@ import App from './App'
 import router from '@/router'
 import { Store, API } from '@/store'
 import { pageMixin } from '@/plugin/page'
+import StoryRender from '@/plugin/storyRender'
 import '@/styles/theme-rssant.less'
 import '@/plugin/theme'
 
@@ -35,6 +36,7 @@ sync(Store, router)
 Vue.prototype.$API = API
 Vue.mixin(pageMixin)
 
+Vue.use(StoryRender)
 Vue.use(MuseUI)
 Vue.use(Loading)
 Vue.use(MuseMessage)

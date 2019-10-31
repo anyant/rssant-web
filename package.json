@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "copy_libs": "rm -rf public/libs/mathjax/2.7.6/ && cp -R node_modules/mathjax/unpacked/ public/libs/mathjax/2.7.6/",
+    "serve": "npm run copy_libs && vue-cli-service serve",
+    "build": "npm run copy_libs &&vue-cli-service build",
     "lint": "vue-cli-service lint",
     "test:unit": "vue-cli-service test:unit"
   },
@@ -17,6 +18,7 @@
     "js-cookie": "^2.2.0",
     "lodash": "^4.17.15",
     "material-design-icons": "^3.0.1",
+    "mathjax": "2.7.6",
     "mescroll.js": "^1.4.1",
     "muse-ui": "^3.0.0-rc.5",
     "muse-ui-loading": "^0.2.0",
