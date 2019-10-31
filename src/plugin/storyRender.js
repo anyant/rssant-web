@@ -44,17 +44,15 @@ const StoryRender = {
       return dom
     }
 
-    Vue.directive('story', {
-      bind: function (el, binding, vnode) {
-        let content = binding.value || ''
-        let dom = renderDom(content)
-        let isMathjaxReady = !_.isNil(window.MathJax) && !_.isNil(window.MathJax.Hub)
-        if (isMathjaxReady) {
-          dom = renderMathjax(dom, content)
-        }
-        el.innerHTML = ''
-        el.appendChild(dom)
+    Vue.directive('story', function (el, binding) {
+      let content = binding.value || ''
+      let dom = renderDom(content)
+      let isMathjaxReady = !_.isNil(window.MathJax) && !_.isNil(window.MathJax.Hub)
+      if (isMathjaxReady) {
+        dom = renderMathjax(dom, content)
       }
+      el.innerHTML = ''
+      el.appendChild(dom)
     })
   }
 }
