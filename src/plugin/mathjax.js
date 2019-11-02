@@ -21,7 +21,7 @@ function initMathjax() {
     };
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src = `${publicPath}libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML,Safe`;
+    script.src = `${publicPath}libs/MathJax-2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML,Safe`;
     document.getElementsByTagName("head")[0].appendChild(script);
 }
 
