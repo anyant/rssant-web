@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "copy_libs": "mkdir -p public/libs/mathjax/2.7.6/ && rm -rf public/libs/mathjax/2.7.6/ && cp -R node_modules/mathjax/unpacked/ public/libs/mathjax/2.7.6/",
+    "copy_libs": "rm -rf public/libs && mkdir -p public/libs/mathjax/2.7.6/ && cp -R node_modules/mathjax/ public/libs/mathjax/2.7.6/",
     "serve": "npm run copy_libs && vue-cli-service serve",
     "build": "npm run copy_libs &&vue-cli-service build",
     "lint": "vue-cli-service lint",

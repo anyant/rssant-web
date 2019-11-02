@@ -3,6 +3,12 @@ const publicPath = process.env.BASE_URL
 function initMathjax() {
     window.MathJax = {
         AuthorInit: function () {
+            // http://docs.mathjax.org/en/v2.7-latest/advanced/debugging-tips.html
+            MathJax.Hub.Register.MessageHook("Math Processing Error", function (message) {
+                // do something with the error. message[2] is the Error object that records the problem.
+                let error = message[2];
+                console.error(error)
+            });
         },
         messageStyle: 'none',
         showMathMenu: false,

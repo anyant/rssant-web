@@ -23,7 +23,7 @@
       </div>
     </div>
     <div class="content" v-if="story">
-      <div id="story-markdown-body" class="markdown-body"  v-story="storyContent"></div>
+      <div id="story-markdown-body" class="markdown-body" v-story="storyContent"></div>
     </div>
   </MoLayout>
 </template>
@@ -137,6 +137,8 @@ export default {
   margin-top: 4 * @pr;
   font-size: 12 * @pr;
   vertical-align: middle;
+  display: flex;
+  align-items: center;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -144,6 +146,11 @@ export default {
 .info-item-name {
   white-space: nowrap;
   color: @antTextGrey;
+}
+
+.info-item-content {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .story-link {
@@ -199,5 +206,15 @@ export default {
   td.code {
     padding: 0;
   }
+}
+
+// 数学公式过长，水平滚动
+.markdown-body .MathJax_Display {
+  overflow-x: scroll;
+  overflow-y: hidden;
+}
+
+.markdown-body .MathJax {
+  outline: none;
 }
 </style>
