@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "copy_libs": "bash scripts/copy_libs.sh",
+    "copy_libs": "sh scripts/copy_libs.sh",
     "serve": "npm run copy_libs && vue-cli-service serve",
     "build": "npm run copy_libs &&vue-cli-service build",
     "lint": "vue-cli-service lint",
