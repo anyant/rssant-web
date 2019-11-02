@@ -13,7 +13,7 @@
       v-if="isOpened"
       :class="{'story-preview-readed': isReaded && !isReading}"
     >
-      <div class="story-preview-title" v-if="previewTitle">{{ title }}</div>
+      <div class="story-preview-title">{{ title }}</div>
       <div class="story-preview-summary">{{ summary }}</div>
       <mu-button icon class="story-preview-link" @click.stop="goLink">
         <i class="fa fa-external-link" aria-hidden="true"></i>
@@ -56,9 +56,6 @@ export default {
     }
   },
   computed: {
-    previewTitle() {
-      return !_.isEmpty(this.title) && this.title.length >= 10
-    },
     dateText() {
       return formatDate(this.date)
     },
@@ -86,11 +83,7 @@ export default {
         await this.$API.story.load({ feedId: this.feedId, offset: this.offset, detail: true })
       }
       this.$emit('read')
-      if (_.isEmpty(this.summary) && !this.isOpened) {
-        this.goLink()
-      } else {
-        this.isOpened = !this.isOpened
-      }
+      this.isOpened = !this.isOpened
     }
   }
 }
