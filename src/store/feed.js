@@ -45,7 +45,7 @@ function groupFeedList(feedList) {
             desert.push(feed)
             return
         }
-        if (feed.story_publish_period >= 3) {
+        if (feed.dryness >= 500) {
             garden.push(feed)
         } else {
             jungle.push(feed)

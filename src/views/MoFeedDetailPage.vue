@@ -71,22 +71,38 @@ const FEED_FIELDS = [
   },
   {
     name: '发布周期',
-    key: 'story_publish_period',
+    key: 'dryness',
     process: function(value) {
-      if (_.isNil(value) || value < 1) {
-        return '小于 1 天'
+      if (_.isNil(value)) {
+        return '未知'
       }
-      return `约 ${value} 天`
+      let numStorysPerMonth = 256 / Math.pow(2, (8 * value) / 1000) - 1
+      let period = 30 / numStorysPerMonth
+      if (period >= 1) {
+        return `约 ${period.toFixed(0)} 天`
+      } else {
+        return `小于 1 天`
+      }
     }
+  },
+  {
+    name: '干货程度',
+    key: 'dryness',
+    process: function(value) {
+      if (_.isNil(value)) {
+        return '未知'
+      }
+      return `${(value / 10).toFixed(1)}%`
+    }
+  },
+  {
+    name: '最老故事发布时间',
+    key: 'dt_first_story_published',
+    type: 'datetime'
   },
   {
     name: '最新故事发布时间',
     key: 'dt_latest_story_published',
-    type: 'datetime'
-  },
-  {
-    name: '历史故事发布时间',
-    key: 'dt_early_story_published',
     type: 'datetime'
   },
   {
