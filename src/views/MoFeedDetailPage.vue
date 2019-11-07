@@ -77,7 +77,7 @@ const FEED_FIELDS = [
         return '未知'
       }
       let numStorysPerMonth = 256 / Math.pow(2, (8 * value) / 1000) - 1
-      let period = 30 / numStorysPerMonth
+      let period = 31 / (numStorysPerMonth + 1)
       if (period >= 1) {
         return `约 ${period.toFixed(0)} 天`
       } else {
