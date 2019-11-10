@@ -153,6 +153,10 @@ export default {
             Vue.delete(state.feeds, id)
             updateFeedList(state)
         },
+        REMOVE_ALL(state, { feedIds }) {
+            feedIds.forEach(id => { Vue.delete(state.feeds, id) })
+            updateFeedList(state)
+        },
         SET_STORY_OFFSET(state, { id, offset }) {
             let feed = state.feeds[id]
             feed.story_offset = offset
@@ -212,6 +216,9 @@ export default {
                 return isAfter(dt_latest, dt_recent)
             })
         },
+        feedList(state) {
+            return _.values(state.feeds)
+        },
         get(state) {
             return feedId => {
                 return state.feeds[feedId]
@@ -259,6 +266,13 @@ export default {
             })
             DAO.REMOVE({ id: feedId })
             DAO.API.story.DELETE_STORYS_OF_FEED(feedId)
+        },
+        async deleteAll(DAO, { feedIds }) {
+            if (feedIds.length > 0) {
+                await API.feed.deleteAll({ ids: feedIds })
+                DAO.REMOVE_ALL({ feedIds })
+                DAO.API.story.DELETE_STORYS_OF_ALL_FEED({ feedIds })
+            }
         },
         async import(DAO, { text }) {
             let data = await API.feed.import({ text })

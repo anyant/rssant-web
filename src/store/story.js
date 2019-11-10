@@ -87,6 +87,14 @@ export default {
             state.mushrooms = state.mushrooms.filter(x => {
                 return x.feed.id !== feedId
             })
+        },
+        DELETE_STORYS_OF_ALL_FEED(state, { feedIds }) {
+            let feedIdsMap = {}
+            feedIds.forEach(feedId => { feedIdsMap[feedId] = 1 });
+            feedIds.forEach(feedId => { Vue.delete(state.storys, feedId) })
+            state.mushrooms = state.mushrooms.filter(x => {
+                return _.isNil(feedIdsMap[x.feed.id])
+            })
         }
     },
     getters: {

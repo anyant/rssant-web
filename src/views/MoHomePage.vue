@@ -15,10 +15,13 @@
               <mu-list-item button @click="exportOPML">
                 <mu-list-item-title>导出订阅</mu-list-item-title>
               </mu-list-item>
+              <mu-list-item button @click="goFeedClean">
+                <mu-list-item-title>清理订阅</mu-list-item-title>
+              </mu-list-item>
             </mu-list>
           </mu-menu>
           <mu-avatar size="32" class="user" @click="()=>{this.$router.push('/account')}">
-            <img :src="avatar">
+            <img :src="avatar" />
           </mu-avatar>
         </div>
       </MoHeader>
@@ -206,6 +209,9 @@ export default {
     },
     exportOPML() {
       this.$API.feed.exportOPML({ download: true })
+    },
+    goFeedClean() {
+      this.$router.push('/feed-clean')
     }
   }
 }

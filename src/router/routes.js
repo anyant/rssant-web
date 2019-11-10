@@ -11,6 +11,7 @@ import MoStoryListPage from '@/views/MoStoryListPage'
 import MoLoginPage from '@/views/MoLoginPage'
 import MoRegisterPage from '@/views/MoRegisterPage'
 import MoFeedCreationPage from '@/views/MoFeedCreationPage'
+import MoFeedCleanPage from '@/views/MoFeedCleanPage'
 import MoStoryPage from '@/views/MoStoryPage'
 import MoFeedDetailPage from '@/views/MoFeedDetailPage'
 import MoAccountConfirmEmailPage from '@/views/MoAccountConfirmEmailPage'
@@ -62,6 +63,12 @@ export default [
     path: '/feed-creation',
     name: 'FeedCreation',
     component: MoFeedCreationPage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: '/feed-clean',
+    name: 'FeedClean',
+    component: MoFeedCleanPage,
     meta: { loginRequired: true },
   },
   {
