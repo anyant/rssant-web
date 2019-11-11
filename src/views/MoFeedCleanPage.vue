@@ -2,42 +2,49 @@
   <MoLayout grey header>
     <MoBackHeader border>
       <template v-slot:title>清理订阅</template>
-      <mu-button flat class="action-delete" @click="deleteSelected" :disabled="false">
+      <mu-button
+        flat
+        class="action-delete"
+        @click="deleteSelected"
+        :class="{ 'action-delete-disable': !canDelete }"
+      >
         <mu-icon value="delete"></mu-icon>
         <span class="action-delete-info">{{ selectedFeedIds.length }} 订阅</span>
       </mu-button>
     </MoBackHeader>
     <keep-alive>
       <div class="feed-list">
-        <div class="feed-item" v-for="feed in feedList" :key="feed.id">
-          <mu-checkbox
-            v-model="selectedFeedIds"
-            :value="feed.id"
-            :ripple="false"
-            :color="checkboxColor"
-            class="feed-checkbox"
-          ></mu-checkbox>
-          <div class="feed-info" @click="onFeedClick(feed)">
-            <div class="feed-title">{{ feed.title }}</div>
-            <div class="feed-detail">
-              <div class="feed-date">{{ formatFeedDate(feed) }}</div>
-              <div class="feed-total-storys">
-                {{ totalStorys(feed) }}
-                <i
-                  class="feed-total-storys-icon fa fa-leaf"
-                  aria-hidden="true"
-                ></i>
-              </div>
-              <div class="feed-dryness">
-                {{ (feed.dryness / 10).toFixed(1) }}
-                <i
-                  class="feed-dryness-icon fa fa-trophy"
-                  aria-hidden="true"
-                ></i>
+        <virtual-list :size="56" :remain="30" :itemcount="feedList.length" :pagemode="true">
+          <div v-for="feed in feedList" :key="feed.id" class="feed-item">
+            <mu-checkbox
+              v-model="selectedFeedIds"
+              :value="feed.id"
+              :ripple="false"
+              :color="checkboxColor"
+              class="feed-checkbox"
+            ></mu-checkbox>
+            <div class="feed-info" @click="onFeedClick(feed)">
+              <div class="feed-title">{{ feed.title }}</div>
+              <div class="feed-detail">
+                <div class="feed-date">{{ formatFeedDate(feed) }}</div>
+                <div class="feed-total-storys">
+                  {{ totalStorys(feed) }}
+                  <i
+                    class="feed-total-storys-icon fa fa-leaf"
+                    aria-hidden="true"
+                  ></i>
+                </div>
+                <div class="feed-dryness">
+                  {{ (feed.dryness / 10).toFixed(1) }}
+                  <i
+                    class="feed-dryness-icon fa fa-trophy"
+                    aria-hidden="true"
+                  ></i>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </virtual-list>
       </div>
     </keep-alive>
   </MoLayout>
@@ -66,20 +73,27 @@ export default {
   computed: {
     feedList() {
       let now = new Date()
-      return _.chain(this.$API.feed.feedList)
-        .sortBy([
-          function(x) {
-            return x.total_storys > 0
-          },
-          function(x) {
-            let dt_latest = new Date(x.dt_latest_story_published)
-            return datefn.differenceInDays(dt_latest, now)
-          },
-          'dryness',
-          'total_storys',
-          'id'
-        ])
-        .value()
+      let badFeeds = []
+      let goodFeeds = []
+      this.$API.feed.feedList.forEach(feed => {
+        if (feed.total_storys <= 0) {
+          badFeeds.push(feed)
+          return
+        } else {
+          if (_.isEmpty(feed.dt_latest_story_published)) {
+            badFeeds.push(feed)
+            return
+          }
+          let dt_latest = new Date(feed.dt_latest_story_published)
+          if (datefn.differenceInDays(now, dt_latest) > 365) {
+            badFeeds.push(feed)
+            return
+          }
+        }
+        goodFeeds.push(feed)
+      })
+      let feeds = this.sortFeeds(badFeeds).concat(this.sortFeeds(goodFeeds))
+      return feeds
     },
     canDelete() {
       return this.selectedFeedIds.length > 0
@@ -103,6 +117,11 @@ export default {
     this.$pageState.commit()
   },
   methods: {
+    sortFeeds(feeds) {
+      return _.chain(feeds)
+        .sortBy(['dryness', 'total_storys', 'id'])
+        .value()
+    },
     deleteSelected() {
       if (!this.canDelete) {
         return
@@ -244,6 +263,10 @@ export default {
     margin-left: 1px;
     font-weight: bold;
   }
+}
+
+.action-delete-disable {
+  color: @antTextGrey;
 }
 </style>
 
