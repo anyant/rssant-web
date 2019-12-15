@@ -10,6 +10,8 @@ function initMathjax() {
                 console.error(error)
             });
         },
+        // https://docs.mathjax.org/en/v2.4-latest/misc/faq.html#the-mathjax-font-folder-is-too-big-is-there-any-way-to-compress-it
+        imageFont: null,
         messageStyle: 'none',
         showMathMenu: false,
         showMathMenuMSIE: false,
