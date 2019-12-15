@@ -65,6 +65,9 @@ export default {
       return this.$API.story.get({ feedId: this.feedId, offset: this.offset })
     },
     storyLinkUnquoted() {
+      if (_.isEmpty(this.story.link)) {
+        return ''
+      }
       return decodeURI(this.story.link)
     },
     headerTitle() {
