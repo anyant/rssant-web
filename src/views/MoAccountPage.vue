@@ -4,14 +4,19 @@
     <div class="main">
       <div class="avatar-wrapper">
         <mu-avatar size="64" class="user">
-          <img :src="avatar">
+          <img :src="avatar" />
         </mu-avatar>
       </div>
       <div class="username-wrapper">
         <span>{{ username }}</span>
       </div>
-      <div class="button-wrapper">
-        <mu-button class="button-logout" :color="antGold" @click="logout">退出登录</mu-button>
+      <div class="button-container">
+        <div class="button-wrapper">
+          <mu-button class="button-delete-all-feed" :color="antRed" @click="deleteAllFeed">删除全部订阅</mu-button>
+        </div>
+        <div class="button-wrapper">
+          <mu-button class="button-logout" :color="antGold" @click="logout">退出登录</mu-button>
+        </div>
       </div>
     </div>
   </MoLayout>
@@ -21,13 +26,13 @@
 import _ from 'lodash'
 import MoLayout from '@/components/MoLayout'
 import MoBackHeader from '@/components/MoBackHeader'
-import { antGold } from '@/plugin/common'
+import { antGold, antRed } from '@/plugin/common'
 import defaultAvatar from '@/assets/avatar.png'
 
 export default {
   components: { MoLayout, MoBackHeader },
   data() {
-    return { antGold }
+    return { antGold, antRed }
   },
   computed: {
     avatar() {
@@ -45,6 +50,23 @@ export default {
   },
   mounted() {},
   methods: {
+    deleteAllFeed() {
+      this.$confirm(`要删除你的全部订阅吗？此操作不可恢复！`, '危险操作', {
+        type: 'warning',
+        okLabel: '删除全部订阅'
+      }).then(({ result }) => {
+        if (result) {
+          this.$API.feed
+            .deleteAll()
+            .then(() => {
+              this.$toast.success('删除成功')
+            })
+            .catch(error => {
+              this.$toast.message('删除失败: ' + error.message)
+            })
+        }
+      })
+    },
     logout() {
       this.$API.user.logout({ next: '/login' })
     }
@@ -76,14 +98,19 @@ export default {
   justify-content: space-around;
 }
 
-.button-wrapper {
+.button-container {
   margin-top: 96 * @pr;
+}
+
+.button-wrapper {
+  margin-top: 40 * @pr;
   display: flex;
   align-items: center;
   justify-content: space-around;
 }
 
-.button-logout {
+.button-logout,
+.button-delete-all-feed {
   width: 152 * @pr;
   height: 40 * @pr;
   font-size: 18 * @pr;

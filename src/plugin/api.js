@@ -156,7 +156,7 @@ const API = {
     delete({ id }) {
       return client.delete(`/feed/${id}`)
     },
-    deleteAll({ ids }) {
+    deleteAll({ ids = null } = {}) {
       return client.post(`/feed/all/delete`, { ids })
     },
     setStoryOffset({ id, offset }) {

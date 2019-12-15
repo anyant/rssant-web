@@ -88,7 +88,12 @@ export default {
                 return x.feed.id !== feedId
             })
         },
-        DELETE_STORYS_OF_ALL_FEED(state, { feedIds }) {
+        DELETE_STORYS_OF_ALL_FEED(state, { feedIds = null } = {}) {
+            if (_.isNil(feedIds)) {
+                state.storys = {}
+                state.mushrooms = []
+                return
+            }
             let feedIdsMap = {}
             feedIds.forEach(feedId => { feedIdsMap[feedId] = 1 });
             feedIds.forEach(feedId => { Vue.delete(state.storys, feedId) })
