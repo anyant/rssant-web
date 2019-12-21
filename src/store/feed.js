@@ -1,15 +1,23 @@
 import _ from 'lodash'
 import Vue from 'vue'
-import { differenceInDays, isAfter, subDays } from 'date-fns'
+import { isAfter, subDays } from 'date-fns'
 import Loading from '@/plugin/loading'
 import { API } from '@/plugin/api'
 
 
+function isEmptyFeed(feed) {
+    return feed.total_storys <= 0 || _.isEmpty(feed.dt_latest_story_published)
+}
+
 function sortFeedList(feedList) {
     return _.chain(feedList)
         .sortBy([
+            function (x) { return !isEmptyFeed(x) },
             function (x) { return x.num_unread_storys > 0 },
-            function (x) { return new Date(x.dt_updated) },
+            function (x) {
+                let dt = x.dt_latest_story_published || x.dt_created
+                return new Date(dt)
+            },
             'id'
         ])
         .reverse()
@@ -17,41 +25,20 @@ function sortFeedList(feedList) {
 }
 
 function groupFeedList(feedList) {
-    // garden 菌圃    更新周期>=3的订阅
-    // jungle 丛林    更新周期<3的订阅
-    // desert 沙漠    最近18个月未更新的订阅
-    // trash  废墟    无效/无法访问的订阅
+    // jungle 丛林    干度<500的订阅
+    // garden 菌圃    干度>=500的订阅或空订阅
+    // trash  废墟    订阅回收站，TODO
     let garden = []
     let jungle = []
-    let desert = []
     let trash = []
-    const MONTH_18 = 18 * 30
     feedList.forEach(feed => {
-        if (feed.status === 'error') {
-            trash.push(feed)
-            return
-        }
-        if (feed.total_storys <= 0) {
-            desert.push(feed)
-            return
-        }
-        if (_.isEmpty(feed.dt_latest_story_published)) {
-            desert.push(feed)
-            return
-        }
-        let now = new Date()
-        let dt_latest = new Date(feed.dt_latest_story_published)
-        if (Math.abs(differenceInDays(now, dt_latest)) > MONTH_18) {
-            desert.push(feed)
-            return
-        }
-        if (feed.dryness >= 500) {
+        if (isEmptyFeed(feed) || feed.dryness >= 500) {
             garden.push(feed)
         } else {
             jungle.push(feed)
         }
     })
-    return { garden, jungle, desert, trash }
+    return { garden, jungle, trash }
 }
 
 function numUnreadFeedsOf(feeds) {
@@ -59,10 +46,9 @@ function numUnreadFeedsOf(feeds) {
 }
 
 function updateFeedList(state) {
-    let { garden, jungle, desert, trash } = groupFeedList(_.values(state.feeds))
+    let { garden, jungle, trash } = groupFeedList(_.values(state.feeds))
     state.garden = sortFeedList(garden)
     state.jungle = sortFeedList(jungle)
-    state.desert = sortFeedList(desert)
     state.trash = sortFeedList(trash)
 }
 
@@ -118,7 +104,6 @@ export default {
         feeds: {},
         garden: [],
         jungle: [],
-        desert: [],
         trash: [],
     },
     mutations: {
@@ -201,12 +186,6 @@ export default {
         numUnreadJungle(state) {
             return numUnreadFeedsOf(state.jungle)
         },
-        desert(state) {
-            return state.desert
-        },
-        numUnreadDesert(state) {
-            return numUnreadFeedsOf(state.desert)
-        },
         trash(state) {
             return state.trash
         },
@@ -216,6 +195,9 @@ export default {
         recentGarden(state) {
             const dt_recent = subDays(new Date(), 14)
             return state.garden.filter(feed => {
+                if (isEmptyFeed(feed)) {
+                    return false
+                }
                 let dt_latest = new Date(feed.dt_latest_story_published)
                 return isAfter(dt_latest, dt_recent)
             })

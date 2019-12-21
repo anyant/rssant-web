@@ -79,22 +79,6 @@
         </div>
         <div
           :color="rippleColor"
-          class="item item-desert"
-          @click="()=>{this.$router.push('/desert')}"
-        >
-          <div class="item-left">
-            <i class="item-icon fa fa-leaf" aria-hidden="true"></i>
-            <span class="item-title">沙漠</span>
-          </div>
-          <div class="item-right">
-            <span class="item-number">
-              <span class="item-number-total">{{ numTotalDesert }}</span>
-            </span>
-            <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
-          </div>
-        </div>
-        <div
-          :color="rippleColor"
           class="item item-favorited"
           @click="()=>{this.$router.push('/favorited')}"
         >
@@ -186,9 +170,6 @@ export default {
     },
     numTotalGarden() {
       return this.$API.feed.garden.length
-    },
-    numTotalDesert() {
-      return this.numTextOf(this.$API.feed.desert.length)
     },
     numTotalTrash() {
       return this.numTextOf(this.$API.feed.trash.length)

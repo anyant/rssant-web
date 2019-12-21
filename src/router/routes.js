@@ -5,7 +5,6 @@ import MoCreationListPage from '@/views/MoCreationListPage'
 import MoCreationDetailPage from '@/views/MoCreationDetailPage'
 import MoGardenPage from '@/views/MoGardenPage'
 import MoJunglePage from '@/views/MoJunglePage'
-import MoDesertPage from '@/views/MoDesertPage'
 import MoTrashPage from '@/views/MoTrashPage'
 import MoStoryListPage from '@/views/MoStoryListPage'
 import MoLoginPage from '@/views/MoLoginPage'
@@ -105,12 +104,6 @@ export default [
     path: '/jungle',
     name: 'Jungle',
     component: MoJunglePage,
-    meta: { loginRequired: true },
-  },
-  {
-    path: '/desert',
-    name: 'Desert',
-    component: MoDesertPage,
     meta: { loginRequired: true },
   },
   {

@@ -22,7 +22,7 @@
           :key="feed.id"
           :title="feed.title"
           :number="feed.num_unread_storys"
-          :date="feed.dt_updated"
+          :date="feed.dt_latest_story_published || feed.dt_created"
           :link="`/feed/${feed.id}`"
         ></MoFeedItem>
       </div>
