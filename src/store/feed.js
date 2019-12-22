@@ -73,7 +73,7 @@ function watchFeedCreation(DAO, { creationId, numTry = 30 }) {
             DAO.ADD_OR_UPDATE_CREATION(creation)
             if (creation.status === 'ready') {
                 clearInterval(token)
-                DAO.API.feed.load({ feedId: creation.feed_id })
+                DAO.API.feed.load({ feedId: creation.feed_id, detail: true })
             } else if (creation.status === 'error' || numTry <= 0) {
                 clearInterval(token)
             }
