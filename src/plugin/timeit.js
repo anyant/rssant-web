@@ -1,8 +1,8 @@
-import * as lodash from 'lodash-es'
+import lodash from 'lodash'
 
 const Timeit = function() {}
 
-Timeit.show = function(time, url) {
+Timeit.show = function(time, method, url) {
   time = time.substring(0, time.length - 2)
   time = lodash.round(lodash.toNumber(time))
   let color = '#4caf50' // green500
@@ -18,7 +18,7 @@ Timeit.show = function(time, url) {
     <span style="min-width:45px; display:inline-block; text-align:right;">
       ${time}ms
     </span>
-    <span>${url}</span>
+    <span>${method.toUpperCase()} ${url}</span>
   `
   parent.appendChild(element)
   setTimeout(() => {

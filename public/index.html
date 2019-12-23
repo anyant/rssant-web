@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="icon" href="<%= BASE_URL %>favicon.png">
+  <title>蚁阅</title>
+  <meta name=viewport
+    content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="keywords" content="蚁阅 RSS RSS阅读器 RSSAnt" />
+  <meta name="description" content="让RSS更好用，轻松订阅你喜欢的博客和资讯" />
+  <style>
+    .rssant-spinner {
+      position: fixed;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      z-index: 999;
+      margin-top: 50%;
+      text-align: center;
+    }
+
+    .rssant-spinner .spinner-title {
+      font-size: 36px;
+      line-height: 54px;
+      height: 54px;
+      font-family: Helvetica, Arial, sans-serif;
+      margin: 24px 0;
+      font-weight: bold;
+      color: #ECECEC;
+    }
+
+    .sk-spinner-three-bounce.sk-spinner {
+      margin: 0 auto;
+      width: 70px;
+      text-align: center;
+    }
+
+    .sk-spinner-three-bounce div {
+      width: 18px;
+      height: 18px;
+      background-color: #ECECEC;
+      border-radius: 100%;
+      display: inline-block;
+      -webkit-animation: sk-threeBounceDelay 1.4s infinite ease-in-out;
+      animation: sk-threeBounceDelay 1.4s infinite ease-in-out;
+      /* Prevent first frame from flickering when animation starts */
+      -webkit-animation-fill-mode: both;
+      animation-fill-mode: both;
+    }
+
+    .sk-spinner-three-bounce .sk-bounce1 {
+      -webkit-animation-delay: -0.32s;
+      animation-delay: -0.32s;
+    }
+
+    .sk-spinner-three-bounce .sk-bounce2 {
+      -webkit-animation-delay: -0.16s;
+      animation-delay: -0.16s;
+    }
+
+    @-webkit-keyframes sk-threeBounceDelay {
+
+      0%,
+      80%,
+      100% {
+        -webkit-transform: scale(0);
+        transform: scale(0);
+      }
+
+      40% {
+        -webkit-transform: scale(1);
+        transform: scale(1);
+      }
+    }
+
+    @keyframes sk-threeBounceDelay {
+
+      0%,
+      80%,
+      100% {
+        -webkit-transform: scale(0);
+        transform: scale(0);
+      }
+
+      40% {
+        -webkit-transform: scale(1);
+        transform: scale(1);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <noscript>
+    <strong>蚁阅 - RSS阅读器 - 让RSS更好用，轻松订阅你喜欢的博客和资讯</strong>
+  </noscript>
+  <div id="rssant-spinner" class="rssant-spinner">
+    <div class="spinner-title">蚁阅</div>
+    <div class="sk-spinner sk-spinner-three-bounce">
+      <div class="sk-bounce1"></div>
+      <div class="sk-bounce2"></div>
+      <div class="sk-bounce3"></div>
+    </div>
+  </div>
+  <div id="app"></div>
+  <!-- built files will be auto injected -->
+</body>
+
+</html>

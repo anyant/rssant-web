@@ -1,54 +1,64 @@
 import Vue from 'vue'
-import App from './App'
-import { sync } from 'vuex-router-sync'
+// muse-ui
 import MuseUI from 'muse-ui'
 import 'muse-ui/dist/muse-ui.css'
+import 'muse-ui-message/dist/muse-ui-message.css';
+import 'muse-ui-loading/dist/muse-ui-loading.css'
+import Loading from 'muse-ui-loading'
+import Toast from 'muse-ui-toast'
+import MuseMessage from 'muse-ui-message';
+// styles
+import 'material-design-icons/iconfont/material-icons.css'
 import 'font-awesome/css/font-awesome.css'
 import 'typeface-roboto'
-import '@/styles/theme-rssant.less'
-import Notification from '@/plugin/notify'
-import { Message, Table, TableColumn, Loading } from 'element-ui'
-import moment from 'moment'
-import 'moment/locale/zh-cn'
-import VueMoment from 'vue-moment'
-import { focus } from 'vue-focus'
-import InfiniteScroll from 'vue-infinite-scroll'
-import VirtualScrollList from 'vue-virtual-scroll-list'
-import VueRecycList from 'vue-recyclist'
-import ClusterizeList from 'vue-clusterize'
+// others
+import { sync } from 'vuex-router-sync'
+import Mescroll from "mescroll.js/mescroll.vue";
+import virtualList from 'vue-virtual-scroll-list'
 
-import router from './router'
-import store from './store'
-import api from './plugin/api'
+// rssant
+import App from './App'
+import router from '@/router'
+import { Store, API } from '@/store'
+import { pageMixin } from '@/plugin/page'
+import StoryRender from '@/plugin/storyRender'
+import '@/styles/theme-rssant.less'
+import '@/plugin/theme'
+
+// REM layout
+import initREM from '@/plugin/rem'
+
+initREM(true, 32, 1);
 
 Vue.config.productionTip = false
 
-sync(store, router)
-Vue.prototype.$api = api
-Vue.prototype.$notify = Notification
-Vue.prototype.$message = Message
-Vue.prototype.$loading = Loading.service
+sync(Store, router)
 
-Vue.use(Loading.directive)
+Vue.prototype.$API = API
+Vue.mixin(pageMixin)
+
+Vue.use(StoryRender)
 Vue.use(MuseUI)
-// muse-ui 的 Table 组件有性能问题，改用 element-ui
-Vue.component(Table.name, Table)
-Vue.component(TableColumn.name, TableColumn)
-
-Vue.directive('focus', focus)
-Vue.use(InfiniteScroll)
-Vue.component('virtual-scroll-list', VirtualScrollList)
-Vue.component('vue-recyclist', VueRecycList)
-Vue.component('clusterize-list', ClusterizeList)
-
-Vue.use(VueMoment, {
-  moment
+Vue.use(Loading)
+Vue.use(MuseMessage)
+Vue.use(Toast, {
+  time: 3000,
+  close: false
 })
+// 上拉刷新下拉加载滚动列表
+Vue.component('mescroll', Mescroll)
+Vue.component('virtual-list', virtualList)
 
 window.app = new Vue({
   el: '#app',
-  store,
   router,
   render: h => h(App)
 })
-window.app.debug = localStorage.getItem('debug') === '1'
+
+// remove spinner: https://pathgather.github.io/please-wait/
+document.addEventListener('DOMContentLoaded', function () {
+  let spiner = document.getElementById('rssant-spinner')
+  if (spiner !== undefined && spiner !== null) {
+    spiner.remove()
+  }
+});

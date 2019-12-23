@@ -1,40 +1,30 @@
-@import '~muse-ui/src/styles/vars.less'; // 默认基础的变量
+// REM布局: 1px
+@pr: 1/16rem;
 
-// // 修改基础变量
-// @primaryColor: #66bb6a;
-// @darkerPrimaryColor: #4caf50;
-// @lighterPrimaryColor: #a5d6a7;
-// @accentColor: #0288d1;
+// 主色
+@antGreen: #66BB6A;
+@antBlue : #44B0F2;
+@antGold : #FFBA00;
+@antRed  : #F44336;
 
-// @textColor: #212121;
-// @secondaryTextColor: #757575;
-// @borderColor: #e9e9e9;
-// @disabledColor: #bdbdbd;
+// 字体黑白灰
+@antTextBlack : #000000; // 主内容
+@antTextSemi  : #353535; // 大段的主要内容
+@antTextGrey  : #888888; // 次要内容
+@antTextLight : #B2B2B2; // 时间戳与表单缺省值
+@antTextWhite : #FFFFFF; // 文字白
 
-// // 修改组件变量
-// @badgePrimaryColor: @darkerPrimaryColor;
-// @checkboxCheckedColor: @accentColor;
-// @checkboxColor: @secondaryTextColor;
-// @datePickerSelectColor: @accentColor;
-// @flatButtonPrimaryTextColor: @accentColor;
-// @circleColor: @accentColor;
-// @linearProgressFillColor: @accentColor;
-// @radioColor: @darkerPrimaryColor;
-// @radioCheckedColor: @accentColor;
-// @raisedButtonPrimaryColor: @darkerPrimaryColor;
-// @refreshControlColor: @accentColor;
-// @sliderSelectionColor: @accentColor;
-// @snackbarColor: @darkBlack;
-// @stepperIconColor: @accentColor;
-// @switchThumbOnColor: @accentColor;
-// @switchTrackOnColor: fade(@accentColor, 50%);
-// @textFieldFocusTextColor: @accentColor;
-// @textFieldFocusLineColor: @accentColor;
-// @timePickerSelectColor: @accentColor;
-// @toastColor: @darkBlack;
+// 其他黑白灰
+@antBackWhite  : #FFFFFF; // 背景白
+@antRippleGrey : #090909; // 涟漪黑
+@antBackGrey   : #ECECEC; // 背景浅灰
+@antLineGrey   : #ECECEC; // 线条浅灰
 
-// @tabsBackgroundColor: #ffffff;
-// @tabsTextColor: fade(#000000, 75%);
-// @tabsSelectedTextColor: #000000;
-
-// // RssAnt定义的变量
+// helper
+.clearfix {
+  &::after {
+    content: '';
+    display: block;
+    clear  : both;
+  }
+}

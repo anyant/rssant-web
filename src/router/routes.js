@@ -1,45 +1,134 @@
-import HomePage from '@/pages/HomePage'
-import FeedPage from '@/pages/FeedPage'
-import ServerPage from '@/pages/ServerPage'
-import StoryPage from '@/pages/StoryPage'
-import FeedDetailPage from '@/pages/FeedDetailPage'
-import TaskListPage from '@/pages/TaskListPage'
-import TaskPage from '@/pages/TaskPage'
+import MoHomePage from '@/views/MoHomePage'
+import MoMushroomsPage from '@/views/MoMushroomsPage'
+import MoFavoritedPage from '@/views/MoFavoritedPage'
+import MoCreationListPage from '@/views/MoCreationListPage'
+import MoCreationDetailPage from '@/views/MoCreationDetailPage'
+import MoGardenPage from '@/views/MoGardenPage'
+import MoJunglePage from '@/views/MoJunglePage'
+import MoTrashPage from '@/views/MoTrashPage'
+import MoStoryListPage from '@/views/MoStoryListPage'
+import MoLoginPage from '@/views/MoLoginPage'
+import MoRegisterPage from '@/views/MoRegisterPage'
+import MoFeedCreationPage from '@/views/MoFeedCreationPage'
+import MoFeedCleanPage from '@/views/MoFeedCleanPage'
+import MoStoryPage from '@/views/MoStoryPage'
+import MoFeedDetailPage from '@/views/MoFeedDetailPage'
+import MoAccountConfirmEmailPage from '@/views/MoAccountConfirmEmailPage'
+import MoResetPasswordPage from '@/views/MoResetPasswordPage'
+import MoResetPasswordConfirmPage from '@/views/MoResetPasswordConfirmPage'
+import MoAccountPage from '@/views/MoAccountPage'
+
+import MoNotFoundPage from '@/views/MoNotFoundPage'
 
 export default [
   {
     path: '/',
     name: 'Home',
-    component: HomePage
+    component: MoHomePage,
+    meta: { loginRequired: true },
   },
   {
-    path: '/server/',
-    name: 'Server',
-    component: ServerPage
+    path: '/login',
+    name: 'Login',
+    component: MoLoginPage,
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: MoRegisterPage,
+  },
+  {
+    path: '/account-confirm-email/:key',
+    name: 'AccountConfirmEmail',
+    component: MoAccountConfirmEmailPage,
+  },
+  {
+    path: '/reset-password',
+    name: 'ResetPassword',
+    component: MoResetPasswordPage,
+  },
+  {
+    path: '/reset-password/:uid',
+    name: 'ResetPasswordConfirm',
+    component: MoResetPasswordConfirmPage,
+  },
+  {
+    path: '/account',
+    name: 'Account',
+    component: MoAccountPage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: '/feed-creation',
+    name: 'FeedCreation',
+    component: MoFeedCreationPage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: '/feed-clean',
+    name: 'FeedClean',
+    component: MoFeedCleanPage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: '/mushrooms',
+    name: 'Mushrooms',
+    component: MoMushroomsPage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: '/favorited',
+    name: 'Favorited',
+    component: MoFavoritedPage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: '/creation/',
+    name: 'CreationList',
+    component: MoCreationListPage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: '/creation/:creationId',
+    name: 'CreationDetail',
+    component: MoCreationDetailPage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: '/garden',
+    name: 'Garden',
+    component: MoGardenPage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: '/jungle',
+    name: 'Jungle',
+    component: MoJunglePage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: '/trash',
+    name: 'Trash',
+    component: MoTrashPage,
+    meta: { loginRequired: true },
   },
   {
     path: '/feed/:feedId',
-    name: 'Feed',
-    component: FeedPage
+    name: 'StoryList',
+    component: MoStoryListPage,
+    meta: { loginRequired: true },
   },
   {
-    path: '/story/:storyId',
+    path: '/story/:feedId-:offset',
     name: 'Story',
-    component: StoryPage
+    component: MoStoryPage,
+    meta: { loginRequired: true },
   },
   {
     path: '/feed/:feedId/detail',
     name: 'FeedDetail',
-    component: FeedDetailPage
+    component: MoFeedDetailPage,
+    meta: { loginRequired: true },
   },
-  {
-    path: '/task',
-    name: 'TaskList',
-    component: TaskListPage
-  },
-  {
-    path: '/task/:taskId',
-    name: 'Task',
-    component: TaskPage
-  }
+  { path: '*', component: MoNotFoundPage }
 ]
