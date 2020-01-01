@@ -1,4 +1,14 @@
 module.exports = {
+    // https://cli.vuejs.org/core-plugins/pwa.html#configuration
+    pwa: {
+        name: '蚁阅',
+        workboxPluginMode: 'GenerateSW',
+        workboxOptions: {
+            // https://developers.google.com/web/tools/workbox/modules/workbox-webpack-plugin
+            importWorkboxFrom: 'local',
+            importsDirectory: 'libs',
+        },
+    },
     devServer: {
         port: 6789,
         disableHostCheck: true,

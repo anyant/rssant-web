@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "copy_libs": "sh scripts/copy_libs.sh",
     "serve": "npm run copy_libs && vue-cli-service serve",
-    "build": "npm run copy_libs &&vue-cli-service build",
+    "build": "npm run copy_libs && vue-cli-service build",
     "lint": "vue-cli-service lint",
+    "copy_libs": "sh scripts/copy_libs.sh",
+    "serve_dist": "node scripts/serve_dist.js",
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
@@ -23,6 +24,7 @@
     "muse-ui-loading": "^0.2.0",
     "muse-ui-message": "^0.2.1",
     "muse-ui-toast": "^0.3.0",
+    "register-service-worker": "^1.6.2",
     "typeface-roboto": "0.0.54",
     "urijs": "^1.19.1",
     "vue": "^2.6.6",
@@ -34,6 +36,7 @@
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.4.0",
     "@vue/cli-plugin-eslint": "^3.4.0",
+    "@vue/cli-plugin-pwa": "^3.4.0",
     "@vue/cli-plugin-unit-mocha": "^3.4.0",
     "@vue/cli-service": "^3.4.0",
     "@vue/eslint-config-standard": "^4.0.0",
@@ -44,8 +47,12 @@
     "eslint": "^5.8.0",
     "eslint-config-prettier": "^4.1.0",
     "eslint-plugin-vue": "^5.0.0",
+    "express-http-proxy": "^1.6.0",
+    "http-proxy-middleware": "^0.20.0",
     "less": "^3.0.4",
     "less-loader": "^4.1.0",
+    "serve": "^11.2.0",
+    "vue-cli-plugin-pwa": "^1.0.0-alpha.1",
     "vue-template-compiler": "^2.5.21",
     "webpack-cli": "^3.3.0"
   }

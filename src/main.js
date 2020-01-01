@@ -28,6 +28,8 @@ import '@/plugin/theme'
 // REM layout
 import initREM from '@/plugin/rem'
 
+import './registerServiceWorker'
+
 initREM(true, 32, 1);
 
 Vue.config.productionTip = false
