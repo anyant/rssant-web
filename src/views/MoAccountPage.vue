@@ -68,7 +68,7 @@ export default {
       })
     },
     logout() {
-      this.$API.user.logout({ next: '/login' })
+      this.$API.user.logout({ next: '/' })
     }
   }
 }
