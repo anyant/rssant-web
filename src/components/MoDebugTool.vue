@@ -6,10 +6,12 @@
 
 <script>
 import _ from 'lodash'
+import localConfig from '@/plugin/localConfig'
+
 export default {
   data() {
     return {
-      count: 0
+      count: 0,
     }
   },
   mounted() {
@@ -19,10 +21,10 @@ export default {
   },
   methods: {
     isDebug() {
-      return localStorage.getItem('debug') === '1'
+      return localConfig.DEBUG.get()
     },
     setDebug(debug) {
-      localStorage.setItem('debug', debug ? '1' : '0')
+      localConfig.DEBUG.set(debug)
     },
     applyDebug(debug) {
       window._RSSANT_DEBUG = debug
@@ -69,8 +71,8 @@ export default {
           this.count = 0
         }, 3000)
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

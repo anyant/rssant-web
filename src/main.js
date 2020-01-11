@@ -28,8 +28,15 @@ import '@/plugin/theme'
 // REM layout
 import initREM from '@/plugin/rem'
 
+// localConfig
+import localConfig from '@/plugin/localConfig'
+
 // PWA Service Worker
-import '@/registerServiceWorker'
+import registerServiceWorker from '@/registerServiceWorker'
+
+if (localConfig.PWA_ENABLE.get()) {
+  registerServiceWorker()
+}
 
 initREM(true, 32, 1)
 
