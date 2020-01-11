@@ -7,6 +7,7 @@ function initMathjax() {
             MathJax.Hub.Register.MessageHook("Math Processing Error", function (message) {
                 // do something with the error. message[2] is the Error object that records the problem.
                 let error = message[2];
+                // eslint-disable-next-line no-console
                 console.error(error)
             });
         },

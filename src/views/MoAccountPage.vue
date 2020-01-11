@@ -10,11 +10,24 @@
       <div class="username-wrapper">
         <span>{{ username }}</span>
       </div>
-      <div class="button-container">
-        <div class="button-wrapper">
+      <div class="action-container">
+        <div class="action-wrapper action-pwa" v-if="hasPWA">
+          <div class="pwa-label">
+            <span>PWA模式</span>
+            <span v-if="hasPWA" class="pwa-label-info">(实验功能)</span>
+            <span v-else class="pwa-label-info">(当前浏览器不支持)</span>
+          </div>
+          <mu-switch
+            class="pwa-switch"
+            v-model="isPWAEnable"
+            @change="togglePWA"
+            :disabled="!hasPWA"
+          ></mu-switch>
+        </div>
+        <div class="action-wrapper">
           <mu-button class="button-delete-all-feed" :color="antRed" @click="deleteAllFeed">删除全部订阅</mu-button>
         </div>
-        <div class="button-wrapper">
+        <div class="action-wrapper">
           <mu-button class="button-logout" :color="antGold" @click="logout">退出登录</mu-button>
         </div>
       </div>
@@ -26,13 +39,16 @@
 import _ from 'lodash'
 import MoLayout from '@/components/MoLayout'
 import MoBackHeader from '@/components/MoBackHeader'
+import localConfig from '@/plugin/localConfig'
 import { antGold, antRed } from '@/plugin/common'
 import defaultAvatar from '@/assets/avatar.png'
+
+const hasPWA = 'serviceWorker' in navigator
 
 export default {
   components: { MoLayout, MoBackHeader },
   data() {
-    return { antGold, antRed }
+    return { antGold, antRed, hasPWA, isPWAEnable: localConfig.PWA_ENABLE.get() }
   },
   computed: {
     avatar() {
@@ -46,14 +62,14 @@ export default {
     username() {
       let user = this.$API.user.loginUser
       return _.isNil(user) ? '' : user.username
-    }
+    },
   },
   mounted() {},
   methods: {
     deleteAllFeed() {
       this.$confirm(`要删除你的全部订阅吗？此操作不可恢复！`, '危险操作', {
         type: 'warning',
-        okLabel: '删除全部订阅'
+        okLabel: '删除全部订阅',
       }).then(({ result }) => {
         if (result) {
           this.$API.feed
@@ -68,9 +84,41 @@ export default {
       })
     },
     logout() {
-      this.$API.user.logout({ next: '/login' })
-    }
-  }
+      this.$API.user.logout({ next: '/' })
+    },
+    togglePWA(newValue) {
+      if (hasPWA) {
+        if (newValue) {
+          this.enablePWA()
+        } else {
+          this.disablePWA()
+        }
+      }
+    },
+    enablePWA() {
+      if (hasPWA) {
+        localConfig.PWA_ENABLE.set(true)
+        this.isPWAEnable = true
+        this.$alert('即将刷新页面以开启PWA', '开启PWA', {
+          okLabel: '知道了',
+        }).then(() => {
+          location.assign('/')
+        })
+      }
+    },
+    disablePWA() {
+      if (hasPWA) {
+        localConfig.PWA_ENABLE.set(false)
+        this.isPWAEnable = false
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (let registration of registrations) {
+            registration.unregister()
+          }
+        })
+        this.$toast.success('PWA已关闭')
+      }
+    },
+  },
 }
 </script>
 
@@ -98,15 +146,27 @@ export default {
   justify-content: space-around;
 }
 
-.button-container {
+.action-container {
   margin-top: 96 * @pr;
 }
 
-.button-wrapper {
+.action-wrapper {
   margin-top: 40 * @pr;
   display: flex;
   align-items: center;
-  justify-content: space-around;
+  justify-content: center;
+}
+
+.pwa-label {
+  font-weight: bold;
+  font-size: 18 * @pr;
+
+  .pwa-label-info {
+    margin-right: 16px;
+  }
+  .mu-switch {
+    cursor: pointer;
+  }
 }
 
 .button-logout,
