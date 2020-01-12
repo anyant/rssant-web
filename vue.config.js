@@ -18,7 +18,7 @@ module.exports = {
     // https://github.com/vuejs/vue-cli/blob/dev/packages/@vue/cli-plugin-pwa/lib/HtmlPwaPlugin.js
     themeColor: '#f9f9f9',
     msTileColor: '#f9f9f9',
-    appleMobileWebAppCapable: true,
+    appleMobileWebAppCapable: 'yes',
     appleMobileWebAppStatusBarStyle: 'default',
     assetsVersion: assetsVersion,
     manifestPath: 'manifest.json',
