@@ -13,6 +13,7 @@ module.exports = {
       importWorkboxFrom: 'local',
       importsDirectory: 'libs',
       exclude: [/\.map$/, /^manifest.*\.js$/, /libs\/MathJax-.*$/],
+      navigateFallback: publicPath + 'index.html',
     },
     // https://github.com/vuejs/vue-cli/blob/dev/packages/@vue/cli-plugin-pwa/lib/HtmlPwaPlugin.js
     themeColor: '#f9f9f9',
