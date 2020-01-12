@@ -11,7 +11,7 @@
         <span>{{ username }}</span>
       </div>
       <div class="action-container">
-        <div class="action-wrapper action-pwa" v-if="hasPWA">
+        <div class="action-wrapper action-pwa">
           <div class="pwa-label">
             <span>PWA模式</span>
             <span v-if="hasPWA" class="pwa-label-info">(实验功能)</span>
