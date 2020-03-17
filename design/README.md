@@ -5,5 +5,5 @@
 
 *Optional* - Check your favicon with the [favicon checker](https://realfavicongenerator.net/favicon_checker)
 
-Favicon for iOS - Web Clip  
-Margin size (for a 57x57 icon) **7px**  
+Favicon for iOS - Web Clip
+Margin size (for a 57x57 icon) **0px**  

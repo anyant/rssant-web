@@ -134,7 +134,7 @@ import _ from 'lodash'
 import MoHeader from '@/components/MoHeader'
 import MoLayout from '@/components/MoLayout'
 import MoDebugTool from '@/components/MoDebugTool'
-import defaultAvatar from '@/assets/avatar.png'
+import defaultAvatar from '@/assets/avatar.svg'
 import { antRippleGrey } from '@/plugin/common'
 
 export default {

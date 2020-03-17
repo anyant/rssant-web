@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1024px" height="1024px" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 61.2 (89653) - https://sketch.com -->
+    <title>rssant-logo</title>
+    <desc>Created with Sketch.</desc>
+    <g id="page" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="logo/fullsize">
+            <g id="atomic/leaf" fill="#788E9E">
+                <path d="M872.999867,149.999251 C872.946503,349.759172 856.814998,595.197943 726,726 C594.983784,857.003256 348.914118,873 149,873 L150.000142,873.000906 C150.056803,673.240911 167.181051,428.80262 298,298 C429.015689,167.000665 674.089276,150 874,150 Z" id="leaf"></path>
+            </g>
+            <g id="atomic/rss" transform="translate(350.000000, 350.000000)">
+                <rect id="rect" fill="#788E9E" x="0" y="0" width="324" height="324"></rect>
+                <g id="atomic-rss" stroke-width="1" fill="#FFFFFF">
+                    <path d="M0,0 C177.150856,0 321.095417,142.173052 323.956593,318.642068 L324,324 L269.863291,324 L269.827137,319.537317 C267.467862,174.024094 149.937077,56.5079165 4.41814177,54.1721443 L0,54.1367089 L0,0 Z" id="bow_2"></path>
+                    <path d="M0,107.894531 C118.158237,107.894531 214.168135,202.722846 216.076517,320.426301 L216.105469,324 L161.976585,324 L161.954885,321.321421 C161.976368,233.848622 90.0235612,163.44399 2.65227588,162.044644 L0,162.023415 L0,107.894531 Z" id="bow_1"></path>
+                    <circle id="cycle" cx="49.9921875" cy="274.007812" r="49.9921875"></circle>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

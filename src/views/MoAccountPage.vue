@@ -41,7 +41,7 @@ import MoLayout from '@/components/MoLayout'
 import MoBackHeader from '@/components/MoBackHeader'
 import localConfig from '@/plugin/localConfig'
 import { antGold, antRed } from '@/plugin/common'
-import defaultAvatar from '@/assets/avatar.png'
+import defaultAvatar from '@/assets/avatar.svg'
 
 const hasPWA = 'serviceWorker' in navigator
 
