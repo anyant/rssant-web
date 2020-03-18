@@ -9,11 +9,14 @@ module.exports = {
     name: '蚁阅',
     workboxPluginMode: 'GenerateSW',
     workboxOptions: {
+      // https://github.com/GoogleChrome/workbox/releases
       // https://developers.google.com/web/tools/workbox/modules/workbox-webpack-plugin
       importWorkboxFrom: 'local',
       importsDirectory: 'libs',
       exclude: [/\.map$/, /^manifest.*\.js$/, /libs\/MathJax-.*$/],
+      // https://developers.google.com/web/tools/workbox/reference-docs/latest/module-workbox-build#.generateSW
       navigateFallback: publicPath + 'index.html',
+      navigateFallbackBlacklist: [/^\/api\/.*$/, /^\/admin\/.*$/],
     },
     // https://github.com/vuejs/vue-cli/blob/dev/packages/@vue/cli-plugin-pwa/lib/HtmlPwaPlugin.js
     themeColor: '#f9f9f9',
