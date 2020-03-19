@@ -32,13 +32,15 @@ import MoBackHeader from '@/components/MoBackHeader'
 import MoLayout from '@/components/MoLayout'
 import MoFeedStoryItem from '@/components/MoFeedStoryItem.vue'
 
+const ITEM_HEIGHT = 48
+
 export default {
   components: { MoBackHeader, MoLayout, MoFeedStoryItem },
   props: {
     vid: {
       type: String,
-      default: '/mushrooms'
-    }
+      default: '/mushrooms',
+    },
   },
   data() {
     return {}
@@ -46,9 +48,10 @@ export default {
   mounted() {
     this.$API.syncFeedLoadMushrooms().then(() => {
       let scrollTop = this.$pageState.get('scrollTop')
-      if (!_.isNil(scrollTop)) {
-        window.scrollTo(0, scrollTop)
+      if (_.isNil(scrollTop) || scrollTop <= 0) {
+        scrollTop = this.getDefaultScrollTop()
       }
+      window.scrollTo(0, scrollTop)
     })
   },
   computed: {
@@ -57,7 +60,7 @@ export default {
     },
     numUnreadMushrooms() {
       return this.$API.story.numUnreadMushrooms
-    }
+    },
   },
   methods: {
     getFeedTitle(feedId) {
@@ -75,12 +78,22 @@ export default {
       })
       feedIds = Array.from(feedIds)
       this.$API.feed.setAllReaded({ feedIds })
-    }
+    },
+    getDefaultScrollTop() {
+      let topReaded = 0
+      for (var i = 0; i < this.mushrooms.length; i++) {
+        if (!this.isReaded(this.mushrooms[i])) {
+          break
+        }
+        topReaded += 1
+      }
+      return topReaded * ITEM_HEIGHT
+    },
   },
   savePageState() {
     this.$pageState.set('scrollTop', window.scrollY)
     this.$pageState.commit()
-  }
+  },
 }
 </script>
 

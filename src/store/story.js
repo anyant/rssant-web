@@ -12,7 +12,6 @@ function sortMushrooms(mushrooms, API) {
             function (x) { return x.feed.id },
             'offset'
         ])
-        .reverse()
         .value()
 }
 
