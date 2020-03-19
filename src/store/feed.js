@@ -3,6 +3,7 @@ import Vue from 'vue'
 import { isAfter, subDays } from 'date-fns'
 import Loading from '@/plugin/loading'
 import { API } from '@/plugin/api'
+import localFeeds from '@/plugin/localFeeds'
 
 
 function isEmptyFeed(feed) {
@@ -214,6 +215,10 @@ export default {
     actions: {
         async sync(DAO) {
             await DAO.state.loading.begin(async () => {
+                let feeds = localFeeds.get()
+                if(!_.isNil(feeds)){
+                    DAO.ADD_OR_UPDATE_LIST(feeds)
+                }
                 let hints = []
                 _.values(DAO.state.feeds).forEach(x => {
                     if (!_.isEmpty(x.dt_updated)) {
@@ -225,6 +230,7 @@ export default {
                         updatedFeeds: result.feeds,
                         deletedFeedIds: result.deleted_ids
                     })
+                    localFeeds.set(DAO.feedList)
                 })
                 await API.feed.queryCreationList().then(result => {
                     DAO.ADD_OR_UPDATE_CREATION_LIST(result.feed_creations)
