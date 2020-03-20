@@ -1,7 +1,12 @@
 <template>
   <div class="thirdpart-login">
     <span class="label">第三方登录注册:</span>
-    <mu-ripple class="button" @click="loginGithub">
+    <mu-ripple
+      class="button"
+      v-loading="githubLoading"
+      data-mu-loading-size="24"
+      @click="loginGithub"
+    >
       <i class="button-icon fa fa-github"></i>
       <span class="button-text">GitHub</span>
     </mu-ripple>
@@ -10,11 +15,17 @@
 
 <script>
 export default {
+  data() {
+    return {
+      githubLoading: false,
+    }
+  },
   methods: {
     loginGithub() {
+      this.githubLoading = true
       this.$API.user.loginGithub()
-    }
-  }
+    },
+  },
 }
 </script>
 
