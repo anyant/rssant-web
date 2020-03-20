@@ -16,7 +16,7 @@ module.exports = {
       exclude: [/\.map$/, /^manifest.*\.js$/, /libs\/MathJax-.*$/],
       // https://developers.google.com/web/tools/workbox/reference-docs/latest/module-workbox-build#.generateSW
       navigateFallback: publicPath + 'index.html',
-      navigateFallbackBlacklist: [/^\/api\/.*$/, /^\/admin\/.*$/],
+      navigateFallbackBlacklist: [/^\/api\/.*$/, /^\/admin\/.*$/, /^.*\..*$/],
     },
     // https://github.com/vuejs/vue-cli/blob/dev/packages/@vue/cli-plugin-pwa/lib/HtmlPwaPlugin.js
     themeColor: '#f9f9f9',
