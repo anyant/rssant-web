@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div id="timeit"></div>
-    <router-view/>
+    <router-view />
   </div>
 </template>
 
@@ -10,7 +10,7 @@ export default {
   data() {
     return {}
   },
-  async created() {}
+  async created() {},
 }
 </script>
 
@@ -19,8 +19,15 @@ export default {
 
 #timeit {
   position: fixed;
-  top: 0;
-  left: 4px;
+  z-index: 999;
+  bottom: 0;
+  left: 0;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+#timeit,
+#timeit * {
+  outline: none !important;
 }
 
 #app {

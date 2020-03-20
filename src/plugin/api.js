@@ -1,10 +1,15 @@
-import Notification from './notify'
-import Timeit from './timeit'
-
 import _ from 'lodash'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import URI from 'urijs'
+
+import Notification from './notify'
+import Timeit from './timeit'
+import localConfig from './localConfig'
+
+function isDebug() {
+  return localConfig.DEBUG.get()
+}
 
 const BASE_URL = '/api/v1'
 
@@ -12,7 +17,7 @@ const client = axios.create({
   baseURL: BASE_URL,
 })
 
-client.interceptors.request.use(function (config) {
+client.interceptors.request.use(function(config) {
   let csrftoken = Cookies.get('csrftoken')
   if (!_.isNil(csrftoken)) {
     if (_.isNil(config.headers)) {
@@ -24,8 +29,8 @@ client.interceptors.request.use(function (config) {
 })
 
 client.interceptors.response.use(
-  function (response) {
-    if (window.app.debug) {
+  function(response) {
+    if (isDebug()) {
       let time = response.headers['x-time']
       if (!_.isNil(time)) {
         Timeit.show(time, response.config.method, response.config.url)
@@ -33,7 +38,7 @@ client.interceptors.response.use(
     }
     return Promise.resolve(response.data)
   },
-  function (error) {
+  function(error) {
     let title = null
     if (_.isNil(error.response)) {
       title = `Failed: ${error.config.method} ${error.config.url}`
@@ -52,13 +57,12 @@ client.interceptors.response.use(
     }
     message = _.truncate(message, { length: 50, separator: /,? +/ })
     Object.assign(error, { title, message })
-    if (window.app.debug) {
+    if (isDebug()) {
       Notification.error({ title, message })
     }
     return Promise.reject(error)
   }
 )
-
 
 function convertDjangoErrorMessage(error, fields) {
   if (!error.response || error.response.status !== 400) {
@@ -77,7 +81,6 @@ function convertDjangoErrorMessage(error, fields) {
   return message
 }
 
-
 const API = {
   user: {
     login({ account, password } = {}) {
@@ -85,21 +88,24 @@ const API = {
     },
     register({ username, email, password }) {
       username = _.defaultTo(username, email)
-      return client.post('/auth/registration/', {
-        username, email,
-        password1: password,
-        password2: password
-      }).catch(error => {
-        if (error.response && error.response.status === 400) {
-          let emailMessage = convertDjangoErrorMessage(error, ['email', 'username'])
-          let passwordMessage = convertDjangoErrorMessage(error, ['password1', 'password2'])
-          error.response.data = {
-            email: emailMessage,
-            password: passwordMessage,
+      return client
+        .post('/auth/registration/', {
+          username,
+          email,
+          password1: password,
+          password2: password,
+        })
+        .catch(error => {
+          if (error.response && error.response.status === 400) {
+            let emailMessage = convertDjangoErrorMessage(error, ['email', 'username'])
+            let passwordMessage = convertDjangoErrorMessage(error, ['password1', 'password2'])
+            error.response.data = {
+              email: emailMessage,
+              password: passwordMessage,
+            }
           }
-        }
-        throw error
-      })
+          throw error
+        })
     },
     confirmEmail({ key }) {
       return client.post('/auth/registration/verify-email/', { key })
@@ -114,12 +120,17 @@ const API = {
       })
     },
     confirmResetPassword({ token, uid, new_password }) {
-      return client.post('/auth/password/reset/confirm/', {
-        token, uid, new_password1: new_password, new_password2: new_password
-      }).catch(error => {
-        error.message = convertDjangoErrorMessage(error, ['new_password1', 'new_password2', 'token', 'uid'])
-        throw error
-      })
+      return client
+        .post('/auth/password/reset/confirm/', {
+          token,
+          uid,
+          new_password1: new_password,
+          new_password2: new_password,
+        })
+        .catch(error => {
+          error.message = convertDjangoErrorMessage(error, ['new_password1', 'new_password2', 'token', 'uid'])
+          throw error
+        })
     },
     logout({ next } = {}) {
       return client.post(`/auth/logout/`).then(() => {
@@ -127,13 +138,11 @@ const API = {
       })
     },
     loginGithub({ next, scope } = {}) {
-      let url = URI(BASE_URL + '/accounts/github/login/')
-        .search({ next, scope, process: 'login' })
+      let url = URI(BASE_URL + '/accounts/github/login/').search({ next, scope, process: 'login' })
       window.location.assign(url)
     },
     connectGithub({ next, scope } = {}) {
-      let url = URI(BASE_URL + '/accounts/github/login/')
-        .search({ next, scope, process: 'connect' })
+      let url = URI(BASE_URL + '/accounts/github/login/').search({ next, scope, process: 'connect' })
       window.location.assign(url)
     },
   },
@@ -170,11 +179,11 @@ const API = {
     },
     importFile({ file }) {
       var formData = new FormData()
-      formData.append("file", file)
+      formData.append('file', file)
       return client.post(`/feed/import/file`, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          'Content-Type': 'multipart/form-data',
+        },
       })
     },
     exportOPML({ download } = {}) {
@@ -203,11 +212,9 @@ const API = {
     },
     setFavorited({ feed_id, offset, is_favorited }) {
       return client.put(`/story/${feed_id}-${offset}/favorited`, { is_favorited })
-    }
-  }
+    },
+  },
 }
 
 export default API
-export {
-  API, BASE_URL, client
-}
+export { API, BASE_URL, client }
