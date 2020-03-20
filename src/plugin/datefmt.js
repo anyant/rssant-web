@@ -4,8 +4,10 @@ import datefn from 'date-fns'
 
 /**
  * 10:35
- * 04-24 10:35
- * 2019-04-24
+ * 昨天
+ * 前天
+ * 04-24
+ * 2019-04
  */
 export function formatDate(date, now) {
     if (_.isNil(date) || _.isEmpty(date)) {
@@ -18,13 +20,13 @@ export function formatDate(date, now) {
     if (datefn.isSameDay(now, date)) {
         return datefn.format(date, 'HH:mm')
     } else if (datefn.isSameDay(now, datefn.addDays(date, 1))) {
-        return datefn.format(date, '昨天HH:mm')
+        return datefn.format(date, '昨天')
     } else if (datefn.isSameDay(now, datefn.addDays(date, 2))) {
-        return datefn.format(date, '前天HH:mm')
+        return datefn.format(date, '前天')
     } else if (datefn.isSameYear(now, date)) {
-        return datefn.format(date, 'MM-DD HH:mm')
+        return datefn.format(date, 'MM-DD')
     } else {
-        return datefn.format(date, 'YYYY-MM-DD')
+        return datefn.format(date, 'YYYY-MM')
     }
 }
 

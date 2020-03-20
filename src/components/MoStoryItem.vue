@@ -3,17 +3,19 @@
     <div class="story-header" :class="{ 'story-header-readed': isReaded }" @click="onOpen">
       <div class="story-title">{{ title || link }}</div>
       <div class="story-date">{{ dateText }}</div>
-      <mu-button icon class="story-favorited" @click.stop="toggleFavorited">
-        <mu-icon v-if="isFavorited" value="star" :color="starColor"></mu-icon>
-        <mu-icon v-else value="star_border" :color="starColor"></mu-icon>
-      </mu-button>
     </div>
     <div
       class="story-preview"
       v-if="isOpened"
       :class="{'story-preview-readed': isReaded && !isReading}"
     >
-      <div class="story-preview-title">{{ title }}</div>
+      <div class="story-preview-header">
+        <div class="story-preview-title">{{ title }}</div>
+        <mu-button icon class="story-favorited" @click.stop="toggleFavorited">
+          <mu-icon v-if="isFavorited" value="star" :color="starColor"></mu-icon>
+          <mu-icon v-else value="star_border" :color="starColor"></mu-icon>
+        </mu-button>
+      </div>
       <div class="story-preview-summary">{{ summary }}</div>
       <mu-button icon class="story-preview-link" @click.stop="goLink">
         <i class="fa fa-external-link" aria-hidden="true"></i>
@@ -31,15 +33,15 @@ export default {
   props: {
     isReaded: {
       type: Boolean,
-      default: false
+      default: false,
     },
     isReading: {
       type: Boolean,
-      default: false
+      default: false,
     },
     isFavorited: {
       type: Boolean,
-      default: false
+      default: false,
     },
     feedId: String,
     offset: Number,
@@ -48,11 +50,11 @@ export default {
     summary: String,
     content: String,
     link: String,
-    routerLink: String
+    routerLink: String,
   },
   data() {
     return {
-      isOpened: false
+      isOpened: false,
     }
   },
   computed: {
@@ -65,7 +67,7 @@ export default {
       } else {
         return null
       }
-    }
+    },
   },
   methods: {
     toggleFavorited() {
@@ -84,8 +86,8 @@ export default {
       }
       this.$emit('read')
       this.isOpened = !this.isOpened
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -132,7 +134,7 @@ export default {
 
 .story-date {
   flex-shrink: 0;
-  width: 64 * @pr;
+  width: 48 * @pr;
   margin-left: 4 * @pr;
   font-size: 12 * @pr;
   text-align: right;
@@ -142,24 +144,23 @@ export default {
   color: @antTextGrey;
 }
 
-.story-favorited {
-  flex-shrink: 0;
-  position: relative;
-  right: -4 * @pr;
-  width: 32 * @pr;
-  height: 32 * @pr;
-  margin-left: 4 * @pr;
-}
-
 .story-preview {
   padding-bottom: 8 * @pr;
   position: relative;
+  min-height: 72 * @pr;
+}
+
+.story-preview-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
 }
 
 .story-preview-title {
   line-height: 23 * @pr;
   font-size: 15 * @pr;
   font-weight: bold;
+  padding-right: 28 * @pr;
 }
 
 .story-preview-summary {
@@ -170,6 +171,15 @@ export default {
   text-overflow: ellipsis;
   line-height: 1.4;
   font-size: 15 * @pr;
+}
+
+.story-favorited {
+  flex-shrink: 0;
+  position: absolute;
+  top: -4 * @pr;
+  right: 12 * @pr;
+  width: 32 * @pr;
+  height: 32 * @pr;
 }
 
 .story-preview-link {

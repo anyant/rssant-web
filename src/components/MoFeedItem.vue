@@ -94,7 +94,7 @@ export default {
 
 .feed-date {
   flex-shrink: 0;
-  width: 64 * @pr;
+  width: 48 * @pr;
   font-size: 12 * @pr;
   text-align: right;
   white-space: nowrap;
