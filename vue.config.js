@@ -16,7 +16,7 @@ module.exports = {
       exclude: [/\.map$/, /^manifest.*\.js$/, /libs\/MathJax-.*$/],
       // https://developers.google.com/web/tools/workbox/reference-docs/latest/module-workbox-build#.generateSW
       navigateFallback: publicPath + 'index.html',
-      navigateFallbackBlacklist: [/^\/api\/.*$/, /^\/admin\/.*$/, /^.*\..*$/],
+      navigateFallbackBlacklist: [/^\/api.*$/, /^\/admin.*$/, /^\/changelog.*$/, /^.*\..*$/],
     },
     // https://github.com/vuejs/vue-cli/blob/dev/packages/@vue/cli-plugin-pwa/lib/HtmlPwaPlugin.js
     themeColor: '#f9f9f9',
@@ -61,6 +61,9 @@ module.exports = {
         target: 'http://127.0.0.1:6788',
       },
       '/static': {
+        target: 'http://127.0.0.1:6788',
+      },
+      '/changelog': {
         target: 'http://127.0.0.1:6788',
       },
     },
