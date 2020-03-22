@@ -115,6 +115,13 @@ export default {
             registration.unregister()
           }
         })
+        if (!_.isNil(window.caches)) {
+          caches.keys().then(function(names) {
+            for (let name of names) {
+              caches.delete(name)
+            }
+          })
+        }
         this.$toast.success('PWA已关闭')
       }
     },
