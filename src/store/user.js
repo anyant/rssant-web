@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import Loading from '@/plugin/loading'
 import { API } from '@/plugin/api'
+import localFeeds from '@/plugin/localFeeds'
 
 export default {
     state: {
@@ -55,6 +56,7 @@ export default {
             await API.user.confirmResetPassword({ token, uid, new_password })
         },
         logout(DAO, { next } = {}) {
+            localFeeds.clear()
             API.user.logout({ next })
         },
         loginGithub(DAO, { next, scope } = {}) {

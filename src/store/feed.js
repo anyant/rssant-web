@@ -164,6 +164,11 @@ export default {
         isLoading(state) {
             return state.loading.isLoading
         },
+        isEmpty(state){
+            let numFeeds = _.size(state.feeds)
+            let numFeedCreations = _.size(state.creations)
+            return numFeeds <= 0 && numFeedCreations <= 0
+        },
         creations(state) {
             return _.chain(_.values(state.creations))
                 .sortBy('dt_created', 'status')

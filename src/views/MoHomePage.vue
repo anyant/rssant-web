@@ -4,9 +4,23 @@
       <MoHeader>
         <MoDebugTool class="title">蚁阅</MoDebugTool>
         <div class="right">
-          <mu-button icon class="action-add" @click="()=>{this.$router.push('/feed-creation')}">
+          <mu-button
+            ref="wizardTrigger"
+            icon
+            class="action-add"
+            @click="()=>{this.$router.push('/feed-creation')}"
+          >
             <mu-icon value="add"></mu-icon>
           </mu-button>
+          <mu-popover
+            class="wizard"
+            :open.sync="openWizard"
+            :trigger="wizardTrigger"
+            placement="bottom"
+          >
+            <span class="wizard-triangle"></span>
+            <div class="wizard-info">点这里添加订阅</div>
+          </mu-popover>
           <mu-menu placement="bottom" class="action-menu" popover-class="menu-popover">
             <mu-button icon class="action-menu-button">
               <mu-icon value="menu"></mu-icon>
@@ -141,7 +155,9 @@ export default {
   components: { MoHeader, MoLayout, MoDebugTool },
   data() {
     return {
-      rippleColor: antRippleGrey
+      rippleColor: antRippleGrey,
+      openWizard: false,
+      wizardTrigger: null,
     }
   },
   computed: {
@@ -179,10 +195,15 @@ export default {
     },
     numFavorited() {
       return this.numTextOf(this.$API.story.favorited.length)
-    }
+    },
   },
   mounted() {
-    this.$API.syncFeedLoadMushrooms()
+    this.wizardTrigger = this.$refs.wizardTrigger.$el
+    this.$API.syncFeedLoadMushrooms().then(() => {
+      if (this.$API.feed.isEmpty) {
+        this.openWizard = true
+      }
+    })
   },
   methods: {
     numTextOf(n) {
@@ -193,8 +214,8 @@ export default {
     },
     goFeedClean() {
       this.$router.push('/feed-clean')
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -235,6 +256,59 @@ export default {
   height: 32 * @pr;
   margin-right: 16 * @pr;
   color: @antTextBlack;
+}
+
+.wizard {
+  margin-top: 8px;
+  box-shadow: none;
+  background-color: @antBackDark;
+  opacity: 0.9;
+  overflow: visible;
+  cursor: default;
+}
+
+.wizard.mu-popover.transition-bottom {
+  transform: none;
+  &.mu-popover-transition-enter {
+    transform: translate3d(0, 10%, 0);
+  }
+  &.mu-popover-transition-leave-to {
+    transform: none;
+  }
+  &.mu-popover-transition-enter,
+  &.mu-popover-transition-leave-to {
+    opacity: 0;
+  }
+  &.mu-popover-transition-enter-active,
+  &.mu-popover-transition-leave-active {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    backface-visibility: hidden;
+  }
+}
+
+.wizard-info {
+  font-size: 10px;
+  line-height: 22px;
+  padding: 4px 8px;
+  color: @antTextWhite;
+  border-radius: 2px;
+}
+
+.wizard-triangle {
+  // https://juejin.im/post/5cdc0458f265da03a1584fd0
+  display: block;
+  height: 14px;
+  width: 14px;
+  background-color: inherit;
+  border: inherit;
+  position: absolute;
+  top: -6px;
+  left: calc(50% - 7px);
+  // ---start---
+  clip-path: polygon(0% 0%, 100% 100%, 0% 100%);
+  transform: rotate(135deg);
+  // ---end---
+  border-radius: 0 0 0 2px;
 }
 
 .menu-list {

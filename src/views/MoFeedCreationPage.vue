@@ -8,7 +8,7 @@
         class="import-text"
         ref="importText"
         v-model="importText"
-        placeholder="请随意输入链接或含有链接的文本"
+        placeholder="请输入链接或含有链接的文本"
         full-width
         multi-line
         :rows="1"
@@ -36,7 +36,7 @@
           ref="importFeedFile"
           style="display: none;"
           @change="onImportFileChange"
-        >
+        />
       </form>
       <div class="import-wrapper">
         <MoAntGreenButton
@@ -65,13 +65,25 @@ export default {
       errorText: null,
       importFile: null,
       importFileTarget: null,
-      importFileLoading: false
+      importFileLoading: false,
     }
   },
   computed: {
     isSaveDisabled() {
       return !this.importText
-    }
+    },
+  },
+  mounted() {
+    this.$API.syncFeedLoadMushrooms().then(() => {
+      if (this.$API.feed.isEmpty) {
+        let changelogUrl = location.origin + '/changelog'
+        this.$alert('🎉🎉欢迎！我们先订阅一下蚁阅更新日志，我帮你填上链接。', {
+          okLabel: '好的',
+        }).then(() => {
+          this.importText = changelogUrl
+        })
+      }
+    })
   },
   methods: {
     handleFeedImportedResult({ isImport, numFeedCreations, numCreatedFeeds, numExistedFeeds }) {
@@ -163,14 +175,14 @@ export default {
         .catch(error => {
           this.$toast.error({
             message: '导入文件失败: ' + error.message,
-            time: 10000
+            time: 10000,
           })
         })
         .finally(() => {
           this.importFileLoading = false
         })
-    }
-  }
+    },
+  },
 }
 </script>
 
