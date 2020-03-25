@@ -23,7 +23,7 @@ export default {
   methods: {
     loginGithub() {
       this.githubLoading = true
-      this.$API.user.loginGithub()
+      this.$API.user.loginGithub({ next: '/' })
     },
   },
 }

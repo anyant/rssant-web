@@ -63,7 +63,7 @@ export default {
             API.user.loginGithub({ next, scope })
         },
         connectGithub(DAO, { next, scope } = {}) {
-            if (!this.isLogined) { return }
+            if (!DAO.isLogined) { return }
             API.user.connectGithub({ next, scope })
         },
     }

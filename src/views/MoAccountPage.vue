@@ -25,6 +25,16 @@
           ></mu-switch>
         </div>
         <div class="action-wrapper">
+          <mu-button
+            class="button-connect-github"
+            :color="antGreen"
+            :disabled="isGithubConnected"
+            @click="connectGithub"
+            v-loading="githubLoading"
+            data-mu-loading-size="24"
+          >{{ isGithubConnected ? 'GitHub已绑定' : '绑定GitHub' }}</mu-button>
+        </div>
+        <div class="action-wrapper">
           <mu-button class="button-delete-all-feed" :color="antRed" @click="deleteAllFeed">删除全部订阅</mu-button>
         </div>
         <div class="action-wrapper">
@@ -40,7 +50,7 @@ import _ from 'lodash'
 import MoLayout from '@/components/MoLayout'
 import MoBackHeader from '@/components/MoBackHeader'
 import localConfig from '@/plugin/localConfig'
-import { antGold, antRed } from '@/plugin/common'
+import { antGold, antRed, antGreen } from '@/plugin/common'
 import defaultAvatar from '@/assets/avatar.svg'
 
 const hasPWA = 'serviceWorker' in navigator
@@ -48,7 +58,14 @@ const hasPWA = 'serviceWorker' in navigator
 export default {
   components: { MoLayout, MoBackHeader },
   data() {
-    return { antGold, antRed, hasPWA, isPWAEnable: localConfig.PWA_ENABLE.get() }
+    return {
+      antGold,
+      antRed,
+      antGreen,
+      hasPWA,
+      isPWAEnable: localConfig.PWA_ENABLE.get(),
+      githubLoading: false,
+    }
   },
   computed: {
     avatar() {
@@ -58,6 +75,22 @@ export default {
       } else {
         return user.avatar_url
       }
+    },
+    isGithubConnected() {
+      let user = this.$API.user.loginUser
+      if (!this.$API.user.isLogined || _.isNil(user)) {
+        return false
+      }
+      if (_.isNil(user.social_accounts)) {
+        return false
+      }
+      for (let i = 0; i < user.social_accounts.length; i++) {
+        let acc = user.social_accounts[i]
+        if (_.isEqual(acc.provider, 'github')) {
+          return true
+        }
+      }
+      return false
     },
     username() {
       let user = this.$API.user.loginUser
@@ -82,6 +115,10 @@ export default {
             })
         }
       })
+    },
+    connectGithub() {
+      this.githubLoading = true
+      this.$API.user.connectGithub({ next: '/' })
     },
     logout() {
       this.$API.user.logout({ next: '/' })
@@ -176,6 +213,7 @@ export default {
   }
 }
 
+.button-connect-github,
 .button-logout,
 .button-delete-all-feed {
   width: 152 * @pr;
@@ -183,5 +221,10 @@ export default {
   font-size: 18 * @pr;
   font-weight: bold;
   box-shadow: none;
+}
+
+.button-connect-github.disabled {
+  background-color: lighten(@antGreen, 10%);
+  color: @antTextWhite;
 }
 </style>
