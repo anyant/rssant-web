@@ -1,5 +1,5 @@
 <template>
-  <MoLayout class="register">
+  <MoLayout class="register" footer>
     <div class="title">创建蚁阅账号</div>
     <mu-text-field
       full-width
@@ -35,6 +35,9 @@
     <div class="thirdpart">
       <MoThirdpartLogin></MoThirdpartLogin>
     </div>
+    <template v-slot:footer>
+      <MoFooter />
+    </template>
   </MoLayout>
 </template>
 
@@ -44,9 +47,10 @@ import { antGreen, antTextGrey } from '@/plugin/common'
 import MoLayout from '@/components/MoLayout'
 import MoAntGreenButton from '@/components/MoAntGreenButton'
 import MoThirdpartLogin from '@/components/MoThirdpartLogin'
+import MoFooter from '@/components/MoFooter'
 
 export default {
-  components: { MoAntGreenButton, MoThirdpartLogin, MoLayout },
+  components: { MoAntGreenButton, MoThirdpartLogin, MoLayout, MoFooter },
   data() {
     return {
       antGreen,
@@ -57,14 +61,14 @@ export default {
         password: null,
         passwordVisibility: false,
         emailErrorText: null,
-        passwordErrorText: null
-      }
+        passwordErrorText: null,
+      },
     }
   },
   computed: {
     isRegisterDisabled() {
       return !(this.registerForm.email && this.registerForm.password)
-    }
+    },
   },
   methods: {
     register() {
@@ -72,14 +76,14 @@ export default {
       this.$API.user
         .register({
           email: this.registerForm.email,
-          password: this.registerForm.password
+          password: this.registerForm.password,
         })
         .then(() => {
           this.$toast.success({ message: '注册成功，请查收邮件验证邮箱！', time: 5000 })
           this.$API.user
             .login({
               account: this.registerForm.email,
-              password: this.registerForm.password
+              password: this.registerForm.password,
             })
             .then(() => {
               this.$router.replace('/')
@@ -111,8 +115,8 @@ export default {
     clearErrorText() {
       this.registerForm.emailErrorText = null
       this.registerForm.passwordErrorText = null
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -173,6 +177,6 @@ export default {
 }
 
 .thirdpart {
-  margin-top: 84 * @pr;
+  margin-top: 64 * @pr;
 }
 </style>

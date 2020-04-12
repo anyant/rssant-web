@@ -1,6 +1,6 @@
 <template>
-  <MoLayout class="login">
-    <div class="title">蚁阅 - 你还没有登录哦~</div>
+  <MoLayout class="login" footer>
+    <div class="title">蚁阅 - 让RSS更好用</div>
     <mu-text-field
       full-width
       placeholder="用户名或邮箱地址"
@@ -33,6 +33,9 @@
     <div class="thirdpart">
       <MoThirdpartLogin></MoThirdpartLogin>
     </div>
+    <template v-slot:footer>
+      <MoFooter />
+    </template>
   </MoLayout>
 </template>
 
@@ -41,9 +44,10 @@ import { antGreen, antTextGrey } from '@/plugin/common'
 import MoLayout from '@/components/MoLayout'
 import MoAntGreenButton from '@/components/MoAntGreenButton'
 import MoThirdpartLogin from '@/components/MoThirdpartLogin'
+import MoFooter from '@/components/MoFooter'
 
 export default {
-  components: { MoAntGreenButton, MoThirdpartLogin, MoLayout },
+  components: { MoAntGreenButton, MoThirdpartLogin, MoLayout, MoFooter },
   data() {
     return {
       antGreen,
@@ -52,14 +56,14 @@ export default {
         account: null,
         password: null,
         passwordVisibility: false,
-        errorText: null
-      }
+        errorText: null,
+      },
     }
   },
   computed: {
     isLoginDisabled() {
       return !(this.loginForm.account && this.loginForm.password)
-    }
+    },
   },
   methods: {
     login() {
@@ -74,8 +78,8 @@ export default {
     },
     clearErrorText() {
       this.loginForm.errorText = null
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -136,6 +140,6 @@ export default {
 }
 
 .thirdpart {
-  margin-top: 84 * @pr;
+  margin-top: 64 * @pr;
 }
 </style>

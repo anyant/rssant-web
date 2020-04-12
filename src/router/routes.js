@@ -17,6 +17,7 @@ import MoAccountConfirmEmailPage from '@/views/MoAccountConfirmEmailPage'
 import MoResetPasswordPage from '@/views/MoResetPasswordPage'
 import MoResetPasswordConfirmPage from '@/views/MoResetPasswordConfirmPage'
 import MoAccountPage from '@/views/MoAccountPage'
+import MoAboutPage from '@/views/MoAboutPage'
 
 import MoNotFoundPage from '@/views/MoNotFoundPage'
 
@@ -26,6 +27,11 @@ export default [
     name: 'Home',
     component: MoHomePage,
     meta: { loginRequired: true },
+  },
+  {
+    path: '/about',
+    name: 'About',
+    component: MoAboutPage,
   },
   {
     path: '/login',
@@ -130,5 +136,5 @@ export default [
     component: MoFeedDetailPage,
     meta: { loginRequired: true },
   },
-  { path: '*', component: MoNotFoundPage }
+  { path: '*', component: MoNotFoundPage },
 ]

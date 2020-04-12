@@ -1,7 +1,11 @@
 <template>
-  <div class="layout" :class="{ 'layout-grey': grey, 'layout-header': header }">
+  <div
+    class="layout"
+    :class="{ 'layout-grey': grey, 'layout-header': header, 'layout-footer': footer }"
+  >
     <div>
       <slot></slot>
+      <slot name="footer" v-if="footer"></slot>
     </div>
   </div>
 </template>
@@ -10,13 +14,17 @@ export default {
   props: {
     grey: {
       type: Boolean,
-      default: false
+      default: false,
     },
     header: {
       type: Boolean,
-      default: false
-    }
-  }
+      default: false,
+    },
+    footer: {
+      type: Boolean,
+      default: false,
+    },
+  },
 }
 </script>
 <style lang="less" scoped>
@@ -30,6 +38,10 @@ export default {
 
 .layout-header {
   padding-top: 48 * @pr;
+}
+
+.layout-footer {
+  padding-bottom: 48 * @pr;
 }
 
 .layout-grey {

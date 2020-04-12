@@ -1,5 +1,5 @@
 <template>
-  <MoLayout header border>
+  <MoLayout header footer>
     <MoBackHeader></MoBackHeader>
     <div class="main">
       <div class="avatar-wrapper">
@@ -42,6 +42,9 @@
         </div>
       </div>
     </div>
+    <template v-slot:footer>
+      <MoFooter />
+    </template>
   </MoLayout>
 </template>
 
@@ -49,6 +52,7 @@
 import _ from 'lodash'
 import MoLayout from '@/components/MoLayout'
 import MoBackHeader from '@/components/MoBackHeader'
+import MoFooter from '@/components/MoFooter'
 import localConfig from '@/plugin/localConfig'
 import { antGold, antRed, antGreen } from '@/plugin/common'
 import defaultAvatar from '@/assets/avatar.svg'
@@ -56,7 +60,7 @@ import defaultAvatar from '@/assets/avatar.svg'
 const hasPWA = 'serviceWorker' in navigator
 
 export default {
-  components: { MoLayout, MoBackHeader },
+  components: { MoLayout, MoBackHeader, MoFooter },
   data() {
     return {
       antGold,
@@ -175,7 +179,7 @@ export default {
 }
 
 .avatar-wrapper {
-  margin-top: 24 * @pr;
+  margin-top: 16 * @pr;
   display: flex;
   align-items: center;
   justify-content: space-around;
@@ -191,11 +195,11 @@ export default {
 }
 
 .action-container {
-  margin-top: 96 * @pr;
+  margin-top: 64 * @pr;
 }
 
 .action-wrapper {
-  margin-top: 40 * @pr;
+  margin-top: 32 * @pr;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -203,7 +207,7 @@ export default {
 
 .pwa-label {
   font-weight: bold;
-  font-size: 18 * @pr;
+  font-size: 16 * @pr;
 
   .pwa-label-info {
     margin-right: 16px;
@@ -217,8 +221,8 @@ export default {
 .button-logout,
 .button-delete-all-feed {
   width: 152 * @pr;
-  height: 40 * @pr;
-  font-size: 18 * @pr;
+  height: 36 * @pr;
+  font-size: 16 * @pr;
   font-weight: bold;
   box-shadow: none;
 }
