@@ -30,7 +30,6 @@
 
 <script>
 import _ from 'lodash'
-import 'github-markdown-css'
 import { antGold } from '@/plugin/common'
 import MoLayout from '@/components/MoLayout.vue'
 import MoBackHeader from '@/components/MoBackHeader'
@@ -166,58 +165,5 @@ export default {
   padding-left: 16 * @pr;
   padding-right: 16 * @pr;
   padding-bottom: 16 * @pr;
-}
-
-.markdown-body {
-  font-size: 15 * @pr;
-  color: @antTextSemi;
-}
-</style>
-
-<style lang="less">
-@import '~@/styles/common';
-
-.markdown-body img {
-  height: auto; // FIX: img标签指定了高度导致异常拉伸的问题
-}
-
-.markdown-body hr {
-  height: 1px;
-}
-
-// 代码块样式优化
-.markdown-body figure,
-.markdown-body .highlight {
-  position: relative;
-  margin: 1em 0;
-
-  tbody,
-  tr,
-  td {
-    display: block;
-    width: 100%;
-  }
-
-  tr {
-    border: none;
-  }
-
-  td.gutter {
-    display: none;
-  }
-
-  td.code {
-    padding: 0;
-  }
-}
-
-// 数学公式过长，水平滚动
-.markdown-body .MathJax_Display {
-  overflow-x: scroll;
-  overflow-y: hidden;
-}
-
-.markdown-body .MathJax {
-  outline: none;
 }
 </style>

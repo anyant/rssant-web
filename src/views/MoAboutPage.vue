@@ -46,7 +46,6 @@
 </template>
 
 <script>
-import 'github-markdown-css'
 import MoLayout from '@/components/MoLayout'
 import MoBackHeader from '@/components/MoBackHeader'
 
@@ -67,11 +66,6 @@ export default {
 .main {
   padding: 16 * @pr;
   padding-bottom: 32 * @pr;
-}
-
-.markdown-body {
-  font-size: 15 * @pr;
-  color: @antTextSemi;
 }
 
 .title,
