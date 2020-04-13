@@ -140,6 +140,6 @@ export default {
 }
 
 .thirdpart {
-  margin-top: 64 * @pr;
+  margin-top: 48 * @pr;
 }
 </style>

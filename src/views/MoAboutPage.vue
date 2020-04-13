@@ -89,6 +89,7 @@ export default {
 
   ul {
     display: inline-block;
+    margin-bottom: 0;
   }
 }
 
