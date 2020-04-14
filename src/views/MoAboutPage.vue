@@ -38,7 +38,10 @@
         <p class="center">
           GitHub(镜像):
           <br />
-          <a href="https://github.com/anyant/rssant" target="_blank">https://github.com/anyant/rssant</a>
+          <a
+            href="https://github.com/anyant/rssant"
+            target="_blank"
+          >https://github.com/anyant/rssant</a>
         </p>
       </div>
     </div>
@@ -89,7 +92,10 @@ export default {
 
 .markdown-body a {
   color: @antTextSemi;
-  text-decoration: underline;
+  display: inline-block;
+  border-bottom: 1px solid @antTextSemi;
+  text-decoration: none;
+  line-height: 1.25;
 }
 
 .changelog {

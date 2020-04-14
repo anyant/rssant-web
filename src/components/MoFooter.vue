@@ -27,7 +27,10 @@ export default {}
   text-align: center;
   a {
     color: @antTextGrey;
-    text-decoration: underline;
+    display: inline-block;
+    border-bottom: 1px solid @antTextGrey;
+    text-decoration: none;
+    line-height: 1.25;
   }
 }
 </style>
