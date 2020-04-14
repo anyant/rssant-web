@@ -32,6 +32,7 @@ export default {
 
 .layout {
   min-height: 100vh;
+  min-height: ~"max(100vh, @{minHeight})";
   background: #ffffff;
   overflow: hidden;
 }

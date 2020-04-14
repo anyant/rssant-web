@@ -32,8 +32,8 @@ export default {
 }
 
 #app {
-  min-width: 300 * @pr;
-  max-width: 640 * @pr;
+  min-width: @minWidth;
+  max-width: @maxWidth;
   margin: 0 auto;
 }
 </style>

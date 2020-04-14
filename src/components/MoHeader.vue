@@ -20,7 +20,7 @@ export default {
   position: fixed;
   top: 0;
   width: 100%;
-  max-width: 640 * @pr;
+  max-width: @maxWidth;
   z-index: 100;
   display: flex;
   height: 48 * @pr;

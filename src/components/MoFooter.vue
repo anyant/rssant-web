@@ -25,7 +25,7 @@ export default {}
 .link-about {
   text-align: center;
   a {
-    color: @antTextSemi;
+    color: @antTextGrey;
     text-decoration: underline;
   }
 }
