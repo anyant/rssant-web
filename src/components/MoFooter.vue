@@ -20,6 +20,7 @@ export default {}
   left: 0;
   width: 100%;
   padding: 0 16 * @pr;
+  background: #ffffff;
 }
 
 .link-about {

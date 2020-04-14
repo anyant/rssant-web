@@ -3,10 +3,8 @@
     class="layout"
     :class="{ 'layout-grey': grey, 'layout-header': header, 'layout-footer': footer }"
   >
-    <div>
-      <slot></slot>
-      <slot name="footer" v-if="footer"></slot>
-    </div>
+    <slot></slot>
+    <slot name="footer" v-if="footer"></slot>
   </div>
 </template>
 <script>
@@ -32,7 +30,6 @@ export default {
 
 .layout {
   min-height: 100vh;
-  min-height: ~"max(100vh, @{minHeight})";
   background: #ffffff;
   overflow: hidden;
 }
