@@ -28,9 +28,9 @@ export default {}
   a {
     color: @antTextGrey;
     display: inline-block;
-    border-bottom: 1px solid @antTextGrey;
+    border-bottom: 1px solid lighten(@antTextGrey, 15%);
     text-decoration: none;
-    line-height: 1.25;
+    line-height: 1.15;
   }
 }
 </style>

@@ -93,9 +93,9 @@ export default {
 .markdown-body a {
   color: @antTextSemi;
   display: inline-block;
-  border-bottom: 1px solid @antTextSemi;
+  border-bottom: 1px solid lighten(@antTextSemi, 15%);
   text-decoration: none;
-  line-height: 1.25;
+  line-height: 1.15;
 }
 
 .changelog {
