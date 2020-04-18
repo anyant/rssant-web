@@ -23,6 +23,21 @@
       </div>
     </div>
     <div class="content" v-if="story">
+      <div class="story-audio-wrapper" v-if="story.audio_url">
+        <audio controls>
+          <source :src="story.audio_url" />Your browser does not support the audio element.
+        </audio>
+      </div>
+      <div class="story-iframe-wrapper" v-if="story.iframe_url">
+        <iframe
+          :src="story.iframe_url"
+          scrolling="no"
+          border="0"
+          frameborder="no"
+          framespacing="0"
+          allowfullscreen="true"
+        ></iframe>
+      </div>
       <div id="story-markdown-body" class="markdown-body" v-story="storyContent"></div>
     </div>
   </MoLayout>
@@ -91,7 +106,7 @@ export default {
         return ''
       }
       return this.story.content
-    }
+    },
   },
   mounted() {
     if (_.isNil(this.feed)) {
@@ -105,8 +120,8 @@ export default {
     toggleFavorited() {
       let is_favorited = !this.isFavorited
       this.$API.story.setFavorited({ feedId: this.feedId, offset: this.offset, is_favorited })
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -165,5 +180,33 @@ export default {
   padding-left: 16 * @pr;
   padding-right: 16 * @pr;
   padding-bottom: 16 * @pr;
+}
+
+.story-audio-wrapper {
+  audio {
+    display: block;
+    width: 100%;
+    outline: none;
+    margin-bottom: 16 * @pr;
+  }
+}
+
+.story-iframe-wrapper {
+  margin-bottom: 16 * @pr;
+}
+
+.story-iframe-wrapper {
+  position: relative;
+  width: 100%;
+  height: 0;
+  padding-bottom: 56.25%; /* 宽高比16:9 */
+
+  iframe {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+  }
 }
 </style>
