@@ -29,6 +29,7 @@
         </audio>
       </div>
       <div class="story-iframe-wrapper" v-if="story.iframe_url">
+        <div class="story-iframe-loading">Loading</div>
         <iframe
           :src="story.iframe_url"
           scrolling="no"
@@ -201,8 +202,25 @@ export default {
   height: 0;
   padding-bottom: 56.25%; /* 宽高比16:9 */
 
+  .story-iframe-loading {
+    position: absolute;
+    z-index: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    font-size: 36px;
+    line-height: 54px;
+    height: 54px;
+    font-family: Helvetica, Arial, sans-serif;
+    font-weight: bold;
+    color: #ececec;
+    opacity: 0.5;
+  }
+
   iframe {
     position: absolute;
+    z-index: 1;
     width: 100%;
     height: 100%;
     left: 0;
