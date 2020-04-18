@@ -29,7 +29,9 @@
         </audio>
       </div>
       <div class="story-iframe-wrapper" v-if="story.iframe_url">
-        <div class="story-iframe-loading">Loading</div>
+        <div class="story-iframe-loading-wrapper">
+          <div class="story-iframe-loading">Loading</div>
+        </div>
         <iframe
           :src="story.iframe_url"
           scrolling="no"
@@ -37,6 +39,7 @@
           frameborder="no"
           framespacing="0"
           allowfullscreen="true"
+          referrerpolicy="no-referrer"
         ></iframe>
       </div>
       <div id="story-markdown-body" class="markdown-body" v-story="storyContent"></div>
@@ -202,12 +205,19 @@ export default {
   height: 0;
   padding-bottom: 56.25%; /* 宽高比16:9 */
 
-  .story-iframe-loading {
+  .story-iframe-loading-wrapper {
     position: absolute;
     z-index: 0;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .story-iframe-loading {
     text-align: center;
     font-size: 36px;
     line-height: 54px;
