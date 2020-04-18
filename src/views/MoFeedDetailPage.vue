@@ -30,44 +30,54 @@ import { formatFullDate } from '@/plugin/datefmt'
 const FEED_FIELDS = [
   {
     name: '名称',
-    key: 'title'
+    key: 'title',
   },
   {
     name: '状态',
     key: 'status',
-    type: 'status'
+    type: 'status',
   },
   {
     name: '主页',
     key: 'link',
-    type: 'link'
+    type: 'link',
   },
   {
     name: '简介',
-    key: 'description'
+    key: 'description',
   },
   {
     name: '作者',
-    key: 'author'
+    key: 'author',
   },
   {
     name: '供稿地址',
     key: 'url',
-    type: 'link'
+    type: 'link',
   },
   {
     name: '供稿格式',
-    key: 'version'
+    key: 'version',
+  },
+  {
+    name: '异常信息',
+    key: 'warnings',
+    process: function(value) {
+      if (_.isEmpty(value)) {
+        return '无'
+      }
+      return value
+    },
   },
   {
     name: '未读故事',
     key: 'num_unread_storys',
-    type: 'number'
+    type: 'number',
   },
   {
     name: '故事总数',
     key: 'total_storys',
-    type: 'number'
+    type: 'number',
   },
   {
     name: '发布周期',
@@ -83,7 +93,7 @@ const FEED_FIELDS = [
       } else {
         return `小于 1 天`
       }
-    }
+    },
   },
   {
     name: '干货程度',
@@ -93,38 +103,48 @@ const FEED_FIELDS = [
         return '未知'
       }
       return `${(value / 10).toFixed(1)}%`
-    }
+    },
+  },
+  {
+    name: '冻结级别',
+    key: 'freeze_level',
+    type: 'number',
+  },
+  {
+    name: '使用代理',
+    key: 'use_proxy',
+    type: 'boolean',
   },
   {
     name: '最老故事发布时间',
     key: 'dt_first_story_published',
-    type: 'datetime'
+    type: 'datetime',
   },
   {
     name: '最新故事发布时间',
     key: 'dt_latest_story_published',
-    type: 'datetime'
+    type: 'datetime',
   },
   {
     name: '创建时间',
     key: 'dt_created',
-    type: 'datetime'
+    type: 'datetime',
   },
   {
     name: '更新时间',
     key: 'dt_updated',
-    type: 'datetime'
+    type: 'datetime',
   },
   {
     name: '检查时间',
     key: 'dt_checked',
-    type: 'datetime'
+    type: 'datetime',
   },
   {
     name: '同步时间',
     key: 'dt_synced',
-    type: 'datetime'
-  }
+    type: 'datetime',
+  },
 ]
 
 export default {
@@ -155,23 +175,25 @@ export default {
         let item = {
           name: field.name,
           type: field.type,
-          value: feed[field.key]
+          value: feed[field.key],
         }
         if (!_.isNil(field.process)) {
           item.value = field.process(item.value)
         }
         if (field.type === 'datetime') {
           item.value = formatFullDate(item.value)
+        } else if (field.type === 'boolean') {
+          item.value = item.value ? '是' : '否'
         }
         info.push(item)
       })
       return info
-    }
+    },
   },
   methods: {
     deleteFeed() {
       this.$confirm(`删除订阅 “${this.feedTitle}” ？`, '提示', {
-        type: 'warning'
+        type: 'warning',
       }).then(({ result }) => {
         if (result) {
           this.$API.feed
@@ -185,8 +207,8 @@ export default {
             })
         }
       })
-    }
-  }
+    },
+  },
 }
 </script>
 
