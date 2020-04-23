@@ -73,7 +73,9 @@ function watchFeedCreation(DAO, { creationId, numTry = 30 }) {
         API.feed.getCreation({ id: creationId }).then(creation => {
             DAO.ADD_OR_UPDATE_CREATION(creation)
             if (creation.status === 'ready') {
-                clearInterval(token)
+                setTimeout(() => {
+                    clearInterval(token)
+                }, 3000)
                 DAO.API.feed.load({ feedId: creation.feed_id, detail: true })
             } else if (creation.status === 'error' || numTry <= 0) {
                 clearInterval(token)
