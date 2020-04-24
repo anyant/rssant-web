@@ -1,6 +1,6 @@
 // 主色
 export const antGreen = '#66BB6A';
-export const antBlue = '#44B0F2';
+export const antBlue = '#60bbf3';
 export const antGold = '#FFBA00';
 export const antRed = '#f44336';
 

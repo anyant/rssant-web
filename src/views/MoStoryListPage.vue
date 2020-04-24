@@ -18,6 +18,7 @@
       :init-offset="feed.story_offset"
       :total="feed.total_storys"
       :load="loadStorys"
+      :jump="onJump"
     >
       <MoStoryItem
         v-for="story in storyList"
@@ -82,7 +83,7 @@ export default {
       return story => {
         return story.offset === feed.story_offset - 1
       }
-    }
+    },
   },
   async mounted() {
     if (_.isNil(this.feed)) {
@@ -108,8 +109,12 @@ export default {
     toggleFavorited(story) {
       let is_favorited = !story.is_favorited
       this.$API.story.setFavorited({ feedId: story.feed.id, offset: story.offset, is_favorited })
-    }
-  }
+    },
+    async onJump(offset) {
+      await this.$API.syncFeedLoadMushrooms()
+      this.$API.feed.setStoryOffset({ feedId: this.feed.id, offset: offset })
+    },
+  },
 }
 </script>
 
