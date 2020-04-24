@@ -105,7 +105,11 @@ export default {
       return lastOffset < this.total - 1
     },
     _deltaPages() {
-      let delta = (this.total - this.initOffset) / this.numPageItems
+      let firstOffset = this.initOffset
+      if (this.items.length > 0) {
+        firstOffset = Math.max(firstOffset, this.items[0].offset)
+      }
+      let delta = (this.total - firstOffset) / this.numPageItems
       return Math.floor(Math.max(0, delta))
     },
     shouldAutoJump() {
