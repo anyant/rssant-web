@@ -166,12 +166,12 @@ export default {
         }
       }
       this.endSuccess()
-      this.updateScrollTop()
+      this.updateScrollTop(initOffset)
     },
-    updateScrollTop() {
+    updateScrollTop(offset) {
       let scrollTop = 0
       for (let item of this.items) {
-        if (item.offset < this.initOffset) {
+        if (item.offset < offset) {
           scrollTop += this.itemSize
         } else {
           break
@@ -237,7 +237,7 @@ export default {
       this.load({ offset: offset, size: this.numPageItems })
         .finally(this.endSuccess)
         .then(() => {
-          this.updateScrollTop()
+          this.updateScrollTop(offset)
         })
     },
   },
