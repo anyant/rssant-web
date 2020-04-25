@@ -213,8 +213,8 @@ export default {
 }
 
 .button-save.disabled {
-  background: lighten(@antBlue, 10%);
-  color: #fff;
+  background: @antBlue;
+  color: #ffffff;
   opacity: 0.8;
 }
 

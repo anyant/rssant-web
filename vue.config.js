@@ -39,7 +39,6 @@ module.exports = {
           type: 'image/png',
         },
       ],
-      orientation: "portrait",
       background_color: '#ffffff',
     },
     iconPaths: {

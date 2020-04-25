@@ -8,8 +8,8 @@ module.exports = {
   globals: { MathJax: 'readonly' },
   rules: {
     // not allow console and debugger
-    'no-console': 'error',
-    'no-debugger': 'error',
+    'no-console': 'warn',
+    'no-debugger': 'warn',
     // ignore non-camelcase
     camelcase: 'off',
     // allow async-await

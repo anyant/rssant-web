@@ -38,13 +38,6 @@ if (localConfig.PWA_ENABLE.get()) {
   registerServiceWorker()
 }
 
-// Try lock screen orientation to portrait
-try {
-  screen.lockOrientation('portrait')
-} catch (ignore) {
-  // not available on this device
-}
-
 initREM(true, 32, 1)
 
 Vue.config.productionTip = false
