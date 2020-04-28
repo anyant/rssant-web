@@ -1,4 +1,4 @@
-import MoHomePage from '@/views/MoHomePage'
+import MoHomeV2Page from '@/views/MoHomeV2Page'
 import MoMushroomsPage from '@/views/MoMushroomsPage'
 import MoFavoritedPage from '@/views/MoFavoritedPage'
 import MoCreationListPage from '@/views/MoCreationListPage'
@@ -25,7 +25,7 @@ export default [
   {
     path: '/',
     name: 'Home',
-    component: MoHomePage,
+    component: MoHomeV2Page,
     meta: { loginRequired: true },
   },
   {

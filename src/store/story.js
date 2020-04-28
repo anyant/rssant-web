@@ -171,6 +171,7 @@ export default {
             await DAO.state.mushroomsLoading.begin(async () => {
                 let data = await API.story.queryRecent({ feed_ids: feedIds, days, detail })
                 DAO.ADD_OR_UPDATE_MUSHROOMS(data.storys)
+                console.log("loadMushrooms done");
             })
         },
         async loadFavorited(DAO) {

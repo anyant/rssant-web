@@ -1,7 +1,9 @@
 <template>
   <div id="app">
     <div id="timeit"></div>
-    <router-view />
+    <keep-alive include="MoHomePage">
+      <router-view />
+    </keep-alive>
   </div>
 </template>
 
