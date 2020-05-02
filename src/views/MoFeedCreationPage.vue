@@ -2,66 +2,83 @@
   <MoLayout header>
     <MoBackHeader>
       <template v-slot:title>添加新订阅</template>
+      <mu-button
+        flat
+        :color="antBlue"
+        class="action-toggle"
+        @click="toggleMode"
+      >{{ isFromText?'导入文件':'输入链接' }}</mu-button>
     </MoBackHeader>
     <div class="main">
-      <mu-text-field
-        class="import-text"
-        ref="importText"
-        v-model="importText"
-        placeholder="请输入链接或含有链接的文本"
-        full-width
-        multi-line
-        :rows="1"
-        :rows-max="6"
-        :error-text="errorText"
-        @focus="onFocus"
-      />
-      <div class="button-wrapper">
-        <mu-button
-          class="button-save"
-          :color="antBlue"
-          @click="onSave"
-          :disabled="isSaveDisabled"
-        >确定</mu-button>
-      </div>
-      <label for="import-feed-file" class="import-feed-label">或从文件导入</label>
-      <div class="import-feed-info">
-        <span>支持XML/OPML, 浏览器书签和HTML</span>
-        <span>或任意格式含有链接的文本文件</span>
-      </div>
-      <form style="display: none;" ref="importFeedForm">
-        <input
-          type="file"
-          name="import-feed-file"
-          ref="importFeedFile"
-          style="display: none;"
-          @change="onImportFileChange"
-        />
-      </form>
-      <div class="import-wrapper">
-        <MoAntGreenButton
-          class="import-file"
-          @click="onImportClick"
-          v-loading="importFileLoading"
-        >导入文件</MoAntGreenButton>
-      </div>
+      <transition name="fade">
+        <div class="workspace workspace-text" v-if="isFromText" key="workspace-text">
+          <mu-text-field
+            class="input-text"
+            ref="inputText"
+            v-model="inputText"
+            placeholder="请输入链接或含有链接的文本"
+            full-width
+            multi-line
+            :rows="1"
+            :rows-max="2"
+            :error-text="errorText"
+            @focus="onFocus"
+          />
+          <div class="button-text-wrapper">
+            <mu-button
+              class="button-text-save"
+              :color="antBlue"
+              @click="onSave"
+              :disabled="isSaveDisabled"
+            >确定</mu-button>
+          </div>
+        </div>
+        <div class="workspace workspace-file" v-else key="workspace-file">
+          <div class="import-file-info">
+            <span>支持 XML/OPML/HTML</span>
+            <span>或任意格式含有链接的文本文件</span>
+          </div>
+          <form style="display: none;" ref="importFeedForm">
+            <input
+              type="file"
+              name="import-file-input"
+              ref="importFileInput"
+              style="display: none;"
+              @change="onImportFileChange"
+            />
+          </form>
+          <div class="button-file-wrapper">
+            <mu-button
+              class="button-file-import"
+              :color="antBlue"
+              flat
+              data-mu-loading-size="24"
+              @click="onImportClick"
+              v-loading="importFileLoading"
+            >导入文件</mu-button>
+          </div>
+        </div>
+      </transition>
+      <MoCreationList class="creation-list"></MoCreationList>
     </div>
   </MoLayout>
 </template>
 
 <script>
 import _ from 'lodash'
-import MoLayout from '@/components/MoLayout.vue'
-import MoBackHeader from '@/components/MoBackHeader.vue'
-import MoAntGreenButton from '@/components/MoAntGreenButton.vue'
+import MoLayout from '@/components/MoLayout'
+import MoBackHeader from '@/components/MoBackHeader'
+import MoCreationList from '@/components/MoCreationList'
+
 import { antBlue } from '@/plugin/common'
 
 export default {
-  components: { MoLayout, MoBackHeader, MoAntGreenButton },
+  components: { MoLayout, MoBackHeader, MoCreationList },
   data() {
     return {
       antBlue,
-      importText: null,
+      isFromText: true,
+      inputText: null,
       errorText: null,
       importFile: null,
       importFileTarget: null,
@@ -70,7 +87,7 @@ export default {
   },
   computed: {
     isSaveDisabled() {
-      return !this.importText
+      return !this.inputText
     },
   },
   mounted() {
@@ -80,12 +97,15 @@ export default {
         this.$alert('🎉🎉欢迎！我们先订阅一下蚁阅更新日志，我帮你填上链接。', {
           okLabel: '好的',
         }).then(() => {
-          this.importText = changelogUrl
+          this.inputText = changelogUrl
         })
       }
     })
   },
   methods: {
+    toggleMode() {
+      this.isFromText = !this.isFromText
+    },
     handleFeedImportedResult({ isImport, numFeedCreations, numCreatedFeeds, numExistedFeeds }) {
       if (numFeedCreations <= 0 && numCreatedFeeds <= 0) {
         let message = ''
@@ -104,7 +124,7 @@ export default {
         return
       }
       let importMessage = isImport ? '导入文件成功，' : ''
-      this.importText = null
+      this.inputText = null
       var message = ''
       if (numFeedCreations <= 0 && numCreatedFeeds > 0) {
         message = `${isImport ? '导入' : '添加'}成功, 找到 ${numCreatedFeeds} 个新订阅`
@@ -126,7 +146,6 @@ export default {
         }
         this.$toast.info({ message: importMessage + message, time: 10000 })
       }
-      this.$router.back()
     },
     onFeedSavedResult(result) {
       return this.handleFeedImportedResult({ isImport: false, ...result })
@@ -139,7 +158,7 @@ export default {
         return
       }
       this.$API.feed
-        .import({ text: this.importText })
+        .import({ text: this.inputText })
         .then(this.onFeedSavedResult.bind(this))
         .catch(error => {
           this.errorText = error.message
@@ -149,13 +168,13 @@ export default {
       this.errorText = null
     },
     onImportClick() {
-      let el = this.$refs.importFeedFile
+      let el = this.$refs.importFileInput
       if (!_.isNil(el)) {
         el.click()
       }
     },
     onImportFileChange() {
-      let el = this.$refs.importFeedFile
+      let el = this.$refs.importFileInput
       if (_.isNil(el) || el.files.length <= 0) {
         return
       }
@@ -189,22 +208,65 @@ export default {
 <style lang="less" scoped>
 @import '~@/styles/common';
 
-.main {
+.action-toggle {
+  font-size: 15 * @pr;
+  margin-right: -12 * @pr;
+}
+
+.action-toggle /deep/ .mu-button-wrapper {
+  padding-left: 12 * @pr;
+  padding-right: 12 * @pr;
+}
+
+.layout {
+  position: relative;
+}
+
+.workspace {
+  position: absolute;
+  z-index: 9;
+  left: 0;
+  right: 0;
   padding-left: 16 * @pr;
   padding-right: 16 * @pr;
+  background: #ffffff;
 }
 
-.import-text {
-  margin-top: 64 * @pr;
+.workspace-text {
+  margin-top: 32 * @pr;
 }
 
-.button-wrapper {
+.workspace-file {
+  margin-top: 26 * @pr;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.input-text {
+  margin-bottom: 12 * @pr;
+}
+
+.button-text-wrapper,
+.button-file-wrapper {
   display: flex;
   align-items: center;
-  justify-content: space-around;
+  justify-content: center;
 }
 
-.button-save {
+.button-file-wrapper {
+  margin-top: 22 * @pr;
+}
+
+.button-text-save,
+.button-file-import {
   width: 152 * @pr;
   height: 40 * @pr;
   font-size: 18 * @pr;
@@ -212,37 +274,33 @@ export default {
   box-shadow: none;
 }
 
-.button-save.disabled {
+.button-file-import {
+  border: solid 1px @antBlue;
+}
+
+.button-text-save.disabled {
   background: @antBlue;
   color: #ffffff;
   opacity: 0.8;
 }
 
-.import-feed-label {
-  display: block;
-  margin-top: 80 * @pr;
-  margin-bottom: 16 * @pr;
-  font-size: 14 * @pr;
-  color: @antTextLight;
-  text-align: center;
-}
-
-.import-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.import-feed-info {
+.import-file-info {
   color: @antTextGrey;
   text-align: center;
+  font-size: 15 * @pr;
   span {
-    display: inline-block;
+    display: block;
   }
 }
 
-.import-file {
-  width: 152 * @pr;
-  margin-top: 16 * @pr;
+.creation-list {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: (48 + 140 + 32) * @pr;
+  bottom: 0;
+  overflow-y: scroll;
+  padding-bottom: 8 * @pr;
+  border-top: solid 1px @antLineGrey;
 }
 </style>

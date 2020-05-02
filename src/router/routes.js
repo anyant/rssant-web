@@ -1,7 +1,6 @@
 import MoHomeV2Page from '@/views/MoHomeV2Page'
 import MoMushroomsPage from '@/views/MoMushroomsPage'
 import MoFavoritedPage from '@/views/MoFavoritedPage'
-import MoCreationListPage from '@/views/MoCreationListPage'
 import MoCreationDetailPage from '@/views/MoCreationDetailPage'
 import MoGardenPage from '@/views/MoGardenPage'
 import MoJunglePage from '@/views/MoJunglePage'
@@ -86,12 +85,6 @@ export default [
     path: '/favorited',
     name: 'Favorited',
     component: MoFavoritedPage,
-    meta: { loginRequired: true },
-  },
-  {
-    path: '/creation/',
-    name: 'CreationList',
-    component: MoCreationListPage,
     meta: { loginRequired: true },
   },
   {

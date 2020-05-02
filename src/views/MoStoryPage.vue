@@ -225,7 +225,7 @@ export default {
     height: 54px;
     font-family: Helvetica, Arial, sans-serif;
     font-weight: bold;
-    color: #ececec;
+    color: @antBackGrey;
     opacity: 0.5;
   }
 
