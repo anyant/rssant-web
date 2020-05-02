@@ -12,41 +12,37 @@
         <span class="action-delete-info">{{ selectedFeedIds.length }} 订阅</span>
       </mu-button>
     </MoBackHeader>
-    <keep-alive>
-      <div class="feed-list">
-        <virtual-list :size="56" :remain="30" :itemcount="feedList.length" :pagemode="true">
-          <div v-for="feed in feedList" :key="feed.id" class="feed-item">
-            <mu-checkbox
-              v-model="selectedFeedIds"
-              :value="feed.id"
-              :ripple="false"
-              :color="checkboxColor"
-              class="feed-checkbox"
-            ></mu-checkbox>
-            <div class="feed-info" @click="onFeedClick(feed)">
-              <div class="feed-title">{{ feed.title }}</div>
-              <div class="feed-detail">
-                <div class="feed-date">{{ formatFeedDate(feed) }}</div>
-                <div class="feed-total-storys">
-                  {{ totalStorys(feed) }}
-                  <i
-                    class="feed-total-storys-icon fa fa-leaf"
-                    aria-hidden="true"
-                  ></i>
-                </div>
-                <div class="feed-dryness">
-                  {{ (feed.dryness / 10).toFixed(1) }}
-                  <i
-                    class="feed-dryness-icon fa fa-trophy"
-                    aria-hidden="true"
-                  ></i>
-                </div>
-              </div>
+    <div class="feed-list">
+      <div v-for="feed in feedList" :key="feed.id" class="feed-item">
+        <mu-checkbox
+          v-model="selectedFeedIds"
+          :value="feed.id"
+          :ripple="false"
+          :color="checkboxColor"
+          class="feed-checkbox"
+        ></mu-checkbox>
+        <div class="feed-info" @click="onFeedClick(feed)">
+          <div class="feed-title">{{ feed.title }}</div>
+          <div class="feed-detail">
+            <div class="feed-date">{{ formatFeedDate(feed) }}</div>
+            <div class="feed-total-storys">
+              {{ totalStorys(feed) }}
+              <i
+                class="feed-total-storys-icon fa fa-leaf"
+                aria-hidden="true"
+              ></i>
+            </div>
+            <div class="feed-dryness">
+              {{ (feed.dryness / 10).toFixed(1) }}
+              <i
+                class="feed-dryness-icon fa fa-trophy"
+                aria-hidden="true"
+              ></i>
             </div>
           </div>
-        </virtual-list>
+        </div>
       </div>
-    </keep-alive>
+    </div>
   </MoLayout>
 </template>
 <script>
@@ -61,13 +57,13 @@ export default {
   props: {
     vid: {
       type: String,
-      default: '/feed-clean'
-    }
+      default: '/feed-clean',
+    },
   },
   data() {
     return {
       checkboxColor: antGold,
-      selectedFeedIds: []
+      selectedFeedIds: [],
     }
   },
   computed: {
@@ -97,15 +93,13 @@ export default {
     },
     canDelete() {
       return this.selectedFeedIds.length > 0
-    }
+    },
   },
   mounted() {
     this.$API.feed.sync().then(() => {
       let scrollTop = this.$pageState.get('scrollTop')
       let selectedFeedIds = this.$pageState.get('selectedFeedIds')
-      if (!_.isNil(scrollTop)) {
-        window.scrollTo(0, scrollTop)
-      }
+      window.scrollTo(0, _.defaultTo(scrollTop, 0))
       if (!_.isNil(selectedFeedIds)) {
         selectedFeedIds.forEach(x => this.selectedFeedIds.push(x))
       }
@@ -156,8 +150,8 @@ export default {
       } else {
         return `${dt_first} ~ ${dt_latest}`
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

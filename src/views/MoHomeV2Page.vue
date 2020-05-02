@@ -16,6 +16,7 @@
         </mu-button>
         <mu-popover
           class="wizard"
+          :class="{'wizard-hidden':!isActive}"
           :open.sync="openWizard"
           :trigger="wizardTrigger"
           placement="bottom"
@@ -23,7 +24,11 @@
           <span class="wizard-triangle"></span>
           <div class="wizard-info">点这里添加订阅</div>
         </mu-popover>
-        <mu-menu placement="bottom" class="action-menu" popover-class="menu-popover">
+        <mu-menu
+          placement="bottom"
+          class="action-menu"
+          :popover-class="isActive?'menu-popover':'menu-popover-hidden'"
+        >
           <mu-button icon class="action-menu-button">
             <mu-icon value="menu"></mu-icon>
           </mu-button>
@@ -33,6 +38,9 @@
             </mu-list-item>
             <mu-list-item button @click="goFeedClean">
               <mu-list-item-title>清理订阅</mu-list-item-title>
+            </mu-list-item>
+            <mu-list-item button @click="goFeedFavorited">
+              <mu-list-item-title>我的收藏</mu-list-item-title>
             </mu-list-item>
           </mu-list>
         </mu-menu>
@@ -148,6 +156,7 @@ export default {
   },
   data() {
     return {
+      isActive: true,
       rippleColor: antRippleGrey,
       openWizard: false,
       wizardTrigger: null,
@@ -187,6 +196,13 @@ export default {
       })
     })
   },
+  activated() {
+    this.isActive = true
+  },
+  deactivated() {
+    this.openWizard = false
+    this.isActive = false
+  },
   savePageState() {
     this.$pageState.set('scrollTop', window.scrollY)
     this.$pageState.commit()
@@ -200,6 +216,9 @@ export default {
     },
     goFeedClean() {
       this.$router.push('/feed-clean')
+    },
+    goFeedFavorited() {
+      this.$router.push('/favorited')
     },
     setAllReaded() {
       let feedIds = this.feedList.map(x => x.id)
@@ -338,12 +357,16 @@ export default {
 <style lang="less">
 @import '~@/styles/common';
 
+.menu-popover-hidden,
 .menu-popover {
   top: 48 * @pr !important;
+  .menu-list .mu-item {
+    height: 40 * @pr;
+  }
 }
 
-.menu-popover .menu-list .mu-item {
-  height: 40 * @pr;
+.menu-popover-hidden {
+  display: none;
 }
 </style>
 
@@ -382,6 +405,10 @@ export default {
   opacity: 0.9;
   overflow: visible;
   cursor: default;
+}
+
+.wizard-hidden {
+  display: none;
 }
 
 .wizard.mu-popover.transition-bottom {

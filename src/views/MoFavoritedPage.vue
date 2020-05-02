@@ -6,20 +6,18 @@
         <span class="num-total">{{ favorited.length }}</span>
       </template>
     </MoBackHeader>
-    <keep-alive>
-      <div class="feed-story-list">
-        <MoFeedStoryItem
-          v-for="story in favorited"
-          :key="`${story.feed.id}:${story.offset}`"
-          :feedId="story.feed.id"
-          :offset="story.offset"
-          :feedTitle="getFeedTitle(story.feed.id)"
-          :storyTitle="story.title"
-          :storyDate="story.dt_published"
-          :isReaded="false"
-        ></MoFeedStoryItem>
-      </div>
-    </keep-alive>
+    <div class="feed-story-list">
+      <MoFeedStoryItem
+        v-for="story in favorited"
+        :key="`${story.feed.id}:${story.offset}`"
+        :feedId="story.feed.id"
+        :offset="story.offset"
+        :feedTitle="getFeedTitle(story.feed.id)"
+        :storyTitle="story.title"
+        :storyDate="story.dt_published"
+        :isReaded="false"
+      ></MoFeedStoryItem>
+    </div>
   </MoLayout>
 </template>
 <script>
@@ -33,31 +31,29 @@ export default {
   props: {
     vid: {
       type: String,
-      default: '/favorited'
-    }
+      default: '/favorited',
+    },
   },
   mounted() {
     this.$API.syncFeedLoadMushrooms().then(() => {
       let scrollTop = this.$pageState.get('scrollTop')
-      if (!_.isNil(scrollTop)) {
-        window.scrollTo(0, scrollTop)
-      }
+      window.scrollTo(0, _.defaultTo(scrollTop, 0))
     })
   },
   computed: {
     favorited() {
       return this.$API.story.favorited
-    }
+    },
   },
   methods: {
     getFeedTitle(feedId) {
       return this.$API.feed.get(feedId).title
-    }
+    },
   },
   savePageState() {
     this.$pageState.set('scrollTop', window.scrollY)
     this.$pageState.commit()
-  }
+  },
 }
 </script>
 
