@@ -1,163 +1,170 @@
 <template>
-  <keep-alive>
-    <MoLayout grey header>
-      <MoHeader>
-        <MoDebugTool class="title">蚁阅</MoDebugTool>
-        <div class="right">
-          <mu-button
-            ref="wizardTrigger"
-            icon
-            class="action-add"
-            @click="()=>{this.$router.push('/feed-creation')}"
-          >
-            <mu-icon value="add"></mu-icon>
+  <MoLayout grey header>
+    <MoHeader border>
+      <MoDebugTool class="title">蚁阅</MoDebugTool>
+      <div class="right">
+        <mu-button icon class="action-readed" @click="setAllReaded">
+          <mu-icon value="done"></mu-icon>
+        </mu-button>
+        <mu-button
+          ref="wizardTrigger"
+          icon
+          class="action-add"
+          @click="()=>{this.$router.push('/feed-creation')}"
+        >
+          <mu-icon value="add"></mu-icon>
+        </mu-button>
+        <mu-popover
+          class="wizard"
+          :class="{'wizard-hidden':!isActive}"
+          :open.sync="openWizard"
+          :trigger="wizardTrigger"
+          placement="bottom"
+        >
+          <span class="wizard-triangle"></span>
+          <div class="wizard-info">点这里添加订阅</div>
+        </mu-popover>
+        <mu-menu
+          placement="bottom"
+          class="action-menu"
+          :popover-class="isActive?'menu-popover':'menu-popover-hidden'"
+        >
+          <mu-button icon class="action-menu-button">
+            <mu-icon value="menu"></mu-icon>
           </mu-button>
-          <mu-popover
-            class="wizard"
-            :open.sync="openWizard"
-            :trigger="wizardTrigger"
-            placement="bottom"
-          >
-            <span class="wizard-triangle"></span>
-            <div class="wizard-info">点这里添加订阅</div>
-          </mu-popover>
-          <mu-menu placement="bottom" class="action-menu" popover-class="menu-popover">
-            <mu-button icon class="action-menu-button">
-              <mu-icon value="menu"></mu-icon>
-            </mu-button>
-            <mu-list slot="content" class="menu-list">
-              <mu-list-item button @click="exportOPML">
-                <mu-list-item-title>导出订阅</mu-list-item-title>
-              </mu-list-item>
-              <mu-list-item button @click="goFeedClean">
-                <mu-list-item-title>清理订阅</mu-list-item-title>
-              </mu-list-item>
-            </mu-list>
-          </mu-menu>
-          <mu-avatar size="32" class="user" @click="()=>{this.$router.push('/account')}">
-            <img :src="avatar" />
-          </mu-avatar>
-        </div>
-      </MoHeader>
-      <div class="items">
-        <div
-          :color="rippleColor"
-          class="item item-mushrooms"
-          @click="()=>{this.$router.push('/mushrooms')}"
-        >
-          <div class="item-left">
-            <i class="item-icon fa fa-trophy" aria-hidden="true"></i>
-            <span class="item-title">蘑菇</span>
-          </div>
-          <div class="item-right">
-            <span class="item-number">
-              {{ numMushrooms }}
-              <span class="item-number-total">/ {{ numTotalMushrooms }}</span>
-            </span>
-            <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
-          </div>
-        </div>
-        <div
-          :color="rippleColor"
-          class="item item-jungle"
-          @click="()=>{this.$router.push('/jungle')}"
-        >
-          <div class="item-left">
-            <i class="item-icon fa fa-leaf" aria-hidden="true"></i>
-            <span class="item-title">丛林</span>
-          </div>
-          <div class="item-right">
-            <span class="item-number">
-              {{ numJungle }}
-              <span class="item-number-total">/ {{ numTotalJungle }}</span>
-            </span>
-            <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
-          </div>
-        </div>
-        <div
-          :color="rippleColor"
-          class="item item-garden"
-          @click="()=>{this.$router.push('/garden')}"
-        >
-          <div class="item-left">
-            <i class="item-icon fa fa-rss" aria-hidden="true"></i>
-            <span class="item-title">菌圃</span>
-          </div>
-          <div class="item-right">
-            <span class="item-number">
-              {{ numGarden }}
-              <span class="item-number-total">/ {{ numTotalGarden }}</span>
-            </span>
-            <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
-          </div>
-        </div>
-        <div
-          :color="rippleColor"
-          class="item item-favorited"
-          @click="()=>{this.$router.push('/favorited')}"
-        >
-          <div class="item-left">
-            <i class="item-icon fa fa-star" aria-hidden="true"></i>
-            <span class="item-title">收藏</span>
-          </div>
-          <div class="item-right">
-            <span class="item-number">
-              <span class="item-number-total">{{ numFavorited }}</span>
-            </span>
-            <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
-          </div>
-        </div>
-        <div
-          :color="rippleColor"
-          class="item item-creations"
-          @click="()=>{this.$router.push('/creation/')}"
-        >
-          <div class="item-left">
-            <i class="item-icon fa fa-eye" aria-hidden="true"></i>
-            <span class="item-title">种籽</span>
-          </div>
-          <div class="item-right">
-            <span class="item-number">
-              <span class="item-number-total">{{ numTotalCreations }}</span>
-            </span>
-            <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
-          </div>
-        </div>
-        <div
-          :color="rippleColor"
-          class="item item-trash"
-          @click="()=>{this.$router.push('/trash')}"
-        >
-          <div class="item-left">
-            <i class="item-icon fa fa-exclamation-triangle" aria-hidden="true"></i>
-            <span class="item-title">废墟</span>
-          </div>
-          <div class="item-right">
-            <span class="item-number">
-              <span class="item-number-total">{{ numTotalTrash }}</span>
-            </span>
-            <i class="item-icon-right fa fa-angle-right" aria-hidden="true"></i>
-          </div>
+          <mu-list slot="content" class="menu-list">
+            <mu-list-item button @click="exportOPML">
+              <mu-list-item-title>导出订阅</mu-list-item-title>
+            </mu-list-item>
+            <mu-list-item button @click="goFeedClean">
+              <mu-list-item-title>清理订阅</mu-list-item-title>
+            </mu-list-item>
+            <mu-list-item button @click="goFeedFavorited">
+              <mu-list-item-title>我的收藏</mu-list-item-title>
+            </mu-list-item>
+          </mu-list>
+        </mu-menu>
+        <mu-avatar size="32" class="user" @click="()=>{this.$router.push('/account')}">
+          <img :src="avatar" />
+        </mu-avatar>
+      </div>
+    </MoHeader>
+    <div class="main">
+      <div class="list-placeholder-wrapper" v-if="!isReady">
+        <div class="list-placeholder spinner">
+          <div class="bounce1"></div>
+          <div class="bounce2"></div>
+          <div class="bounce3"></div>
         </div>
       </div>
-    </MoLayout>
-  </keep-alive>
+      <transition-group
+        class="list list-upper"
+        name="list"
+        tag="div"
+        :style="{ height: virtualUpperHeight + 'px' }"
+      >
+        <VirtualItem
+          v-for="item in virtualUpperList"
+          :key="item.id"
+          :feed="item.feed"
+          :story="item.story"
+        ></VirtualItem>
+      </transition-group>
+      <transition-group
+        class="list list-lower"
+        name="list"
+        tag="div"
+        :style="{ height: virtualLowerHeight + 'px' }"
+      >
+        <VirtualItem
+          v-for="item in virtualLowerList"
+          :key="item.id"
+          :feed="item.feed"
+          :story="item.story"
+        ></VirtualItem>
+      </transition-group>
+    </div>
+  </MoLayout>
 </template>
 <script>
 import _ from 'lodash'
+import Vue from 'vue'
 import MoHeader from '@/components/MoHeader'
 import MoLayout from '@/components/MoLayout'
 import MoDebugTool from '@/components/MoDebugTool'
+import MoFeedItem from '@/components/MoFeedItem.vue'
+import MoFeedStoryItem from '@/components/MoFeedStoryItem.vue'
+
 import defaultAvatar from '@/assets/avatar.svg'
 import { antRippleGrey } from '@/plugin/common'
 
+const ITEM_HEIGHT = 48
+const PAGE_SIZE = Math.ceil((window.innerHeight - 48) / ITEM_HEIGHT)
+
+const VirtualItem = Vue.component('VirtualItem', {
+  props: {
+    feed: {
+      type: Object,
+    },
+    story: {
+      type: Object,
+    },
+  },
+  methods: {
+    getFeedTitle(feedId) {
+      return this.$API.feed.get(feedId).title
+    },
+    isReaded(story) {
+      return this.$API.story.isReaded(story)
+    },
+  },
+  render(h) {
+    let feed = this.feed
+    let story = this.story
+    if (!_.isNil(feed)) {
+      return h(MoFeedItem, {
+        props: {
+          title: feed.title,
+          number: feed.num_unread_storys,
+          date: feed.dt_latest_story_published || feed.dt_created,
+          link: `/feed/${feed.id}`,
+        },
+      })
+    } else {
+      return h(MoFeedStoryItem, {
+        props: {
+          feedId: story.feed.id,
+          offset: story.offset,
+          feedTitle: this.getFeedTitle(story.feed.id),
+          storyTitle: story.title,
+          storyDate: story.dt_published,
+          isReaded: this.isReaded(story),
+        },
+      })
+    }
+  },
+})
+
 export default {
-  components: { MoHeader, MoLayout, MoDebugTool },
+  name: 'MoHomePage',
+  components: { MoHeader, MoLayout, MoDebugTool, VirtualItem },
+  props: {
+    vid: {
+      type: String,
+      default: '/',
+    },
+  },
   data() {
     return {
+      isActive: true,
       rippleColor: antRippleGrey,
       openWizard: false,
       wizardTrigger: null,
+      isReady: false,
+      virtualUpperHeight: 0,
+      virtualUpperList: [],
+      virtualLowerHeight: 0,
+      virtualLowerList: [],
     }
   },
   computed: {
@@ -169,32 +176,11 @@ export default {
         return user.avatar_url
       }
     },
-    numMushrooms() {
-      return this.$API.story.numUnreadMushrooms
+    mushrooms() {
+      return this.$API.story.mushrooms
     },
-    numTotalMushrooms() {
-      return this.$API.story.mushrooms.length
-    },
-    numJungle() {
-      return this.$API.feed.numUnreadJungle
-    },
-    numTotalJungle() {
-      return this.$API.feed.jungle.length
-    },
-    numGarden() {
-      return this.$API.feed.numUnreadGarden
-    },
-    numTotalGarden() {
-      return this.$API.feed.garden.length
-    },
-    numTotalTrash() {
-      return this.numTextOf(this.$API.feed.trash.length)
-    },
-    numTotalCreations() {
-      return this.numTextOf(this.$API.feed.creations.length)
-    },
-    numFavorited() {
-      return this.numTextOf(this.$API.story.favorited.length)
+    feedList() {
+      return this.$API.feed.feedList
     },
   },
   mounted() {
@@ -203,7 +189,23 @@ export default {
       if (this.$API.feed.isEmpty) {
         this.openWizard = true
       }
+      this.isReady = true
+      this.renderVirtualList()
+      this.$watch('feedList', () => {
+        this.updateVirtualList()
+      })
     })
+  },
+  activated() {
+    this.isActive = true
+  },
+  deactivated() {
+    this.openWizard = false
+    this.isActive = false
+  },
+  savePageState() {
+    this.$pageState.set('scrollTop', window.scrollY)
+    this.$pageState.commit()
   },
   methods: {
     numTextOf(n) {
@@ -215,6 +217,139 @@ export default {
     goFeedClean() {
       this.$router.push('/feed-clean')
     },
+    goFeedFavorited() {
+      this.$router.push('/favorited')
+    },
+    setAllReaded() {
+      let feedIds = this.feedList.map(x => x.id)
+      this.$API.feed.setAllReaded({ feedIds })
+    },
+    isReaded(story) {
+      return this.$API.story.isReaded(story)
+    },
+    _upperSize() {
+      let upperSize = 0
+      for (var i = 0; i < this.mushrooms.length; i++) {
+        if (!this.isReaded(this.mushrooms[i])) {
+          break
+        }
+        upperSize += 1
+      }
+      return upperSize
+    },
+    _virtualLayout(bufferList) {
+      // setup layout height
+      let upperSize = this._upperSize()
+      let lowerSize = bufferList.length - upperSize
+      let virtualUpperHeight = Math.max(0, upperSize * ITEM_HEIGHT - 8)
+      let virtualLowerHeight = lowerSize * ITEM_HEIGHT
+      return {
+        upperSize,
+        lowerSize,
+        virtualUpperHeight,
+        virtualLowerHeight,
+      }
+    },
+    _virtualListBuffer() {
+      // prepare virtual list data
+      let result = []
+      _.forEach(this.mushrooms, story => {
+        let item = {
+          id: `${story.feed.id}:${story.offset}`,
+          story: story,
+          visible: false,
+        }
+        result.push(item)
+      })
+      _.forEach(this.feedList, feed => {
+        let item = {
+          id: feed.id,
+          feed: feed,
+          visible: false,
+        }
+        result.push(item)
+      })
+      return result
+    },
+    updateVirtualList() {
+      let bufferList = this._virtualListBuffer()
+      let { upperSize, virtualUpperHeight, virtualLowerHeight } = this._virtualLayout(bufferList)
+      let virtualUpperList = []
+      let virtualLowerList = []
+      for (var i = 0; i < upperSize; i++) {
+        virtualUpperList.push(bufferList[i])
+      }
+      for (var j = upperSize; j < bufferList.length; j++) {
+        virtualLowerList.push(bufferList[j])
+      }
+      this.virtualUpperHeight = virtualUpperHeight
+      this.virtualLowerHeight = virtualLowerHeight
+      this.virtualUpperList = virtualUpperList
+      this.virtualLowerList = virtualLowerList
+    },
+    renderVirtualList() {
+      let bufferList = this._virtualListBuffer()
+      // setup layout height
+      let { upperSize, virtualUpperHeight, virtualLowerHeight } = this._virtualLayout(bufferList)
+      this.virtualUpperList = []
+      this.virtualLowerList = []
+      this.virtualUpperHeight = virtualUpperHeight
+      this.virtualLowerHeight = virtualLowerHeight
+      // setup scroll position
+      let scrollTop = this.$pageState.get('scrollTop')
+      if (_.isNil(scrollTop) || scrollTop <= 0) {
+        scrollTop = this.virtualUpperHeight
+      }
+      let upperIndex = upperSize - 1
+      let lowerIndex = upperSize
+      // render first page quickly
+      let renderFirstPage = () => {
+        for (var i = 0; i < PAGE_SIZE; i++) {
+          if (lowerIndex >= bufferList.length) {
+            break
+          }
+          let item = bufferList[lowerIndex]
+          this.virtualLowerList.push(item)
+          lowerIndex += 1
+        }
+      }
+      // render data in batchs to avoid freeze browser
+      let batchSize = 15
+      let step = () => {
+        let stop = false
+        for (var i = 0; i < batchSize; i++) {
+          let hasLower = lowerIndex < bufferList.length
+          let hasUpper = upperSize > 0 && upperIndex >= 0
+          if (!hasLower && !hasUpper) {
+            stop = true
+            break
+          }
+          if (hasLower) {
+            let item = bufferList[lowerIndex]
+            this.virtualLowerList.push(item)
+            lowerIndex += 1
+          }
+          if (hasUpper) {
+            let item = bufferList[upperIndex]
+            this.virtualUpperList.push(item)
+            upperIndex -= 1
+          }
+        }
+        if (!stop) {
+          requestAnimationFrame(step)
+        }
+      }
+      // 1. update scroll position
+      // 2. render first page
+      // 3. render other pages in batches
+      setTimeout(() => {
+        window.scrollTo(0, scrollTop)
+        renderFirstPage()
+        setTimeout(() => {
+          requestAnimationFrame(step)
+        }, 0)
+      }, 0)
+    },
   },
 }
 </script>
@@ -222,12 +357,16 @@ export default {
 <style lang="less">
 @import '~@/styles/common';
 
+.menu-popover-hidden,
 .menu-popover {
   top: 48 * @pr !important;
+  .menu-list .mu-item {
+    height: 40 * @pr;
+  }
 }
 
-.menu-popover .menu-list .mu-item {
-  height: 40 * @pr;
+.menu-popover-hidden {
+  display: none;
 }
 </style>
 
@@ -249,6 +388,7 @@ export default {
   height: 32 * @pr;
 }
 
+.action-readed,
 .action-add,
 .action-menu,
 .action-menu-button {
@@ -265,6 +405,10 @@ export default {
   opacity: 0.9;
   overflow: visible;
   cursor: default;
+}
+
+.wizard-hidden {
+  display: none;
 }
 
 .wizard.mu-popover.transition-bottom {
@@ -319,64 +463,90 @@ export default {
   font-size: 15 * @pr;
 }
 
-.item {
-  position: relative;
-  background: @antBackWhite;
+.list .feed-story-item,
+.list .feed-item {
   margin-top: 8 * @pr;
-  height: 48 * @pr;
-  padding-left: 16 * @pr;
-  padding-right: 16 * @pr;
+}
+
+.list-upper {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.list-placeholder-wrapper {
+  position: fixed;
+  top: 48 * @pr;
+  bottom: 0;
+  left: 0;
+  right: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
 }
 
-.item-left,
-.item-right {
-  display: flex;
-  align-items: center;
+.list-placeholder {
+  margin: auto;
+  opacity: 0.33;
 }
 
-.item-icon {
+/** https://tobiasahlin.com/spinkit/ */
+.spinner {
+  width: 70px;
+  text-align: center;
+}
+
+.spinner > div {
+  width: 18px;
+  height: 18px;
+  background-color: darken(@antBackGrey, 20%);
+
+  border-radius: 100%;
   display: inline-block;
-  font-size: 20 * @pr;
-  width: 22 * @pr;
+  -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+  animation: sk-bouncedelay 1.4s infinite ease-in-out both;
 }
 
-.item-title {
-  display: inline-block;
-  font-size: 15 * @pr;
-  font-weight: bold;
-  margin-left: 8 * @pr;
-  color: @antTextBlack;
+.spinner .bounce1 {
+  -webkit-animation-delay: -0.32s;
+  animation-delay: -0.32s;
 }
 
-.item-number {
-  display: inline-block;
-  width: 96 * @pr;
-  font-size: 15 * @pr;
-  margin-right: 48 * @pr;
-  text-align: right;
+.spinner .bounce2 {
+  -webkit-animation-delay: -0.16s;
+  animation-delay: -0.16s;
 }
 
-.item-number-total {
-  color: @antTextGrey;
+@-webkit-keyframes sk-bouncedelay {
+  0%,
+  80%,
+  100% {
+    -webkit-transform: scale(0);
+  }
+  40% {
+    -webkit-transform: scale(1);
+  }
 }
 
-.item-icon-right {
-  display: inline-block;
-  font-size: 20 * @pr;
+@keyframes sk-bouncedelay {
+  0%,
+  80%,
+  100% {
+    -webkit-transform: scale(0);
+    transform: scale(0);
+  }
+  40% {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+  }
 }
 
-.item-mushrooms .item-icon {
-  color: @antGold;
+.list-enter-active,
+.list-leave-active {
+  transition: all 1s ease;
 }
 
-.item-jungle .item-icon {
-  color: @antGreen;
-}
-
-.item-garden .item-icon {
-  color: @antBlue;
+.list-enter,
+.list-leave-to {
+  opacity: 0;
 }
 </style>
