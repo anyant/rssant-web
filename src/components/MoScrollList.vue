@@ -1,7 +1,7 @@
 <template>
   <div class="scroll-list">
     <transition name="fade">
-      <div class="jump-to-latest" v-if="needJump && !shouldAutoJump">
+      <div class="jump-to-latest" v-if="needJump">
         <mu-button @click="jumpToLatest" :color="antBlue" :ripple="false">
           <i class="jump-icon fa fa-angle-double-down" aria-hidden="true"></i>看最新
         </mu-button>
@@ -112,17 +112,11 @@ export default {
       let delta = (this.total - firstOffset) / this.numPageItems
       return Math.floor(Math.max(0, delta))
     },
-    shouldAutoJump() {
-      if (_.isNil(this.jump)) {
-        return false
-      }
-      return this._deltaPages >= 10
-    },
     needJump() {
       if (_.isNil(this.jump)) {
         return false
       }
-      return this._deltaPages >= 3
+      return this._deltaPages >= 5
     },
     jumpOffset() {
       let offset = this.total - this.numPageItems
@@ -146,10 +140,6 @@ export default {
     },
     loadInit() {
       let initOffset = this.initOffset
-      if (this.shouldAutoJump) {
-        initOffset = this.jumpOffset
-        this.jump(initOffset)
-      }
       if (this.total > 0 && this.items.length <= this.numPageItems) {
         if (this.hasNext) {
           this.load({ offset: initOffset, size: this.numPageItems })
@@ -256,7 +246,7 @@ export default {
 }
 
 .item-list {
-  padding-bottom: 8 * @pr;
+  padding-bottom: 2 * @pr;
 }
 
 .fade-enter-active,
