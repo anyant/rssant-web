@@ -218,8 +218,8 @@ export default {
     feedList(state) {
       return state.feedList
     },
-    mushroomFeedIds(state){
-        return state.mushroomFeedIds
+    mushroomFeedIds(state) {
+      return state.mushroomFeedIds
     },
     get(state) {
       return feedId => {
@@ -271,8 +271,8 @@ export default {
       await API.feed.delete({
         id: feedId,
       })
-      DAO.REMOVE({ id: feedId })
       DAO.API.story.DELETE_STORYS_OF_FEED(feedId)
+      DAO.REMOVE({ id: feedId })
     },
     async deleteAll(DAO, { feedIds = null } = {}) {
       if (_.isNil(feedIds) || feedIds.length > 0) {

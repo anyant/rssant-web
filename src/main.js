@@ -14,7 +14,6 @@ import 'typeface-roboto'
 // others
 import { sync } from 'vuex-router-sync'
 import Mescroll from 'mescroll.js/mescroll.vue'
-import virtualList from 'vue-virtual-scroll-list'
 
 // rssant
 import App from './App'
@@ -57,7 +56,6 @@ Vue.use(Toast, {
 })
 // 上拉刷新下拉加载滚动列表
 Vue.component('mescroll', Mescroll)
-Vue.component('virtual-list', virtualList)
 
 window.app = new Vue({
   el: '#app',

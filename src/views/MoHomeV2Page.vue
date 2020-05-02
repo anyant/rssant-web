@@ -41,34 +41,39 @@
         </mu-avatar>
       </div>
     </MoHeader>
-    <div class="items" :class="{'not-ready':!isReady}">
-      <div class="feed-story-list">
-        <MoFeedStoryItem
-          v-for="story in mushrooms"
-          :key="`${story.feed.id}:${story.offset}`"
-          :feedId="story.feed.id"
-          :offset="story.offset"
-          :feedTitle="getFeedTitle(story.feed.id)"
-          :storyTitle="story.title"
-          :storyDate="story.dt_published"
-          :isReaded="isReaded(story)"
-        ></MoFeedStoryItem>
-      </div>
-      <div class="feed-list">
-        <MoFeedItem
-          v-for="feed in feedList"
-          :key="feed.id"
-          :title="feed.title"
-          :number="feed.num_unread_storys"
-          :date="feed.dt_latest_story_published || feed.dt_created"
-          :link="`/feed/${feed.id}`"
-        ></MoFeedItem>
-      </div>
+    <div class="main">
+      <transition-group
+        class="list list-upper"
+        name="list"
+        tag="div"
+        :style="{ height: virtualUpperHeight + 'px' }"
+      >
+        <VirtualItem
+          v-for="item in virtualUpperList"
+          :key="item.id"
+          :feed="item.feed"
+          :story="item.story"
+        ></VirtualItem>
+      </transition-group>
+      <transition-group
+        class="list list-lower"
+        name="list"
+        tag="div"
+        :style="{ height: virtualLowerHeight + 'px' }"
+      >
+        <VirtualItem
+          v-for="item in virtualLowerList"
+          :key="item.id"
+          :feed="item.feed"
+          :story="item.story"
+        ></VirtualItem>
+      </transition-group>
     </div>
   </MoLayout>
 </template>
 <script>
 import _ from 'lodash'
+import Vue from 'vue'
 import MoHeader from '@/components/MoHeader'
 import MoLayout from '@/components/MoLayout'
 import MoDebugTool from '@/components/MoDebugTool'
@@ -79,10 +84,55 @@ import defaultAvatar from '@/assets/avatar.svg'
 import { antRippleGrey } from '@/plugin/common'
 
 const ITEM_HEIGHT = 48
+const PAGE_SIZE = Math.ceil(window.innerHeight / ITEM_HEIGHT)
+
+const VirtualItem = Vue.component('VirtualItem', {
+  props: {
+    feed: {
+      type: Object,
+    },
+    story: {
+      type: Object,
+    },
+  },
+  methods: {
+    getFeedTitle(feedId) {
+      return this.$API.feed.get(feedId).title
+    },
+    isReaded(story) {
+      return this.$API.story.isReaded(story)
+    },
+  },
+  render(h) {
+    let feed = this.feed
+    let story = this.story
+    if (!_.isNil(feed)) {
+      return h(MoFeedItem, {
+        props: {
+          title: feed.title,
+          number: feed.num_unread_storys,
+          date: feed.dt_latest_story_published || feed.dt_created,
+          link: `/feed/${feed.id}`,
+        },
+      })
+    } else {
+      return h(MoFeedStoryItem, {
+        props: {
+          feedId: story.feed.id,
+          offset: story.offset,
+          feedTitle: this.getFeedTitle(story.feed.id),
+          storyTitle: story.title,
+          storyDate: story.dt_published,
+          isReaded: this.isReaded(story),
+        },
+      })
+    }
+  },
+})
 
 export default {
   name: 'MoHomePage',
-  components: { MoHeader, MoLayout, MoDebugTool, MoFeedStoryItem, MoFeedItem },
+  components: { MoHeader, MoLayout, MoDebugTool, VirtualItem },
   props: {
     vid: {
       type: String,
@@ -94,7 +144,10 @@ export default {
       rippleColor: antRippleGrey,
       openWizard: false,
       wizardTrigger: null,
-      isReady: false,
+      virtualUpperHeight: 0,
+      virtualUpperList: [],
+      virtualLowerHeight: 0,
+      virtualLowerList: [],
     }
   },
   computed: {
@@ -119,16 +172,9 @@ export default {
       if (this.$API.feed.isEmpty) {
         this.openWizard = true
       }
-      let scrollTop = this.$pageState.get('scrollTop')
-      if (_.isNil(scrollTop) || scrollTop <= 0) {
-        scrollTop = this.getDefaultScrollTop()
-      }
-      // call scrollTo after page rendered
-      this.$nextTick(() => {
-        setTimeout(() => {
-          this.isReady = true
-          window.scrollTo(0, scrollTop)
-        }, 100)
+      this.renderVirtualList()
+      this.$watch('feedList', () => {
+        this.updateVirtualList()
       })
     })
   },
@@ -150,21 +196,131 @@ export default {
       let feedIds = this.feedList.map(x => x.id)
       this.$API.feed.setAllReaded({ feedIds })
     },
-    getFeedTitle(feedId) {
-      return this.$API.feed.get(feedId).title
-    },
     isReaded(story) {
       return this.$API.story.isReaded(story)
     },
-    getDefaultScrollTop() {
-      let topReaded = 0
+    _upperSize() {
+      let upperSize = 0
       for (var i = 0; i < this.mushrooms.length; i++) {
         if (!this.isReaded(this.mushrooms[i])) {
           break
         }
-        topReaded += 1
+        upperSize += 1
       }
-      return topReaded * ITEM_HEIGHT
+      return upperSize
+    },
+    _virtualLayout(bufferList) {
+      // setup layout height
+      let upperSize = this._upperSize()
+      let lowerSize = bufferList.length - upperSize
+      let virtualUpperHeight = Math.max(0, upperSize * ITEM_HEIGHT - 8)
+      let virtualLowerHeight = lowerSize * ITEM_HEIGHT
+      return {
+        upperSize,
+        lowerSize,
+        virtualUpperHeight,
+        virtualLowerHeight,
+      }
+    },
+    _virtualListBuffer() {
+      // prepare virtual list data
+      let result = []
+      _.forEach(this.mushrooms, story => {
+        let item = {
+          id: `${story.feed.id}:${story.offset}`,
+          story: story,
+          visible: false,
+        }
+        result.push(item)
+      })
+      _.forEach(this.feedList, feed => {
+        let item = {
+          id: feed.id,
+          feed: feed,
+          visible: false,
+        }
+        result.push(item)
+      })
+      return result
+    },
+    updateVirtualList() {
+      let bufferList = this._virtualListBuffer()
+      let { upperSize, virtualUpperHeight, virtualLowerHeight } = this._virtualLayout(bufferList)
+      let virtualUpperList = []
+      let virtualLowerList = []
+      for (var i = 0; i < upperSize; i++) {
+        virtualUpperList.push(bufferList[i])
+      }
+      for (var j = upperSize; j < bufferList.length; j++) {
+        virtualLowerList.push(bufferList[j])
+      }
+      this.virtualUpperHeight = virtualUpperHeight
+      this.virtualLowerHeight = virtualLowerHeight
+      this.virtualUpperList = virtualUpperList
+      this.virtualLowerList = virtualLowerList
+    },
+    renderVirtualList() {
+      let bufferList = this._virtualListBuffer()
+      // setup layout height
+      let { upperSize, virtualUpperHeight, virtualLowerHeight } = this._virtualLayout(bufferList)
+      this.virtualUpperList = []
+      this.virtualLowerList = []
+      this.virtualUpperHeight = virtualUpperHeight
+      this.virtualLowerHeight = virtualLowerHeight
+      // setup scroll position
+      let scrollTop = this.$pageState.get('scrollTop')
+      if (_.isNil(scrollTop) || scrollTop <= 0) {
+        scrollTop = this.virtualUpperHeight
+      }
+      let upperIndex = upperSize - 1
+      let lowerIndex = upperSize
+      // render first page quickly
+      let renderFirstPage = () => {
+        for (var i = 0; i < PAGE_SIZE; i++) {
+          if (lowerIndex >= bufferList.length) {
+            break
+          }
+          let item = bufferList[lowerIndex]
+          this.virtualLowerList.push(item)
+          lowerIndex += 1
+        }
+      }
+      // render data in batchs to avoid freeze browser
+      let batchSize = 15
+      let step = () => {
+        let stop = false
+        for (var i = 0; i < batchSize; i++) {
+          let hasLower = lowerIndex < bufferList.length
+          let hasUpper = upperSize > 0 && upperIndex >= 0
+          if (!hasLower && !hasUpper) {
+            stop = true
+            break
+          }
+          if (hasLower) {
+            let item = bufferList[lowerIndex]
+            this.virtualLowerList.push(item)
+            lowerIndex += 1
+          }
+          if (hasUpper) {
+            let item = bufferList[upperIndex]
+            this.virtualUpperList.push(item)
+            upperIndex -= 1
+          }
+        }
+        if (!stop) {
+          requestAnimationFrame(step)
+        }
+      }
+      // 1. update scroll position
+      // 2. render first page
+      // 3. render other pages in batches
+      setTimeout(() => {
+        window.scrollTo(0, scrollTop)
+        renderFirstPage()
+        setTimeout(() => {
+          requestAnimationFrame(step)
+        }, 0)
+      }, 0)
     },
   },
 }
@@ -271,16 +427,23 @@ export default {
   font-size: 15 * @pr;
 }
 
-.not-ready {
-  visibility: hidden;
-}
-
-.feed-story-item,
-.feed-item {
+.list .feed-story-item,
+.list .feed-item {
   margin-top: 8 * @pr;
 }
 
-.items {
-  padding-bottom: 8 * @pr;
+.list-upper {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.list-enter-active,
+.list-leave-active {
+  transition: all 1s ease;
+}
+
+.list-enter,
+.list-leave-to {
+  opacity: 0;
 }
 </style>

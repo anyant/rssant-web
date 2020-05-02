@@ -119,6 +119,7 @@ export default {
     if (_.isNil(this.story) || _.isEmpty(this.story.content)) {
       this.$API.story.load({ feedId: this.feedId, offset: this.offset, detail: true })
     }
+    window.scrollTo(0, 0)
   },
   methods: {
     toggleFavorited() {
