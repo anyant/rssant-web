@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "npm run copy_libs && vue-cli-service serve",
-    "build": "npm run copy_libs && vue-cli-service build",
+    "build": "npm run copy_libs && vue-cli-service build --report",
     "lint": "vue-cli-service lint",
     "copy_libs": "sh scripts/copy_libs.sh",
     "serve_dist": "node scripts/serve_dist.js",
@@ -36,6 +36,8 @@
     "vuex-router-sync": "^5.0.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/preset-env": "^7.9.6",
     "@vue/cli-plugin-babel": "^4.1.0",
     "@vue/cli-plugin-eslint": "^4.1.0",
     "@vue/cli-plugin-pwa": "^4.1.0",
@@ -47,13 +49,15 @@
     "@vue/test-utils": "1.0.0-beta.29",
     "babel-eslint": "^10.0.3",
     "babel-plugin-component": "^1.1.1",
+    "babel-plugin-import": "^1.13.0",
+    "babel-plugin-lodash": "^3.3.4",
     "chai": "^4.1.2",
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^6.9.0",
     "eslint-plugin-vue": "^5.0.0",
     "express-http-proxy": "^1.6.0",
     "http-proxy-middleware": "^0.20.0",
-    "less": "^3.0.4",
+    "less": "^3.11.1",
     "less-loader": "^5.0.0",
     "vue-template-compiler": "^2.6.10"
   }

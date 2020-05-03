@@ -202,9 +202,7 @@ export default {
   mounted() {
     this.wizardTrigger = this.$refs.wizardTrigger.$el
     this.$API.syncFeedLoadMushrooms().then(() => {
-      if (this.isEmpty) {
-        this.openWizard = true
-      }
+      this.openWizard = this.isEmpty
       this.isReady = true
       this.renderVirtualList()
       this.$watch('feedList', () => {
@@ -213,9 +211,7 @@ export default {
     })
   },
   activated() {
-    if (this.isEmpty) {
-      this.openWizard = true
-    }
+    this.openWizard = this.isReady && this.isEmpty
     this.isActive = true
   },
   deactivated() {

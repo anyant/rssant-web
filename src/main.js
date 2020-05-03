@@ -1,16 +1,8 @@
 import Vue from 'vue'
 // muse-ui
-import MuseUI from 'muse-ui'
-import 'muse-ui/dist/muse-ui.css'
-import 'muse-ui-message/dist/muse-ui-message.css'
-import 'muse-ui-loading/dist/muse-ui-loading.css'
-import Loading from 'muse-ui-loading'
-import Toast from 'muse-ui-toast'
-import MuseMessage from 'muse-ui-message'
+import '@/plugin/muse-ui'
 // fontawesome
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import '@/plugin/fontawesome'
-
 // styles
 import 'material-design-icons/iconfont/material-icons.css'
 import 'typeface-roboto'
@@ -50,19 +42,9 @@ Vue.prototype.$API = API
 Vue.mixin(pageMixin)
 
 Vue.use(StoryRender)
-Vue.use(MuseUI)
-Vue.use(Loading)
-Vue.use(MuseMessage)
-Vue.use(Toast, {
-  time: 3000,
-  close: false,
-})
 
 // 上拉刷新下拉加载滚动列表
 Vue.component('mescroll', Mescroll)
-
-// font-awesome-icon
-Vue.component('font-awesome-icon', FontAwesomeIcon)
 
 window.app = new Vue({
   el: '#app',

@@ -106,9 +106,7 @@ export default {
   },
   methods: {
     sortFeeds(feeds) {
-      return _.chain(feeds)
-        .sortBy(['dryness', 'total_storys', 'id'])
-        .value()
+      return _.sortBy(feeds, ['dryness', 'total_storys', 'id'])
     },
     deleteSelected() {
       if (!this.canDelete) {
