@@ -52,7 +52,8 @@ import _ from 'lodash'
 import { antGold } from '@/plugin/common'
 import MoLayout from '@/components/MoLayout.vue'
 import MoBackHeader from '@/components/MoBackHeader'
-import { formatFullDate } from '@/plugin/datefmt'
+import { formatFullDateFriendly } from '@/plugin/datefmt'
+import initMathjax from '@/plugin/mathjax'
 
 export default {
   components: { MoBackHeader, MoLayout },
@@ -103,7 +104,7 @@ export default {
       if (_.isNil(this.story)) {
         return ''
       }
-      return formatFullDate(this.story.dt_published)
+      return formatFullDateFriendly(this.story.dt_published)
     },
     storyContent() {
       if (_.isNil(this.story)) {
@@ -120,6 +121,7 @@ export default {
       this.$API.story.load({ feedId: this.feedId, offset: this.offset, detail: true })
     }
     window.scrollTo(0, 0)
+    initMathjax()
   },
   methods: {
     toggleFavorited() {

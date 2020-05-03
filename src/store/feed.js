@@ -14,16 +14,15 @@ function isReadedFeed(feed) {
 }
 
 function sortFeedList(feedList) {
-  return _.chain(feedList)
-    .sortBy([
+  return _.reverse(
+    _.sortBy(feedList, [
       function(x) {
         let dt = x.dt_latest_story_published || x.dt_created
         return new Date(dt)
       },
       'id',
     ])
-    .reverse()
-    .value()
+  )
 }
 
 function groupFeedList(feedList) {
@@ -206,10 +205,7 @@ export default {
       return numFeeds <= 0 && numFeedCreations <= 0
     },
     creations(state) {
-      return _.chain(_.values(state.creations))
-        .sortBy('dt_created', 'status')
-        .reverse()
-        .value()
+      return _.reverse(_.sortBy(_.values(state.creations), ['dt_created', 'status']))
     },
     getCreation(state) {
       return creationId => {
@@ -236,7 +232,7 @@ export default {
           DAO.ADD_OR_UPDATE_LIST(feeds)
         }
         let hints = []
-        _.values(DAO.state.feeds).forEach(x => {
+        _.forEach(_.values(DAO.state.feeds), x => {
           if (!_.isEmpty(x.dt_updated)) {
             hints.push({ id: x.id, dt_updated: x.dt_updated })
           }

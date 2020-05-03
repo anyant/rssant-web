@@ -41,7 +41,8 @@
 </template>
 <script>
 import _ from 'lodash'
-import datefn from 'date-fns'
+import { differenceInDays } from 'date-fns'
+import { formatDate } from '@/plugin/datefmt'
 import { antGold } from '@/plugin/common'
 import MoBackHeader from '@/components/MoBackHeader'
 import MoLayout from '@/components/MoLayout'
@@ -75,7 +76,7 @@ export default {
             return
           }
           let dt_latest = new Date(feed.dt_latest_story_published)
-          if (datefn.differenceInDays(now, dt_latest) > 365) {
+          if (differenceInDays(now, dt_latest) > 365) {
             badFeeds.push(feed)
             return
           }
@@ -106,9 +107,7 @@ export default {
   },
   methods: {
     sortFeeds(feeds) {
-      return _.chain(feeds)
-        .sortBy(['dryness', 'total_storys', 'id'])
-        .value()
+      return _.sortBy(feeds, ['dryness', 'total_storys', 'id'])
     },
     deleteSelected() {
       if (!this.canDelete) {
@@ -133,8 +132,8 @@ export default {
     formatFeedDate(feed) {
       let dt_first = feed.dt_first_story_published
       let dt_latest = feed.dt_latest_story_published
-      dt_first = _.isEmpty(dt_first) ? '' : datefn.format(dt_first, 'YYYY-MM-DD')
-      dt_latest = _.isEmpty(dt_latest) ? '' : datefn.format(dt_latest, 'YYYY-MM-DD')
+      dt_first = _.isEmpty(dt_first) ? '' : formatDate(dt_first)
+      dt_latest = _.isEmpty(dt_latest) ? '' : formatDate(dt_latest)
       if (_.isEmpty(dt_first) && _.isEmpty(dt_latest)) {
         return '未知时间'
       } else if (_.isEmpty(dt_first) && !_.isEmpty(dt_latest)) {

@@ -27,7 +27,7 @@
 <script>
 import _ from 'lodash'
 import { antGold } from '@/plugin/common'
-import { formatDate } from '@/plugin/datefmt'
+import { formatDateFriendly } from '@/plugin/datefmt'
 
 export default {
   props: {
@@ -59,7 +59,7 @@ export default {
   },
   computed: {
     dateText() {
-      return formatDate(this.date)
+      return formatDateFriendly(this.date)
     },
     starColor() {
       if (this.isFavorited) {

@@ -1,7 +1,6 @@
 import _ from 'lodash'
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import URI from 'urijs'
 import Toast from 'muse-ui-toast'
 
 import Timeit from './timeit'
@@ -12,6 +11,18 @@ function isDebug() {
 }
 
 const BASE_URL = '/api/v1'
+
+function urlFor(path, query) {
+  let url = new URL(path, window.location.origin)
+  let search = new URLSearchParams()
+  _.forEach(_.entries(query), ([key, value]) => {
+    if (!_.isNil(value)) {
+      search.append(key, value)
+    }
+  })
+  url.search = search
+  return url.toString()
+}
 
 const client = axios.create({
   baseURL: BASE_URL,
@@ -138,11 +149,13 @@ const API = {
       })
     },
     loginGithub({ next, scope } = {}) {
-      let url = URI(BASE_URL + '/accounts/github/login/').search({ next, scope, process: 'login' })
+      let path = BASE_URL + '/accounts/github/login/'
+      let url = urlFor(path, { next, scope, process: 'login' })
       window.location.assign(url)
     },
     connectGithub({ next, scope } = {}) {
-      let url = URI(BASE_URL + '/accounts/github/login/').search({ next, scope, process: 'connect' })
+      let path = BASE_URL + '/accounts/github/login/'
+      let url = urlFor(path, { next, scope, process: 'connect' })
       window.location.assign(url)
     },
   },

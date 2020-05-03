@@ -8,7 +8,7 @@
 
 <script>
 import _ from 'lodash'
-import { formatDate } from '@/plugin/datefmt'
+import { formatDateFriendly } from '@/plugin/datefmt'
 
 export default {
   props: {
@@ -25,7 +25,7 @@ export default {
       return _.isNil(this.number) || this.number <= 0
     },
     dateText() {
-      return formatDate(this.date)
+      return formatDateFriendly(this.date)
     },
     numberText() {
       if (_.isNil(this.number)) {
