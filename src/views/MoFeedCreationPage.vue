@@ -94,7 +94,7 @@ export default {
     this.$API.syncFeedLoadMushrooms().then(() => {
       if (this.$API.feed.isEmpty) {
         let changelogUrl = location.origin + '/changelog'
-        this.$alert('🎉🎉欢迎！我们先订阅一下蚁阅更新日志，我帮你填上链接。', {
+        this.$alert('🎉🎉欢迎！我们先订阅一下蚁阅更新日志吧，我帮你填上链接。', {
           okLabel: '好的',
         }).then(() => {
           this.inputText = changelogUrl

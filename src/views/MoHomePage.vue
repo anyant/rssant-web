@@ -57,6 +57,19 @@
           <div class="bounce3"></div>
         </div>
       </div>
+      <transition name="fade">
+        <div class="empty-placeholder-wrapper" v-if="isReady && isEmpty">
+          <div class="empty-placeholder">
+            <span>
+              <span>点击上方</span>
+              <mu-icon class="icon-add" value="add"></mu-icon>
+              <span>号</span>
+            </span>
+            <br />
+            <span>轻松订阅</span>
+          </div>
+        </div>
+      </transition>
       <transition-group
         class="list list-upper"
         name="list"
@@ -182,11 +195,14 @@ export default {
     feedList() {
       return this.$API.feed.feedList
     },
+    isEmpty() {
+      return this.$API.feed.isEmpty
+    },
   },
   mounted() {
     this.wizardTrigger = this.$refs.wizardTrigger.$el
     this.$API.syncFeedLoadMushrooms().then(() => {
-      if (this.$API.feed.isEmpty) {
+      if (this.isEmpty) {
         this.openWizard = true
       }
       this.isReady = true
@@ -197,6 +213,9 @@ export default {
     })
   },
   activated() {
+    if (this.isEmpty) {
+      this.openWizard = true
+    }
     this.isActive = true
   },
   deactivated() {
@@ -473,6 +492,7 @@ export default {
   flex-direction: column-reverse;
 }
 
+.empty-placeholder-wrapper,
 .list-placeholder-wrapper {
   position: fixed;
   top: 48 * @pr;
@@ -482,11 +502,27 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: default;
 }
 
+.empty-placeholder,
 .list-placeholder {
   margin: auto;
   opacity: 0.33;
+}
+
+.empty-placeholder {
+  font-size: 36 * @pr;
+  font-family: Helvetica, Arial, sans-serif;
+  color: darken(@antBackGrey, 20%);
+  text-align: center;
+
+  .icon-add {
+    font-size: 48 * @pr;
+    position: relative;
+    top: 10 * @pr;
+    color: @antTextSemi;
+  }
 }
 
 /** https://tobiasahlin.com/spinkit/ */
@@ -538,6 +574,16 @@ export default {
     -webkit-transform: scale(1);
     transform: scale(1);
   }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.3s ease;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
 }
 
 .list-enter-active,

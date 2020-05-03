@@ -11,15 +11,21 @@
   <meta name="keywords" content="蚁阅 RSS RSS阅读器 RSSAnt" />
   <meta name="description" content="让RSS更好用，轻松订阅你喜欢的博客和资讯" />
   <style>
-    .rssant-spinner {
+    .rssant-spinner-wrapper {
       position: fixed;
       left: 0;
       right: 0;
       top: 0;
       bottom: 0;
       z-index: 999;
-      margin-top: 50%;
-      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: default;
+    }
+
+    .rssant-spinner {
+      margin: auto;
     }
 
     .rssant-spinner .spinner-title {
@@ -97,12 +103,14 @@
   <noscript>
     <strong>蚁阅 - RSS阅读器 - 让RSS更好用，轻松订阅你喜欢的博客和资讯</strong>
   </noscript>
-  <div id="rssant-spinner" class="rssant-spinner">
-    <div class="spinner-title">蚁阅</div>
-    <div class="sk-spinner sk-spinner-three-bounce">
-      <div class="sk-bounce1"></div>
-      <div class="sk-bounce2"></div>
-      <div class="sk-bounce3"></div>
+  <div id="rssant-spinner" class="rssant-spinner-wrapper">
+    <div class="rssant-spinner">
+      <div class="spinner-title">蚁阅</div>
+      <div class="sk-spinner sk-spinner-three-bounce">
+        <div class="sk-bounce1"></div>
+        <div class="sk-bounce2"></div>
+        <div class="sk-bounce3"></div>
+      </div>
     </div>
   </div>
   <div id="app"></div>

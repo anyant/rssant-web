@@ -220,13 +220,14 @@ export default {
 
   .story-iframe-loading {
     text-align: center;
-    font-size: 36px;
-    line-height: 54px;
-    height: 54px;
+    font-size: 36 * @pr;
+    line-height: 54 * @pr;
+    height: 54 * @pr;
     font-family: Helvetica, Arial, sans-serif;
     font-weight: bold;
     color: @antBackGrey;
     opacity: 0.5;
+    cursor: default;
   }
 
   iframe {
