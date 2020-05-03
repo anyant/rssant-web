@@ -35,10 +35,13 @@ export default {
     },
   },
   mounted() {
-    this.$API.syncFeedLoadMushrooms().then(() => {
-      let scrollTop = this.$pageState.get('scrollTop')
-      window.scrollTo(0, _.defaultTo(scrollTop, 0))
-    })
+    this.$API.story
+      .loadFavorited()
+      .then(this.$API.syncFeedLoadMushrooms())
+      .then(() => {
+        let scrollTop = this.$pageState.get('scrollTop')
+        window.scrollTo(0, _.defaultTo(scrollTop, 0))
+      })
   },
   computed: {
     favorited() {

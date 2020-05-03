@@ -135,6 +135,7 @@ function handleImportedFeedResult(DAO, data) {
 export default {
   state: {
     loading: new Loading(),
+    loadingCreations: new Loading(),
     creations: {},
     feeds: {},
     feedList: [],
@@ -247,6 +248,10 @@ export default {
           })
           localFeeds.set(DAO.feedList)
         })
+      })
+    },
+    async loadCreationList(DAO) {
+      await DAO.state.loadingCreations.begin(async () => {
         await API.feed.queryCreationList().then(result => {
           DAO.ADD_OR_UPDATE_CREATION_LIST(result.feed_creations)
         })

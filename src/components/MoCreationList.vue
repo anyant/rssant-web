@@ -21,6 +21,7 @@ export default {
     },
   },
   mounted() {
+    this.$API.feed.loadCreationList()
     this.$API.syncFeedLoadMushrooms()
   },
 }
