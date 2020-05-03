@@ -108,6 +108,7 @@ import MoDebugTool from '@/components/MoDebugTool'
 import MoFeedItem from '@/components/MoFeedItem.vue'
 import MoFeedStoryItem from '@/components/MoFeedStoryItem.vue'
 
+import initMathjax from '@/plugin/mathjax'
 import defaultAvatar from '@/assets/avatar.svg'
 import { antRippleGrey } from '@/plugin/common'
 
@@ -208,6 +209,7 @@ export default {
       this.$watch('feedList', () => {
         this.updateVirtualList()
       })
+      initMathjax()
     })
   },
   activated() {

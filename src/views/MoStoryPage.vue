@@ -53,6 +53,7 @@ import { antGold } from '@/plugin/common'
 import MoLayout from '@/components/MoLayout.vue'
 import MoBackHeader from '@/components/MoBackHeader'
 import { formatFullDateFriendly } from '@/plugin/datefmt'
+import initMathjax from '@/plugin/mathjax'
 
 export default {
   components: { MoBackHeader, MoLayout },
@@ -120,6 +121,7 @@ export default {
       this.$API.story.load({ feedId: this.feedId, offset: this.offset, detail: true })
     }
     window.scrollTo(0, 0)
+    initMathjax()
   },
   methods: {
     toggleFavorited() {
