@@ -2,8 +2,14 @@
 
 set -ex
 
-rm -rf public/libs/
-mkdir -p public/libs/
-tar -xzf extra/MathJax-2.7.6.tar.gz -C public/libs/
-rm -rf public/libs/MathJax-2.7.6/fonts/HTML-CSS/TeX/png/
-rm -rf public/libs/MathJax-2.7.6/unpacked
+if test "$1" = 'dist'; then
+    target="dist/libs"
+else
+    target="public/libs"
+fi
+
+mkdir -p $target/
+rm -rf $target/MathJax-2.7.6
+tar -xzf extra/MathJax-2.7.6.tar.gz -C $target/
+rm -rf $target/MathJax-2.7.6/fonts/HTML-CSS/TeX/png/
+rm -rf $target/MathJax-2.7.6/unpacked
