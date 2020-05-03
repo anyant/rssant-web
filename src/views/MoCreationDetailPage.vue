@@ -95,6 +95,7 @@ export default {
     this.$API.feed.loadCreation({ creationId: this.creationId, detail: true }).then(() => {
       this.$API.syncFeedLoadMushrooms()
     })
+    window.scrollTo(0, 0)
   },
   methods: {},
 }
