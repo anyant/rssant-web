@@ -25,7 +25,7 @@
 import _ from 'lodash'
 import MoLayout from '@/components/MoLayout.vue'
 import MoBackHeader from '@/components/MoBackHeader'
-import { formatFullDate } from '@/plugin/datefmt'
+import { formatFullDateFriendly } from '@/plugin/datefmt'
 
 const FEED_FIELDS = [
   {
@@ -181,7 +181,7 @@ export default {
           item.value = field.process(item.value)
         }
         if (field.type === 'datetime') {
-          item.value = formatFullDate(item.value)
+          item.value = formatFullDateFriendly(item.value)
         } else if (field.type === 'boolean') {
           item.value = item.value ? '是' : '否'
         }

@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import datefn from 'date-fns'
+import { addSeconds } from 'date-fns'
 
 const FEEDS_STORAGE_KEY = 'RSSANT_FEEDS'
 const FEEDS_TTL = 8 * 60 * 60
@@ -44,7 +44,7 @@ const localFeeds = (function() {
         return
       }
       let now = new Date()
-      let expireAt = datefn.addSeconds(now, FEEDS_TTL)
+      let expireAt = addSeconds(now, FEEDS_TTL)
       let value = {
         feeds: feeds,
         expireAt: expireAt,

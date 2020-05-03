@@ -36,7 +36,7 @@
 import _ from 'lodash'
 import MoBackHeader from '@/components/MoBackHeader'
 import MoLayout from '@/components/MoLayout'
-import { formatFullDate } from '@/plugin/datefmt'
+import { formatFullDateFriendly } from '@/plugin/datefmt'
 
 export default {
   components: { MoBackHeader, MoLayout },
@@ -58,7 +58,7 @@ export default {
       }
     },
     dateText() {
-      return formatFullDate(this.creation && this.creation.dt_created)
+      return formatFullDateFriendly(this.creation && this.creation.dt_created)
     },
     feedId() {
       if (_.isNil(this.creation) || _.isEmpty(this.creation.feed_id)) {

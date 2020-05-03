@@ -9,7 +9,7 @@
 <script>
 import _ from 'lodash'
 import { antGreen, antBlue, antRed, antRippleGrey } from '@/plugin/common'
-import { formatDate } from '@/plugin/datefmt'
+import { formatDateFriendly } from '@/plugin/datefmt'
 
 export default {
   props: {
@@ -20,7 +20,7 @@ export default {
   },
   computed: {
     dateText() {
-      return formatDate(this.date)
+      return formatDateFriendly(this.date)
     },
     color() {
       const colorMap = {

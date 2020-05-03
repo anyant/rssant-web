@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import { formatDate } from '@/plugin/datefmt'
+import { formatDateFriendly } from '@/plugin/datefmt'
 
 export default {
   props: {
@@ -23,7 +23,7 @@ export default {
   },
   computed: {
     dateText() {
-      return formatDate(this.storyDate)
+      return formatDateFriendly(this.storyDate)
     }
   },
   methods: {
