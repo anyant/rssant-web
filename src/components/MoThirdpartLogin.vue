@@ -7,7 +7,7 @@
       data-mu-loading-size="24"
       @click="loginGithub"
     >
-      <i class="button-icon fa fa-github"></i>
+      <font-awesome-icon class="button-icon" :icon="['fab', 'github']" aria-hidden="true" />
       <span class="button-text">GitHub</span>
     </mu-ripple>
   </div>
@@ -54,9 +54,8 @@ export default {
 }
 
 .button-icon {
-  font-size: 24 * @pr;
+  font-size: 22 * @pr;
   position: relative;
-  top: -1 * @pr;
 }
 
 .button-text {

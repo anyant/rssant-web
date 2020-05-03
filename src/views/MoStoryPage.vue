@@ -119,6 +119,7 @@ export default {
     if (_.isNil(this.story) || _.isEmpty(this.story.content)) {
       this.$API.story.load({ feedId: this.feedId, offset: this.offset, detail: true })
     }
+    window.scrollTo(0, 0)
   },
   methods: {
     toggleFavorited() {
@@ -219,13 +220,14 @@ export default {
 
   .story-iframe-loading {
     text-align: center;
-    font-size: 36px;
-    line-height: 54px;
-    height: 54px;
+    font-size: 36 * @pr;
+    line-height: 54 * @pr;
+    height: 54 * @pr;
     font-family: Helvetica, Arial, sans-serif;
     font-weight: bold;
-    color: #ececec;
+    color: @antBackGrey;
     opacity: 0.5;
+    cursor: default;
   }
 
   iframe {

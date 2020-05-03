@@ -1,10 +1,7 @@
 <template>
   <MoLayout header>
     <MoBackHeader border>
-      <template v-slot:title>
-        种籽 -
-        <span>{{ title }}</span>
-      </template>
+      <template v-slot:title>{{ title }}</template>
     </MoBackHeader>
     <div class="creation-info" v-if="creation">
       <div class="item">
@@ -17,7 +14,10 @@
       </div>
       <div class="item" v-if="feedLink">
         <span class="item-name">订阅</span>
-        <router-link class="item-link" :to="feedLink">{{ feedLink }}</router-link>
+        <router-link class="item-link" :to="feedLink">
+          {{ feedTitle }}
+          <font-awesome-icon icon="external-link-alt" aria-hidden="true" />
+        </router-link>
       </div>
       <div class="item">
         <span class="item-name">创建时间</span>
@@ -60,11 +60,28 @@ export default {
     dateText() {
       return formatFullDate(this.creation && this.creation.dt_created)
     },
-    feedLink() {
+    feedId() {
       if (_.isNil(this.creation) || _.isEmpty(this.creation.feed_id)) {
         return null
       }
-      return `/feed/${this.creation.feed_id}`
+      return this.creation.feed_id
+    },
+    feedLink() {
+      if (_.isNil(this.feedId)) {
+        return null
+      }
+      return `/feed/${this.feedId}`
+    },
+    feedTitle() {
+      if (_.isNil(this.feedId)) {
+        return null
+      }
+      let feed = this.$API.feed.get(this.feedId)
+      if (_.isNil(feed) || _.isEmpty(feed.title)) {
+        return this.feedLink
+      } else {
+        return feed.title
+      }
     },
     message() {
       if (_.isNil(this.creation)) {
@@ -72,14 +89,14 @@ export default {
       }
       let message = _.defaultTo(this.creation.message, '')
       return message
-    }
+    },
   },
   mounted() {
-    this.$API.feed.loadCreation({ creationId: this.creationId, detail: true }).then(() => {
-      this.$API.syncFeedLoadMushrooms()
-    })
+    this.$API.feed.loadCreation({ creationId: this.creationId, detail: true })
+    this.$API.syncFeedLoadMushrooms()
+    window.scrollTo(0, 0)
   },
-  methods: {}
+  methods: {},
 }
 </script>
 
@@ -113,6 +130,12 @@ export default {
   max-height: 4 * 22 * @pr;
   overflow: hidden;
   text-overflow: clip;
+
+  .fa {
+    position: relative;
+    left: 1 * @pr;
+    top: 1 * @pr;
+  }
 }
 
 .item-link {

@@ -2,8 +2,8 @@ import _ from 'lodash'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import URI from 'urijs'
+import Toast from 'muse-ui-toast'
 
-import Notification from './notify'
 import Timeit from './timeit'
 import localConfig from './localConfig'
 
@@ -58,7 +58,7 @@ client.interceptors.response.use(
     message = _.truncate(message, { length: 50, separator: /,? +/ })
     Object.assign(error, { title, message })
     if (isDebug()) {
-      Notification.error({ title, message })
+      Toast.error(title + ': ' + message)
     }
     return Promise.reject(error)
   }

@@ -7,14 +7,16 @@ import 'muse-ui-loading/dist/muse-ui-loading.css'
 import Loading from 'muse-ui-loading'
 import Toast from 'muse-ui-toast'
 import MuseMessage from 'muse-ui-message'
+// fontawesome
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import '@/plugin/fontawesome'
+
 // styles
 import 'material-design-icons/iconfont/material-icons.css'
-import 'font-awesome/css/font-awesome.css'
 import 'typeface-roboto'
 // others
 import { sync } from 'vuex-router-sync'
 import Mescroll from 'mescroll.js/mescroll.vue'
-import virtualList from 'vue-virtual-scroll-list'
 
 // rssant
 import App from './App'
@@ -55,9 +57,12 @@ Vue.use(Toast, {
   time: 3000,
   close: false,
 })
+
 // 上拉刷新下拉加载滚动列表
 Vue.component('mescroll', Mescroll)
-Vue.component('virtual-list', virtualList)
+
+// font-awesome-icon
+Vue.component('font-awesome-icon', FontAwesomeIcon)
 
 window.app = new Vue({
   el: '#app',

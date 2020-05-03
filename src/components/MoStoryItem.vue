@@ -18,7 +18,7 @@
       </div>
       <div class="story-preview-summary">{{ summary }}</div>
       <mu-button icon class="story-preview-link" @click.stop="goLink">
-        <i class="fa fa-external-link" aria-hidden="true"></i>
+        <font-awesome-icon icon="external-link-alt" aria-hidden="true" />
       </mu-button>
     </div>
   </div>
