@@ -27,17 +27,11 @@
             <div class="feed-date">{{ formatFeedDate(feed) }}</div>
             <div class="feed-total-storys">
               {{ totalStorys(feed) }}
-              <i
-                class="feed-total-storys-icon fa fa-leaf"
-                aria-hidden="true"
-              ></i>
+              <font-awesome-icon class="feed-total-storys-icon" icon="leaf" aria-hidden="true" />
             </div>
             <div class="feed-dryness">
               {{ (feed.dryness / 10).toFixed(1) }}
-              <i
-                class="feed-dryness-icon fa fa-trophy"
-                aria-hidden="true"
-              ></i>
+              <font-awesome-icon class="feed-dryness-icon" icon="trophy" aria-hidden="true" />
             </div>
           </div>
         </div>

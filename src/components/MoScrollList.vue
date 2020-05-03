@@ -3,7 +3,8 @@
     <transition name="fade">
       <div class="jump-to-latest" v-if="needJump">
         <mu-button @click="jumpToLatest" :color="antBlue" :ripple="false">
-          <i class="jump-icon fa fa-angle-double-down" aria-hidden="true"></i>看最新
+          <font-awesome-icon class="jump-icon" icon="angle-double-down" aria-hidden="true" />
+          <span>看最新</span>
         </mu-button>
       </div>
     </transition>
@@ -281,7 +282,7 @@ export default {
 
   .jump-icon {
     display: inline-block;
-    font-size: 24 * @pr;
+    font-size: 18 * @pr;
     font-weight: normal;
     margin-right: 4 * @pr;
   }

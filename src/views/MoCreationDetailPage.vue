@@ -16,7 +16,7 @@
         <span class="item-name">订阅</span>
         <router-link class="item-link" :to="feedLink">
           {{ feedTitle }}
-          <i class="fa fa-external-link" aria-hidden="true"></i>
+          <font-awesome-icon icon="external-link-alt" aria-hidden="true" />
         </router-link>
       </div>
       <div class="item">
