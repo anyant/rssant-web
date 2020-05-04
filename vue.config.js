@@ -19,8 +19,8 @@ module.exports = {
       navigateFallbackBlacklist: [/^\/api.*$/, /^\/admin.*$/, /^\/changelog.*$/, /^.*\..*$/],
     },
     // https://github.com/vuejs/vue-cli/blob/dev/packages/@vue/cli-plugin-pwa/lib/HtmlPwaPlugin.js
-    themeColor: '#f9f9f9',
-    msTileColor: '#f9f9f9',
+    themeColor: '#FFFFFF',
+    msTileColor: '#FFFFFF',
     appleMobileWebAppCapable: 'yes',
     appleMobileWebAppStatusBarStyle: 'default',
     assetsVersion: assetsVersion,
@@ -39,7 +39,7 @@ module.exports = {
           type: 'image/png',
         },
       ],
-      background_color: '#ffffff',
+      background_color: '#FFFFFF',
     },
     iconPaths: {
       // will auto prefix '/' and auto add assetsVersion
