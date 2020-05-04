@@ -97,6 +97,9 @@
         ></VirtualItem>
       </transition-group>
     </div>
+    <!-- pre-load muse-ui icons -->
+    <mu-icon value="favorite" v-if="isReady" style="position:fixed;top:-100px;" />
+    <!-- end pre-load muse-ui icons -->
   </MoLayout>
 </template>
 <script>
@@ -113,7 +116,7 @@ import defaultAvatar from '@/assets/avatar.svg'
 import { antRippleGrey } from '@/plugin/common'
 
 const ITEM_HEIGHT = 48
-const PAGE_SIZE = Math.ceil((window.innerHeight - 48) / ITEM_HEIGHT)
+const PAGE_SIZE = Math.ceil(window.innerHeight / ITEM_HEIGHT)
 
 const VirtualItem = Vue.component('VirtualItem', {
   props: {
@@ -470,6 +473,11 @@ export default {
   transform: rotate(135deg);
   // ---end---
   border-radius: 0 0 0 2px;
+}
+
+.main {
+  // header border height
+  margin-top: -1 * @pr;
 }
 
 .menu-list {

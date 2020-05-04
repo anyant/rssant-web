@@ -143,13 +143,14 @@ export default {
       if (hasPWA) {
         localConfig.PWA_ENABLE.set(true)
         this.isPWAEnable = true
-        const h = this.$createElement
-        let content = h('ol', null, [
-          h('li', null, [h('span', null, '页面刷新后，浏览器可能会弹出 "将蚁阅添加到主屏" 提示，点击确认即可')]),
-          h('li', null, [h('span', null, '如果没有弹出提示，可以从浏览器菜单将蚁阅添加到主屏')]),
-          h('li', null, [h('span', null, '安卓系统上，浏览器可能需要 "桌面快捷方式" 权限，可以在系统设置中授权')]),
-          h('li', null, [h('span', null, '如果使用中遇到问题，可尝试关闭此功能，清除浏览器缓存')]),
-        ])
+        let content = h => {
+          return h('ol', null, [
+            h('li', null, [h('span', null, '页面刷新后，浏览器可能会弹出 "将蚁阅添加到主屏" 提示，点击确认即可')]),
+            h('li', null, [h('span', null, '如果没有弹出提示，可以从浏览器菜单将蚁阅添加到主屏')]),
+            h('li', null, [h('span', null, '安卓系统上，浏览器可能需要 "桌面快捷方式" 权限，可以在系统设置中授权')]),
+            h('li', null, [h('span', null, '如果使用中遇到问题，可尝试关闭此功能，清除浏览器缓存')]),
+          ])
+        }
         this.$alert(content, '将蚁阅添加到主屏', {
           className: 'action-pwa-dialog',
           okLabel: '知道了',
