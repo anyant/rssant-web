@@ -58,8 +58,8 @@
           <div class="bounce3"></div>
         </div>
       </div>
-      <transition name="fade">
-        <div class="empty-placeholder-wrapper" v-if="isReady && isEmpty">
+      <transition name="fade" v-if="isReady && isEmpty">
+        <div class="empty-placeholder-wrapper">
           <div class="empty-placeholder">
             <span>
               <span>点击上方</span>

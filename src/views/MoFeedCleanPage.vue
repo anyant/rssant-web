@@ -26,12 +26,11 @@
           <div class="feed-detail">
             <div class="feed-date">{{ formatFeedDate(feed) }}</div>
             <div class="feed-total-storys">
-              {{ totalStorys(feed) }}
-              <fa-icon class="feed-total-storys-icon" icon="leaf" />
+              <span>{{ totalStorys(feed) }}#</span>
             </div>
             <div class="feed-dryness">
-              {{ (feed.dryness / 10).toFixed(0) }}
-              <fa-icon class="feed-dryness-icon" icon="trophy" />
+              <span>{{ (feed.dryness / 10).toFixed(0) }}</span>
+              <mu-icon class="feed-dryness-icon" value="wb_sunny" />
             </div>
           </div>
         </div>
@@ -199,8 +198,10 @@ export default {
 .feed-total-storys,
 .feed-dryness {
   flex-shrink: 0;
-  display: inline-block;
-
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 48 * @pr;
   margin-left: 12 * @pr;
   font-size: 12 * @pr;
   text-align: right;
@@ -210,21 +211,9 @@ export default {
   color: @antTextGrey;
 
   .feed-dryness-icon {
-    font-size: 11 * @pr;
+    font-size: 14 * @pr;
+    margin-left: 1px;
   }
-}
-
-.feed-total-storys {
-  width: 48 * @pr;
-}
-
-.feed-dryness {
-  width: 48 * @pr;
-}
-
-.feed-total-storys-icon,
-.feed-dryness-icon {
-  margin-left: 1px;
 }
 
 .feed-date {
