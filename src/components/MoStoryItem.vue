@@ -12,13 +12,13 @@
       <div class="story-preview-header">
         <div class="story-preview-title">{{ title }}</div>
         <mu-button icon class="story-favorited" @click.stop="toggleFavorited">
-          <mu-icon v-if="isFavorited" value="star" :color="starColor"></mu-icon>
-          <mu-icon v-else value="star_border" :color="starColor"></mu-icon>
+          <fa-icon size="18" v-if="isFavorited" icon="star" :color="starColor" />
+          <fa-icon size="18" v-else icon="far/star" :color="starColor" />
         </mu-button>
       </div>
       <div class="story-preview-summary">{{ summary }}</div>
       <mu-button icon class="story-preview-link" @click.stop="goLink">
-        <font-awesome-icon icon="external-link-alt" aria-hidden="true" />
+        <fa-icon icon="external-link-alt" />
       </mu-button>
     </div>
   </div>
@@ -114,8 +114,7 @@ export default {
 
 .story-header-readed {
   .story-title,
-  .story-date,
-  .story-favorited {
+  .story-date {
     color: @antTextLight;
   }
 }
@@ -176,7 +175,7 @@ export default {
 .story-favorited {
   flex-shrink: 0;
   position: absolute;
-  top: -4 * @pr;
+  top: -6 * @pr;
   right: 12 * @pr;
   width: 32 * @pr;
   height: 32 * @pr;

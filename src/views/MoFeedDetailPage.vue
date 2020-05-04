@@ -3,7 +3,7 @@
     <MoBackHeader border>
       <template v-slot:title>{{ feedTitle }}</template>
       <mu-button icon class="action-delete" @click="deleteFeed">
-        <mu-icon class="action-icon" value="delete"></mu-icon>
+        <fa-icon class="action-icon" icon="trash" />
       </mu-button>
     </MoBackHeader>
     <div class="feed-info">
@@ -250,7 +250,6 @@ export default {
 
 .action-icon {
   display: inline-block;
-  font-size: 20 * @pr;
   width: 22 * @pr;
 }
 
@@ -258,7 +257,6 @@ export default {
   position: relative;
   width: 32 * @pr;
   height: 32 * @pr;
-  color: @antTextBlack;
   margin-left: 16 * @pr;
 }
 </style>

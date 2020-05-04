@@ -3,8 +3,8 @@
     <MoBackHeader border>
       <template v-slot:title>{{ headerTitle }}</template>
       <mu-button icon class="action-favorited" @click="toggleFavorited">
-        <mu-icon v-if="isFavorited" value="star" :color="starColor"></mu-icon>
-        <mu-icon v-else value="star_border" :color="starColor"></mu-icon>
+        <fa-icon size="18" v-if="isFavorited" icon="star" :color="starColor" />
+        <fa-icon size="18" v-else icon="far/star" :color="starColor" />
       </mu-button>
     </MoBackHeader>
     <div class="story-info" v-if="story">
@@ -144,7 +144,6 @@ export default {
   right: -4 * @pr;
   width: 32 * @pr;
   height: 32 * @pr;
-  color: @antTextBlack;
 }
 
 .story-info {

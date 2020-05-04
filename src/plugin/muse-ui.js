@@ -21,6 +21,7 @@ import {
   TextField,
   Tooltip,
   Snackbar,
+  Progress,
 } from 'muse-ui'
 
 Vue.use(Avatar)
@@ -38,6 +39,7 @@ Vue.use(Switch)
 Vue.use(TextField)
 Vue.use(Tooltip)
 Vue.use(Snackbar)
+Vue.use(Progress)
 
 Vue.use(Loading)
 Vue.use(MuseMessage)

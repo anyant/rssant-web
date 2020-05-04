@@ -4,7 +4,7 @@
       <MoDebugTool class="title">蚁阅</MoDebugTool>
       <div class="right">
         <mu-button icon class="action-readed" @click="setAllReaded">
-          <mu-icon value="done"></mu-icon>
+          <fa-icon class="action-icon" icon="check" />
         </mu-button>
         <mu-button
           ref="wizardTrigger"
@@ -12,7 +12,7 @@
           class="action-add"
           @click="()=>{this.$router.push('/feed-creation')}"
         >
-          <mu-icon value="add"></mu-icon>
+          <fa-icon class="action-icon" icon="plus" />
         </mu-button>
         <mu-popover
           class="wizard"
@@ -30,7 +30,7 @@
           :popover-class="isActive?'menu-popover':'menu-popover-hidden'"
         >
           <mu-button icon class="action-menu-button">
-            <mu-icon value="menu"></mu-icon>
+            <fa-icon class="action-icon" icon="bars" />
           </mu-button>
           <mu-list slot="content" class="menu-list">
             <mu-list-item button @click="exportOPML">
@@ -62,7 +62,7 @@
           <div class="empty-placeholder">
             <span>
               <span>点击上方</span>
-              <mu-icon class="icon-add" value="add"></mu-icon>
+              <fa-icon class="icon-add" icon="plus" />
               <span>号</span>
             </span>
             <br />
@@ -197,7 +197,7 @@ export default {
       return this.$API.feed.feedList
     },
     isEmpty() {
-      return this.$API.feed.isEmpty
+      return _.isNil(this.feedList) || this.feedList.length <= 0
     },
   },
   mounted() {
@@ -412,7 +412,7 @@ export default {
   width: 32 * @pr;
   height: 32 * @pr;
   margin-right: 16 * @pr;
-  color: @antTextBlack;
+  color: @antTextSemi;
 }
 
 .wizard {
@@ -516,9 +516,10 @@ export default {
   text-align: center;
 
   .icon-add {
-    font-size: 48 * @pr;
-    position: relative;
-    top: 10 * @pr;
+    display: inline-block;
+    font-size: 40 * @pr;
+    margin-left: 4px;
+    margin-right: 4px;
     color: @antTextSemi;
   }
 }

@@ -2,7 +2,7 @@
   <MoHeader :border="border">
     <div class="left">
       <mu-button icon class="back" @click="goBack">
-        <mu-icon size="32" value="keyboard_arrow_left"></mu-icon>
+        <fa-icon size="18" icon="chevron-left" />
       </mu-button>
       <div class="title">
         <slot name="title"></slot>
@@ -21,14 +21,14 @@ export default {
   props: {
     border: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   methods: {
     goBack() {
       this.$router.back()
-    }
-  }
+    },
+  },
 }
 </script>
 <style lang="less" scoped>

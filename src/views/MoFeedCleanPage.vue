@@ -8,7 +8,7 @@
         @click="deleteSelected"
         :class="{ 'action-delete-disable': !canDelete }"
       >
-        <mu-icon value="delete"></mu-icon>
+        <fa-icon icon="trash" />
         <span class="action-delete-info">{{ selectedFeedIds.length }} 订阅</span>
       </mu-button>
     </MoBackHeader>
@@ -27,11 +27,11 @@
             <div class="feed-date">{{ formatFeedDate(feed) }}</div>
             <div class="feed-total-storys">
               {{ totalStorys(feed) }}
-              <font-awesome-icon class="feed-total-storys-icon" icon="leaf" aria-hidden="true" />
+              <fa-icon class="feed-total-storys-icon" icon="leaf" />
             </div>
             <div class="feed-dryness">
-              {{ (feed.dryness / 10).toFixed(1) }}
-              <font-awesome-icon class="feed-dryness-icon" icon="trophy" aria-hidden="true" />
+              {{ (feed.dryness / 10).toFixed(0) }}
+              <fa-icon class="feed-dryness-icon" icon="trophy" />
             </div>
           </div>
         </div>
@@ -208,6 +208,10 @@ export default {
   overflow: hidden;
   text-overflow: clip;
   color: @antTextGrey;
+
+  .feed-dryness-icon {
+    font-size: 11 * @pr;
+  }
 }
 
 .feed-total-storys {
@@ -243,11 +247,8 @@ export default {
   font-size: 14 * @pr;
   color: @antGold;
   min-width: auto;
-  .mu-icon {
-    font-size: 18 * @pr;
-  }
   .action-delete-info {
-    margin-left: 1px;
+    margin-left: 4px;
     font-weight: bold;
   }
 }

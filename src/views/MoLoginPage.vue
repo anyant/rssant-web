@@ -127,6 +127,7 @@ export default {
   padding-bottom: 4 * @pr;
   padding-left: 4 * @pr;
   color: @antTextGrey;
+  cursor: pointer;
 }
 
 .register,

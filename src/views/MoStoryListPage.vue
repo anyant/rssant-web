@@ -3,10 +3,10 @@
     <MoBackHeader border>
       <template v-slot:title>{{ numUnreadText }}{{ feedTitle }}</template>
       <mu-button icon class="action-readed" @click="setAllReaded">
-        <mu-icon value="done"></mu-icon>
+        <fa-icon icon="check" />
       </mu-button>
       <mu-button icon class="action-detail" @click="goFeedDetail">
-        <mu-icon value="info_outline"></mu-icon>
+        <fa-icon size="18" icon="info-circle" />
       </mu-button>
     </MoBackHeader>
     <MoScrollList
@@ -126,13 +126,13 @@ export default {
   position: relative;
   width: 32 * @pr;
   height: 32 * @pr;
-  color: @antTextBlack;
   margin-left: 16 * @pr;
 }
 
 .action-detail {
   position: relative;
   right: -4 * @pr;
+  color: lighten(@antTextSemi, 5%);
 }
 
 .story-item {

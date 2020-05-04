@@ -14,10 +14,7 @@
       </div>
       <div class="item" v-if="feedLink">
         <span class="item-name">订阅</span>
-        <router-link class="item-link" :to="feedLink">
-          {{ feedTitle }}
-          <font-awesome-icon icon="external-link-alt" aria-hidden="true" />
-        </router-link>
+        <router-link class="item-link" :to="feedLink">{{ feedTitle }}</router-link>
       </div>
       <div class="item">
         <span class="item-name">创建时间</span>
