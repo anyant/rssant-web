@@ -27,6 +27,7 @@
         <mu-menu
           placement="bottom"
           class="action-menu"
+          :open.sync="isMenuOpen"
           :popover-class="isActive?'menu-popover':'menu-popover-hidden'"
         >
           <mu-button icon class="action-menu-button">
@@ -177,6 +178,7 @@ export default {
       rippleColor: antRippleGrey,
       openWizard: false,
       wizardTrigger: null,
+      isMenuOpen: false,
       isReady: false,
       virtualUpperHeight: 0,
       virtualUpperList: [],
@@ -221,6 +223,7 @@ export default {
   },
   deactivated() {
     this.openWizard = false
+    this.isMenuOpen = false
     this.isActive = false
   },
   savePageState() {
