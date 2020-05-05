@@ -59,6 +59,7 @@ import defaultAvatar from '@/assets/avatar.svg'
 const hasPWA = 'serviceWorker' in navigator
 
 export default {
+  name: 'MoAccountPage',
   components: { MoLayout, MoBackHeader, MoFooter },
   data() {
     return {

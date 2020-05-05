@@ -73,6 +73,7 @@ import MoCreationList from '@/components/MoCreationList'
 import { antBlue } from '@/plugin/common'
 
 export default {
+  name: 'MoFeedCreationPage',
   components: { MoLayout, MoBackHeader, MoCreationList },
   data() {
     return {

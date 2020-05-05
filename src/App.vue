@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div id="timeit"></div>
-    <keep-alive include="MoHomePage">
+    <keep-alive :include="keepAlivePages">
       <router-view />
     </keep-alive>
   </div>
@@ -10,7 +10,9 @@
 <script>
 export default {
   data() {
-    return {}
+    return {
+      keepAlivePages: ['MoHomePage', 'MoAccountPage', 'MoFeedCreationPage'],
+    }
   },
   async created() {},
 }
