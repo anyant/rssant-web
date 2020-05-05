@@ -82,9 +82,27 @@ function updateFeedList(state) {
   state.feedList = feedList
 }
 
+function updateStateFeed(state, feed) {
+  feed = fixTitle(feed)
+  feed = normalizeFeedStoryOffset(feed)
+  Vue.set(state.feeds, feed.id, feed)
+}
+
 function fixTitle(feed) {
   if (_.isEmpty(feed.title)) {
     feed.title = `#${feed.id}`
+  }
+  return feed
+}
+
+function normalizeFeedStoryOffset(feed) {
+  if (_.isNil(feed.num_unread_storys) || _.isNil(feed.story_offset) || _.isNil(feed.total_storys)) {
+    return feed
+  }
+  const MAX_UNREAD_STORYS = 999
+  if (feed.num_unread_storys > MAX_UNREAD_STORYS) {
+    feed.num_unread_storys = MAX_UNREAD_STORYS
+    feed.story_offset = feed.total_storys - MAX_UNREAD_STORYS
   }
   return feed
 }
@@ -146,7 +164,7 @@ export default {
         Vue.delete(state.feeds, feedId)
       })
       _.defaultTo(updatedFeeds, []).forEach(feed => {
-        Vue.set(state.feeds, feed.id, fixTitle(feed))
+        updateStateFeed(state, feed)
       })
       updateFeedList(state)
     },
@@ -159,12 +177,12 @@ export default {
       })
     },
     ADD_OR_UPDATE(state, feed) {
-      Vue.set(state.feeds, feed.id, fixTitle(feed))
+      updateStateFeed(state, feed)
       updateFeedList(state)
     },
     ADD_OR_UPDATE_LIST(state, feedList) {
       feedList.forEach(feed => {
-        Vue.set(state.feeds, feed.id, fixTitle(feed))
+        updateStateFeed(state, feed)
       })
       updateFeedList(state)
     },
