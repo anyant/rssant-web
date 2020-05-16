@@ -1,8 +1,8 @@
 export default {
   async syncFeedLoadMushrooms(API) {
     await API.feed.sync()
-    let mushroomFeedIds = API.feed.mushroomFeedIds
-    await API.story.loadMushrooms({ feedIds: mushroomFeedIds, days: 14 })
+    let mushroomKeys = API.feed.mushroomKeys
+    await API.story.loadMushrooms({ mushroomKeys })
     API.story.sortMushrooms()
   },
 }

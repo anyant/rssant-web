@@ -34,8 +34,29 @@ function groupFeedList(feedList) {
   let jungleReaded = []
   let gardenNotReaded = []
   let jungleNotReaded = []
-  let mushroomFeedIds = []
+  let mushroomKeys = []
+
   const dt_recent = subDays(new Date(), 14)
+
+  let pickMushroom = feed => {
+    if (feed.num_unread_storys >= 1 && feed.num_unread_storys <= 3) {
+      mushroomKeys.push({
+        feed_id: feed.id,
+        offset: feed.story_offset,
+        limit: feed.num_unread_storys,
+      })
+    } else if (feed.total_storys > 0) {
+      let dt_latest = new Date(feed.dt_latest_story_published)
+      if (isAfter(dt_latest, dt_recent)) {
+        mushroomKeys.push({
+          feed_id: feed.id,
+          offset: feed.total_storys - 1,
+          limit: 1,
+        })
+      }
+    }
+  }
+
   feedList.forEach(feed => {
     if (isEmptyFeed(feed)) {
       trash.push(feed)
@@ -45,10 +66,7 @@ function groupFeedList(feedList) {
       } else {
         gardenNotReaded.push(feed)
       }
-      let dt_latest = new Date(feed.dt_latest_story_published)
-      if (isAfter(dt_latest, dt_recent)) {
-        mushroomFeedIds.push(feed.id)
-      }
+      pickMushroom(feed)
     } else {
       if (isReadedFeed(feed)) {
         jungleReaded.push(feed)
@@ -63,15 +81,15 @@ function groupFeedList(feedList) {
     jungleReaded,
     gardenNotReaded,
     jungleNotReaded,
-    mushroomFeedIds,
+    mushroomKeys,
   }
 }
 
 function updateFeedList(state) {
-  let { trash, gardenReaded, jungleReaded, gardenNotReaded, jungleNotReaded, mushroomFeedIds } = groupFeedList(
+  let { trash, gardenReaded, jungleReaded, gardenNotReaded, jungleNotReaded, mushroomKeys } = groupFeedList(
     _.values(state.feeds)
   )
-  state.mushroomFeedIds = mushroomFeedIds
+  state.mushroomKeys = mushroomKeys
   let feedList = _.concat(
     sortFeedList(jungleNotReaded),
     sortFeedList(gardenNotReaded),
@@ -156,7 +174,7 @@ export default {
     creations: {},
     feeds: {},
     feedList: [],
-    mushroomFeedIds: [],
+    mushroomKeys: [],
   },
   mutations: {
     SYNC(state, { updatedFeeds, deletedFeedIds }) {
@@ -233,8 +251,8 @@ export default {
     feedList(state) {
       return state.feedList
     },
-    mushroomFeedIds(state) {
-      return state.mushroomFeedIds
+    mushroomKeys(state) {
+      return state.mushroomKeys
     },
     get(state) {
       return feedId => {

@@ -211,6 +211,9 @@ const API = {
     queryRecent({ feed_ids, days, detail } = {}) {
       return client.post('/story/recent', { feed_ids, days, detail })
     },
+    queryBatch({ storys, detail }) {
+      return client.post('/story/query-batch', { storys, detail })
+    },
     get({ feed_id, offset, detail }) {
       return client.get(`/story/${feed_id}-${offset}`, { params: { detail } })
     },
