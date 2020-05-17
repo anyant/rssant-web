@@ -50,7 +50,8 @@ export default {
   },
   methods: {
     getFeedTitle(feedId) {
-      return this.$API.feed.get(feedId).title
+      let feed = this.$API.feed.get(feedId)
+      return _.isNil(feed) ? feedId : feed.title
     },
   },
   savePageState() {
