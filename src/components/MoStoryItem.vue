@@ -81,8 +81,11 @@ export default {
       }
     },
     async onOpen() {
-      if (_.isEmpty(this.summary) && _.isEmpty(this.content)) {
-        await this.$API.story.load({ feedId: this.feedId, offset: this.offset, detail: true })
+      if (_.isEmpty(this.summary) || _.isEmpty(this.content)) {
+        let promise = this.$API.story.load({ feedId: this.feedId, offset: this.offset, detail: true })
+        if (_.isEmpty(this.summary) && _.isEmpty(this.content)) {
+          await promise
+        }
       }
       this.$emit('read')
       this.isOpened = !this.isOpened
