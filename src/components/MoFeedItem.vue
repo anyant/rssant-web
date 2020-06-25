@@ -15,10 +15,10 @@ export default {
     title: String,
     number: {
       type: Number,
-      default: 0
+      default: 0,
     },
     date: String,
-    link: String
+    link: String,
   },
   computed: {
     readed() {
@@ -35,7 +35,7 @@ export default {
         return '9999'
       }
       return this.number.toString()
-    }
+    },
   },
   data() {
     return {}
@@ -43,8 +43,8 @@ export default {
   methods: {
     onClick() {
       this.$router.push(this.link)
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -65,6 +65,10 @@ export default {
 .feed-item-readed {
   .feed-num-unread {
     visibility: hidden;
+  }
+  .feed-title,
+  .feed-date {
+    color: @antTextLight;
   }
 }
 
