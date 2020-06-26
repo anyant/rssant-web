@@ -41,6 +41,7 @@
 
 <script>
 import { antGreen, antTextGrey } from '@/plugin/common'
+import localFeeds from '@/plugin/localFeeds'
 import MoLayout from '@/components/MoLayout'
 import MoAntGreenButton from '@/components/MoAntGreenButton'
 import MoThirdpartLogin from '@/components/MoThirdpartLogin'
@@ -70,6 +71,7 @@ export default {
       this.$API.user
         .login({ account: this.loginForm.account, password: this.loginForm.password })
         .then(() => {
+          localFeeds.clear()
           this.$router.replace('/')
         })
         .catch(error => {

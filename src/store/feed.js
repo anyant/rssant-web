@@ -316,6 +316,7 @@ export default {
         await API.feed.deleteAll({ ids: feedIds })
         DAO.REMOVE_ALL({ feedIds })
         DAO.API.story.DELETE_STORYS_OF_ALL_FEED({ feedIds })
+        localFeeds.clear()
       }
     },
     async import(DAO, { text }) {
