@@ -1,5 +1,5 @@
 <template>
-  <div id="app" :class="{'app-mobile': !hasBoard}">
+  <div id="app">
     <div id="timeit"></div>
     <keep-alive :include="keepAlivePages">
       <router-view />
@@ -40,12 +40,6 @@ export default {
 
 #app {
   position: relative;
-  margin: 0 auto;
-  min-width: @maxWidth;
-}
-
-#app.app-mobile {
   min-width: @minWidth;
-  max-width: @maxWidth;
 }
 </style>

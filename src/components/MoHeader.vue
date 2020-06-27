@@ -1,5 +1,5 @@
 <template>
-  <div class="header" :class="{ 'header-border': border, 'header-board': hasBoard }">
+  <div class="header" :class="{ 'header-border': border, 'header-board': board && hasBoard }">
     <slot></slot>
   </div>
 </template>
@@ -9,6 +9,10 @@ import { hasBoard } from '@/plugin/common'
 export default {
   props: {
     border: {
+      type: Boolean,
+      default: false,
+    },
+    board: {
       type: Boolean,
       default: false,
     },

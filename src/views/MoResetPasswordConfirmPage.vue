@@ -1,27 +1,29 @@
 <template>
-  <MoLayout class="reset-password-confirm">
-    <div class="title">蚁阅 - 设置新密码</div>
-    <mu-text-field
-      full-width
-      type="password"
-      placeholder="请输入新密码"
-      @focus="clearErrorText"
-      :error-text="errorText"
-      v-model="password"
-    ></mu-text-field>
-    <div class="button-wrapper">
-      <mu-button
+  <MoLayout>
+    <div class="reset-password-confirm">
+      <div class="title">蚁阅 - 设置新密码</div>
+      <mu-text-field
         full-width
-        @click="save"
-        class="button-save"
-        :color="antGreen"
-        :disabled="isSaveDisabled"
-        data-mu-loading-size="24"
-        v-loading="isLoading"
-      >确定</mu-button>
-    </div>
-    <div class="login">
-      <MoAntGreenButton @click="()=>{this.$router.replace('/login')}">直接去登录</MoAntGreenButton>
+        type="password"
+        placeholder="请输入新密码"
+        @focus="clearErrorText"
+        :error-text="errorText"
+        v-model="password"
+      ></mu-text-field>
+      <div class="button-wrapper">
+        <mu-button
+          full-width
+          @click="save"
+          class="button-save"
+          :color="antGreen"
+          :disabled="isSaveDisabled"
+          data-mu-loading-size="24"
+          v-loading="isLoading"
+        >确定</mu-button>
+      </div>
+      <div class="login">
+        <MoAntGreenButton @click="()=>{this.$router.replace('/login')}">直接去登录</MoAntGreenButton>
+      </div>
     </div>
   </MoLayout>
 </template>
@@ -40,7 +42,7 @@ export default {
       antTextGrey,
       isLoading: false,
       password: null,
-      errorText: null
+      errorText: null,
     }
   },
   computed: {
@@ -52,7 +54,7 @@ export default {
     },
     isSaveDisabled() {
       return _.isEmpty(this.password)
-    }
+    },
   },
   methods: {
     save() {
@@ -72,8 +74,8 @@ export default {
     },
     clearErrorText() {
       this.errorText = null
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -88,8 +90,8 @@ export default {
 .title {
   font-size: 20 * @pr;
   font-weight: bold;
-  margin-top: 40 * @pr;
-  margin-bottom: 40 * @pr;
+  padding-top: 40 * @pr;
+  padding-bottom: 40 * @pr;
   text-align: center;
 }
 

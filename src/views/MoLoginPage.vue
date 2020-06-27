@@ -1,37 +1,39 @@
 <template>
-  <MoLayout class="login" footer>
-    <div class="title">蚁阅 - 让RSS更好用</div>
-    <mu-text-field
-      full-width
-      placeholder="用户名或邮箱地址"
-      @focus="clearErrorText"
-      v-model="loginForm.account"
-    ></mu-text-field>
-    <mu-text-field
-      full-width
-      placeholder="密码"
-      :action-icon="loginForm.passwordVisibility ? 'visibility_off' : 'visibility'"
-      :action-click="() => (loginForm.passwordVisibility = !loginForm.passwordVisibility)"
-      :type="loginForm.passwordVisibility ? 'text' : 'password'"
-      :error-text="loginForm.errorText"
-      @focus="clearErrorText"
-      @keyup.enter.native="login"
-      v-model="loginForm.password"
-    ></mu-text-field>
-    <div class="button-wrapper">
-      <mu-button
-        @click="login"
-        class="button-login"
-        :color="antGreen"
-        :disabled="isLoginDisabled"
-      >登录</mu-button>
-      <mu-ripple class="button-forgot" @click="()=>this.$router.replace('/reset-password')">忘了密码？</mu-ripple>
-    </div>
-    <div class="register">
-      <MoAntGreenButton @click="()=>{this.$router.replace('/register')}">没有账号？去注册</MoAntGreenButton>
-    </div>
-    <div class="thirdpart">
-      <MoThirdpartLogin></MoThirdpartLogin>
+  <MoLayout footer>
+    <div class="login">
+      <div class="title">蚁阅 - 让RSS更好用</div>
+      <mu-text-field
+        full-width
+        placeholder="用户名或邮箱地址"
+        @focus="clearErrorText"
+        v-model="loginForm.account"
+      ></mu-text-field>
+      <mu-text-field
+        full-width
+        placeholder="密码"
+        :action-icon="loginForm.passwordVisibility ? 'visibility_off' : 'visibility'"
+        :action-click="() => (loginForm.passwordVisibility = !loginForm.passwordVisibility)"
+        :type="loginForm.passwordVisibility ? 'text' : 'password'"
+        :error-text="loginForm.errorText"
+        @focus="clearErrorText"
+        @keyup.enter.native="login"
+        v-model="loginForm.password"
+      ></mu-text-field>
+      <div class="button-wrapper">
+        <mu-button
+          @click="login"
+          class="button-login"
+          :color="antGreen"
+          :disabled="isLoginDisabled"
+        >登录</mu-button>
+        <mu-ripple class="button-forgot" @click="()=>this.$router.replace('/reset-password')">忘了密码？</mu-ripple>
+      </div>
+      <div class="register">
+        <MoAntGreenButton @click="()=>{this.$router.replace('/register')}">没有账号？去注册</MoAntGreenButton>
+      </div>
+      <div class="thirdpart">
+        <MoThirdpartLogin></MoThirdpartLogin>
+      </div>
     </div>
     <template v-slot:footer>
       <MoFooter />
@@ -96,8 +98,8 @@ export default {
 .title {
   font-size: 20 * @pr;
   font-weight: bold;
-  margin-top: 40 * @pr;
-  margin-bottom: 40 * @pr;
+  padding-top: 40 * @pr;
+  padding-bottom: 40 * @pr;
   text-align: center;
 }
 

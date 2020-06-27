@@ -192,14 +192,14 @@ export default {
 }
 
 .avatar-wrapper {
-  margin-top: 16 * @pr;
+  padding-top: 16 * @pr;
   display: flex;
   align-items: center;
   justify-content: space-around;
 }
 
 .username-wrapper {
-  margin-top: 16 * @pr;
+  padding-top: 16 * @pr;
   font-size: 18 * @pr;
   font-weight: bold;
   display: flex;

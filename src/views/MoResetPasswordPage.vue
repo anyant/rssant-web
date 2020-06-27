@@ -1,27 +1,29 @@
 <template>
-  <MoLayout class="reset-password">
-    <div class="title">蚁阅 - 重置密码</div>
-    <mu-text-field
-      full-width
-      type="email"
-      placeholder="邮箱地址"
-      @focus="clearErrorText"
-      :error-text="errorText"
-      v-model="email"
-    ></mu-text-field>
-    <div class="button-wrapper">
-      <mu-button
+  <MoLayout>
+    <div class="reset-password">
+      <div class="title">蚁阅 - 重置密码</div>
+      <mu-text-field
         full-width
-        @click="reset"
-        class="button-reset"
-        :color="antGreen"
-        :disabled="isResetDisabled"
-        data-mu-loading-size="24"
-        v-loading="isLoading"
-      >确定</mu-button>
-    </div>
-    <div class="login">
-      <MoAntGreenButton @click="()=>{this.$router.replace('/login')}">返回登录</MoAntGreenButton>
+        type="email"
+        placeholder="邮箱地址"
+        @focus="clearErrorText"
+        :error-text="errorText"
+        v-model="email"
+      ></mu-text-field>
+      <div class="button-wrapper">
+        <mu-button
+          full-width
+          @click="reset"
+          class="button-reset"
+          :color="antGreen"
+          :disabled="isResetDisabled"
+          data-mu-loading-size="24"
+          v-loading="isLoading"
+        >确定</mu-button>
+      </div>
+      <div class="login">
+        <MoAntGreenButton @click="()=>{this.$router.replace('/login')}">返回登录</MoAntGreenButton>
+      </div>
     </div>
   </MoLayout>
 </template>
@@ -40,13 +42,13 @@ export default {
       antTextGrey,
       isLoading: false,
       email: null,
-      errorText: null
+      errorText: null,
     }
   },
   computed: {
     isResetDisabled() {
       return _.isEmpty(this.email)
-    }
+    },
   },
   methods: {
     reset() {
@@ -66,8 +68,8 @@ export default {
     },
     clearErrorText() {
       this.errorText = null
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -82,8 +84,8 @@ export default {
 .title {
   font-size: 20 * @pr;
   font-weight: bold;
-  margin-top: 40 * @pr;
-  margin-bottom: 40 * @pr;
+  padding-top: 40 * @pr;
+  padding-bottom: 40 * @pr;
   text-align: center;
 }
 

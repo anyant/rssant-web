@@ -5,16 +5,22 @@
       'layout-grey': grey, 
       'layout-header': header, 
       'layout-footer': footer, 
-      'layout-has-board': hasBoard,
-      'layout-not-board': !hasBoard
+      'layout-has-board': board && hasBoard,
+      'layout-not-board': !(board && hasBoard)
     }"
   >
-    <div class="layout-main">
-      <slot></slot>
-      <slot name="footer" v-if="footer"></slot>
-    </div>
-    <div class="layout-board" v-if="hasBoard">
-      <slot name="board"></slot>
+    <div class="layout-wrapper">
+      <div class="layout-main">
+        <div class="layout-main-container">
+          <slot></slot>
+          <slot name="footer" v-if="footer"></slot>
+        </div>
+      </div>
+      <div class="layout-board" v-if="board && hasBoard">
+        <div class="layout-board-container">
+          <slot name="board"></slot>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -35,6 +41,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    board: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return { hasBoard }
@@ -45,16 +55,14 @@ export default {
 @import '~@/styles/common';
 
 .layout {
-  min-height: 100vh;
-  overflow: hidden;
-  background: #ffffff;
+  position: relative;
 }
 
-.layout-header .layout-main {
-  margin-top: 48 * @pr;
+.layout-header .layout-main-container {
+  padding-top: 48 * @pr;
 }
 
-.layout-footer .layout-main {
+.layout-footer .layout-main-container {
   padding-bottom: 48 * @pr;
 }
 
@@ -62,19 +70,31 @@ export default {
   background: @antBackGrey;
 }
 
+.layout-main-container,
+.layout-board-container {
+  position: relative;
+  min-height: 100vh;
+}
+
 .layout-not-board {
-  .layout-main {
-    min-height: 100vh;
+  .layout-wrapper {
+    max-width: @maxWidth;
+    margin: 0 auto;
+    overflow: hidden;
+    background: #ffffff;
   }
 }
 
 .layout-has-board {
-  position: fixed;
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  overflow: hidden;
+  .layout-wrapper {
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    background: #ffffff;
+  }
 
   .layout-main {
     position: fixed;

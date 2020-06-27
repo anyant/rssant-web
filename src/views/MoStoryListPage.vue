@@ -12,6 +12,7 @@
     <MoScrollList
       v-if="feed"
       class="story-list"
+      board
       :vid="`/feed/${feedId}`"
       :itemSize="48"
       :items="storyList"

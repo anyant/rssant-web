@@ -1,6 +1,6 @@
 <template>
-  <MoLayout grey header>
-    <MoHeader border>
+  <MoLayout grey header board>
+    <MoHeader border board>
       <MoDebugTool class="title">蚁阅</MoDebugTool>
       <div class="right">
         <mu-button icon class="action-readed" @click="setAllReaded">

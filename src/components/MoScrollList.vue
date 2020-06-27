@@ -11,6 +11,7 @@
     <mescroll
       ref="mescroll"
       class="mescroll"
+      :class="{'mescroll-board': board && hasBoard}"
       :down="mescrollDown"
       :up="mescrollUp"
       @init="mescrollInit"
@@ -24,7 +25,7 @@
 
 <script>
 import _ from 'lodash'
-import { antBlue } from '@/plugin/common'
+import { antBlue, hasBoard } from '@/plugin/common'
 
 export default {
   props: {
@@ -52,11 +53,16 @@ export default {
       type: Function,
       required: false,
     },
+    board: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     let pageSize = window.innerHeight - 48
     let numPageItems = Math.ceil(pageSize / this.itemSize)
     return {
+      hasBoard,
       pageSize: pageSize,
       numPageItems: numPageItems,
       isPrevLoading: false,
@@ -244,6 +250,10 @@ export default {
   bottom: 0;
   height: auto;
   max-width: @maxWidth;
+}
+
+.mescroll-board {
+  max-width: @appWidth;
 }
 
 .item-list {
