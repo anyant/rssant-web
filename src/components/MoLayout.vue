@@ -56,6 +56,8 @@ export default {
 
 .layout {
   position: relative;
+  background: lighten(@antBackGrey, 5%) !important;
+  background-color: lighten(@antBackGrey, 5%) !important;
 }
 
 .layout-header .layout-main-container {
