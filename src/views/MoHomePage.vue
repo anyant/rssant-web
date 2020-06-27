@@ -98,6 +98,9 @@
         ></VirtualItem>
       </transition-group>
     </div>
+    <template v-slot:board>
+      <div>board</div>
+    </template>
     <!-- pre-load muse-ui icons -->
     <mu-icon value="favorite" v-if="isReady" style="position:fixed;top:-100px;" />
     <!-- end pre-load muse-ui icons -->

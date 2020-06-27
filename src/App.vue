@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" :class="{'app-mobile': !hasBoard}">
     <div id="timeit"></div>
     <keep-alive :include="keepAlivePages">
       <router-view />
@@ -8,9 +8,12 @@
 </template>
 
 <script>
+import { hasBoard } from '@/plugin/common'
+
 export default {
   data() {
     return {
+      hasBoard,
       keepAlivePages: ['MoHomePage', 'MoAccountPage', 'MoFeedCreationPage'],
     }
   },
@@ -36,8 +39,13 @@ export default {
 }
 
 #app {
+  position: relative;
+  margin: 0 auto;
+  min-width: @maxWidth;
+}
+
+#app.app-mobile {
   min-width: @minWidth;
   max-width: @maxWidth;
-  margin: 0 auto;
 }
 </style>
