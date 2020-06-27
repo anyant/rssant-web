@@ -60,15 +60,15 @@ export default {
   background-color: lighten(@antBackGrey, 5%) !important;
 }
 
-.layout-header .layout-main-container {
+.layout-header > .layout-wrapper > .layout-main > .layout-main-container {
   padding-top: 48 * @pr;
 }
 
-.layout-footer .layout-main-container {
+.layout-footer > .layout-wrapper > .layout-main > .layout-main-container {
   padding-bottom: 48 * @pr;
 }
 
-.layout-grey .layout-main {
+.layout-grey > .layout-wrapper > .layout-main {
   background: @antBackGrey;
 }
 
@@ -79,7 +79,7 @@ export default {
 }
 
 .layout-not-board {
-  .layout-wrapper {
+  > .layout-wrapper {
     max-width: @maxWidth;
     margin: 0 auto;
     overflow: hidden;
@@ -88,7 +88,7 @@ export default {
 }
 
 .layout-has-board {
-  .layout-wrapper {
+  > .layout-wrapper {
     position: fixed;
     left: 0;
     top: 0;
@@ -98,7 +98,7 @@ export default {
     background: #ffffff;
   }
 
-  .layout-main {
+  > .layout-wrapper > .layout-main {
     position: fixed;
     left: 0;
     top: 0;
@@ -107,7 +107,7 @@ export default {
     overflow: scroll;
   }
 
-  .layout-board {
+  > .layout-wrapper > .layout-board {
     position: fixed;
     left: @appWidth;
     top: 0;

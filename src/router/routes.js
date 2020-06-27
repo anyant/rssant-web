@@ -1,3 +1,4 @@
+import { hasBoard } from '@/plugin/common'
 import MoHomePage from '@/views/MoHomePage'
 import MoFavoritedPage from '@/views/MoFavoritedPage'
 import MoCreationDetailPage from '@/views/MoCreationDetailPage'
@@ -13,15 +14,72 @@ import MoResetPasswordPage from '@/views/MoResetPasswordPage'
 import MoResetPasswordConfirmPage from '@/views/MoResetPasswordConfirmPage'
 import MoAccountPage from '@/views/MoAccountPage'
 import MoAboutPage from '@/views/MoAboutPage'
-
 import MoNotFoundPage from '@/views/MoNotFoundPage'
 
-export default [
+const boardRoutes = [
+  {
+    path: 'account',
+    name: 'Account',
+    component: MoAccountPage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: 'feed-creation',
+    name: 'FeedCreation',
+    component: MoFeedCreationPage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: 'feed-clean',
+    name: 'FeedClean',
+    component: MoFeedCleanPage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: 'favorited',
+    name: 'Favorited',
+    component: MoFavoritedPage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: 'creation/:creationId',
+    name: 'CreationDetail',
+    component: MoCreationDetailPage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: 'feed/:feedId',
+    name: 'StoryList',
+    component: MoStoryListPage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: 'story/:feedId-:offset',
+    name: 'Story',
+    component: MoStoryPage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: 'feed/:feedId/detail',
+    name: 'FeedDetail',
+    component: MoFeedDetailPage,
+    meta: { loginRequired: true },
+  },
+]
+
+const mainRoutes = boardRoutes.map(x => {
+  let r = { ...x }
+  r.path = '/' + x.path
+  return r
+})
+
+const routes = [
   {
     path: '/',
     name: 'Home',
     component: MoHomePage,
     meta: { loginRequired: true },
+    children: hasBoard ? boardRoutes : [],
   },
   {
     path: '/about',
@@ -53,53 +111,10 @@ export default [
     name: 'ResetPasswordConfirm',
     component: MoResetPasswordConfirmPage,
   },
-  {
-    path: '/account',
-    name: 'Account',
-    component: MoAccountPage,
-    meta: { loginRequired: true },
-  },
-  {
-    path: '/feed-creation',
-    name: 'FeedCreation',
-    component: MoFeedCreationPage,
-    meta: { loginRequired: true },
-  },
-  {
-    path: '/feed-clean',
-    name: 'FeedClean',
-    component: MoFeedCleanPage,
-    meta: { loginRequired: true },
-  },
-  {
-    path: '/favorited',
-    name: 'Favorited',
-    component: MoFavoritedPage,
-    meta: { loginRequired: true },
-  },
-  {
-    path: '/creation/:creationId',
-    name: 'CreationDetail',
-    component: MoCreationDetailPage,
-    meta: { loginRequired: true },
-  },
-  {
-    path: '/feed/:feedId',
-    name: 'StoryList',
-    component: MoStoryListPage,
-    meta: { loginRequired: true },
-  },
-  {
-    path: '/story/:feedId-:offset',
-    name: 'Story',
-    component: MoStoryPage,
-    meta: { loginRequired: true },
-  },
-  {
-    path: '/feed/:feedId/detail',
-    name: 'FeedDetail',
-    component: MoFeedDetailPage,
-    meta: { loginRequired: true },
-  },
-  { path: '*', component: MoNotFoundPage },
 ]
+if (!hasBoard) {
+  mainRoutes.forEach(x => routes.push(x))
+}
+routes.push({ path: '*', component: MoNotFoundPage })
+
+export default routes
