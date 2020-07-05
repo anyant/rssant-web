@@ -1,6 +1,6 @@
 <template>
   <div>
-    <MoHeader border board>
+    <MoHeader border board v-show="showHeader">
       <MoDebugTool class="title">蚁阅</MoDebugTool>
       <div class="right">
         <mu-button icon class="action-readed" @click="setAllReaded">
@@ -50,7 +50,7 @@
         </mu-avatar>
       </div>
     </MoHeader>
-    <div class="main">
+    <div class="main" ref="mainRef">
       <div class="list-placeholder-wrapper" v-if="!isReady">
         <div class="list-placeholder spinner">
           <div class="bounce1"></div>
@@ -163,7 +163,6 @@ const VirtualItem = Vue.component('VirtualItem', {
 })
 
 export default {
-  name: 'MoHomePage',
   components: { MoHeader, MoDebugTool, VirtualItem },
   props: {
     vid: {
@@ -203,6 +202,9 @@ export default {
     isEmpty() {
       return _.isNil(this.feedList) || this.feedList.length <= 0
     },
+    showHeader() {
+      return this.isReady || !this.$LAYOUT.hasBoard
+    },
   },
   mounted() {
     this.wizardTrigger = this.$refs.wizardTrigger.$el
@@ -219,6 +221,11 @@ export default {
   activated() {
     this.openWizard = this.isReady && this.isEmpty
     this.isActive = true
+    let el = this.$refs.mainRef
+    let scrollTop = this.$pageState.get('scrollTop')
+    if (!_.isNil(el) && !_.isNil(scrollTop) && scrollTop > 0) {
+      el.scrollTo(0, scrollTop)
+    }
   },
   deactivated() {
     this.openWizard = false
@@ -226,8 +233,11 @@ export default {
     this.isActive = false
   },
   savePageState() {
-    this.$pageState.set('scrollTop', window.scrollY)
-    this.$pageState.commit()
+    let el = this.$refs.mainRef
+    if (!_.isNil(el)) {
+      this.$pageState.set('scrollTop', el.scrollTop)
+      this.$pageState.commit()
+    }
   },
   methods: {
     numTextOf(n) {
@@ -320,7 +330,7 @@ export default {
       // setup scroll position
       let scrollTop = this.$pageState.get('scrollTop')
       if (_.isNil(scrollTop) || scrollTop <= 0) {
-        scrollTop = this.virtualUpperHeight
+        scrollTop = this.virtualUpperHeight - 8
       }
       let upperIndex = upperSize - 1
       let lowerIndex = upperSize
@@ -365,7 +375,10 @@ export default {
       // 2. render first page
       // 3. render other pages in batches
       setTimeout(() => {
-        window.scrollTo(0, scrollTop)
+        let el = this.$refs.mainRef
+        if (!_.isNil(el)) {
+          el.scrollTo(0, scrollTop)
+        }
         renderFirstPage()
         setTimeout(() => {
           requestAnimationFrame(step)

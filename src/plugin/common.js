@@ -41,6 +41,10 @@ window.addEventListener(
     let newWidth = window.innerWidth
     if (newWidth !== LAYOUT.windowInnerWidth) {
       let newLayout = computeLayout(newWidth)
+      // reload routes after change layout
+      if (newLayout.hasBoard !== LAYOUT.hasBoard) {
+        window.location.reload()
+      }
       _.forEach(_.entries(newLayout), ([key, value]) => {
         LAYOUT[key] = value
       })

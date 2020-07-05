@@ -4,7 +4,7 @@
       <MoHome></MoHome>
     </MoLayout>
     <div v-if="hasBoard" class="app-board" :style="boardStyle">
-      <div class="rssant-placeholder">
+      <div class="rssant-placeholder" v-if="showPlaceholder">
         <div class="placeholder-title">蚁阅</div>
       </div>
       <router-view />
@@ -17,13 +17,24 @@ import MoLayout from '@/components/MoLayout'
 import MoHome from '@/components/MoHome'
 
 export default {
+  name: 'MoHomePage',
   components: { MoLayout, MoHome },
   data() {
-    return {}
+    return {
+      isReady: false,
+    }
+  },
+  mounted() {
+    this.$API.syncFeedLoadMushrooms().then(() => {
+      this.isReady = true
+    })
   },
   computed: {
     hasBoard() {
       return this.$LAYOUT.hasBoard
+    },
+    showPlaceholder() {
+      return this.isReady && this.hasBoard && this.$route.path === '/'
     },
     layoutStyle() {
       let marginWidth = (this.$LAYOUT.windowInnerWidth - this.$LAYOUT.appWidth) / 2
@@ -70,6 +81,8 @@ export default {
 .rssant-placeholder {
   height: 100vh;
   display: flex;
+  position: absolute;
+  width: 100%;
 }
 
 .rssant-placeholder .placeholder-title {
