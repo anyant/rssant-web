@@ -7,7 +7,7 @@
       <div class="rssant-placeholder" v-if="showPlaceholder">
         <div class="placeholder-title">蚁阅</div>
       </div>
-      <router-view />
+      <router-view :key="this.$route.path" />
     </div>
   </div>
 </template>
