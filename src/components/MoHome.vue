@@ -10,7 +10,7 @@
           ref="wizardTrigger"
           icon
           class="action-add"
-          @click="()=>{this.$router.push('/feed-creation')}"
+          @click="()=>{this.routeTo('/feed-creation')}"
         >
           <fa-icon class="action-icon" icon="plus" />
         </mu-button>
@@ -45,7 +45,7 @@
             </mu-list-item>
           </mu-list>
         </mu-menu>
-        <mu-avatar size="32" class="user" @click="()=>{this.$router.push('/account')}">
+        <mu-avatar size="32" class="user" @click="()=>{this.routeTo('/account')}">
           <img :src="avatar" />
         </mu-avatar>
       </div>
@@ -82,6 +82,7 @@
           :key="item.id"
           :feed="item.feed"
           :story="item.story"
+          :routeTo="routeTo"
         ></VirtualItem>
       </transition-group>
       <transition-group
@@ -95,6 +96,7 @@
           :key="item.id"
           :feed="item.feed"
           :story="item.story"
+          :routeTo="routeTo"
         ></VirtualItem>
       </transition-group>
     </div>
@@ -126,6 +128,7 @@ const VirtualItem = Vue.component('VirtualItem', {
     story: {
       type: Object,
     },
+    routeTo: Function,
   },
   methods: {
     getFeedTitle(feedId) {
@@ -145,6 +148,7 @@ const VirtualItem = Vue.component('VirtualItem', {
           number: feed.num_unread_storys,
           date: feed.dt_latest_story_published || feed.dt_created,
           link: `/feed/${feed.id}`,
+          routeTo: this.routeTo,
         },
       })
     } else {
@@ -156,6 +160,7 @@ const VirtualItem = Vue.component('VirtualItem', {
           storyTitle: story.title,
           storyDate: story.dt_published,
           isReaded: this.isReaded(story),
+          routeTo: this.routeTo,
         },
       })
     }
@@ -205,6 +210,9 @@ export default {
     showHeader() {
       return this.isReady || !this.$LAYOUT.hasBoard
     },
+    replaceRouter() {
+      return this.$LAYOUT.hasBoard && this.$route.path !== '/'
+    },
   },
   mounted() {
     this.wizardTrigger = this.$refs.wizardTrigger.$el
@@ -245,12 +253,25 @@ export default {
     },
     exportOPML() {
       this.$API.feed.exportOPML({ download: true })
+      this.isMenuOpen = false
+    },
+    routeTo(path) {
+      if (this.$route.path === path) {
+        return
+      }
+      if (this.replaceRouter) {
+        this.$router.replace(path)
+      } else {
+        this.$router.push(path)
+      }
     },
     goFeedClean() {
-      this.$router.push('/feed-clean')
+      this.routeTo('/feed-clean')
+      this.isMenuOpen = false
     },
     goFeedFavorited() {
-      this.$router.push('/favorited')
+      this.routeTo('/favorited')
+      this.isMenuOpen = false
     },
     setAllReaded() {
       let feedIds = this.feedList.map(x => x.id)

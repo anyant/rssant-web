@@ -16,7 +16,8 @@ export default {
     feedTitle: String,
     storyTitle: String,
     storyDate: String,
-    isReaded: Boolean
+    isReaded: Boolean,
+    routeTo: Function,
   },
   data() {
     return {}
@@ -24,19 +25,19 @@ export default {
   computed: {
     dateText() {
       return formatDateFriendly(this.storyDate)
-    }
+    },
   },
   methods: {
     goFeed() {
-      this.$router.push(`/feed/${this.feedId}`)
+      this.routeTo(`/feed/${this.feedId}`)
     },
     goStory() {
       if (!this.isReaded) {
         this.$API.feed.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
       }
-      this.$router.push(`/story/${this.feedId}-${this.offset}`)
-    }
-  }
+      this.routeTo(`/story/${this.feedId}-${this.offset}`)
+    },
+  },
 }
 </script>
 
