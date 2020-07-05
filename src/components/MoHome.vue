@@ -263,7 +263,7 @@ export default {
       // setup layout height
       let upperSize = this._upperSize()
       let lowerSize = bufferList.length - upperSize
-      let virtualUpperHeight = Math.max(0, upperSize * ITEM_HEIGHT - 8)
+      let virtualUpperHeight = Math.max(0, upperSize * ITEM_HEIGHT)
       let virtualLowerHeight = lowerSize * ITEM_HEIGHT
       return {
         upperSize,
@@ -475,11 +475,6 @@ export default {
   transform: rotate(135deg);
   // ---end---
   border-radius: 0 0 0 2px;
-}
-
-.main {
-  // header border height
-  margin-top: -1 * @pr;
 }
 
 .menu-list {

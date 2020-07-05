@@ -16,6 +16,7 @@ import router from '@/router'
 import { Store, API } from '@/store'
 import { pageMixin } from '@/plugin/page'
 import StoryRender from '@/plugin/storyRender'
+import { LAYOUT } from '@/plugin/common'
 import '@/styles/theme-rssant.less'
 import '@/plugin/theme'
 
@@ -39,6 +40,7 @@ Vue.config.productionTip = false
 sync(Store, router)
 
 Vue.prototype.$API = API
+Vue.prototype.$LAYOUT = LAYOUT
 Vue.mixin(pageMixin)
 
 Vue.use(StoryRender)

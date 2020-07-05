@@ -1,24 +1,15 @@
 <template>
-  <div class="header" :class="{ 'header-border': border, 'header-board': board && hasBoard }">
+  <div class="header" :class="{ 'header-border': border }">
     <slot></slot>
   </div>
 </template>
 <script>
-import { hasBoard } from '@/plugin/common'
-
 export default {
   props: {
     border: {
       type: Boolean,
       default: false,
     },
-    board: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  data() {
-    return { hasBoard }
   },
 }
 </script>
@@ -26,7 +17,7 @@ export default {
 @import '~@/styles/common';
 
 .header {
-  position: fixed;
+  position: absolute;
   top: 0;
   width: 100%;
   max-width: @maxWidth;
@@ -38,10 +29,6 @@ export default {
   align-items: center;
   justify-content: space-between;
   background: #ffffff;
-}
-
-.header-board {
-  width: @appWidth;
 }
 
 .header-border {

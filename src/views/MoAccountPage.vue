@@ -1,49 +1,49 @@
 <template>
-  <MoLayout header footer>
+  <MoLayout header>
     <MoBackHeader></MoBackHeader>
     <div class="main">
-      <div class="avatar-wrapper">
-        <mu-avatar size="64" class="user">
-          <img :src="avatar" />
-        </mu-avatar>
-      </div>
-      <div class="username-wrapper">
-        <span>{{ username }}</span>
-      </div>
-      <div class="action-container">
-        <div class="action-wrapper">
-          <div class="action-pwa" @click.capture.stop.prevent="togglePWA">
-            <mu-checkbox
-              v-model="isPWAEnable"
-              :uncheck-icon="hasPWA?'favorite_border':'help_outline'"
-              checked-icon="favorite"
-              :label="isPWAEnable?'已添加到主屏':'添加到主屏'"
-              :label-left="true"
-              :ripple="false"
-            ></mu-checkbox>
+      <div class="main-wrapper">
+        <div class="avatar-wrapper">
+          <mu-avatar size="64" class="user">
+            <img :src="avatar" />
+          </mu-avatar>
+        </div>
+        <div class="username-wrapper">
+          <span>{{ username }}</span>
+        </div>
+        <div class="action-container">
+          <div class="action-wrapper">
+            <div class="action-pwa" @click.capture.stop.prevent="togglePWA">
+              <mu-checkbox
+                v-model="isPWAEnable"
+                :uncheck-icon="hasPWA?'favorite_border':'help_outline'"
+                checked-icon="favorite"
+                :label="isPWAEnable?'已添加到主屏':'添加到主屏'"
+                :label-left="true"
+                :ripple="false"
+              ></mu-checkbox>
+            </div>
+          </div>
+          <div class="action-wrapper">
+            <mu-button
+              class="button-connect-github"
+              :color="antGreen"
+              :disabled="isGithubConnected"
+              @click="connectGithub"
+              v-loading="githubLoading"
+              data-mu-loading-size="24"
+            >{{ isGithubConnected ? 'GitHub已绑定' : '绑定GitHub' }}</mu-button>
+          </div>
+          <div class="action-wrapper">
+            <mu-button class="button-delete-all-feed" :color="antRed" @click="deleteAllFeed">删除全部订阅</mu-button>
+          </div>
+          <div class="action-wrapper">
+            <mu-button class="button-logout" :color="antGold" @click="logout">退出登录</mu-button>
           </div>
         </div>
-        <div class="action-wrapper">
-          <mu-button
-            class="button-connect-github"
-            :color="antGreen"
-            :disabled="isGithubConnected"
-            @click="connectGithub"
-            v-loading="githubLoading"
-            data-mu-loading-size="24"
-          >{{ isGithubConnected ? 'GitHub已绑定' : '绑定GitHub' }}</mu-button>
-        </div>
-        <div class="action-wrapper">
-          <mu-button class="button-delete-all-feed" :color="antRed" @click="deleteAllFeed">删除全部订阅</mu-button>
-        </div>
-        <div class="action-wrapper">
-          <mu-button class="button-logout" :color="antGold" @click="logout">退出登录</mu-button>
-        </div>
       </div>
-    </div>
-    <template v-slot:footer>
       <MoFooter />
-    </template>
+    </div>
   </MoLayout>
 </template>
 
@@ -189,6 +189,11 @@ export default {
 .main {
   padding-left: 16 * @pr;
   padding-right: 16 * @pr;
+}
+
+.main-wrapper {
+  min-height: 100%;
+  padding-bottom: @footerHeight;
 }
 
 .avatar-wrapper {

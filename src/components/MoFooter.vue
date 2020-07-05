@@ -14,12 +14,9 @@ export default {}
 @import '~@/styles/common';
 
 .footer {
-  height: 48 * @pr;
-  position: absolute;
-  bottom: 0;
-  left: 0;
   width: 100%;
-  padding: 0 16 * @pr;
+  padding: 48 * @pr 16 * @pr 24 * @pr 16 * @pr;
+  margin-top: -@footerHeight;
   background: #ffffff;
 }
 

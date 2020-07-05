@@ -8,12 +8,9 @@
 </template>
 
 <script>
-import { hasBoard } from '@/plugin/common'
-
 export default {
   data() {
     return {
-      hasBoard,
       keepAlivePages: ['MoHomePage', 'MoAccountPage', 'MoFeedCreationPage'],
     }
   },
@@ -41,5 +38,7 @@ export default {
 #app {
   position: relative;
   min-width: @minWidth;
+  max-width: @maxWidth;
+  margin: 0 auto;
 }
 </style>

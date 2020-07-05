@@ -1,3 +1,6 @@
+import Vue from 'vue'
+import _ from 'lodash'
+
 // 主色
 export const antGreen = '#66BB6A'
 export const antBlue = '#60bbf3'
@@ -17,5 +20,33 @@ export const antRippleGrey = '#090909' // 涟漪黑
 export const antBackGrey = '#ECECEC' // 背景浅灰
 export const antLineGrey = '#ECECEC' // 线条浅灰
 
-const hasBoard = window.innerWidth >= 750
-export { hasBoard }
+// 页面布局
+function computeLayout(windowInnerWidth) {
+  const appWidth = Math.min(1500, windowInnerWidth)
+  const hasBoard = appWidth >= 850
+  const mainWidth = Math.max(375, Math.round(appWidth / 3))
+  const boardWidth = appWidth - mainWidth
+  return {
+    windowInnerWidth: windowInnerWidth,
+    appWidth: appWidth,
+    hasBoard: hasBoard,
+    mainWidth: hasBoard ? mainWidth : appWidth,
+    boardWidth: hasBoard ? boardWidth : 0,
+  }
+}
+const LAYOUT = Vue.observable(computeLayout(window.innerWidth))
+window.addEventListener(
+  'resize',
+  _.debounce(function() {
+    let newWidth = window.innerWidth
+    if (newWidth !== LAYOUT.windowInnerWidth) {
+      let newLayout = computeLayout(newWidth)
+      _.forEach(_.entries(newLayout), ([key, value]) => {
+        LAYOUT[key] = value
+      })
+    }
+  }),
+  150
+)
+export const hasBoard = LAYOUT.hasBoard
+export { LAYOUT }
