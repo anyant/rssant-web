@@ -90,5 +90,6 @@ export default {
   margin: auto;
   font-family: Helvetica, Arial, sans-serif;
   color: darken(@antBackGrey, 5%);
+  cursor: default;
 }
 </style>

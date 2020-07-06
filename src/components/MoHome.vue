@@ -83,6 +83,8 @@
           :feed="item.feed"
           :story="item.story"
           :routeTo="routeTo"
+          @click.native.capture="setActiveItem(item.id)"
+          :class="{'active-item': isActiveItem(item.id)}"
         ></VirtualItem>
       </transition-group>
       <transition-group
@@ -97,6 +99,8 @@
           :feed="item.feed"
           :story="item.story"
           :routeTo="routeTo"
+          @click.native.capture="setActiveItem(item.id)"
+          :class="{'active-item': isActiveItem(item.id)}"
         ></VirtualItem>
       </transition-group>
     </div>
@@ -183,6 +187,7 @@ export default {
       wizardTrigger: null,
       isMenuOpen: false,
       isReady: false,
+      activeItemKey: null,
       virtualUpperHeight: 0,
       virtualUpperList: [],
       virtualLowerHeight: 0,
@@ -265,6 +270,9 @@ export default {
         this.$router.push(path)
       }
     },
+    setActiveItem(key) {
+      this.activeItemKey = key
+    },
     goFeedClean() {
       this.routeTo('/feed-clean')
       this.isMenuOpen = false
@@ -279,6 +287,12 @@ export default {
     },
     isReaded(story) {
       return this.$API.story.isReaded(story)
+    },
+    isActiveItem(key) {
+      if (_.isNil(this.activeItemKey) || !this.$LAYOUT.hasBoard) {
+        return false
+      }
+      return this.activeItemKey === key
     },
     _upperSize() {
       let upperSize = 0
@@ -522,6 +536,11 @@ export default {
 .list .feed-story-item,
 .list .feed-item {
   margin-top: 8 * @pr;
+  cursor: default;
+}
+
+.list .active-item {
+  box-shadow: 0 0 4 * @pr 0 @antInk;
 }
 
 .list-upper {
