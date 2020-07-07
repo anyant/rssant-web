@@ -239,8 +239,8 @@ export default {
 @import '~@/styles/common';
 
 .mescroll {
-  position: fixed;
-  top: 48 * @pr;
+  position: absolute;
+  top: 0;
   bottom: 0;
   height: auto;
   max-width: @maxWidth;
@@ -263,7 +263,7 @@ export default {
 }
 
 .jump-to-latest {
-  position: fixed;
+  position: absolute;
   bottom: 12 * @pr;
   left: 0;
   right: 0;

@@ -1,43 +1,45 @@
 <template>
-  <MoLayout class="register" footer>
-    <div class="title">创建蚁阅账号</div>
-    <mu-text-field
-      full-width
-      placeholder="邮箱地址"
-      :error-text="registerForm.emailErrorText"
-      @focus="clearErrorText"
-      v-model="registerForm.email"
-    ></mu-text-field>
-    <mu-text-field
-      full-width
-      placeholder="密码"
-      :action-icon="registerForm.passwordVisibility ? 'visibility_off' : 'visibility'"
-      :action-click="() => (registerForm.passwordVisibility = !registerForm.passwordVisibility)"
-      :type="registerForm.passwordVisibility ? 'text' : 'password'"
-      :error-text="registerForm.passwordErrorText"
-      @focus="clearErrorText"
-      @keyup.enter.native="register"
-      v-model="registerForm.password"
-    ></mu-text-field>
-    <div class="button-wrapper">
-      <mu-button
-        @click="register"
-        class="button-register"
-        :color="antGreen"
-        :disabled="isRegisterDisabled"
-        data-mu-loading-size="24"
-        v-loading="isRegisterLoading"
-      >注册</mu-button>
-    </div>
-    <div class="login">
-      <MoAntGreenButton @click="()=>{this.$router.replace('/login')}">已有账号？去登录</MoAntGreenButton>
-    </div>
-    <div class="thirdpart">
-      <MoThirdpartLogin></MoThirdpartLogin>
-    </div>
-    <template v-slot:footer>
+  <MoLayout footer>
+    <div class="register">
+      <div class="register-wrapper">
+        <div class="title">创建蚁阅账号</div>
+        <mu-text-field
+          full-width
+          placeholder="邮箱地址"
+          :error-text="registerForm.emailErrorText"
+          @focus="clearErrorText"
+          v-model="registerForm.email"
+        ></mu-text-field>
+        <mu-text-field
+          full-width
+          placeholder="密码"
+          :action-icon="registerForm.passwordVisibility ? 'visibility_off' : 'visibility'"
+          :action-click="() => (registerForm.passwordVisibility = !registerForm.passwordVisibility)"
+          :type="registerForm.passwordVisibility ? 'text' : 'password'"
+          :error-text="registerForm.passwordErrorText"
+          @focus="clearErrorText"
+          @keyup.enter.native="register"
+          v-model="registerForm.password"
+        ></mu-text-field>
+        <div class="button-wrapper">
+          <mu-button
+            @click="register"
+            class="button-register"
+            :color="antGreen"
+            :disabled="isRegisterDisabled"
+            data-mu-loading-size="24"
+            v-loading="isRegisterLoading"
+          >注册</mu-button>
+        </div>
+        <div class="login">
+          <MoAntGreenButton @click="()=>{this.$router.replace('/login')}">已有账号？去登录</MoAntGreenButton>
+        </div>
+        <div class="thirdpart">
+          <MoThirdpartLogin></MoThirdpartLogin>
+        </div>
+      </div>
       <MoFooter />
-    </template>
+    </div>
   </MoLayout>
 </template>
 
@@ -128,11 +130,16 @@ export default {
   padding-right: 16 * @pr;
 }
 
+.register-wrapper {
+  min-height: 100vh;
+  padding-bottom: @footerHeight;
+}
+
 .title {
   font-size: 20 * @pr;
   font-weight: bold;
-  margin-top: 40 * @pr;
-  margin-bottom: 40 * @pr;
+  padding-top: 40 * @pr;
+  padding-bottom: 40 * @pr;
   text-align: center;
 }
 

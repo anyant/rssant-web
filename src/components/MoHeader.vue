@@ -8,16 +8,16 @@ export default {
   props: {
     border: {
       type: Boolean,
-      default: false
-    }
-  }
+      default: false,
+    },
+  },
 }
 </script>
 <style lang="less" scoped>
 @import '~@/styles/common';
 
 .header {
-  position: fixed;
+  position: absolute;
   top: 0;
   width: 100%;
   max-width: @maxWidth;
@@ -32,6 +32,8 @@ export default {
 }
 
 .header-border {
+  height: 49 * @pr;
+  margin-bottom: -1 * @pr;
   border-bottom: 1px solid @antLineGrey;
 }
 </style>

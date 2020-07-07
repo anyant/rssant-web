@@ -36,6 +36,7 @@ export default {
 }
 
 #app {
+  position: relative;
   min-width: @minWidth;
   max-width: @maxWidth;
   margin: 0 auto;

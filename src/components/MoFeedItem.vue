@@ -19,6 +19,7 @@ export default {
     },
     date: String,
     link: String,
+    routeTo: Function,
   },
   computed: {
     readed() {
@@ -42,7 +43,7 @@ export default {
   },
   methods: {
     onClick() {
-      this.$router.push(this.link)
+      this.routeTo(this.link)
     },
   },
 }
