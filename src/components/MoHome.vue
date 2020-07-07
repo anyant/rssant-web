@@ -365,7 +365,7 @@ export default {
       // setup scroll position
       let scrollTop = this.$pageState.get('scrollTop')
       if (_.isNil(scrollTop) || scrollTop <= 0) {
-        scrollTop = this.virtualUpperHeight - 8
+        scrollTop = this.virtualUpperHeight
       }
       let upperIndex = upperSize - 1
       let lowerIndex = upperSize
@@ -412,7 +412,10 @@ export default {
       setTimeout(() => {
         let el = this.$refs.mainRef
         if (!_.isNil(el)) {
-          el.scrollTo(0, scrollTop)
+          // fix scroll unexpected position by setTimeout
+          setTimeout(() => {
+            el.scrollTo(0, scrollTop)
+          }, 0)
         }
         renderFirstPage()
         setTimeout(() => {

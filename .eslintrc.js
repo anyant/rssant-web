@@ -10,6 +10,7 @@ module.exports = {
     // not allow console and debugger
     'no-console': 'warn',
     'no-debugger': 'warn',
+    'no-unused-vars': 'warn',
     // ignore non-camelcase
     camelcase: 'off',
     // allow async-await
