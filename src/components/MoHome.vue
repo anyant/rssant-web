@@ -553,8 +553,8 @@ export default {
 
 .empty-placeholder-wrapper,
 .list-placeholder-wrapper {
-  position: fixed;
-  top: 48 * @pr;
+  position: absolute;
+  top: 0;
   bottom: 0;
   left: 0;
   right: 0;

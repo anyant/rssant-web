@@ -4,9 +4,12 @@
       <MoHome></MoHome>
     </MoLayout>
     <div v-if="hasBoard" class="app-board" :style="boardStyle">
-      <div class="rssant-placeholder" v-if="showPlaceholder">
-        <div class="placeholder-title">蚁阅</div>
-      </div>
+      <MoLayout grey header v-if="showPlaceholder">
+        <MoHeader></MoHeader>
+        <div class="rssant-placeholder">
+          <div class="placeholder-title">蚁阅</div>
+        </div>
+      </MoLayout>
       <router-view :key="this.$route.path" />
     </div>
   </div>
@@ -15,10 +18,11 @@
 <script>
 import MoLayout from '@/components/MoLayout'
 import MoHome from '@/components/MoHome'
+import MoHeader from '@/components/MoHeader'
 
 export default {
   name: 'MoHomePage',
-  components: { MoLayout, MoHome },
+  components: { MoLayout, MoHome, MoHeader },
   data() {
     return {
       isReady: false,
@@ -79,10 +83,7 @@ export default {
 }
 
 .rssant-placeholder {
-  height: 100vh;
   display: flex;
-  position: absolute;
-  width: 100%;
 }
 
 .rssant-placeholder .placeholder-title {
