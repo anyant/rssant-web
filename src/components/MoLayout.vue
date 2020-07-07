@@ -39,6 +39,8 @@ export default {
   min-height: 100vh;
   background: #ffffff;
   overflow: hidden;
+  max-width: @pageMaxWidth;
+  margin: 0 auto;
 }
 
 .layout-header {
