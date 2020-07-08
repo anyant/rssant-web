@@ -7,6 +7,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import { formatDateFriendly } from '@/plugin/datefmt'
 
 export default {
@@ -28,14 +29,21 @@ export default {
     },
   },
   methods: {
+    myRouteTo(link) {
+      if (_.isNil(this.routeTo)) {
+        this.$router.push(link)
+      } else {
+        this.routeTo(link)
+      }
+    },
     goFeed() {
-      this.routeTo(`/feed/${this.feedId}`)
+      this.myRouteTo(`/feed/${this.feedId}`)
     },
     goStory() {
       if (!this.isReaded) {
         this.$API.feed.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
       }
-      this.routeTo(`/story/${this.feedId}-${this.offset}`)
+      this.myRouteTo(`/story/${this.feedId}-${this.offset}`)
     },
   },
 }

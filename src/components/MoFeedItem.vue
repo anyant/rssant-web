@@ -43,7 +43,11 @@ export default {
   },
   methods: {
     onClick() {
-      this.routeTo(this.link)
+      if (_.isNil(this.routeTo)) {
+        this.$router.push(this.link)
+      } else {
+        this.routeTo(this.link)
+      }
     },
   },
 }
