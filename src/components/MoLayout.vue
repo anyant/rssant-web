@@ -1,8 +1,12 @@
 <template>
-  <div class="layout" :class="{
+  <div
+    class="layout"
+    :class="{
       'layout-grey': grey,
       'layout-header': header,
-    }">
+    }"
+    :style="wrapperStyle"
+  >
     <slot></slot>
   </div>
 </template>
@@ -16,6 +20,13 @@ export default {
     header: {
       type: Boolean,
       default: false,
+    },
+  },
+  computed: {
+    wrapperStyle() {
+      return {
+        minHeight: `${this.$LAYOUT.windowInnerHeight}px`,
+      }
     },
   },
 }
