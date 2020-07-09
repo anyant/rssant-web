@@ -34,7 +34,11 @@ function computeLayout(windowInnerWidth) {
     boardWidth: hasBoard ? boardWidth : 0,
   }
 }
-const LAYOUT = Vue.observable(computeLayout(window.innerWidth))
+
+const LAYOUT = Vue.observable({
+  windowInnerHeight: window.innerHeight,
+  ...computeLayout(window.innerWidth),
+})
 window.addEventListener(
   'resize',
   _.debounce(function() {
@@ -48,6 +52,10 @@ window.addEventListener(
       _.forEach(_.entries(newLayout), ([key, value]) => {
         LAYOUT[key] = value
       })
+    }
+    let newHeight = window.innerHeight
+    if (newHeight !== LAYOUT.windowInnerHeight) {
+      LAYOUT.windowInnerHeight = newHeight
     }
   }),
   150

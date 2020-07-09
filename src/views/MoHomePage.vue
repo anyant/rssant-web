@@ -44,15 +44,15 @@ export default {
       let marginWidth = (this.$LAYOUT.windowInnerWidth - this.$LAYOUT.appWidth) / 2
       return {
         position: 'fixed',
-        left: marginWidth + 'px',
-        right: marginWidth + 'px',
+        left: `${marginWidth}px`,
+        right: `${marginWidth}px`,
         top: 0,
         bottom: 0,
       }
     },
     mainStyle() {
       return {
-        width: this.$LAYOUT.mainWidth + 'px',
+        width: `${this.$LAYOUT.mainWidth}px`,
         position: 'absolute',
         left: 0,
         top: 0,
@@ -63,7 +63,7 @@ export default {
     boardStyle() {
       let boardWidth = this.$LAYOUT.boardWidth - 8
       return {
-        width: boardWidth + 'px',
+        width: `${boardWidth}px`,
         position: 'absolute',
         right: 0,
         top: 0,
@@ -87,7 +87,7 @@ export default {
 }
 
 .rssant-placeholder .placeholder-title {
-  font-size: 54px;
+  font-size: 54 * @pr;
   margin: auto;
   font-family: Helvetica, Arial, sans-serif;
   color: darken(@antBackGrey, 5%);

@@ -1,7 +1,7 @@
 <template>
   <MoLayout footer>
     <div class="register">
-      <div class="register-wrapper">
+      <div class="register-wrapper" :style="wrapperStyle">
         <div class="title">创建蚁阅账号</div>
         <mu-text-field
           full-width
@@ -70,6 +70,11 @@ export default {
   computed: {
     isRegisterDisabled() {
       return !(this.registerForm.email && this.registerForm.password)
+    },
+    wrapperStyle() {
+      return {
+        minHeight: `${this.$LAYOUT.windowInnerHeight}px`,
+      }
     },
   },
   methods: {

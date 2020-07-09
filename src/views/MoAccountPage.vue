@@ -2,7 +2,7 @@
   <MoLayout header>
     <MoBackHeader></MoBackHeader>
     <div class="main">
-      <div class="main-wrapper">
+      <div class="main-wrapper" :style="wrapperStyle">
         <div class="avatar-wrapper">
           <mu-avatar size="64" class="user">
             <img :src="avatar" />
@@ -100,6 +100,11 @@ export default {
       let user = this.$API.user.loginUser
       return _.isNil(user) ? '' : user.username
     },
+    wrapperStyle() {
+      return {
+        minHeight: `${this.$LAYOUT.windowInnerHeight - 48}px`,
+      }
+    },
   },
   mounted() {},
   methods: {
@@ -192,7 +197,7 @@ export default {
 }
 
 .main-wrapper {
-  min-height: 100%;
+  min-height: 100vh;
   padding-bottom: @footerHeight;
 }
 

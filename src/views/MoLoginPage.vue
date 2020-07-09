@@ -1,7 +1,7 @@
 <template>
   <MoLayout footer>
     <div class="login">
-      <div class="login-wrapper">
+      <div class="login-wrapper" :style="wrapperStyle">
         <div class="title">蚁阅 - 让RSS更好用</div>
         <mu-text-field
           full-width
@@ -69,6 +69,11 @@ export default {
   computed: {
     isLoginDisabled() {
       return !(this.loginForm.account && this.loginForm.password)
+    },
+    wrapperStyle() {
+      return {
+        minHeight: `${this.$LAYOUT.windowInnerHeight}px`,
+      }
     },
   },
   methods: {
