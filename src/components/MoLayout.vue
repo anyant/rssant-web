@@ -47,6 +47,7 @@ export default {
 @import '~@/styles/common';
 
 .layout {
+  position: relative;
   min-height: 100vh;
   background: #ffffff;
   overflow: hidden;
