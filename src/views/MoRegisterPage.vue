@@ -103,10 +103,20 @@ export default {
           if (!_.isNil(error.response) && error.response.status === 400) {
             let data = error.response.data
             if (!_.isEmpty(data.email)) {
-              this.registerForm.emailErrorText = data.email
+              if (data.email.toLowerCase().includes('already registered')) {
+                this.registerForm.emailErrorText = '此邮箱已注册'
+              } else if (data.email.toLowerCase().includes('valid email address')) {
+                this.registerForm.emailErrorText = '邮箱地址无效'
+              } else {
+                this.registerForm.emailErrorText = data.email
+              }
             }
             if (!_.isEmpty(data.password)) {
-              this.registerForm.passwordErrorText = data.password
+              if (data.password.toLowerCase().includes('password is too short')) {
+                this.registerForm.passwordErrorText = '密码至少要 8 个字符'
+              } else {
+                this.registerForm.passwordErrorText = data.password
+              }
             }
             if (_.isEmpty(data.email) && _.isEmpty(data.password)) {
               this.registerForm.passwordErrorText = error.message
