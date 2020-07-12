@@ -117,7 +117,7 @@ function normalizeFeedStoryOffset(feed) {
   if (_.isNil(feed.num_unread_storys) || _.isNil(feed.story_offset) || _.isNil(feed.total_storys)) {
     return feed
   }
-  const MAX_UNREAD_STORYS = 999
+  const MAX_UNREAD_STORYS = 99
   if (feed.num_unread_storys > MAX_UNREAD_STORYS) {
     feed.num_unread_storys = MAX_UNREAD_STORYS
     feed.story_offset = feed.total_storys - MAX_UNREAD_STORYS
