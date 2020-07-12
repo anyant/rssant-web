@@ -117,7 +117,13 @@ function normalizeFeedStoryOffset(feed) {
   if (_.isNil(feed.num_unread_storys) || _.isNil(feed.story_offset) || _.isNil(feed.total_storys)) {
     return feed
   }
-  const MAX_UNREAD_STORYS = 99
+  const MAX_NEW_UNREAD_STORYS = 99
+  const isNewFeed = feed.story_offset <= 0
+  if (isNewFeed && feed.num_unread_storys > MAX_NEW_UNREAD_STORYS) {
+    feed.num_unread_storys = MAX_NEW_UNREAD_STORYS
+    feed.story_offset = feed.total_storys - MAX_NEW_UNREAD_STORYS
+  }
+  const MAX_UNREAD_STORYS = 300
   if (feed.num_unread_storys > MAX_UNREAD_STORYS) {
     feed.num_unread_storys = MAX_UNREAD_STORYS
     feed.story_offset = feed.total_storys - MAX_UNREAD_STORYS
