@@ -18,6 +18,7 @@ import {
   Radio,
   Select,
   Switch,
+  Slider,
   TextField,
   Tooltip,
   Snackbar,
@@ -36,6 +37,7 @@ Vue.use(Popover)
 Vue.use(Radio)
 Vue.use(Select)
 Vue.use(Switch)
+Vue.use(Slider)
 Vue.use(TextField)
 Vue.use(Tooltip)
 Vue.use(Snackbar)

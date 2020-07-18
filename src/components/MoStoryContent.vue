@@ -17,9 +17,7 @@
     </div>
     <div class="content" v-if="story">
       <div class="story-audio-wrapper" v-if="story.audio_url">
-        <audio controls>
-          <source :src="story.audio_url" />Your browser does not support the audio element.
-        </audio>
+        <MoAudioPlayer :src="story.audio_url"></MoAudioPlayer>
       </div>
       <div class="story-iframe-wrapper" v-if="story.iframe_url">
         <div class="story-iframe-loading-wrapper">
@@ -44,8 +42,10 @@
 import _ from 'lodash'
 import { formatFullDateFriendly } from '@/plugin/datefmt'
 import initMathjax from '@/plugin/mathjax'
+import MoAudioPlayer from '@/components/MoAudioPlayer'
 
 export default {
+  components: { MoAudioPlayer },
   props: {
     story: Object,
   },

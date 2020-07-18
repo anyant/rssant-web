@@ -21,6 +21,8 @@ faLibrary.add(fas.faStar)
 faLibrary.add(fas.faChevronLeft)
 faLibrary.add(fas.faInfoCircle)
 faLibrary.add(fas.faTrash)
+faLibrary.add(fas.faPlayCircle)
+faLibrary.add(fas.faPauseCircle)
 faLibrary.add(far.faStar)
 faLibrary.add(fab.faGithub)
 
