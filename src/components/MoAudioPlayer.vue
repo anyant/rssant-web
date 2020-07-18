@@ -66,7 +66,6 @@ export default {
       audioError: null,
       audioDuration: 0,
       isAudioSeekable: true,
-      defaultVolume: 1.0,
       // buffer and progress
       audioBuffer: 0,
       audioProgress: 0,
@@ -124,20 +123,6 @@ export default {
       hour = hour < 10 ? '0' + hour : hour
       return `${hour}:${min}:${sec}`
     },
-    smoothAudioPause() {
-      let self = this
-      let step = self.defaultVolume / 16
-      let audioFadeOut = function() {
-        if (self.audio.volume <= step) {
-          self.audio.pause()
-          self.audio.volume = self.defaultVolume
-        } else {
-          self.audio.volume -= step
-          requestAnimationFrame(audioFadeOut)
-        }
-      }
-      requestAnimationFrame(audioFadeOut)
-    },
     handlePlayError(error) {
       let isNotSupportedError =
         error.name === 'NotSupportedError' || error.code === 9 || error.name === 'NOT_SUPPORTED_ERR'
@@ -152,7 +137,6 @@ export default {
       this.isPaused = !this.isPaused
       if (!this.isPaused) {
         this.audio.preload = 'auto'
-        this.audio.volume = this.defaultVolume
         let promise = this.audio.play()
         if (!_.isNil(promise)) {
           promise
@@ -164,7 +148,7 @@ export default {
             })
         }
       } else {
-        this.smoothAudioPause()
+        this.audio.pause()
       }
     },
     // slider element
@@ -252,7 +236,6 @@ export default {
       this.audio = audio
       audio.preload = 'metadata'
       audio.muted = false
-      this.defaultVolume = audio.volume
       this.isAudioSeekable = !!audio.seekable
       audio.addEventListener('durationchange', this.handleAudioDuration)
       audio.addEventListener('timeupdate', this.handleAudioProgress)
@@ -294,7 +277,6 @@ export default {
         duration = -1
       }
       this.audioDuration = duration
-      this.defaultVolume = this.audio.volume
       let seekable = this.audio.seekable
       this.isAudioSeekable = !_.isNil(seekable) && seekable.length > 0
       this.isAudioReady = true
