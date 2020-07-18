@@ -259,6 +259,8 @@ export default {
       audio.addEventListener('progress', this.handleAudioBuffer)
       audio.addEventListener('waiting', this.handleAudioWaiting)
       audio.addEventListener('playing', this.handleAudioPlaying)
+      audio.addEventListener('play', this.handleAudioPlay)
+      audio.addEventListener('pause', this.handleAudioPause)
       audio.addEventListener('ended', this.handleAudioEnded)
       audio.addEventListener('emptied', this.handleAudioEmptied)
       audio.addEventListener('error', this.handleAudioError)
@@ -273,6 +275,8 @@ export default {
       audio.removeEventListener('progress', this.handleAudioBuffer)
       audio.removeEventListener('waiting', this.handleAudioWaiting)
       audio.removeEventListener('playing', this.handleAudioPlaying)
+      audio.removeEventListener('play', this.handleAudioPlay)
+      audio.removeEventListener('pause', this.handleAudioPause)
       audio.removeEventListener('ended', this.handleAudioEnded)
       audio.removeEventListener('emptied', this.handleAudioEmptied)
       audio.removeEventListener('error', this.handleAudioError)
@@ -319,6 +323,18 @@ export default {
     handleAudioPlaying(e) {
       this.isAudioPlaying = true
       this.isAudioWaiting = false
+    },
+    handleAudioPlay() {
+      // handle audio play by system widget
+      if (this.isPaused) {
+        this.isPaused = _.defaultTo(this.audio.paused, false)
+      }
+    },
+    handleAudioPause() {
+      // handle audio pause by system widget
+      if (!this.isPaused) {
+        this.isPaused = _.defaultTo(this.audio.paused, true)
+      }
     },
     handleAudioEnded(e) {
       this.isAudioEnded = _.defaultTo(this.audio.ended, true)
