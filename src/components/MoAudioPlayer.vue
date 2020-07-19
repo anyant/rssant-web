@@ -231,12 +231,22 @@ export default {
       this.audio.currentTime = this.audioProgress
       this.isSeeking = false
     },
+    syncAudioSeekable() {
+      let seekable = this.audio.seekable
+      this.isAudioSeekable = !_.isNil(seekable) && seekable.length > 0
+    },
+    syncAudioPaused(defaultValue) {
+      this.isPaused = !!_.defaultTo(this.audio.paused, defaultValue)
+    },
+    syncAudioEnded() {
+      this.isAudioEnded = _.defaultTo(this.audio.ended, true)
+    },
     initAudio() {
       let audio = new Audio(this.src)
       this.audio = audio
       audio.preload = 'metadata'
       audio.muted = false
-      this.isAudioSeekable = !!audio.seekable
+      this.syncAudioSeekable()
       audio.addEventListener('durationchange', this.handleAudioDuration)
       audio.addEventListener('timeupdate', this.handleAudioProgress)
       audio.addEventListener('progress', this.handleAudioBuffer)
@@ -277,13 +287,16 @@ export default {
         duration = -1
       }
       this.audioDuration = duration
-      let seekable = this.audio.seekable
-      this.isAudioSeekable = !_.isNil(seekable) && seekable.length > 0
       this.isAudioReady = true
+      this.syncAudioSeekable()
     },
     handleAudioProgress(e) {
       if (!this.isSeeking) {
         this.audioProgress = this.audio.currentTime
+        // the ended event may not fired
+        if (this.audioDuration > 0 && this.audioProgress >= this.audioDuration) {
+          this.handleAudioEnded(e)
+        }
       }
     },
     handleAudioBuffer(e) {
@@ -309,21 +322,25 @@ export default {
     handleAudioPlay() {
       // handle audio play by system widget
       if (this.isPaused) {
-        this.isPaused = _.defaultTo(this.audio.paused, false)
+        this.syncAudioPaused(false)
       }
+      this.syncAudioSeekable()
     },
     handleAudioPause() {
       // handle audio pause by system widget
       if (!this.isPaused) {
-        this.isPaused = _.defaultTo(this.audio.paused, true)
+        this.syncAudioPaused(true)
       }
+      this.syncAudioSeekable()
     },
     handleAudioEnded(e) {
-      this.isAudioEnded = _.defaultTo(this.audio.ended, true)
-      this.isPaused = _.defaultTo(this.audio.paused, true)
+      this.syncAudioEnded()
+      this.syncAudioPaused(true)
+      this.syncAudioSeekable()
     },
     handleAudioEmptied(e) {
-      this.isPaused = _.defaultTo(this.audio.paused, true)
+      this.syncAudioPaused(true)
+      this.syncAudioSeekable()
     },
     handleAudioError(e) {
       if (!_.isNil(this.audio.error)) {
@@ -331,7 +348,8 @@ export default {
         // eslint-disable-next-line no-console
         console.error(this.audio.error)
       }
-      this.isPaused = _.defaultTo(this.audio.paused, true)
+      this.syncAudioPaused(true)
+      this.syncAudioSeekable()
     },
   },
 }
