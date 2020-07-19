@@ -59,10 +59,10 @@ export default {
       isSeeking: false,
       isAudioReady: false,
       isAudioEnded: false,
-      isAudioPlaying: true,
       isAudioWaiting: false,
       // attribute
       audio: null,
+      audioChecker: null,
       audioError: null,
       audioDuration: 0,
       isAudioSeekable: true,
@@ -94,8 +94,7 @@ export default {
       }
     },
     isShowLoading() {
-      let isWaiting = !this.isAudioReady || this.isAudioWaiting
-      return !this.isPaused && isWaiting && !this.audioError
+      return !this.isPaused && this.isAudioWaiting && !this.audioError
     },
     isSliderSeekable() {
       return this.isAudioReady && this.audioDuration > 0 && this.isAudioSeekable
@@ -150,6 +149,7 @@ export default {
       } else {
         this.audio.pause()
       }
+      this.syncAudioSeekable()
     },
     // slider element
     initSlider() {
@@ -159,6 +159,12 @@ export default {
     destroySlider() {
       this.sliderRef.removeEventListener('touchstart', this.handleTouchStart)
       this.sliderRef.removeEventListener('mousedown', this.handleMouseStart)
+      // ensure remove all listener
+      document.removeEventListener('touchmove', this.handleTouchMove)
+      document.removeEventListener('touchend', this.handleTouchEnd)
+      document.removeEventListener('touchcancel', this.handleTouchEnd)
+      document.removeEventListener('mousemove', this.handleMouseMove)
+      document.removeEventListener('mouseup', this.handleMouseEnd)
     },
     // touch events
     handleTouchStart(e) {
@@ -228,7 +234,12 @@ export default {
     // audio player
     // https://html.spec.whatwg.org/multipage/media.html#the-audio-element
     applyAudioProgress() {
-      this.audio.currentTime = this.audioProgress
+      try {
+        this.audio.currentTime = this.audioProgress
+      } catch (ignore) {
+        /** audio seek failed */
+        this.audioProgress = this.audio.currentTime
+      }
       this.isSeeking = false
     },
     syncAudioSeekable() {
@@ -241,17 +252,42 @@ export default {
     syncAudioEnded() {
       this.isAudioEnded = _.defaultTo(this.audio.ended, true)
     },
+    checkIsProgressEnded() {
+      return this.audioDuration > 0 && this.audioProgress >= this.audioDuration
+    },
+    startAudioWaitingChecker() {
+      // show loading when audio waiting too long
+      // use timer because audio events may not fired in some system
+      let state = []
+      let timer = setInterval(() => {
+        let isWaiting = false
+        if (!this.isPaused && !this.checkIsProgressEnded()) {
+          state.push(this.audioProgress)
+          while (state.length > 2) {
+            state.splice(0, 1)
+          }
+          if (state.length === 2 && state[0] === state[1]) {
+            isWaiting = true
+          }
+        }
+        this.isAudioWaiting = isWaiting
+      }, 3000)
+      return timer
+    },
     initAudio() {
       let audio = new Audio(this.src)
       this.audio = audio
       audio.preload = 'metadata'
       audio.muted = false
       this.syncAudioSeekable()
+      this.audioChecker = this.startAudioWaitingChecker()
       audio.addEventListener('durationchange', this.handleAudioDuration)
       audio.addEventListener('timeupdate', this.handleAudioProgress)
       audio.addEventListener('progress', this.handleAudioBuffer)
-      audio.addEventListener('waiting', this.handleAudioWaiting)
       audio.addEventListener('playing', this.handleAudioPlaying)
+      audio.addEventListener('canplay', this.handleAudioCanPlay)
+      audio.addEventListener('loadedmetadata', this.handleAudioLoaded)
+      audio.addEventListener('loadeddata', this.handleAudioLoaded)
       audio.addEventListener('play', this.handleAudioPlay)
       audio.addEventListener('pause', this.handleAudioPause)
       audio.addEventListener('ended', this.handleAudioEnded)
@@ -263,11 +299,17 @@ export default {
       if (_.isNil(audio)) {
         return
       }
+      if (!_.isNil(this.audioChecker)) {
+        clearInterval(this.audioChecker)
+        this.audioChecker = null
+      }
       audio.removeEventListener('durationchange', this.handleAudioDuration)
       audio.removeEventListener('timeupdate', this.handleAudioProgress)
       audio.removeEventListener('progress', this.handleAudioBuffer)
-      audio.removeEventListener('waiting', this.handleAudioWaiting)
       audio.removeEventListener('playing', this.handleAudioPlaying)
+      audio.removeEventListener('canplay', this.handleAudioCanPlay)
+      audio.removeEventListener('loadedmetadata', this.handleAudioLoaded)
+      audio.removeEventListener('loadeddata', this.handleAudioLoaded)
       audio.removeEventListener('play', this.handleAudioPlay)
       audio.removeEventListener('pause', this.handleAudioPause)
       audio.removeEventListener('ended', this.handleAudioEnded)
@@ -294,7 +336,7 @@ export default {
       if (!this.isSeeking) {
         this.audioProgress = this.audio.currentTime
         // the ended event may not fired
-        if (this.audioDuration > 0 && this.audioProgress >= this.audioDuration) {
+        if (this.checkIsProgressEnded()) {
           this.handleAudioEnded(e)
         }
       }
@@ -305,19 +347,16 @@ export default {
         this.audioBuffer = buffer.end(0)
       }
     },
-    handleAudioWaiting(e) {
-      // show loading when audio waiting too long
-      // and avoid show short loading when seek audio
-      this.isAudioPlaying = false
-      setTimeout(() => {
-        if (!this.isAudioPlaying) {
-          this.isAudioWaiting = true
-        }
-      }, 5000)
-    },
     handleAudioPlaying(e) {
-      this.isAudioPlaying = true
       this.isAudioWaiting = false
+      this.syncAudioSeekable()
+    },
+    handleAudioCanPlay(e) {
+      this.isAudioWaiting = false
+      this.syncAudioSeekable()
+    },
+    handleAudioLoaded(e) {
+      this.syncAudioSeekable()
     },
     handleAudioPlay() {
       // handle audio play by system widget
