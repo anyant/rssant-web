@@ -1,5 +1,5 @@
 <template>
-  <div class="story-item">
+  <div class="story-item" :class="{'story-item-ctrl':isCtrlKeyHold}">
     <div
       class="story-header"
       :class="{ 'story-header-readed': isReaded }"
@@ -21,7 +21,7 @@
           <fa-icon size="18" v-else icon="far/star" :color="starColor" />
         </mu-button>
       </div>
-      <div class="story-preview-summary">{{ summary }}</div>
+      <div class="story-preview-summary" @click="handleSummaryClick">{{ summary }}</div>
       <mu-button icon class="story-preview-link" @click.stop="goLink">
         <fa-icon icon="external-link-alt" />
       </mu-button>
@@ -45,6 +45,10 @@ export default {
       default: false,
     },
     isFavorited: {
+      type: Boolean,
+      default: false,
+    },
+    isCtrlKeyHold: {
       type: Boolean,
       default: false,
     },
@@ -78,8 +82,21 @@ export default {
     toggleFavorited() {
       this.$emit('toggleFavorited')
     },
+    handleSummaryClick() {
+      if (this.isCtrlKeyHold) {
+        this.openLinkInNewTab()
+      }
+    },
+    openLinkInNewTab() {
+      if (!_.isEmpty(this.link)) {
+        window.open(this.link, '_blank')
+      } else if (!_.isEmpty(this.routerLink)) {
+        this.$router.push(this.routerLink)
+      }
+    },
     goLink() {
-      if (!_.isEmpty(this.link) && (_.isEmpty(this.content) || this.content.length <= 20)) {
+      let isPoorContent = _.isEmpty(this.content) || this.content.length <= 20
+      if (!_.isEmpty(this.link) && (this.isCtrlKeyHold || isPoorContent)) {
         window.open(this.link, '_blank')
       } else if (!_.isEmpty(this.routerLink)) {
         this.$router.push(this.routerLink)
@@ -93,7 +110,11 @@ export default {
         }
       }
       this.$emit('read')
-      this.isOpened = !this.isOpened
+      if (!this.isOpened && this.isCtrlKeyHold) {
+        this.openLinkInNewTab()
+      } else {
+        this.isOpened = !this.isOpened
+      }
     },
   },
 }
@@ -179,6 +200,10 @@ export default {
   text-overflow: ellipsis;
   line-height: 1.4;
   font-size: 15 * @pr;
+}
+
+.story-item-ctrl .story-preview-summary:hover {
+  cursor: pointer;
 }
 
 .story-favorited {

@@ -34,6 +34,7 @@
         :link="story.link"
         :router-link="`/story/${story.feed.id}-${story.offset}`"
         :isFavorited="story.is_favorited"
+        :isCtrlKeyHold="isCtrlKeyHold"
         @read="onRead(story)"
         @toggleFavorited="toggleFavorited(story)"
       ></MoStoryItem>
@@ -47,10 +48,15 @@ import MoLayout from '@/components/MoLayout'
 import MoStoryItem from '@/components/MoStoryItem'
 import MoScrollList from '@/components/MoScrollList'
 
+const isMacLike = /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)
+const TARGET_KEY = isMacLike ? 'meta' : 'control'
+
 export default {
   components: { MoBackHeader, MoLayout, MoStoryItem, MoScrollList },
   data() {
-    return {}
+    return {
+      isCtrlKeyHold: false,
+    }
   },
   computed: {
     feedId() {
@@ -90,6 +96,12 @@ export default {
       await this.$API.feed.load({ feedId: this.feedId })
     }
     await this.$API.syncFeedLoadMushrooms()
+    document.addEventListener('keydown', this.handleKeyDown)
+    document.addEventListener('keyup', this.handleKeyUp)
+  },
+  destroyed() {
+    document.removeEventListener('keydown', this.handleKeyDown)
+    document.removeEventListener('keyup', this.handleKeyUp)
   },
   methods: {
     loadStorys({ offset, size }) {
@@ -113,6 +125,18 @@ export default {
     async onJump(offset) {
       await this.$API.syncFeedLoadMushrooms()
       this.$API.feed.setStoryOffset({ feedId: this.feed.id, offset: offset })
+    },
+    handleKeyDown(event) {
+      if (event.key.toLowerCase() === TARGET_KEY.toLowerCase()) {
+        this.isCtrlKeyHold = true
+      } else {
+        if (this.isCtrlKeyHold) {
+          this.isCtrlKeyHold = false
+        }
+      }
+    },
+    handleKeyUp(event) {
+      this.isCtrlKeyHold = false
     },
   },
 }
