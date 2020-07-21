@@ -55,6 +55,7 @@ export default {
   white-space: nowrap;
   text-overflow: ellipsis;
   color: @antTextBlack;
+  cursor: default;
 }
 
 .left,

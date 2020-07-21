@@ -207,4 +207,9 @@ export default {
     top: 1 * @pr;
   }
 }
+
+.story-header,
+.story-preview-header {
+  cursor: pointer;
+}
 </style>

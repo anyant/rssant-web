@@ -65,6 +65,7 @@ export default {
   align-items: center;
   justify-content: space-between;
   background: #fff;
+  cursor: pointer;
 }
 
 .feed-item-readed {

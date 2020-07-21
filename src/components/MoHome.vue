@@ -450,6 +450,7 @@ export default {
   color: @antTextBlack;
   font-weight: bold;
   font-size: 16 * @pr;
+  cursor: default;
 }
 
 .right {
@@ -459,6 +460,7 @@ export default {
 .user {
   width: 32 * @pr;
   height: 32 * @pr;
+  cursor: pointer;
 }
 
 .action-readed,
@@ -539,7 +541,7 @@ export default {
 .list .feed-story-item,
 .list .feed-item {
   margin-top: 8 * @pr;
-  cursor: default;
+  cursor: pointer;
 }
 
 .list .active-item {
