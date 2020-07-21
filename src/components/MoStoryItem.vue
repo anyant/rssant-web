@@ -1,15 +1,20 @@
 <template>
   <div class="story-item">
-    <div class="story-header" :class="{ 'story-header-readed': isReaded }" @click="onOpen">
+    <div
+      class="story-header"
+      :class="{ 'story-header-readed': isReaded }"
+      v-if="!isOpened"
+      @click="onOpen"
+    >
       <div class="story-title">{{ title || link }}</div>
       <div class="story-date">{{ dateText }}</div>
     </div>
     <div
       class="story-preview"
-      v-if="isOpened"
       :class="{'story-preview-readed': isReaded && !isReading}"
+      v-if="isOpened"
     >
-      <div class="story-preview-header">
+      <div class="story-preview-header" @click="onOpen">
         <div class="story-preview-title">{{ title }}</div>
         <mu-button icon class="story-favorited" @click.stop="toggleFavorited">
           <fa-icon size="18" v-if="isFavorited" icon="star" :color="starColor" />
@@ -147,7 +152,8 @@ export default {
 }
 
 .story-preview {
-  padding-bottom: 8 * @pr;
+  padding-top: 9 * @pr;
+  padding-bottom: 9 * @pr;
   position: relative;
   min-height: 72 * @pr;
 }
@@ -178,7 +184,7 @@ export default {
 .story-favorited {
   flex-shrink: 0;
   position: absolute;
-  top: -6 * @pr;
+  top: 3 * @pr;
   right: 12 * @pr;
   width: 32 * @pr;
   height: 32 * @pr;
