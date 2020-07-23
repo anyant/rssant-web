@@ -97,7 +97,7 @@ export default {
     goLink() {
       let isPoorContent = _.isEmpty(this.content) || this.content.length <= 20
       if (!_.isEmpty(this.link) && (this.isCtrlKeyHold || isPoorContent)) {
-        window.open(this.link, '_blank')
+        this.openLinkInNewTab()
       } else if (!_.isEmpty(this.routerLink)) {
         this.$router.push(this.routerLink)
       }
