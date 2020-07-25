@@ -59,7 +59,6 @@ export default {
     summary: String,
     content: String,
     link: String,
-    routerLink: String,
   },
   data() {
     return {
@@ -76,6 +75,9 @@ export default {
       } else {
         return null
       }
+    },
+    routerLink() {
+      return `/story/${this.feedId}-${this.offset}`
     },
   },
   methods: {

@@ -7,7 +7,7 @@
         <fa-icon size="18" v-else icon="far/star" :color="starColor" />
       </mu-button>
     </MoBackHeader>
-    <MoStoryContent :story="story"></MoStoryContent>
+    <MoStoryContent :story="story" :source="source" :next-feed="nextFeed" :next-story="nextStory"></MoStoryContent>
   </MoLayout>
 </template>
 
@@ -30,8 +30,20 @@ export default {
     offset() {
       return parseInt(this.$route.params.offset)
     },
+    source() {
+      return _.defaultTo(this.$route.query.source, '').toLowerCase()
+    },
+    isSourceMushroom() {
+      return this.source === 'mushroom'
+    },
     isFavorited() {
       return !_.isNil(this.story) && this.story.is_favorited
+    },
+    isReaded() {
+      if (_.isNil(this.feed) || _.isNil(this.story)) {
+        return false
+      }
+      return this.story.offset < this.feed.story_offset
     },
     starColor() {
       if (this.isFavorited) {
@@ -46,6 +58,27 @@ export default {
     story() {
       return this.$API.story.get({ feedId: this.feedId, offset: this.offset })
     },
+    nextStory() {
+      let story = null
+      if (this.isSourceMushroom) {
+        story = this.$API.story.nextMushroom({
+          feedId: this.feedId,
+          offset: this.offset,
+        })
+      } else {
+        story = this.$API.story.get({
+          feedId: this.feedId,
+          offset: this.offset + 1,
+        })
+      }
+      return story
+    },
+    nextFeed() {
+      if (_.isNil(this.nextStory)) {
+        return null
+      }
+      return this.$API.feed.get(this.nextStory.feed.id)
+    },
     headerTitle() {
       if (!_.isNil(this.story) && !_.isNil(this.feed)) {
         return `${this.feed.title} - ${this.story.title}`
@@ -58,19 +91,59 @@ export default {
       }
     },
   },
-  mounted() {
-    if (_.isNil(this.feed)) {
-      this.$API.feed.load({ feedId: this.feedId })
-    }
-    if (_.isNil(this.story) || _.isEmpty(this.story.content)) {
-      this.$API.story.load({ feedId: this.feedId, offset: this.offset, detail: true })
-    }
-    window.scrollTo(0, 0)
+  async mounted() {
+    await this.loadFeedAndStory()
+    await this.$API.syncFeedLoadMushrooms()
+  },
+  beforeRouteUpdate(to, from, next) {
+    next()
+    this.loadFeedAndStory()
   },
   methods: {
     toggleFavorited() {
       let is_favorited = !this.isFavorited
       this.$API.story.setFavorited({ feedId: this.feedId, offset: this.offset, is_favorited })
+    },
+    async loadFeed({ feed, feedId }) {
+      if (_.isNil(feed)) {
+        await this.$API.feed.load({ feedId: feedId })
+      }
+    },
+    async loadStory({ story, feedId, offset }) {
+      if (_.isNil(story) || _.isEmpty(story.content)) {
+        await this.$API.story.load({ feedId, offset, detail: true })
+      }
+    },
+    async loadFeedAndStory() {
+      let feedLoaded = this.loadFeed({
+        feed: this.feed,
+        feedId: this.feedId,
+      })
+      let storyLoaded = this.loadStory({
+        story: this.story,
+        feedId: this.feedId,
+        offset: this.offset,
+      })
+      await feedLoaded
+      await storyLoaded
+      if (!_.isNil(this.feed) && !_.isNil(this.story) && !this.isReaded) {
+        this.$API.feed.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
+      }
+      window.scrollTo(0, 0)
+      if (!this.isSourceMushroom) {
+        let hasNext = this.offset + 1 < this.feed.total_storys
+        if (hasNext) {
+          let next = this.$API.story.get({
+            feedId: this.feedId,
+            offset: this.offset + 1,
+          })
+          await this.loadStory({
+            story: next,
+            feedId: this.feedId,
+            offset: this.offset + 1,
+          })
+        }
+      }
     },
   },
 }

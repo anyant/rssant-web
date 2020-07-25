@@ -1,40 +1,52 @@
 <template>
   <div class="story-content">
-    <div class="story-info" v-if="story">
-      <div class="info-title">{{ story.title }}</div>
-      <div class="info-item">
-        <span class="info-item-name">原文：</span>
-        <a
-          class="info-item-content story-link"
-          :href="story.link"
-          target="_blank"
-        >{{ storyLinkUnquoted }}</a>
-      </div>
-      <div class="info-item">
-        <span class="info-item-name">发布时间：</span>
-        <span class="info-item-content">{{ dateText }}</span>
-      </div>
-    </div>
-    <div class="content" v-if="story">
-      <div class="story-audio-wrapper" v-if="story.audio_url">
-        <MoAudioPlayer :src="story.audio_url"></MoAudioPlayer>
-      </div>
-      <div class="story-iframe-wrapper" v-if="story.iframe_url">
-        <div class="story-iframe-loading-wrapper">
-          <div class="story-iframe-loading">Loading</div>
+    <div class="story-wrapper" :style="wrapperStyle">
+      <div class="story-info" v-if="story">
+        <div class="info-title">{{ story.title }}</div>
+        <div class="info-item">
+          <span class="info-item-name">原文：</span>
+          <a
+            class="info-item-content story-link"
+            :href="story.link"
+            target="_blank"
+          >{{ storyLinkUnquoted }}</a>
         </div>
-        <iframe
-          :src="story.iframe_url"
-          scrolling="no"
-          border="0"
-          frameborder="no"
-          framespacing="0"
-          allowfullscreen="true"
-          referrerpolicy="no-referrer"
-        ></iframe>
+        <div class="info-item">
+          <span class="info-item-name">发布时间：</span>
+          <span class="info-item-content">{{ dateText }}</span>
+        </div>
       </div>
-      <div id="story-markdown-body" class="markdown-body" v-story="storyContent"></div>
+      <div class="content" v-if="story">
+        <div class="story-audio-wrapper" v-if="story.audio_url">
+          <MoAudioPlayer :src="story.audio_url"></MoAudioPlayer>
+        </div>
+        <div class="story-iframe-wrapper" v-if="story.iframe_url">
+          <div class="story-iframe-loading-wrapper">
+            <div class="story-iframe-loading">Loading</div>
+          </div>
+          <iframe
+            :src="story.iframe_url"
+            scrolling="no"
+            border="0"
+            frameborder="no"
+            framespacing="0"
+            allowfullscreen="true"
+            referrerpolicy="no-referrer"
+          ></iframe>
+        </div>
+        <div id="story-markdown-body" class="markdown-body" v-story="storyContent"></div>
+      </div>
     </div>
+    <transition name="fade">
+      <div v-if="nextStory" class="next-story">
+        <div class="next-story-label">
+          <div class="next-story-label-line"></div>
+          <div class="next-story-label-value">下一篇</div>
+          <div class="next-story-label-line"></div>
+        </div>
+        <a class="next-story-link" @click.prevent="openNextStory">{{ nextTitle }}</a>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -48,6 +60,9 @@ export default {
   components: { MoAudioPlayer },
   props: {
     story: Object,
+    source: String,
+    nextFeed: Object,
+    nextStory: Object,
   },
   computed: {
     storyLinkUnquoted() {
@@ -68,9 +83,46 @@ export default {
       }
       return this.story.content
     },
+    wrapperStyle() {
+      return {
+        minHeight: `${this.$LAYOUT.windowInnerHeight - 48}px`,
+      }
+    },
+    isSourceMushroom() {
+      return _.defaultTo(this.source, '').toLowerCase() === 'mushroom'
+    },
+    nextTitle() {
+      if (_.isNil(this.nextStory)) {
+        return ''
+      }
+      let feedTitle = null
+      if (this.isSourceMushroom && !_.isNil(this.nextFeed)) {
+        feedTitle = this.nextFeed.title
+      }
+      let storyTitle = this.nextStory.title || decodeURI(this.nextStory.link)
+      if (!_.isEmpty(feedTitle)) {
+        return `${feedTitle} - ${storyTitle}`
+      } else {
+        return storyTitle
+      }
+    },
   },
   mounted() {
     initMathjax()
+  },
+  methods: {
+    openNextStory() {
+      if (_.isNil(this.nextStory)) {
+        return
+      }
+      let feedId = this.nextStory.feed.id
+      let offset = this.nextStory.offset
+      let link = `/story/${feedId}-${offset}`
+      if (!_.isEmpty(this.source)) {
+        link += `?source=${this.source}`
+      }
+      this.$router.replace(link)
+    },
   },
 }
 </script>
@@ -78,8 +130,15 @@ export default {
 <style lang="less" scoped>
 @import '~@/styles/common';
 
+@nextStoryLinkHeight: 120 * @pr;
+
+.story-wrapper {
+  min-height: 100vh;
+  padding-bottom: @nextStoryLinkHeight;
+}
+
 .story-info {
-  margin: 16 * @pr;
+  padding: 16 * @pr;
   overflow: hidden;
 }
 
@@ -112,6 +171,7 @@ export default {
   white-space: nowrap;
   color: @antBlue;
   font-size: 14 * @pr;
+  line-height: 1.25;
 }
 
 .content {
@@ -171,5 +231,55 @@ export default {
     left: 0;
     top: 0;
   }
+}
+
+.next-story {
+  margin-top: -@nextStoryLinkHeight;
+  padding: 16 * @pr;
+  overflow: hidden;
+}
+
+.next-story-label {
+  margin-top: 12 * @pr;
+  margin-bottom: 12 * @pr;
+  display: flex;
+  align-items: center;
+  cursor: default;
+
+  .next-story-label-value {
+    padding-left: 8 * @pr;
+    padding-right: 8 * @pr;
+    color: @antTextGrey;
+  }
+
+  .next-story-label-line {
+    flex: 1;
+    height: 0;
+    border-bottom: 1 * @pr solid @antLineGrey;
+  }
+}
+
+.next-story-link {
+  display: block;
+  text-align: center;
+  font-size: 15 * @pr;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  padding-top: 4 * @pr;
+  padding-bottom: 4 * @pr;
+  color: @antBlue;
+  cursor: pointer;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 3s ease;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

@@ -39,7 +39,6 @@ function addOrUpdateStory(feedStorys, story) {
 export default {
   state: {
     storys: {},
-    mushroomsSorted: false,
     mushrooms: [],
     mushroomsLoading: new Loading(),
     favoritedLoading: new Loading(),
@@ -75,10 +74,6 @@ export default {
     },
     ADD_OR_UPDATE_MUSHROOMS(state, storys) {
       addOrUpdateList(state, storys)
-      state.mushrooms = storys
-    },
-    SET_SORTED_MUSHROOMS(state, storys) {
-      state.mushroomsSorted = true
       state.mushrooms = storys
     },
     DELETE_STORYS_OF_FEED(state, feedId) {
@@ -123,15 +118,16 @@ export default {
     mushrooms(state) {
       return state.mushrooms
     },
-    numUnreadMushrooms(state, API) {
-      function notRead(story) {
-        let feed = API.feed.get(story.feed.id)
-        if (_.isNil(feed)) {
-          return true
+    nextMushroom(state) {
+      return ({ feedId, offset }) => {
+        let index = state.mushrooms.findIndex(story => {
+          return story.feed.id === feedId && story.offset === offset
+        })
+        if (index >= 0 && index + 1 < state.mushrooms.length) {
+          return state.mushrooms[index + 1]
         }
-        return story.offset >= feed.story_offset
+        return null
       }
-      return state.mushrooms.filter(notRead).length
     },
     favorited(state) {
       let favorited = []
@@ -174,7 +170,8 @@ export default {
     async loadMushrooms(DAO, { mushroomKeys, detail }) {
       await DAO.state.mushroomsLoading.begin(async () => {
         let data = await API.story.queryBatch({ storys: mushroomKeys, detail })
-        DAO.ADD_OR_UPDATE_MUSHROOMS(data.storys)
+        let mushrooms = sortMushrooms(data.storys, DAO.API)
+        DAO.ADD_OR_UPDATE_MUSHROOMS(mushrooms)
       })
     },
     async loadFavorited(DAO) {
@@ -182,12 +179,6 @@ export default {
         let data = await API.story.listFavorited()
         DAO.ADD_OR_UPDATE_LIST({ storys: data.storys })
       })
-    },
-    sortMushrooms(DAO) {
-      if (!DAO.state.mushroomsSorted) {
-        let mushrooms = sortMushrooms(DAO.state.mushrooms, DAO.API)
-        DAO.SET_SORTED_MUSHROOMS(mushrooms)
-      }
     },
   },
 }

@@ -43,7 +43,7 @@ export default {
       if (!this.isReaded) {
         this.$API.feed.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
       }
-      this.myRouteTo(`/story/${this.feedId}-${this.offset}`)
+      this.myRouteTo(`/story/${this.feedId}-${this.offset}?source=mushroom`)
     },
   },
 }

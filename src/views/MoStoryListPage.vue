@@ -32,7 +32,6 @@
         :content="story.content"
         :date="story.dt_published"
         :link="story.link"
-        :router-link="`/story/${story.feed.id}-${story.offset}`"
         :isFavorited="story.is_favorited"
         :isCtrlKeyHold="isCtrlKeyHold"
         @read="onRead(story)"
