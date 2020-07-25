@@ -36,6 +36,10 @@ import { formatDateFriendly } from '@/plugin/datefmt'
 
 export default {
   props: {
+    isOpened: {
+      type: Boolean,
+      default: false,
+    },
     isReaded: {
       type: Boolean,
       default: false,
@@ -61,9 +65,7 @@ export default {
     link: String,
   },
   data() {
-    return {
-      isOpened: false,
-    }
+    return {}
   },
   computed: {
     dateText() {
@@ -115,7 +117,7 @@ export default {
       if (!this.isOpened && this.isCtrlKeyHold) {
         this.openLinkInNewTab()
       } else {
-        this.isOpened = !this.isOpened
+        this.$emit('update:isOpened', !this.isOpened)
       }
     },
   },

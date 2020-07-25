@@ -23,6 +23,7 @@
       <MoStoryItem
         v-for="story in storyList"
         :key="story.offset"
+        :isOpened.sync="storyOpened[story.offset]"
         :isReaded="isReaded(story)"
         :isReading="isReading(story)"
         :feedId="feedId"
@@ -54,6 +55,7 @@ export default {
   components: { MoBackHeader, MoLayout, MoStoryItem, MoScrollList },
   data() {
     return {
+      storyOpened: {},
       isCtrlKeyHold: false,
     }
   },
@@ -124,6 +126,10 @@ export default {
     async onJump(offset) {
       await this.$API.syncFeedLoadMushrooms()
       this.$API.feed.setStoryOffset({ feedId: this.feed.id, offset: offset })
+      // close all story cards so that scroll position can be computed correctly
+      _.forEach(_.keys(this.storyOpened), key => {
+        this.storyOpened[key] = false
+      })
     },
     handleKeyDown(event) {
       if (event.key.toLowerCase() === TARGET_KEY.toLowerCase()) {
