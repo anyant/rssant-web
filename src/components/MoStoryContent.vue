@@ -273,9 +273,12 @@ export default {
   cursor: pointer;
 }
 
-.fade-enter-active,
-.fade-leave-active {
+.fade-enter-active {
   transition: opacity 3s ease;
+}
+
+.fade-leave-active {
+  transition: opacity 0.3s ease;
 }
 
 .fade-enter,
