@@ -118,10 +118,11 @@ export default {
       let feedId = this.nextStory.feed.id
       let offset = this.nextStory.offset
       let link = `/story/${feedId}-${offset}`
+      let query = {}
       if (!_.isEmpty(this.source)) {
-        link += `?source=${this.source}`
+        query.source = this.source
       }
-      this.$router.replace(link)
+      this.$router.replace({ path: link, query: query })
     },
   },
 }

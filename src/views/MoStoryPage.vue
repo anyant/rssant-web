@@ -100,10 +100,11 @@ export default {
   async mounted() {
     await this.loadFeedAndStory()
     await this.$API.syncFeedLoadMushrooms()
-  },
-  beforeRouteUpdate(to, from, next) {
-    next()
-    this.loadFeedAndStory()
+    // chrome: $route will change and mounted will not re-executed
+    // firefox and safari: mounted will re-executed
+    this.$watch('$route', () => {
+      this.loadFeedAndStory()
+    })
   },
   methods: {
     toggleFavorited() {
