@@ -7,7 +7,13 @@
         <fa-icon size="18" v-else icon="far/star" :color="starColor" />
       </mu-button>
     </MoBackHeader>
-    <MoStoryContent :story="story" :source="source" :next-feed="nextFeed" :next-story="nextStory"></MoStoryContent>
+    <MoStoryContent
+      ref="contentRef"
+      :story="story"
+      :source="source"
+      :next-feed="nextFeed"
+      :next-story="nextStory"
+    ></MoStoryContent>
   </MoLayout>
 </template>
 
@@ -129,7 +135,7 @@ export default {
       if (!_.isNil(this.feed) && !_.isNil(this.story) && !this.isReaded) {
         this.$API.feed.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
       }
-      window.scrollTo(0, 0)
+      this.scrollToTop()
       if (!this.isSourceMushroom) {
         let hasNext = this.offset + 1 < this.feed.total_storys
         if (hasNext) {
@@ -143,6 +149,13 @@ export default {
             offset: this.offset + 1,
           })
         }
+      }
+    },
+    scrollToTop() {
+      window.scrollTo(0, 0)
+      let contentRef = this.$refs.contentRef
+      if (!_.isNil(contentRef) && !_.isNil(contentRef.$el)) {
+        contentRef.$el.scrollTo(0, 0)
       }
     },
   },
