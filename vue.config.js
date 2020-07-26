@@ -43,8 +43,8 @@ module.exports = {
     },
     iconPaths: {
       // will auto prefix '/' and auto add assetsVersion
-      favicon32: 'img/icons/favicon-32x32.png',
-      favicon16: 'img/icons/favicon-16x16.png',
+      favicon32: null,
+      favicon16: null,
       appleTouchIcon: 'img/icons/apple-touch-icon.png',
       maskIcon: 'img/icons/safari-pinned-tab.svg',
       msTileImage: 'img/icons/msapplication-icon-150x150.png',

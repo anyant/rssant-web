@@ -5,10 +5,10 @@
   "scripts": {
     "serve": "npm run copy_libs && vue-cli-service serve",
     "build": "sh scripts/pre_build.sh && vue-cli-service build --report && npm run copy_libs dist",
+    "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "copy_libs": "sh scripts/copy_libs.sh",
-    "serve_dist": "node scripts/serve_dist.js",
-    "test:unit": "vue-cli-service test:unit"
+    "serve_dist": "node scripts/serve_dist.js"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.28",
@@ -38,13 +38,13 @@
   "devDependencies": {
     "@babel/cli": "^7.8.4",
     "@babel/preset-env": "^7.9.6",
-    "@vue/cli-plugin-babel": "^4.1.0",
-    "@vue/cli-plugin-eslint": "^4.1.0",
-    "@vue/cli-plugin-pwa": "^4.1.0",
-    "@vue/cli-plugin-router": "^4.1.0",
-    "@vue/cli-plugin-unit-mocha": "^4.1.0",
-    "@vue/cli-plugin-vuex": "^4.1.0",
-    "@vue/cli-service": "^4.3.1",
+    "@vue/cli-plugin-babel": "^4.4.6",
+    "@vue/cli-plugin-eslint": "^4.4.6",
+    "@vue/cli-plugin-pwa": "^4.4.6",
+    "@vue/cli-plugin-router": "^4.4.6",
+    "@vue/cli-plugin-unit-mocha": "^4.4.6",
+    "@vue/cli-plugin-vuex": "^4.4.6",
+    "@vue/cli-service": "^4.4.6",
     "@vue/eslint-config-standard": "^4.0.0",
     "@vue/test-utils": "1.0.0-beta.29",
     "babel-eslint": "^10.0.3",
