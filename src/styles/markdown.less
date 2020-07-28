@@ -49,6 +49,12 @@
     outline: none;
 }
 
+// fix content overflow, eg: inline MathJax
+.markdown-body p {
+    max-width: 100%;
+    overflow : auto;
+}
+
 /* Fix: font-weight: 600 not working in Android Chrome */
 .markdown-body strong {
     font-weight: bold;
