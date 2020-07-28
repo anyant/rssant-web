@@ -4,7 +4,8 @@ import _ from 'lodash'
 // https://liam.page/2019/06/28/variants-of-FM/
 // http://matt33.com/2019/10/27/paper-chandy-lamport/
 
-const RE_INLINE_MATHJAX = /(\$[^$]+?\$)|(`[^`]+?`)/ms
+// Note: accept $...$ but not $10...$10
+const RE_INLINE_MATHJAX = /(\$(?!\d)[^$]+?\$(?!\d))|(`[^`]+?`)/ms
 const RE_DISPLAY_MATHJAX = /(\$\$[^$]+?\$\$)|(\\\([^()]+?\\\))|(\\\[[^[]]+?\\\])/ms
 
 const StoryRender = {
@@ -15,12 +16,13 @@ const StoryRender = {
       return dom
     }
 
-    function renderMathjax(dom, content) {
-      let hasInlineMathjax = RE_INLINE_MATHJAX.exec(content)
-      let hasDisplayMathjax = RE_DISPLAY_MATHJAX.exec(content)
-      if (!(hasInlineMathjax || hasDisplayMathjax)) {
-        return
-      }
+    function hasMathJax(content) {
+      let hasInlineMathjax = RE_INLINE_MATHJAX.test(content)
+      let hasDisplayMathjax = RE_DISPLAY_MATHJAX.test(content)
+      return hasInlineMathjax || hasDisplayMathjax
+    }
+
+    function renderMathjax(dom) {
       // http://docs.mathjax.org/en/v2.7-latest/advanced/typeset.html#reset-automatic-equation-numbering
       MathJax.Hub.Queue(
         ['resetEquationNumbers', MathJax.InputJax.TeX],
@@ -29,8 +31,8 @@ const StoryRender = {
       )
       dom.querySelectorAll('code,pre').forEach(block => {
         const text = block.innerHTML
-        let hasInlineMathjax = RE_INLINE_MATHJAX.exec(text)
-        let hasDisplayMathjax = RE_DISPLAY_MATHJAX.exec(text)
+        let hasInlineMathjax = RE_INLINE_MATHJAX.test(text)
+        let hasDisplayMathjax = RE_DISPLAY_MATHJAX.test(text)
         if (hasInlineMathjax || hasDisplayMathjax) {
           if (hasInlineMathjax) {
             block.outerHTML = '<span class="story-render-mathjax">' + text + '</span>'
@@ -42,14 +44,25 @@ const StoryRender = {
       MathJax.Hub.Queue(['Typeset', MathJax.Hub, dom])
     }
 
+    function isMathjaxReady() {
+      return !_.isNil(window.MathJax) && !_.isNil(window.MathJax.Hub)
+    }
+
+    function renderMathjaxIfReady(dom) {
+      if (isMathjaxReady()) {
+        renderMathjax(dom)
+      } else {
+        // TODO: render MathJax after it's ready
+      }
+    }
+
     Vue.directive('story', function(el, binding) {
       let content = binding.value || ''
       let dom = renderDom(content)
       el.innerHTML = ''
       el.appendChild(dom)
-      let isMathjaxReady = !_.isNil(window.MathJax) && !_.isNil(window.MathJax.Hub)
-      if (isMathjaxReady) {
-        renderMathjax(dom, content)
+      if (hasMathJax(content)) {
+        renderMathjaxIfReady(dom)
       }
     })
   },

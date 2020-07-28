@@ -19,7 +19,8 @@ function initMathjax() {
     messageStyle: 'none',
     showMathMenu: false,
     showMathMenuMSIE: false,
-    elements: ['story-markdown-body'],
+    skipStartupTypeset: true,
+    elements: ['do-not-auto-render-any-elements'],
     tex2jax: {
       inlineMath: [
         ['$', '$'],
