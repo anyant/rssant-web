@@ -7,13 +7,12 @@ import '@/plugin/fontawesome'
 import 'material-design-icons/iconfont/material-icons.css'
 import 'typeface-roboto'
 // others
-import { sync } from 'vuex-router-sync'
 import Mescroll from 'mescroll.js/mescroll.vue'
 
 // rssant
 import App from './App'
 import router from '@/router'
-import { Store, API } from '@/store'
+import { API } from '@/store'
 import { pageMixin } from '@/plugin/page'
 import StoryRender from '@/plugin/storyRender'
 import { LAYOUT } from '@/plugin/common'
@@ -36,8 +35,6 @@ if (localConfig.PWA_ENABLE.get()) {
 initREM(true, 32, 1)
 
 Vue.config.productionTip = false
-
-sync(Store, router)
 
 Vue.prototype.$API = API
 Vue.prototype.$LAYOUT = LAYOUT
