@@ -24,16 +24,14 @@
           <span class="wizard-triangle"></span>
           <div class="wizard-info">点这里添加订阅</div>
         </mu-popover>
-        <mu-menu
-          placement="bottom"
-          class="action-menu"
-          :open.sync="isMenuOpen"
-          :popover-class="isActive?'menu-popover':'menu-popover-hidden'"
-        >
-          <mu-button icon class="action-menu-button">
-            <fa-icon class="action-icon" icon="bars" />
-          </mu-button>
-          <mu-list slot="content" class="menu-list">
+        <mu-button ref="actionMenuRef" icon class="action-menu" @click="toggleMenu">
+          <fa-icon class="action-icon" icon="bars" />
+        </mu-button>
+        <transition name="fade">
+          <mu-list ref="actionMenuListRef" class="action-menu-list" v-show="isMenuOpen">
+            <mu-list-item button @click="goAccount">
+              <mu-list-item-title>账号设置</mu-list-item-title>
+            </mu-list-item>
             <mu-list-item button @click="exportOPML">
               <mu-list-item-title>导出订阅</mu-list-item-title>
             </mu-list-item>
@@ -44,10 +42,7 @@
               <mu-list-item-title>我的收藏</mu-list-item-title>
             </mu-list-item>
           </mu-list>
-        </mu-menu>
-        <mu-avatar size="32" class="user" @click="()=>{this.routeTo('/account')}">
-          <img :src="avatar" />
-        </mu-avatar>
+        </transition>
       </div>
     </MoHeader>
     <div class="main" ref="mainRef">
@@ -118,7 +113,6 @@ import MoFeedItem from '@/components/MoFeedItem.vue'
 import MoFeedStoryItem from '@/components/MoFeedStoryItem.vue'
 
 import initMathjax from '@/plugin/mathjax'
-import defaultAvatar from '@/assets/avatar.svg'
 import { antRippleGrey } from '@/plugin/common'
 
 const ITEM_HEIGHT = 48
@@ -195,14 +189,6 @@ export default {
     }
   },
   computed: {
-    avatar() {
-      let user = this.$API.user.loginUser
-      if (_.isNil(user) || _.isEmpty(user.avatar_url)) {
-        return defaultAvatar
-      } else {
-        return user.avatar_url
-      }
-    },
     mushrooms() {
       return this.$API.story.mushrooms
     },
@@ -272,6 +258,29 @@ export default {
     },
     setActiveItem(key) {
       this.activeItemKey = key
+    },
+    toggleMenu() {
+      this.isMenuOpen = !this.isMenuOpen
+      if (this.isMenuOpen) {
+        window.addEventListener('click', this.handleClickOutsideMenu)
+      } else {
+        window.removeEventListener('click', this.handleClickOutsideMenu)
+      }
+    },
+    handleClickOutsideMenu(event) {
+      let actionMenuRef = this.$refs.actionMenuRef
+      let actionMenuListRef = this.$refs.actionMenuListRef
+      if (!_.isNil(actionMenuRef) && !_.isNil(actionMenuListRef)) {
+        if (actionMenuRef.$el.contains(event.target) || actionMenuListRef.$el.contains(event.target)) {
+          return
+        }
+      }
+      this.isMenuOpen = false
+      window.removeEventListener('click', this.handleClickOutsideMenu)
+    },
+    goAccount() {
+      this.routeTo('/account')
+      this.isMenuOpen = false
     },
     goFeedClean() {
       this.routeTo('/feed-clean')
@@ -430,16 +439,24 @@ export default {
 <style lang="less">
 @import '~@/styles/common';
 
-.menu-popover-hidden,
-.menu-popover {
-  top: 48 * @pr !important;
-  .menu-list .mu-item {
-    height: 40 * @pr;
-  }
+.action-menu-list {
+  position: absolute;
+  top: 48 * @pr;
+  right: 8 * @pr;
+  background: @antBackWhite;
+  width: auto;
+  padding: 0;
+  border-radius: 4 * @pr;
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
 }
 
-.menu-popover-hidden {
-  display: none;
+.action-menu-list .mu-item {
+  height: 48 * @pr;
+  font-weight: bold;
+}
+
+.action-menu-list > li:not(:first-child) .mu-item {
+  border-top: solid 1px lighten(@antLineGrey, 4%);
 }
 </style>
 
@@ -465,12 +482,13 @@ export default {
 
 .action-readed,
 .action-add,
-.action-menu,
-.action-menu-button {
+.action-menu {
   width: 32 * @pr;
   height: 32 * @pr;
-  margin-right: 16 * @pr;
+  margin-left: 16 * @pr;
   color: @antTextSemi;
+  position: relative;
+  right: -8 * @pr;
 }
 
 .wizard {

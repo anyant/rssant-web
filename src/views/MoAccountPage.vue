@@ -3,11 +3,6 @@
     <MoBackHeader></MoBackHeader>
     <div class="main">
       <div class="main-wrapper" :style="wrapperStyle">
-        <div class="avatar-wrapper">
-          <mu-avatar size="64" class="user">
-            <img :src="avatar" />
-          </mu-avatar>
-        </div>
         <div class="username-wrapper">
           <span>{{ username }}</span>
         </div>
@@ -54,7 +49,6 @@ import MoBackHeader from '@/components/MoBackHeader'
 import MoFooter from '@/components/MoFooter'
 import localConfig from '@/plugin/localConfig'
 import { antGold, antRed, antGreen } from '@/plugin/common'
-import defaultAvatar from '@/assets/avatar.svg'
 
 const hasPWA = 'serviceWorker' in navigator
 
@@ -72,14 +66,6 @@ export default {
     }
   },
   computed: {
-    avatar() {
-      let user = this.$API.user.loginUser
-      if (_.isNil(user) || _.isEmpty(user.avatar_url)) {
-        return defaultAvatar
-      } else {
-        return user.avatar_url
-      }
-    },
     isGithubConnected() {
       let user = this.$API.user.loginUser
       if (!this.$API.user.isLogined || _.isNil(user)) {
@@ -201,15 +187,8 @@ export default {
   padding-bottom: @footerHeight;
 }
 
-.avatar-wrapper {
-  padding-top: 16 * @pr;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-}
-
 .username-wrapper {
-  padding-top: 16 * @pr;
+  padding-top: 32 * @pr;
   font-size: 18 * @pr;
   font-weight: bold;
   display: flex;
