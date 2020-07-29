@@ -46,6 +46,9 @@ function isMathjaxReady() {
 
 export { hasInlineMathJax, hasDisplayMathJax, hasMathJax }
 
+// https://github.com/mathjax/mathjax-docs/wiki/'Can't-make-callback-from-given-data'-error-if-resetEquationNumbers-is-called-when-no-math-is-typeset
+let isFirstMathJaxRender = true
+
 const StoryRender = {
   install(Vue) {
     function renderDom(content) {
@@ -54,13 +57,8 @@ const StoryRender = {
       return dom
     }
 
-    function renderMathjax(dom) {
-      // http://docs.mathjax.org/en/v2.7-latest/advanced/typeset.html#reset-automatic-equation-numbering
-      MathJax.Hub.Queue(
-        ['resetEquationNumbers', MathJax.InputJax.TeX],
-        ['PreProcess', MathJax.Hub],
-        ['Reprocess', MathJax.Hub]
-      )
+    function renderMathjax(dom, elementId) {
+      let hasMathBlocks = false
       dom.querySelectorAll('code,pre').forEach(block => {
         const text = block.innerHTML
         let hasInline = hasInlineMathJax(text)
@@ -71,14 +69,32 @@ const StoryRender = {
           } else {
             block.outerHTML = '<p class="story-render-mathjax">' + text + '</p>'
           }
+          hasMathBlocks = true
         }
       })
-      MathJax.Hub.Queue(['Typeset', MathJax.Hub, dom])
+      if (hasMathBlocks) {
+        try {
+          // http://docs.mathjax.org/en/v2.7-latest/advanced/typeset.html#reset-automatic-equation-numbering
+          if (!isFirstMathJaxRender) {
+            // use elementId instead of dom object can avoid errors
+            MathJax.Hub.Queue(
+              ['resetEquationNumbers', MathJax.InputJax.TeX, elementId],
+              ['PreProcess', MathJax.Hub, elementId],
+              ['Reprocess', MathJax.Hub, elementId]
+            )
+          }
+          isFirstMathJaxRender = false
+          MathJax.Hub.Queue(['Typeset', MathJax.Hub, elementId])
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.warn('MathJax ' + error)
+        }
+      }
     }
 
-    function renderMathjaxIfReady(dom) {
-      if (isMathjaxReady()) {
-        renderMathjax(dom)
+    function renderMathjaxIfReady(dom, elementId) {
+      if (isMathjaxReady() && !_.isEmpty(elementId)) {
+        renderMathjax(dom, elementId)
       } else {
         // TODO: render MathJax after it's ready
       }
@@ -90,7 +106,7 @@ const StoryRender = {
       el.innerHTML = ''
       el.appendChild(dom)
       if (hasMathJax(content)) {
-        renderMathjaxIfReady(dom)
+        renderMathjaxIfReady(dom, el.id)
       }
     })
   },
