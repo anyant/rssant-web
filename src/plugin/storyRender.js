@@ -54,12 +54,6 @@ let isFirstMathJaxRender = true
 
 const StoryRender = {
   install(Vue) {
-    function renderDom(content) {
-      let dom = document.createElement('div')
-      dom.innerHTML = content
-      return dom
-    }
-
     function renderMathjax(dom, elementId) {
       dom.querySelectorAll('code,pre').forEach(block => {
         const text = block.innerHTML
@@ -100,12 +94,10 @@ const StoryRender = {
     }
 
     Vue.directive('story', function(el, binding) {
-      let content = binding.value || ''
-      let dom = renderDom(content)
-      el.innerHTML = ''
-      el.appendChild(dom)
+      let content = (binding.value || '').trim()
+      el.innerHTML = content
       if (hasMathJax(content)) {
-        renderMathjaxIfReady(dom, el.id)
+        renderMathjaxIfReady(el, el.id)
       }
     })
   },

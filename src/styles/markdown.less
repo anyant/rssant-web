@@ -40,19 +40,20 @@
 }
 
 // 数学公式过长，水平滚动
-.markdown-body .MathJax_Display {
+.markdown-body .MathJax_Display,
+.markdown-body .MathJax {
+    max-width : 100%;
     overflow-x: scroll;
     overflow-y: hidden;
-}
-
-.markdown-body .MathJax {
-    outline: none;
+    outline   : none;
 }
 
 // fix content overflow, eg: inline MathJax
-.markdown-body p {
-    max-width: 100%;
-    overflow : auto;
+.markdown-body>*,
+.markdown-body>div>* {
+    max-width : 100%;
+    overflow-x: scroll;
+    overflow-y: hidden;
 }
 
 /* Fix: font-weight: 600 not working in Android Chrome */
