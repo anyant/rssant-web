@@ -4,17 +4,20 @@ import _ from 'lodash'
 // https://liam.page/2019/06/28/variants-of-FM/
 // http://matt33.com/2019/10/27/paper-chandy-lamport/
 // https://andrewchen.co/podcast-ecosystem-2019/
+// http://karpathy.github.io/2015/03/30/breaking-convnets/
+// https://timvieira.github.io/blog/post/2016/09/25/evaluating-fx-is-as-fast-as-fx/
+// https://www.zybuluo.com/knight/note/96093
 
 // Note: accept $...$ but not $10...$10, 10$...10$ and jQuery $
 // see also: https://stackoverflow.com/questions/35142364/regex-negative-lookbehind-not-valid-in-javascript
 // see also: https://caniuse.com/#feat=js-regexp-lookbehind
 // see also: https://regexr.com/
-const RE_INLINE_DOLLAR = /([\d(.])?\$(?![(.])[^$]+?([(.])?\$(?![\d(.])/gms
-const RE_INLINE_QUOTE = /`[^`]+?`/ms
-const RE_DISPLAY_MATHJAX = /(\$\$[^$]+?\$\$)|(\\\([^()]+?\\\))|(\\\[[^[]]+?\\\])/ms
+const RE_INLINE_DOLLAR = /([\d(.])?\$(?![(.]).+?([(.])?\$(?![\d(.])/gms
+const RE_INLINE_MATHJAX = /(`[^`]+?`(?!`))|(\\\(.+?\\\))/ms
+const RE_DISPLAY_MATHJAX = /(\$\$.+?\$\$)|(\\\[.+?\\\])/ms
 
 function hasInlineMathJax(content) {
-  if (RE_INLINE_QUOTE.test(content)) {
+  if (RE_INLINE_MATHJAX.test(content)) {
     return true
   }
   // JavaScript RegExp objects are stateful when they have the global or sticky flags set
@@ -58,7 +61,6 @@ const StoryRender = {
     }
 
     function renderMathjax(dom, elementId) {
-      let hasMathBlocks = false
       dom.querySelectorAll('code,pre').forEach(block => {
         const text = block.innerHTML
         let hasInline = hasInlineMathJax(text)
@@ -69,26 +71,23 @@ const StoryRender = {
           } else {
             block.outerHTML = '<p class="story-render-mathjax">' + text + '</p>'
           }
-          hasMathBlocks = true
         }
       })
-      if (hasMathBlocks) {
-        try {
-          // http://docs.mathjax.org/en/v2.7-latest/advanced/typeset.html#reset-automatic-equation-numbering
-          if (!isFirstMathJaxRender) {
-            // use elementId instead of dom object can avoid errors
-            MathJax.Hub.Queue(
-              ['resetEquationNumbers', MathJax.InputJax.TeX, elementId],
-              ['PreProcess', MathJax.Hub, elementId],
-              ['Reprocess', MathJax.Hub, elementId]
-            )
-          }
-          isFirstMathJaxRender = false
-          MathJax.Hub.Queue(['Typeset', MathJax.Hub, elementId])
-        } catch (error) {
-          // eslint-disable-next-line no-console
-          console.warn('MathJax ' + error)
+      try {
+        // http://docs.mathjax.org/en/v2.7-latest/advanced/typeset.html#reset-automatic-equation-numbering
+        if (!isFirstMathJaxRender) {
+          // use elementId instead of dom object can avoid errors
+          MathJax.Hub.Queue(
+            ['resetEquationNumbers', MathJax.InputJax.TeX, elementId],
+            ['PreProcess', MathJax.Hub, elementId],
+            ['Reprocess', MathJax.Hub, elementId]
+          )
         }
+        isFirstMathJaxRender = false
+        MathJax.Hub.Queue(['Typeset', MathJax.Hub, elementId])
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.warn('MathJax ' + error)
       }
     }
 
