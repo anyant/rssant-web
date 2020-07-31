@@ -41,10 +41,37 @@ export { hasInlineMathJax, hasDisplayMathJax, hasStrictMathJax }
 // https://github.com/mathjax/mathjax-docs/wiki/'Can't-make-callback-from-given-data'-error-if-resetEquationNumbers-is-called-when-no-math-is-typeset
 let isFirstMathJaxRender = true
 
+const ignoreClasses = {}
+;[
+  'asciimath2jax_ignore',
+  'tex2jax_ignore',
+  'mathjax_ignore',
+  'asciimath2jax-ignore',
+  'tex2jax-ignore',
+  'mathjax-ignore',
+].forEach(c => {
+  ignoreClasses[c] = true
+})
+
+function isClassNameIgnore(className) {
+  if (!_.isEmpty(className)) {
+    let classList = className.split(/\s+/g)
+    for (let c of classList) {
+      if (ignoreClasses[c.toLowerCase()]) {
+        return true
+      }
+    }
+  }
+  return false
+}
+
 const StoryRender = {
   install(Vue) {
     function renderMathjax(dom, elementId) {
       dom.querySelectorAll('code,pre').forEach(block => {
+        if (isClassNameIgnore(block.className)) {
+          return
+        }
         const text = block.innerHTML
         let hasInline = hasInlineMathJax(text)
         let hasDisplay = hasDisplayMathJax(text)
