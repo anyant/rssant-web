@@ -99,10 +99,14 @@ export default {
     await this.$API.syncFeedLoadMushrooms()
     document.addEventListener('keydown', this.handleKeyDown)
     document.addEventListener('keyup', this.handleKeyUp)
+    document.addEventListener('visibilitychange', this.handleVisibilityChange)
+    window.addEventListener('blur', this.handleVisibilityChange)
   },
   destroyed() {
     document.removeEventListener('keydown', this.handleKeyDown)
     document.removeEventListener('keyup', this.handleKeyUp)
+    document.removeEventListener('visibilitychange', this.handleVisibilityChange)
+    window.removeEventListener('blur', this.handleVisibilityChange)
   },
   methods: {
     loadStorys({ offset, size }) {
@@ -141,6 +145,9 @@ export default {
       }
     },
     handleKeyUp(event) {
+      this.isCtrlKeyHold = false
+    },
+    handleVisibilityChange(event) {
       this.isCtrlKeyHold = false
     },
   },
