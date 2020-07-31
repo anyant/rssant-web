@@ -23,6 +23,7 @@
     "js-cookie": "^2.2.0",
     "lodash": "^4.17.19",
     "material-design-icons": "^3.0.1",
+    "mathjax": "^2.7.8",
     "mescroll.js": "^1.4.1",
     "muse-ui": "^3.0.2",
     "muse-ui-loading": "^0.2.0",

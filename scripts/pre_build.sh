@@ -3,4 +3,5 @@
 set -ex
 
 target="public/libs"
-rm -rf $target/MathJax-2.7.6
+version="2.7.8"
+rm -rf "$target/MathJax-$version"

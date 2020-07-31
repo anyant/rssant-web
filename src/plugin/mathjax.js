@@ -1,4 +1,5 @@
 const publicPath = process.env.BASE_URL
+const version = '2.7.8'
 
 function initMathjax() {
   if (!(window.MathJax === null || window.MathJax === undefined)) {
@@ -31,7 +32,7 @@ function initMathjax() {
   }
   var script = document.createElement('script')
   script.type = 'text/javascript'
-  script.src = `${publicPath}libs/MathJax-2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML,Safe`
+  script.src = `${publicPath}libs/MathJax-${version}/MathJax.js?config=TeX-AMS-MML_HTMLorMML,Safe`
   document.getElementsByTagName('head')[0].appendChild(script)
 }
 

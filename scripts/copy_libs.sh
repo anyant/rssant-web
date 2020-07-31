@@ -7,9 +7,10 @@ if test "$1" = 'dist'; then
 else
     target="public/libs"
 fi
+version="2.7.8"
 
 mkdir -p $target/
-rm -rf $target/MathJax-2.7.6
-tar -xzf extra/MathJax-2.7.6.tar.gz -C $target/
-rm -rf $target/MathJax-2.7.6/fonts/HTML-CSS/TeX/png/
-rm -rf $target/MathJax-2.7.6/unpacked
+rm -rf "$target/MathJax-$version"
+cp -r "node_modules/mathjax" "$target/MathJax-$version"
+rm -rf "$target/MathJax-$version/fonts/HTML-CSS/TeX/png/"
+rm -rf "$target/MathJax-$version/unpacked"
