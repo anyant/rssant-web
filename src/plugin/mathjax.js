@@ -32,7 +32,8 @@ function initMathjax() {
   }
   var script = document.createElement('script')
   script.type = 'text/javascript'
-  script.src = `${publicPath}libs/MathJax-${version}/MathJax.js?config=TeX-AMS-MML_HTMLorMML,Safe`
+  // http://docs.mathjax.org/en/v2.7-latest/config-files.html
+  script.src = `${publicPath}libs/MathJax-${version}/MathJax.js?config=TeX-MML-AM_HTMLorMML,Safe`
   document.getElementsByTagName('head')[0].appendChild(script)
 }
 

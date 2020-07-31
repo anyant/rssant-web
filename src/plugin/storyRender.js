@@ -112,6 +112,9 @@ const StoryRender = {
     }
 
     Vue.directive('story', function(el, binding) {
+      if (binding.value === binding.oldValue) {
+        return
+      }
       let content = (binding.value || '').trim()
       el.innerHTML = content
       if (hasMathJax(content)) {
