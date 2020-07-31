@@ -1,30 +1,45 @@
 import { expect } from 'chai'
-import { hasInlineMathJax, hasDisplayMathJax, hasMathJax } from '@/plugin/storyRender'
+import { hasInlineMathJax, hasInlineCodeMathJax, hasDisplayMathJax, hasMathJax } from '@/plugin/storyRender'
 
 describe('plugin/storyRender', () => {
+  let trueInlineCases = [
+    '$x^{y^z}=(1+{\\rm e}^x)^{-2xy^w}$',
+    '$f(x,y,z) = 3y^2z \\left( 3+\\frac{7x+5}{1+y^2} \\right)$',
+    '$1 \\over 3$',
+    '$\\vec{a} \\cdot \\vec{b}=0$',
+    '\\(\\sqrt[n]{3}\\)',
+    '$\\sqrt[n]{3}$',
+  ]
+  let falseInlineCases = [
+    '$10 aaa $10  $10 aaa $10',
+    '$10 $10  $10 $10',
+    '$10.0',
+    '100$ 100$',
+    'console.log($.fn.jquery); window.$;',
+    '$ === jQuery; typeof($);',
+    "$('p,div'); $('p.red,p.green');",
+  ]
+  let asciiMathCases = [
+    '`sum_(i=1)^n i^3=((n(n+1))/2)^2`',
+    '`hello world`',
+    "echo `date '--date=1 hour ago' +%Y-%m-%d-%H`",
+  ]
+
   it('test hasInlineMathJax', () => {
-    let trueCases = [
-      '$x^{y^z}=(1+{\\rm e}^x)^{-2xy^w}$',
-      '$f(x,y,z) = 3y^2z \\left( 3+\\frac{7x+5}{1+y^2} \\right)$',
-      '$1 \\over 3$',
-      '$\\vec{a} \\cdot \\vec{b}=0$',
-      `\\(\\sqrt[n]{3}\\)`,
-      `$\\sqrt[n]{3}$`,
-    ]
-    let falseCases = [
-      '$10 aaa $10  $10 aaa $10',
-      '$10 $10  $10 $10',
-      '$10.0',
-      '100$ 100$',
-      'console.log($.fn.jquery); window.$;',
-      '$ === jQuery; typeof($);',
-      "$('p,div'); $('p.red,p.green');",
-    ]
-    trueCases.forEach(text => {
+    ;[...trueInlineCases, ...asciiMathCases].forEach(text => {
       expect(hasInlineMathJax(text)).to.equal(true, text)
     })
-    falseCases.forEach(text => {
+    falseInlineCases.forEach(text => {
       expect(hasInlineMathJax(text)).to.equal(false, text)
+    })
+  })
+
+  it('test hasInlineCodeMathJax', () => {
+    trueInlineCases.forEach(text => {
+      expect(hasInlineCodeMathJax(text)).to.equal(true, text)
+    })
+    ;[...falseInlineCases, ...asciiMathCases].forEach(text => {
+      expect(hasInlineCodeMathJax(text)).to.equal(false, text)
     })
   })
 
@@ -67,7 +82,7 @@ describe('plugin/storyRender', () => {
       `gradient on the image \\(x\\) is simply \\(\\nabla_x s = w\\).`,
       `the gradient \\(\\nabla f(x)\\) is as fast of computing \\(f(x)\\).`,
     ]
-    trueCases.forEach(text => {
+    ;[...trueCases, ...asciiMathCases].forEach(text => {
       expect(hasMathJax(text)).to.equal(true, text)
     })
     let falseCases = [
@@ -80,9 +95,6 @@ describe('plugin/storyRender', () => {
        or anywhere from $10 to $45 for paid audio courses.`,
       '```hello world```',
       "echo $(date '--date=1 hour ago' +%Y-%m-%d-%H)",
-      // TODO: fix below cases about quote program code
-      // '`hello world`',
-      // "echo `date '--date=1 hour ago' +%Y-%m-%d-%H`",
     ]
     falseCases.forEach(text => {
       expect(hasMathJax(text)).to.equal(false, text)

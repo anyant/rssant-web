@@ -14,12 +14,20 @@ import _ from 'lodash'
 // see also: https://regexr.com/
 const RE_INLINE_DOLLAR = /([\d(.])?\$(?![(.]).+?([(.])?\$(?![\d(.])/gms
 const RE_INLINE_MATHJAX = /(`[^`]+?`(?!`))|(\\\(.+?\\\))/ms
+const RE_INLINE_NON_AML = /(\\\(.+?\\\))/ms
 const RE_DISPLAY_MATHJAX = /(\$\$.+?\$\$)|(\\\[.+?\\\])/ms
 
 function hasInlineMathJax(content) {
   if (RE_INLINE_MATHJAX.test(content)) {
     return true
   }
+  if (_hasInlineDollar(content)) {
+    return true
+  }
+  return false
+}
+
+function _hasInlineDollar(content) {
   // JavaScript RegExp objects are stateful when they have the global or sticky flags set
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec
   let inlineDollar = new RegExp(RE_INLINE_DOLLAR)
@@ -31,6 +39,16 @@ function hasInlineMathJax(content) {
     if (!matcher[1] && !matcher[2]) {
       return true
     }
+  }
+  return false
+}
+
+function hasInlineCodeMathJax(content) {
+  if (RE_INLINE_NON_AML.test(content)) {
+    return true
+  }
+  if (_hasInlineDollar(content)) {
+    return true
   }
   return false
 }
@@ -47,7 +65,7 @@ function isMathjaxReady() {
   return !_.isNil(window.MathJax) && !_.isNil(window.MathJax.Hub)
 }
 
-export { hasInlineMathJax, hasDisplayMathJax, hasMathJax }
+export { hasInlineMathJax, hasInlineCodeMathJax, hasDisplayMathJax, hasMathJax }
 
 // https://github.com/mathjax/mathjax-docs/wiki/'Can't-make-callback-from-given-data'-error-if-resetEquationNumbers-is-called-when-no-math-is-typeset
 let isFirstMathJaxRender = true
@@ -57,7 +75,7 @@ const StoryRender = {
     function renderMathjax(dom, elementId) {
       dom.querySelectorAll('code,pre').forEach(block => {
         const text = block.innerHTML
-        let hasInline = hasInlineMathJax(text)
+        let hasInline = hasInlineCodeMathJax(text)
         let hasDisplay = hasDisplayMathJax(text)
         if (hasInline || hasDisplay) {
           if (hasInline) {
