@@ -37,6 +37,9 @@ function initMathjax() {
       ],
       processEscapes: true,
     },
+    // Fix: Uncaught TypeError: Cannot read property 'firstChild' of null
+    // https://github.com/mathjax/MathJax/issues/2157
+    'fast-preview': { disabled: true },
   }
   var script = document.createElement('script')
   script.type = 'text/javascript'
