@@ -94,7 +94,7 @@ const StoryRender = {
           )
         }
         isFirstMathJaxRender = false
-        MathJax.Hub.Queue(['Typeset', MathJax.Hub, elementId])
+        MathJax.Hub.Queue(['Typeset', MathJax.Hub, dom])
       } catch (error) {
         // eslint-disable-next-line no-console
         console.warn('MathJax ' + error)
@@ -111,8 +111,7 @@ const StoryRender = {
         window._MathJaxStoryRender = () => {
           window._MathJaxStoryRender = null
           if (window.location.href === expectUrl) {
-            isFirstMathJaxRender = false
-            MathJax.Hub.Queue(['Typeset', MathJax.Hub, elementId])
+            renderMathjax(dom, elementId)
           }
         }
       }
