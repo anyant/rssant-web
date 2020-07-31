@@ -14,6 +14,14 @@ function initMathjax() {
         // eslint-disable-next-line no-console
         console.error(error)
       })
+      // https://docs.mathjax.org/en/v2.7-latest/advanced/startup.html
+      MathJax.Hub.Register.StartupHook('End', function() {
+        let renderTask = window._MathJaxStoryRender
+        window._MathJaxStoryRender = null
+        if (renderTask !== null && renderTask !== undefined) {
+          renderTask()
+        }
+      })
     },
     // https://docs.mathjax.org/en/v2.4-latest/misc/faq.html#the-mathjax-font-folder-is-too-big-is-there-any-way-to-compress-it
     imageFont: null,

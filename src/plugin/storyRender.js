@@ -33,7 +33,7 @@ function hasDisplayMathJax(content) {
 }
 
 function isMathjaxReady() {
-  return !_.isNil(window.MathJax) && !_.isNil(window.MathJax.Hub)
+  return !_.isNil(window.MathJax) && !_.isNil(window.MathJax.Hub) && window.MathJax.isReady
 }
 
 export { hasInlineMathJax, hasDisplayMathJax, hasStrictMathJax }
@@ -102,10 +102,19 @@ const StoryRender = {
     }
 
     function renderMathjaxIfReady(dom, elementId) {
-      if (isMathjaxReady() && !_.isEmpty(elementId)) {
+      if (isMathjaxReady()) {
+        window._MathJaxStoryRender = null
         renderMathjax(dom, elementId)
       } else {
-        // TODO: render MathJax after it's ready
+        // render MathJax after it's ready and stay in the same page
+        const expectUrl = window.location.href
+        window._MathJaxStoryRender = () => {
+          window._MathJaxStoryRender = null
+          if (window.location.href === expectUrl) {
+            isFirstMathJaxRender = false
+            MathJax.Hub.Queue(['Typeset', MathJax.Hub, elementId])
+          }
+        }
       }
     }
 
@@ -115,7 +124,7 @@ const StoryRender = {
       }
       let content = (binding.value || '').trim()
       el.innerHTML = content
-      if (hasStrictMathJax(content)) {
+      if (hasStrictMathJax(content) && !_.isEmpty(el.id)) {
         renderMathjaxIfReady(el, el.id)
       }
     })
