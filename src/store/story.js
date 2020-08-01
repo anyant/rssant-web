@@ -40,6 +40,8 @@ export default {
   state: {
     storys: {},
     mushrooms: [],
+    loadedOffsetBegin: {}, // include
+    loadedOffsetEnd: {}, // include
     mushroomsLoading: new Loading(),
     favoritedLoading: new Loading(),
   },
@@ -72,12 +74,28 @@ export default {
         })
       }
     },
+    UPDATE_LOADED_OFFSET(state, { feedId, begin, end }) {
+      let oldBegin = state.loadedOffsetBegin[feedId]
+      if (_.isNil(oldBegin) || begin < oldBegin) {
+        Vue.set(state.loadedOffsetBegin, feedId, begin)
+      }
+      let oldEnd = state.loadedOffsetEnd[feedId]
+      if (_.isNil(oldEnd) || end > oldEnd) {
+        Vue.set(state.loadedOffsetEnd, feedId, end)
+      }
+    },
+    RESET_LOADED_OFFSET(state, feedId) {
+      Vue.delete(state.loadedOffsetBegin, feedId)
+      Vue.delete(state.loadedOffsetEnd, feedId)
+    },
     ADD_OR_UPDATE_MUSHROOMS(state, storys) {
       addOrUpdateList(state, storys)
       state.mushrooms = storys
     },
     DELETE_STORYS_OF_FEED(state, feedId) {
       Vue.delete(state.storys, feedId)
+      Vue.delete(state.loadedOffsetBegin, feedId)
+      Vue.delete(state.loadedOffsetEnd, feedId)
       state.mushrooms = state.mushrooms.filter(x => {
         return x.feed.id !== feedId
       })
@@ -86,6 +104,8 @@ export default {
       if (_.isNil(feedIds)) {
         state.storys = {}
         state.mushrooms = []
+        state.loadedOffsetBegin = {}
+        state.loadedOffsetEnd = {}
         return
       }
       let feedIdsMap = {}
@@ -94,6 +114,8 @@ export default {
       })
       feedIds.forEach(feedId => {
         Vue.delete(state.storys, feedId)
+        Vue.delete(state.loadedOffsetBegin, feedId)
+        Vue.delete(state.loadedOffsetEnd, feedId)
       })
       state.mushrooms = state.mushrooms.filter(x => {
         return _.isNil(feedIdsMap[x.feed.id])
@@ -149,6 +171,27 @@ export default {
         return story.offset < feed.story_offset
       }
     },
+    loadedOffset(state) {
+      return feedId => {
+        let begin = state.loadedOffsetBegin[feedId]
+        // handle favorite storys
+        while (!_.isNil(begin)) {
+          if (_.isNil(state.storys[begin - 1])) {
+            break
+          }
+          begin = begin - 1
+        }
+        let end = state.loadedOffsetEnd[feedId]
+        // handle mushroom storys
+        while (!_.isNil(end)) {
+          if (_.isNil(state.storys[end + 1])) {
+            break
+          }
+          end = end + 1
+        }
+        return { begin, end }
+      }
+    },
   },
   actions: {
     async setFavorited(DAO, { feedId, offset, is_favorited }) {
@@ -166,6 +209,10 @@ export default {
     async loadList(DAO, { feedId, offset, detail, size }) {
       let data = await API.story.query({ feed_id: feedId, offset, detail, size })
       DAO.ADD_OR_UPDATE_LIST({ feedId, storys: data.storys })
+      DAO.UPDATE_LOADED_OFFSET({ feedId, begin: offset, end: offset + size - 1 })
+    },
+    resetLoadedOffset(DAO, { feedId }) {
+      DAO.RESET_LOADED_OFFSET(feedId)
     },
     async loadMushrooms(DAO, { mushroomKeys, detail }) {
       await DAO.state.mushroomsLoading.begin(async () => {

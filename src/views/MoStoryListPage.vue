@@ -16,6 +16,8 @@
       :itemSize="48"
       :items="storyList"
       :init-offset="feed.story_offset"
+      :begin-offset="beginOffset"
+      :end-offset="endOffset"
       :total="feed.total_storys"
       :load="loadStorys"
       :jump="onJump"
@@ -76,8 +78,23 @@ export default {
       let num = this.feed.num_unread_storys
       return num > 0 ? `#${num}# ` : ''
     },
+    beginOffset() {
+      let offset = this.$API.story.loadedOffset(this.feedId)
+      return _.isNil(offset) ? null : offset.begin
+    },
+    endOffset() {
+      let offset = this.$API.story.loadedOffset(this.feedId)
+      return _.isNil(offset) ? null : offset.end
+    },
     storyList() {
-      return this.$API.story.getListByFeed(this.feedId)
+      let offset = this.$API.story.loadedOffset(this.feedId)
+      if (_.isNil(offset) || _.isNil(offset.begin) || _.isNil(offset.end)) {
+        return []
+      }
+      let storys = this.$API.story.getListByFeed(this.feedId)
+      return _.filter(storys, s => {
+        return s.offset >= offset.begin && s.offset <= offset.end
+      })
     },
     isReaded() {
       let feed = this.feed
@@ -134,6 +151,7 @@ export default {
       _.forEach(_.keys(this.storyOpened), key => {
         this.storyOpened[key] = false
       })
+      this.$API.story.resetLoadedOffset({ feedId: this.feed.id })
     },
     handleKeyDown(event) {
       if (event.key.toLowerCase() === TARGET_KEY.toLowerCase()) {

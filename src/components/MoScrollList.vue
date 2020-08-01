@@ -40,6 +40,12 @@ export default {
       type: Number,
       default: 0,
     },
+    beginOffset: {
+      type: Number,
+    },
+    endOffset: {
+      type: Number,
+    },
     total: {
       type: Number,
       required: true,
@@ -88,36 +94,30 @@ export default {
       if (this.total <= 0) {
         return false
       }
-      if (this.items.length <= 0) {
+      if (this.items.length <= 0 || _.isNil(this.beginOffset)) {
         return this.initOffset > 0
       }
-      let firstOffset = this.items[0].offset
-      let lastOffset = this.items[this.items.length - 1].offset
-      return firstOffset > 0 || lastOffset - firstOffset + 1 > this.items.length
+      return this.beginOffset > 0
     },
     hasNext() {
       if (this.total <= 0) {
         return false
       }
-      if (this.items.length <= 0) {
+      if (this.items.length <= 0 || _.isNil(this.endOffset)) {
         return this.initOffset < this.total
       }
-      let lastOffset = this.items[this.items.length - 1].offset
-      return lastOffset < this.total - 1
+      return this.endOffset < this.total - 1
     },
     _deltaPages() {
-      let firstOffset = this.initOffset
-      if (this.items.length > 0) {
-        firstOffset = Math.max(firstOffset, this.items[0].offset)
-      }
-      let delta = (this.total - firstOffset) / this.numPageItems
+      let endOffset = _.defaultTo(this.endOffset, this.initOffset)
+      let delta = (this.total - endOffset) / this.numPageItems
       return Math.floor(Math.max(0, delta))
     },
     needJump() {
       if (_.isNil(this.jump)) {
         return false
       }
-      return this._deltaPages >= 5
+      return this._deltaPages >= 3
     },
     jumpOffset() {
       let offset = this.total - this.numPageItems
@@ -176,15 +176,8 @@ export default {
         return
       }
       let prevItemsLength = this.items.length
-      let lastOffset = this.items[this.items.length - 1].offset
-      let firstOffset = this.items[0].offset
-      let index = 1
-      while (index < this.items.length && lastOffset - firstOffset > this.items.length - index) {
-        firstOffset = this.items[index].offset
-        index++
-      }
       this.isPrevLoading = true
-      let offset = Math.max(0, firstOffset - this.numPageItems)
+      let offset = Math.max(0, this.beginOffset - this.numPageItems)
       this.load({ offset, size: this.numPageItems }).finally(() => {
         this.isPrevLoading = false
         this.endSuccess(prevItemsLength)
@@ -196,9 +189,8 @@ export default {
         return
       }
       let prevItemsLength = this.items.length
-      let lastOffset = this.items[this.items.length - 1].offset
       this.isNextLoading = true
-      this.load({ offset: lastOffset + 1, size: this.numPageItems }).finally(() => {
+      this.load({ offset: this.endOffset + 1, size: this.numPageItems }).finally(() => {
         this.isNextLoading = false
         this.endSuccess(prevItemsLength)
       })
