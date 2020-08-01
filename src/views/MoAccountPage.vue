@@ -116,7 +116,9 @@ export default {
       this.$API.user.connectGithub({ next: '/' })
     },
     logout() {
-      this.$API.user.logout({ next: '/' })
+      this.$API.user.logout().then(() => {
+        window.location.assign('/')
+      })
     },
     togglePWA() {
       if (!hasPWA) {

@@ -143,10 +143,8 @@ const API = {
           throw error
         })
     },
-    logout({ next } = {}) {
-      return client.post(`/auth/logout/`).then(() => {
-        window.location.assign(_.defaultTo(next, '/'))
-      })
+    logout() {
+      return client.post(`/auth/logout/`)
     },
     loginGithub({ next, scope } = {}) {
       let path = BASE_URL + '/accounts/github/login/'

@@ -55,9 +55,9 @@ export default {
         async confirmResetPassword(DAO, { token, uid, new_password }) {
             await API.user.confirmResetPassword({ token, uid, new_password })
         },
-        logout(DAO, { next } = {}) {
+        async logout(DAO) {
             localFeeds.clear()
-            API.user.logout({ next })
+            await API.user.logout()
         },
         loginGithub(DAO, { next, scope } = {}) {
             API.user.loginGithub({ next, scope })
