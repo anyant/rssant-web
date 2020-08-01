@@ -158,6 +158,7 @@ const VirtualItem = Vue.component('VirtualItem', {
           storyTitle: story.title,
           storyDate: story.dt_published,
           isReaded: this.isReaded(story),
+          source: 'mushroom',
           routeTo: this.routeTo,
         },
       })

@@ -15,7 +15,8 @@
         :feedTitle="getFeedTitle(story.feed.id)"
         :storyTitle="story.title"
         :storyDate="story.dt_published"
-        :isReaded="false"
+        :isReaded="null"
+        source="favorited"
       ></MoFeedStoryItem>
     </div>
   </MoLayout>

@@ -42,6 +42,9 @@ export default {
     isSourceMushroom() {
       return this.source === 'mushroom'
     },
+    isSourceFavorited() {
+      return this.source === 'favorited'
+    },
     isFavorited() {
       return !_.isNil(this.story) && this.story.is_favorited
     },
@@ -71,7 +74,7 @@ export default {
           feedId: this.feedId,
           offset: this.offset,
         })
-      } else {
+      } else if (!this.isSourceFavorited) {
         story = this.$API.story.get({
           feedId: this.feedId,
           offset: this.offset + 1,
@@ -137,7 +140,7 @@ export default {
         this.$API.feed.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
       }
       this.scrollToTop()
-      if (!this.isSourceMushroom) {
+      if (!this.isSourceMushroom && !this.isSourceFavorited) {
         let hasNext = this.offset + 1 < this.feed.total_storys
         if (hasNext) {
           let next = this.$API.story.get({

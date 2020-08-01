@@ -18,6 +18,7 @@ export default {
     storyTitle: String,
     storyDate: String,
     isReaded: Boolean,
+    source: String,
     routeTo: Function,
   },
   data() {
@@ -40,10 +41,14 @@ export default {
       this.myRouteTo(`/feed/${this.feedId}`)
     },
     goStory() {
-      if (!this.isReaded) {
+      if (!_.isNil(this.isReaded) && !this.isReaded) {
         this.$API.feed.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
       }
-      this.myRouteTo(`/story/${this.feedId}-${this.offset}?source=mushroom`)
+      let link = `/story/${this.feedId}-${this.offset}`
+      if (!_.isNil(this.source)) {
+        link = link + `?source=${this.source}`
+      }
+      this.myRouteTo(link)
     },
   },
 }
