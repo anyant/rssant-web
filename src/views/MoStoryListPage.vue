@@ -126,8 +126,14 @@ export default {
     window.removeEventListener('blur', this.handleVisibilityChange)
   },
   methods: {
-    loadStorys({ offset, size }) {
-      return this.$API.story.loadList({ feedId: this.feedId, offset: offset, detail: true, size: size })
+    loadStorys({ offset, size, resetLoadedOffset }) {
+      return this.$API.story.loadList({
+        feedId: this.feedId,
+        offset: offset,
+        detail: true,
+        size: size,
+        resetLoadedOffset: resetLoadedOffset,
+      })
     },
     onRead(story) {
       if (!this.isReaded(story)) {
@@ -151,7 +157,6 @@ export default {
       _.forEach(_.keys(this.storyOpened), key => {
         this.storyOpened[key] = false
       })
-      this.$API.story.resetLoadedOffset({ feedId: this.feed.id })
     },
     handleKeyDown(event) {
       if (event.key.toLowerCase() === TARGET_KEY.toLowerCase()) {

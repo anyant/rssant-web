@@ -206,13 +206,13 @@ export default {
       let story = await API.story.get({ feed_id: feedId, offset, detail })
       DAO.ADD_OR_UPDATE(story)
     },
-    async loadList(DAO, { feedId, offset, detail, size }) {
+    async loadList(DAO, { feedId, offset, detail, size, resetLoadedOffset }) {
       let data = await API.story.query({ feed_id: feedId, offset, detail, size })
+      if (resetLoadedOffset) {
+        DAO.RESET_LOADED_OFFSET(feedId)
+      }
       DAO.ADD_OR_UPDATE_LIST({ feedId, storys: data.storys })
       DAO.UPDATE_LOADED_OFFSET({ feedId, begin: offset, end: offset + size - 1 })
-    },
-    resetLoadedOffset(DAO, { feedId }) {
-      DAO.RESET_LOADED_OFFSET(feedId)
     },
     async loadMushrooms(DAO, { mushroomKeys, detail }) {
       await DAO.state.mushroomsLoading.begin(async () => {

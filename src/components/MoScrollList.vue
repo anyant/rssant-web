@@ -217,7 +217,7 @@ export default {
     jumpToLatest() {
       let offset = this.jumpOffset
       this.jump(this.jumpOffset)
-      this.load({ offset: offset, size: this.numPageItems })
+      this.load({ offset: offset, size: this.numPageItems, resetLoadedOffset: true })
         .finally(this.endSuccess)
         .then(() => {
           this.updateScrollTop(offset)
