@@ -110,6 +110,9 @@ export default {
     },
     _deltaPages() {
       let endOffset = _.defaultTo(this.endOffset, this.initOffset)
+      let beginOffset = _.defaultTo(this.beginOffset, this.initOffset)
+      // consider preloaded pages even when it not loaded yet
+      endOffset = Math.max(endOffset, beginOffset + this.numPageItems * 2)
       let delta = (this.total - endOffset) / this.numPageItems
       return Math.floor(Math.max(0, delta))
     },
