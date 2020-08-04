@@ -301,7 +301,7 @@ export default {
   right: 0;
   top: (48 + 140 + 32) * @pr;
   bottom: 0;
-  overflow-y: scroll;
+  overflow-y: auto;
   padding-bottom: 8 * @pr;
   border-top: solid 1px @antLineGrey;
 }
