@@ -26,6 +26,7 @@
         </mu-popover>
         <mu-button ref="actionMenuRef" icon class="action-menu" @click="toggleMenu">
           <fa-icon class="action-icon" icon="bars" />
+          <span v-if="showMenuDot" class="action-menu-dot"></span>
         </mu-button>
         <transition name="fade">
           <mu-list ref="actionMenuListRef" class="action-menu-list" v-show="isMenuOpen">
@@ -43,6 +44,7 @@
             </mu-list-item>
             <mu-list-item button @click="goHelp">
               <mu-list-item-title>蚁阅锦囊</mu-list-item-title>
+              <span v-if="showMenuDot" class="action-menu-help-dot"></span>
             </mu-list-item>
           </mu-list>
         </transition>
@@ -116,6 +118,7 @@ import MoFeedItem from '@/components/MoFeedItem.vue'
 import MoFeedStoryItem from '@/components/MoFeedStoryItem.vue'
 
 import initMathjax from '@/plugin/mathjax'
+import localConfig from '@/plugin/localConfig'
 import { antRippleGrey } from '@/plugin/common'
 
 const ITEM_HEIGHT = 48
@@ -190,6 +193,7 @@ export default {
       virtualUpperList: [],
       virtualLowerHeight: 0,
       virtualLowerList: [],
+      isHelpReaded: localConfig.HELP_READED.get(),
     }
   },
   computed: {
@@ -204,6 +208,9 @@ export default {
     },
     showHeader() {
       return this.isReady || !this.$LAYOUT.hasBoard
+    },
+    showMenuDot() {
+      return this.isReady && !this.isEmpty && !this.isHelpReaded
     },
     replaceRouter() {
       return this.$LAYOUT.hasBoard && this.$route.path !== '/'
@@ -297,6 +304,10 @@ export default {
     goHelp() {
       this.routeTo('/help')
       this.isMenuOpen = false
+      if (!this.isHelpReaded) {
+        localConfig.HELP_READED.set(true)
+        this.isHelpReaded = true
+      }
     },
     setAllReaded() {
       let feedIds = this.feedList.map(x => x.id)
@@ -497,6 +508,27 @@ export default {
   color: @antTextSemi;
   position: relative;
   right: -8 * @pr;
+}
+
+.action-menu-dot,
+.action-menu-help-dot {
+  position: absolute;
+  display: inline-block;
+  width: 8 * @pr;
+  height: 8 * @pr;
+  border-radius: 4 * @pr;
+  background: @antBlue;
+  z-index: 99;
+}
+
+.action-menu-dot {
+  right: 4 * @pr;
+  top: 6 * @pr;
+}
+
+.action-menu-help-dot {
+  right: 5 * @pr;
+  top: 20 * @pr;
 }
 
 .wizard {

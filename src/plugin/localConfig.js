@@ -4,6 +4,7 @@ const CONFIG_STORAGE_KEY = 'RSSANT_CONFIG'
 const CONFIGS = {
   DEBUG: { defaultValue: false },
   PWA_ENABLE: { defaultValue: false },
+  HELP_READED: { defaultValue: false },
 }
 
 const localConfig = (function() {
