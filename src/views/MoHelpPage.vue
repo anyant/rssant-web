@@ -8,6 +8,7 @@
         <h4 class="sub-title">将蚁阅添加到主屏</h4>
         <div class="center">
           <div>获得和App一样沉浸式的体验</div>
+          <div v-if="!isLikelySupportPWA" class="pwa-tip">推荐用Chrome，Safari，火狐，微软Edge，或小米浏览器打开蚁阅</div>
           <div class="button-wrapper">
             <MoPWAButton />
           </div>
@@ -36,14 +37,14 @@
 import MoLayout from '@/components/MoLayout'
 import MoBackHeader from '@/components/MoBackHeader'
 import MoPWAButton from '@/components/MoPWAButton'
+import { isLikelySupportPWA } from '@/plugin/pwaDetector'
 
-const changelogUrl = location.origin + '/changelog'
 const contactEmail = 'guyskk@anyant.com'
 
 export default {
   components: { MoLayout, MoBackHeader, MoPWAButton },
   data() {
-    return { changelogUrl, contactEmail }
+    return { contactEmail, isLikelySupportPWA: isLikelySupportPWA() }
   },
 }
 </script>
@@ -65,6 +66,11 @@ export default {
 
 .center {
   text-align: center;
+}
+
+.pwa-tip {
+  font-size: 13 * @pr;
+  margin-top: 8 * @pr;
 }
 
 .button-wrapper {

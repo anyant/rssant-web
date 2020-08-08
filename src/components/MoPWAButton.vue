@@ -14,20 +14,19 @@
 <script>
 import _ from 'lodash'
 import localConfig from '@/plugin/localConfig'
-
-const hasPWA = 'serviceWorker' in navigator
+import { hasPWA } from '@/plugin/pwaDetector'
 
 export default {
   data() {
     return {
-      hasPWA,
+      hasPWA: hasPWA,
       isPWAEnable: localConfig.PWA_ENABLE.get(),
     }
   },
   methods: {
     togglePWA() {
       if (!hasPWA) {
-        this.$alert('可以尝试用Chrome，Safari，火狐，微软Edge，小米浏览器等打开蚁阅。', '当前浏览器不支持添加到主屏', {
+        this.$alert('可以尝试用Chrome，Safari，火狐，微软Edge，或小米浏览器打开蚁阅。', '当前浏览器不支持添加到主屏', {
           okLabel: '好的',
         })
         return
