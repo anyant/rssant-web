@@ -41,6 +41,9 @@
             <mu-list-item button @click="goFeedFavorited">
               <mu-list-item-title>我的收藏</mu-list-item-title>
             </mu-list-item>
+            <mu-list-item button @click="goHelp">
+              <mu-list-item-title>蚁阅锦囊</mu-list-item-title>
+            </mu-list-item>
           </mu-list>
         </transition>
       </div>
@@ -289,6 +292,10 @@ export default {
     },
     goFeedFavorited() {
       this.routeTo('/favorited')
+      this.isMenuOpen = false
+    },
+    goHelp() {
+      this.routeTo('/help')
       this.isMenuOpen = false
     },
     setAllReaded() {

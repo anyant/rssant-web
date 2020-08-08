@@ -14,6 +14,7 @@ import MoResetPasswordPage from '@/views/MoResetPasswordPage'
 import MoResetPasswordConfirmPage from '@/views/MoResetPasswordConfirmPage'
 import MoAccountPage from '@/views/MoAccountPage'
 import MoAboutPage from '@/views/MoAboutPage'
+import MoHelpPage from '@/views/MoHelpPage'
 import MoNotFoundPage from '@/views/MoNotFoundPage'
 
 const boardRoutes = [
@@ -21,6 +22,12 @@ const boardRoutes = [
     path: 'account',
     name: 'Account',
     component: MoAccountPage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: 'help',
+    name: 'Help',
+    component: MoHelpPage,
     meta: { loginRequired: true },
   },
   {
