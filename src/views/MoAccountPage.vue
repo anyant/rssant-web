@@ -12,6 +12,14 @@
           </div>
           <div class="action-wrapper">
             <mu-button
+              class="button-configure-password"
+              :color="antGreen"
+              :disabled="isPasswordConfigured"
+              @click="configurePassword"
+            >{{ isPasswordConfigured ? '密码已设置' : '设置密码' }}</mu-button>
+          </div>
+          <div class="action-wrapper">
+            <mu-button
               class="button-connect-github"
               :color="antGreen"
               :disabled="isGithubConnected"
@@ -69,6 +77,13 @@ export default {
       }
       return false
     },
+    isPasswordConfigured() {
+      let user = this.$API.user.loginUser
+      if (!this.$API.user.isLogined || _.isNil(user)) {
+        return false
+      }
+      return !_.isNil(user.has_usable_password) && user.has_usable_password
+    },
     username() {
       let user = this.$API.user.loginUser
       return _.isNil(user) ? '' : user.username
@@ -95,6 +110,26 @@ export default {
             .catch(error => {
               this.$toast.message('删除失败: ' + error.message)
             })
+        }
+      })
+    },
+    configurePassword() {
+      this.$prompt(null, '请输入新密码', {
+        inputType: 'password',
+        beforeClose: (result, instance, done) => {
+          if (!result) {
+            return done()
+          }
+          this.$API.user
+            .changePassword({ password: instance.value })
+            .then(() => done())
+            .catch(error => {
+              instance.errorText = error.message
+            })
+        },
+      }).then(({ result }) => {
+        if (result) {
+          this.$toast.success('密码设置成功')
         }
       })
     },
@@ -134,7 +169,7 @@ export default {
 }
 
 .action-container {
-  margin-top: 64 * @pr;
+  margin-top: 48 * @pr;
 }
 
 .action-wrapper {
@@ -144,6 +179,7 @@ export default {
   justify-content: center;
 }
 
+.button-configure-password,
 .button-connect-github,
 .button-logout,
 .button-delete-all-feed {
@@ -154,6 +190,7 @@ export default {
   box-shadow: none;
 }
 
+.button-configure-password.disabled,
 .button-connect-github.disabled {
   background-color: lighten(@antGreen, 10%);
   color: @antTextWhite;

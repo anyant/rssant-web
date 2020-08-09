@@ -84,12 +84,36 @@ function convertDjangoErrorMessage(error, fields) {
   for (let field of fields) {
     if (_.isArray(data[field])) {
       message = message.concat(data[field])
-    } else if (_.isEmpty(data[field])) {
+    } else if (!_.isEmpty(data[field])) {
       message.push(data[field])
     }
   }
   message = message.slice(0, 1).join(' ')
   return message
+}
+
+function convertEmailMessage(emailMessage) {
+  if (!_.isEmpty(emailMessage)) {
+    if (emailMessage.toLowerCase().includes('already registered')) {
+      emailMessage = '此邮箱已注册'
+    } else if (emailMessage.toLowerCase().includes('valid email address')) {
+      emailMessage = '邮箱地址无效'
+    }
+  }
+  return emailMessage
+}
+
+function convertPasswordMessage(passwordMessage) {
+  if (!_.isEmpty(passwordMessage)) {
+    if (passwordMessage.toLowerCase().includes('password is too short')) {
+      passwordMessage = '密码至少要 8 个字符'
+    } else if (passwordMessage.toLowerCase().includes('password is too common')) {
+      passwordMessage = '密码不能太简单'
+    } else if (passwordMessage.toLowerCase().includes('password is too similar to the username')) {
+      passwordMessage = '密码不能和用户名太相似'
+    }
+  }
+  return passwordMessage
 }
 
 const API = {
@@ -109,7 +133,9 @@ const API = {
         .catch(error => {
           if (error.response && error.response.status === 400) {
             let emailMessage = convertDjangoErrorMessage(error, ['email', 'username'])
+            emailMessage = convertEmailMessage(emailMessage)
             let passwordMessage = convertDjangoErrorMessage(error, ['password1', 'password2'])
+            passwordMessage = convertPasswordMessage(passwordMessage)
             error.response.data = {
               email: emailMessage,
               password: passwordMessage,
@@ -122,11 +148,24 @@ const API = {
       return client.post('/auth/registration/verify-email/', { key })
     },
     changePassword({ password }) {
-      return client.post('/auth/password/change/', { password1: password, password2: password })
+      return client
+        .post('/auth/password/change/', { new_password1: password, new_password2: password })
+        .catch(error => {
+          let passwordMessage = convertDjangoErrorMessage(error, ['new_password1', 'new_password2'])
+          passwordMessage = convertPasswordMessage(passwordMessage)
+          if (!_.isEmpty(passwordMessage)) {
+            error.message = passwordMessage
+          }
+          throw error
+        })
     },
     resetPassword({ email }) {
       return client.post('/auth/password/reset/', { email }).catch(error => {
-        error.message = convertDjangoErrorMessage(error, ['email'])
+        let emailMessage = convertDjangoErrorMessage(error, ['email'])
+        emailMessage = convertEmailMessage(emailMessage)
+        if (!_.isEmpty(emailMessage)) {
+          error.message = emailMessage
+        }
         throw error
       })
     },
@@ -139,7 +178,11 @@ const API = {
           new_password2: new_password,
         })
         .catch(error => {
-          error.message = convertDjangoErrorMessage(error, ['new_password1', 'new_password2', 'token', 'uid'])
+          let passwordMessage = convertDjangoErrorMessage(error, ['new_password1', 'new_password2', 'token', 'uid'])
+          passwordMessage = convertPasswordMessage(passwordMessage)
+          if (!_.isEmpty(passwordMessage)) {
+            error.message = passwordMessage
+          }
           throw error
         })
     },
