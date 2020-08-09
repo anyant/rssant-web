@@ -82,7 +82,7 @@ export default {
       if (!this.$API.user.isLogined || _.isNil(user)) {
         return false
       }
-      return !_.isNil(user.has_usable_password) && user.has_usable_password
+      return _.isNil(user.has_usable_password) || user.has_usable_password
     },
     username() {
       let user = this.$API.user.loginUser
