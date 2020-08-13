@@ -6,7 +6,7 @@
         <span class="num-total">{{ favorited.length }}</span>
       </template>
     </MoBackHeader>
-    <div class="feed-story-list">
+    <div class="feed-story-list" ref="mainRef">
       <MoFeedStoryItem
         v-for="story in favorited"
         :key="`${story.feed.id}:${story.offset}`"
@@ -41,7 +41,10 @@ export default {
       .then(this.$API.syncFeedLoadMushrooms())
       .then(() => {
         let scrollTop = this.$pageState.get('scrollTop')
-        window.scrollTo(0, _.defaultTo(scrollTop, 0))
+        let el = this.$refs.mainRef
+        if (!_.isNil(el)) {
+          el.scrollTo(0, _.defaultTo(scrollTop, 0))
+        }
       })
   },
   computed: {
@@ -56,7 +59,10 @@ export default {
     },
   },
   savePageState() {
-    this.$pageState.set('scrollTop', window.scrollY)
+    let el = this.$refs.mainRef
+    if (!_.isNil(el)) {
+      this.$pageState.set('scrollTop', el.scrollTop)
+    }
     this.$pageState.commit()
   },
 }

@@ -12,7 +12,7 @@
         <span class="action-delete-info">{{ selectedFeedIds.length }} 订阅</span>
       </mu-button>
     </MoBackHeader>
-    <div class="feed-list">
+    <div class="feed-list" ref="mainRef">
       <div v-for="feed in feedList" :key="feed.id" class="feed-item">
         <mu-checkbox
           v-model="selectedFeedIds"
@@ -93,14 +93,20 @@ export default {
     this.$API.feed.sync().then(() => {
       let scrollTop = this.$pageState.get('scrollTop')
       let selectedFeedIds = this.$pageState.get('selectedFeedIds')
-      window.scrollTo(0, _.defaultTo(scrollTop, 0))
+      let el = this.$refs.mainRef
+      if (!_.isNil(el)) {
+        el.scrollTo(0, _.defaultTo(scrollTop, 0))
+      }
       if (!_.isNil(selectedFeedIds)) {
         selectedFeedIds.forEach(x => this.selectedFeedIds.push(x))
       }
     })
   },
   savePageState() {
-    this.$pageState.set('scrollTop', window.scrollY)
+    let el = this.$refs.mainRef
+    if (!_.isNil(el)) {
+      this.$pageState.set('scrollTop', el.scrollTop)
+    }
     this.$pageState.set('selectedFeedIds', this.selectedFeedIds)
     this.$pageState.commit()
   },
