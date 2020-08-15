@@ -37,7 +37,7 @@
 import MoLayout from '@/components/MoLayout'
 import MoBackHeader from '@/components/MoBackHeader'
 import MoPWAButton from '@/components/MoPWAButton'
-import { isLikelySupportPWA } from '@/plugin/pwaDetector'
+import { isLikelySupportPWA } from '@/plugin/pwa'
 
 const contactEmail = 'guyskk@anyant.com'
 

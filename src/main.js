@@ -22,16 +22,10 @@ import '@/plugin/theme'
 // REM layout
 import initREM from '@/plugin/rem'
 
-// localConfig
-import localConfig from '@/plugin/localConfig'
-
 // PWA Service Worker
-import registerServiceWorker from '@/registerServiceWorker'
+import { initPWA } from '@/plugin/pwa'
 
-if (localConfig.PWA_ENABLE.get()) {
-  registerServiceWorker()
-}
-
+initPWA()
 initREM(true, 32, 1)
 
 Vue.config.productionTip = false

@@ -12,9 +12,8 @@
 </template>
 
 <script>
-import _ from 'lodash'
 import localConfig from '@/plugin/localConfig'
-import { hasPWA } from '@/plugin/pwaDetector'
+import { hasPWA, unregisterServiceWorker } from '@/plugin/pwa'
 
 export default {
   data() {
@@ -59,21 +58,17 @@ export default {
     },
     disablePWA() {
       if (hasPWA) {
-        localConfig.PWA_ENABLE.set(false)
-        this.isPWAEnable = false
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-          for (let registration of registrations) {
-            registration.unregister()
+        this.$confirm('关闭添加到主屏功能？', {
+          okLabel: '确定',
+          cancelLabel: '取消',
+        }).then(({ result }) => {
+          if (result) {
+            localConfig.PWA_ENABLE.set(false)
+            this.isPWAEnable = false
+            unregisterServiceWorker()
+            location.assign('/')
           }
         })
-        if (!_.isNil(window.caches)) {
-          caches.keys().then(function(names) {
-            for (let name of names) {
-              caches.delete(name)
-            }
-          })
-        }
-        this.$toast.success('已关闭添加到主屏功能')
       }
     },
   },
