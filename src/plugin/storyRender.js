@@ -65,6 +65,37 @@ function isClassNameIgnore(className) {
   return false
 }
 
+const _HAS_MATH_DOMAINS = ['mathoverflow.net']
+const HAS_MATH_DOMAINS = {}
+_HAS_MATH_DOMAINS.forEach(x => {
+  HAS_MATH_DOMAINS[x] = true
+})
+
+function getDomainOfLink(link) {
+  if (_.isNil(link) || link === '') {
+    return null
+  }
+  let hostname
+  try {
+    hostname = new URL(link).hostname
+  } catch (ignore) {
+    return null
+  }
+  if (!hostname) {
+    return null
+  }
+  let parts = hostname.split('.')
+  if (parts.length < 2) {
+    return null
+  }
+  return parts.slice(parts.length - 2, parts.length).join('.')
+}
+
+export function isHasMathStoryLink(link) {
+  let domain = getDomainOfLink(link)
+  return domain ? !!HAS_MATH_DOMAINS[domain] : false
+}
+
 const StoryRender = {
   install(Vue) {
     function renderMathjax(dom, elementId) {
@@ -118,12 +149,15 @@ const StoryRender = {
     }
 
     Vue.directive('story', function(el, binding) {
-      if (binding.value === binding.oldValue) {
+      let newContent = _.isNil(binding.value) ? '' : binding.value.content
+      let oldContent = _.isNil(binding.oldValue) ? '' : binding.oldValue.content
+      if (newContent === oldContent) {
         return
       }
-      let content = (binding.value || '').trim()
+      let content = (newContent || '').trim()
+      let hasMath = hasStrictMathJax(content) || isHasMathStoryLink(binding.value.link)
       el.innerHTML = content
-      if (hasStrictMathJax(content) && !_.isEmpty(el.id)) {
+      if (hasMath && !_.isEmpty(el.id)) {
         renderMathjaxIfReady(el, el.id)
       }
     })

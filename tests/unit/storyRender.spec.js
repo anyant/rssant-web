@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { expect } from 'chai'
-import { hasInlineMathJax, hasDisplayMathJax, hasStrictMathJax } from '@/plugin/storyRender'
+import { hasInlineMathJax, hasDisplayMathJax, hasStrictMathJax, isHasMathStoryLink } from '@/plugin/storyRender'
 
 describe('plugin/storyRender', () => {
   let trueStrictCases = [
@@ -131,5 +131,12 @@ describe('plugin/storyRender', () => {
     falseDisplayCases.forEach(text => {
       expect(hasDisplayMathJax(text)).to.equal(false, text)
     })
+  })
+  it('test isHasMathStoryLink', () => {
+    expect(isHasMathStoryLink('https://mathoverflow.net/feeds/xxx.html')).to.equal(true)
+    expect(isHasMathStoryLink('https://www.mathoverflow.net/')).to.equal(true)
+    expect(isHasMathStoryLink('https://rss.anyant.com/')).to.equal(false)
+    expect(isHasMathStoryLink('http://')).to.equal(false)
+    expect(isHasMathStoryLink('http://localhost')).to.equal(false)
   })
 })

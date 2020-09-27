@@ -2,7 +2,7 @@
   <div class="story-content">
     <div class="story-wrapper" :style="wrapperStyle">
       <div class="story-info" v-if="story">
-        <div class="info-title">{{ story.title }}</div>
+        <div id="story-info-title" class="info-title" v-story="titleForRender"></div>
         <div class="info-item">
           <span class="info-item-name">原文：</span>
           <a
@@ -34,7 +34,7 @@
             referrerpolicy="no-referrer"
           ></iframe>
         </div>
-        <div id="story-markdown-body" class="markdown-body" v-story="storyContent"></div>
+        <div id="story-markdown-body" class="markdown-body" v-story="storyForRender"></div>
       </div>
     </div>
     <transition name="fade">
@@ -77,11 +77,16 @@ export default {
       }
       return formatFullDateFriendly(this.story.dt_published)
     },
-    storyContent() {
-      if (_.isNil(this.story)) {
-        return ''
-      }
-      return this.story.content
+    link() {
+      return _.isNil(this.story) ? '' : this.story.link
+    },
+    titleForRender() {
+      let content = _.isNil(this.story) ? '' : this.story.title
+      return { content, link: this.link }
+    },
+    storyForRender() {
+      let content = _.isNil(this.story) ? '' : this.story.content
+      return { content, link: this.link }
     },
     wrapperStyle() {
       return {
