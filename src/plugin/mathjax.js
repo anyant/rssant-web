@@ -26,8 +26,6 @@ function initMathjax() {
     // https://docs.mathjax.org/en/v2.4-latest/misc/faq.html#the-mathjax-font-folder-is-too-big-is-there-any-way-to-compress-it
     imageFont: null,
     messageStyle: 'none',
-    showMathMenu: false,
-    showMathMenuMSIE: false,
     skipStartupTypeset: true,
     elements: ['do-not-auto-render-any-elements'],
     tex2jax: {
