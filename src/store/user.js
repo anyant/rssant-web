@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import Toast from 'muse-ui-toast'
 import Loading from '@/plugin/loading'
 import { API } from '@/plugin/api'
 import localFeeds from '@/plugin/localFeeds'
@@ -13,8 +14,7 @@ async function syncCustomerBalance(DAO) {
       DAO.SET_SHOPANT_CUSTOMER(customer)
     })
     .catch(ex => {
-      // eslint-disable-next-line
-      console.log(ex)
+      Toast.error(`余额查询失败: ${ex.message}`)
     })
 }
 
@@ -25,6 +25,7 @@ export default {
     loginToken: null,
     loginDate: null,
     shopantCustomer: null,
+    shopantProduct: null,
   },
   mutations: {
     LOGIN(state, loginUser) {
@@ -37,6 +38,9 @@ export default {
     },
     SET_SHOPANT_CUSTOMER(state, customer) {
       state.shopantCustomer = customer
+    },
+    SET_SHOPANT_PRODUCT(state, product) {
+      state.shopantProduct = product
     },
   },
   getters: {
@@ -70,6 +74,9 @@ export default {
       let balance = state.shopantCustomer.balance
       return new Date(balance * 1000)
     },
+    shopantProduct(state) {
+      return state.shopantProduct
+    },
   },
   actions: {
     async login(DAO, { account, password } = {}) {
@@ -87,6 +94,13 @@ export default {
     },
     async syncCustomerBalance(DAO) {
       await syncCustomerBalance(DAO)
+    },
+    async syncProduct(DAO) {
+      if (!_.isNil(DAO.state.shopantProduct)) {
+        return
+      }
+      let product = await shopantClient.call('product.get')
+      DAO.SET_SHOPANT_PRODUCT(product)
     },
     async register(DAO, { username, email, password }) {
       await API.user.register({ username, email, password })
