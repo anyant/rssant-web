@@ -2,6 +2,21 @@ import _ from 'lodash'
 import Loading from '@/plugin/loading'
 import { API } from '@/plugin/api'
 import localFeeds from '@/plugin/localFeeds'
+import shopantClient from '@/plugin/shopant'
+
+async function syncCustomerBalance(DAO) {
+  await shopantClient
+    .call('customer.get', {
+      customer: DAO.shopantCustomerParameter,
+    })
+    .then(customer => {
+      DAO.SET_SHOPANT_CUSTOMER(customer)
+    })
+    .catch(ex => {
+      // eslint-disable-next-line
+      console.log(ex)
+    })
+}
 
 export default {
   state: {
@@ -9,6 +24,7 @@ export default {
     loginUser: null,
     loginToken: null,
     loginDate: null,
+    shopantCustomer: null,
   },
   mutations: {
     LOGIN(state, loginUser) {
@@ -18,6 +34,9 @@ export default {
       if (!_.isNil(state.loginUser)) {
         state.loginUser.has_usable_password = true
       }
+    },
+    SET_SHOPANT_CUSTOMER(state, customer) {
+      state.shopantCustomer = customer
     },
   },
   getters: {
@@ -29,6 +48,27 @@ export default {
     },
     loginUser(state) {
       return state.loginUser
+    },
+    shopantCustomerParameter(state) {
+      if (_.isNil(state.loginUser)) {
+        return null
+      }
+      let user = state.loginUser
+      return {
+        external_id: user.id,
+        external_dt_created: user.dt_created,
+        nickname: user.username,
+      }
+    },
+    shopantCustomer(state) {
+      return state.shopantCustomer
+    },
+    balance(state) {
+      if (_.isNil(state.shopantCustomer)) {
+        return null
+      }
+      let balance = state.shopantCustomer.balance
+      return new Date(balance * 1000)
     },
   },
   actions: {
@@ -42,7 +82,11 @@ export default {
         await API.user.login({ account, password }).then(user => {
           DAO.LOGIN(user)
         })
+        syncCustomerBalance(DAO)
       })
+    },
+    async syncCustomerBalance(DAO) {
+      await syncCustomerBalance(DAO)
     },
     async register(DAO, { username, email, password }) {
       await API.user.register({ username, email, password })

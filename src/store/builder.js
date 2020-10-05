@@ -53,16 +53,16 @@ class StoreBuilder {
           return STORE.commit(key, payload)
         }
       })
-      _.forEach(_.entries(stateDriver.actions), ([actionnName, actionnFunc]) => {
-        API[name][actionnName] = function(payload) {
-          return actionnFunc(DAO, payload)
+      _.forEach(_.entries(stateDriver.actions), ([actionName, actionFunc]) => {
+        API[name][actionName] = function(payload) {
+          return actionFunc(DAO, payload)
         }
       })
     })
     if (!_.isNil(this.rootDriver)) {
-      _.forEach(_.entries(this.rootDriver), ([actionnName, actionnFunc]) => {
-        API[actionnName] = function(payload) {
-          return actionnFunc(API, payload)
+      _.forEach(_.entries(this.rootDriver), ([actionName, actionFunc]) => {
+        API[actionName] = function(payload) {
+          return actionFunc(API, payload)
         }
       })
     }
