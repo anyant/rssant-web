@@ -133,7 +133,7 @@ export default {
       let item = this.getPackagePriceItem(amount)
       let currency = item.payment_channel.currency
       let price = item.price / currency.unit
-      return `${price}`
+      return price
     },
     getPackageCurrency(amount) {
       let item = this.getPackagePriceItem(amount)
@@ -218,8 +218,8 @@ export default {
 }
 
 .package {
-  width: 120 * @pr;
-  height: 80 * @pr;
+  width: 144 * @pr;
+  height: 88 * @pr;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -246,6 +246,7 @@ export default {
     font-size: 12 * @pr;
     font-weight: lighter;
     color: @antTextSemi;
+    margin-left: 2 * @pr;
   }
 }
 
