@@ -1,6 +1,6 @@
 <template>
   <MoHeader :border="border">
-    <div class="left">
+    <div class="left" :class="{'center-title': centerTitle}">
       <mu-button icon class="back" @click="goBack">
         <fa-icon size="18" icon="chevron-left" />
       </mu-button>
@@ -20,6 +20,10 @@ export default {
   components: { MoHeader },
   props: {
     border: {
+      type: Boolean,
+      default: false,
+    },
+    centerTitle: {
       type: Boolean,
       default: false,
     },
@@ -45,6 +49,16 @@ export default {
   width: 32 * @pr;
   height: 32 * @pr;
   color: @antTextBlack;
+}
+
+.left.center-title {
+  flex: 1;
+  .title {
+    width: 100%;
+    text-align: center;
+    position: relative;
+    left: -12 * @pr;
+  }
 }
 
 .title {
