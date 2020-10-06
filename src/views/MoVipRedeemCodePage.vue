@@ -1,5 +1,5 @@
 <template>
-  <MoLayout header class="vip">
+  <MoLayout header>
     <MoBackHeader>
       <template v-slot:title>兑换码</template>
     </MoBackHeader>

@@ -23,7 +23,7 @@
         <h4 class="sub-title">蚁阅会员</h4>
         <div class="center">
           <div>会员可享受全部功能，订阅数量不限</div>
-          <div>首月免费，价格 5 元每月，预售期间一折</div>
+          <div>首月免费试用，预售期间一折购买</div>
           <div class="dt-avaliable">
             <span class="label">会员到期时间:</span>
             <span class="value">{{ customerBalance }}</span>
@@ -132,6 +132,6 @@ export default {
 }
 
 .go-vip {
-  margin-top: 8 * @pr;
+  margin-top: 12 * @pr;
 }
 </style>

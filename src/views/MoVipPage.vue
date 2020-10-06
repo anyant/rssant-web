@@ -16,6 +16,7 @@
       <div class="description">
         <div>会员可享受全部功能，订阅数量不限</div>
         <div>到期后订阅将停止更新（预售结束后执行）</div>
+        <div class="description-highlight">原价 5 元每月，预售期间一折购买</div>
       </div>
       <div class="package-list">
         <div
@@ -204,6 +205,10 @@ export default {
 .description {
   margin-top: 16 * @pr;
   color: @antTextSemi;
+}
+
+.description-highlight {
+  font-weight: bold;
 }
 
 .package-list {
