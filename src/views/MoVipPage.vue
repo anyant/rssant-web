@@ -2,7 +2,7 @@
   <MoLayout header class="vip">
     <MoBackHeader>
       <template v-slot:title>蚁阅会员</template>
-      <mu-button flat class="action-redeem-code" @click="goRedeemCodeExchange">兑换码</mu-button>
+      <mu-button flat class="action-redeem-code" to="/vip-redeem-code">兑换码</mu-button>
     </MoBackHeader>
     <div class="main">
       <div class="balance">
@@ -11,7 +11,7 @@
           <span class="balance-date">{{ customerBalance }}</span>
           <span>到期</span>
         </div>
-        <router-link class="button-balance-logs" to="/redeem-code-exchange">充值兑换记录</router-link>
+        <router-link class="button-balance-logs" to="/vip-balance-logs">充值兑换记录</router-link>
       </div>
       <div class="description">
         <div>会员可享受全部功能，订阅数量不限</div>
@@ -52,7 +52,6 @@
 import _ from 'lodash'
 import MoLayout from '@/components/MoLayout.vue'
 import MoBackHeader from '@/components/MoBackHeader'
-// import MoAntGreenButton from '@/components/MoAntGreenButton'
 import shopantClient from '@/plugin/shopant'
 import { formatDate } from '@/plugin/datefmt'
 
@@ -144,9 +143,6 @@ export default {
     },
     onPackageClick(pkg) {
       this.form.package_amount = pkg.amount
-    },
-    goRedeemCodeExchange() {
-      this.$router.push('/redeem-code-exchange')
     },
     async onPay() {
       let data = await shopantClient.call('payment.start', {
