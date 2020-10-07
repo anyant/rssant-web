@@ -102,14 +102,14 @@ export default {
 }
 
 .balance-log {
-  height: 64px;
+  height: 64 * @pr;
   display: flex;
   flex-direction: column;
   justify-content: center;
 
   .type {
-    width: 64px;
-    font-size: 16px;
+    width: 64 * @pr;
+    font-size: 16 * @pr;
     font-weight: bold;
   }
 
@@ -119,7 +119,7 @@ export default {
 
   .amount {
     color: @antGreen;
-    font-size: 16px;
+    font-size: 16 * @pr;
     font-weight: bold;
   }
 
@@ -129,7 +129,7 @@ export default {
 
   .date,
   .balance {
-    font-size: 12px;
+    font-size: 12 * @pr;
     color: @antTextLight;
   }
 }

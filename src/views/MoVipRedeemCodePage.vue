@@ -14,11 +14,11 @@
           @focus="onFocus"
         />
         <div class="button-wrapper">
-          <MoAnyBlueButton
+          <MoAntBlueButton
             class="button-exchange"
             @click="onExchange"
             :disabled="isExchangeDisabled"
-          >兑换</MoAnyBlueButton>
+          >兑换</MoAntBlueButton>
         </div>
       </div>
     </div>
@@ -29,14 +29,14 @@
 import _ from 'lodash'
 import MoLayout from '@/components/MoLayout.vue'
 import MoBackHeader from '@/components/MoBackHeader'
-import MoAnyBlueButton from '@/components/MoAnyBlueButton'
+import MoAntBlueButton from '@/components/MoAntBlueButton'
 import shopantClient from '@/plugin/shopant'
 
 export default {
   components: {
     MoLayout,
     MoBackHeader,
-    MoAnyBlueButton,
+    MoAntBlueButton,
   },
   data() {
     return {
@@ -71,7 +71,7 @@ export default {
         .catch(ex => {
           let message = null
           if (_.isNil(ex.status)) {
-            message = _.defaultTo(ex.message, '兑换失败')
+            message = _.defaultTo(ex.message, '未知错误')
           } else {
             const errorMap = {
               'shopant.RedeemCodeAlreadyUsed': '兑换码已用过',

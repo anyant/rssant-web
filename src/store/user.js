@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import Toast from 'muse-ui-toast'
 import Loading from '@/plugin/loading'
 import { API } from '@/plugin/api'
 import localFeeds from '@/plugin/localFeeds'
@@ -24,7 +23,8 @@ async function syncCustomerBalance(DAO) {
       DAO.SET_SHOPANT_CUSTOMER(customer)
     })
     .catch(ex => {
-      Toast.error(`余额查询失败: ${ex.message}`)
+      // eslint-disable-next-line
+      console.log(ex)
     })
 }
 
