@@ -5,7 +5,17 @@ import { API } from '@/plugin/api'
 import localFeeds from '@/plugin/localFeeds'
 import shopantClient from '@/plugin/shopant'
 
+function isShopantEnable(state) {
+  if (_.isNil(state.loginUser)) {
+    return false
+  }
+  return _.defaultTo(state.loginUser.shopant_enable, false)
+}
+
 async function syncCustomerBalance(DAO) {
+  if (!isShopantEnable(DAO.state)) {
+    return
+  }
   await shopantClient
     .call('customer.get', {
       customer: DAO.shopantCustomerParameter,
@@ -16,6 +26,14 @@ async function syncCustomerBalance(DAO) {
     .catch(ex => {
       Toast.error(`余额查询失败: ${ex.message}`)
     })
+}
+
+function getBalance(state) {
+  if (_.isNil(state.shopantCustomer)) {
+    return null
+  }
+  let balance = state.shopantCustomer.balance
+  return new Date(balance * 1000)
 }
 
 export default {
@@ -53,6 +71,9 @@ export default {
     loginUser(state) {
       return state.loginUser
     },
+    isShopantEnable(state) {
+      return isShopantEnable(state)
+    },
     shopantCustomerParameter(state) {
       if (_.isNil(state.loginUser)) {
         return null
@@ -68,11 +89,7 @@ export default {
       return state.shopantCustomer
     },
     balance(state) {
-      if (_.isNil(state.shopantCustomer)) {
-        return null
-      }
-      let balance = state.shopantCustomer.balance
-      return new Date(balance * 1000)
+      return getBalance(state)
     },
     shopantProduct(state) {
       return state.shopantProduct
@@ -97,6 +114,9 @@ export default {
     },
     async syncProduct(DAO) {
       if (!_.isNil(DAO.state.shopantProduct)) {
+        return
+      }
+      if (!isShopantEnable(DAO.state)) {
         return
       }
       let product = await shopantClient.call('product.get')

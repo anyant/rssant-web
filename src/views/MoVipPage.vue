@@ -98,13 +98,21 @@ export default {
     customerBalance() {
       let dt = this.$API.user.balance
       if (_.isNil(dt)) {
-        return '-'
+        return '#'
       }
       return formatDate(dt)
     },
+    isPayEnable() {
+      return !_.isNil(this.package_amount) && !_.isNil(this.payment_channel_id)
+    },
   },
   async mounted() {
-    await this.$API.user.syncProduct()
+    try {
+      await this.$API.user.syncProduct()
+    } catch (ex) {
+      this.$toast.error(ex.message)
+      return
+    }
     this.form.package_amount = this.package_amount
     this.form.payment_channel_id = this.payment_channel_id
   },
@@ -146,6 +154,9 @@ export default {
       this.form.package_amount = pkg.amount
     },
     async onPay() {
+      if (!this.isPayEnable) {
+        return
+      }
       let data = await shopantClient.call('payment.start', {
         customer: this.$API.user.shopantCustomerParameter,
         package_amount: this.package_amount,

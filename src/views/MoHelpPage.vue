@@ -20,18 +20,20 @@
             <a href="https://github.com/anyant/hellorss" target="_blank">RSS阅读指南</a>
           </div>
         </div>
-        <h4 class="sub-title">蚁阅会员</h4>
-        <div class="center">
-          <div>会员可享受全部功能，订阅数量不限</div>
-          <div>首月免费试用，预售期间一折购买</div>
-          <div class="dt-avaliable">
-            <span class="label">会员到期时间:</span>
-            <span class="value">{{ customerBalance }}</span>
+        <template v-if="isShopantEnable">
+          <h4 class="sub-title">蚁阅会员</h4>
+          <div class="center">
+            <div>会员可享受全部功能，订阅数量不限</div>
+            <div>首月免费试用，预售期间一折购买</div>
+            <div class="dt-avaliable">
+              <span class="label">会员到期时间:</span>
+              <span class="value">{{ customerBalance }}</span>
+            </div>
+            <div class="go-vip">
+              <MoAntGreenButton @click="goVip">充值或兑换</MoAntGreenButton>
+            </div>
           </div>
-          <div class="go-vip">
-            <MoAntGreenButton @click="goVip">充值或兑换</MoAntGreenButton>
-          </div>
-        </div>
+        </template>
         <h4 class="sub-title">反馈建议</h4>
         <p class="center">
           欢迎通过邮件联系我
@@ -62,10 +64,13 @@ export default {
     return { contactEmail, isLikelySupportPWA: isLikelySupportPWA() }
   },
   computed: {
+    isShopantEnable() {
+      return this.$API.user.isShopantEnable
+    },
     customerBalance() {
       let dt = this.$API.user.balance
       if (_.isNil(dt)) {
-        return '-'
+        return '#'
       }
       return formatDate(dt)
     },

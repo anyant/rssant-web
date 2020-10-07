@@ -4,7 +4,7 @@
       <template v-slot:title>{{ username }}</template>
     </MoBackHeader>
     <div class="main">
-      <div class="action-group action-group-vip">
+      <div class="action-group action-group-vip" v-if="isShopantEnable">
         <div class="action-row" @click="goVip">
           <span class="action-label">蚁阅会员</span>
           <span>
@@ -70,10 +70,13 @@ export default {
     }
   },
   computed: {
+    isShopantEnable() {
+      return this.$API.user.isShopantEnable
+    },
     customerBalance() {
       let dt = this.$API.user.balance
       if (_.isNil(dt)) {
-        return '-'
+        return '#'
       }
       return formatDate(dt)
     },
@@ -158,10 +161,14 @@ export default {
 <style lang="less" scoped>
 @import '~@/styles/common';
 
+.main {
+  padding-top: 8 * @pr;
+}
+
 .divider {
-  margin-top: 8px;
-  margin-bottom: 8px;
-  border-bottom: solid 1px @antLineGrey;
+  margin-top: 8 * @pr;
+  margin-bottom: 8 * @pr;
+  border-bottom: solid 1 * @pr @antLineGrey;
 }
 
 .action-group {
@@ -169,8 +176,7 @@ export default {
 }
 
 .action-group-vip {
-  margin-top: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 8 * @pr;
   background: lighten(@antGold, 48%);
   color: @antTextBlack;
 }
@@ -179,7 +185,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 64px;
+  height: 64 * @pr;
   padding-left: 16 * @pr;
   padding-right: 16 * @pr;
   cursor: pointer;
@@ -193,14 +199,14 @@ export default {
 
 .action-label {
   font-weight: bold;
-  font-size: 16px;
+  font-size: 16 * @pr;
 }
 
 .action-icon {
-  margin-left: 8px;
+  margin-left: 8 * @pr;
   color: lighten(@antTextSemi, 10%);
   position: relative;
-  top: 1px;
+  top: 1 * @pr;
 }
 
 .action-logout {
