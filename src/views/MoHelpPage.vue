@@ -20,6 +20,20 @@
             <a href="https://github.com/anyant/hellorss" target="_blank">RSS阅读指南</a>
           </div>
         </div>
+        <template v-if="isShopantEnable">
+          <h4 class="sub-title">蚁阅会员</h4>
+          <div class="center">
+            <div>会员可享受全部功能，订阅数量不限</div>
+            <div>首月免费试用，预售期间一折购买</div>
+            <div class="dt-avaliable">
+              <span class="label">会员到期时间:</span>
+              <span class="value">{{ customerBalance }}</span>
+            </div>
+            <div class="go-vip">
+              <MoAntGreenButton @click="goVip">充值或兑换</MoAntGreenButton>
+            </div>
+          </div>
+        </template>
         <h4 class="sub-title">反馈建议</h4>
         <p class="center">
           欢迎通过邮件联系我
@@ -34,17 +48,37 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import MoLayout from '@/components/MoLayout'
 import MoBackHeader from '@/components/MoBackHeader'
 import MoPWAButton from '@/components/MoPWAButton'
+import MoAntGreenButton from '@/components/MoAntGreenButton'
 import { isLikelySupportPWA } from '@/plugin/pwa'
+import { formatDate } from '@/plugin/datefmt'
 
 const contactEmail = 'guyskk@anyant.com'
 
 export default {
-  components: { MoLayout, MoBackHeader, MoPWAButton },
+  components: { MoLayout, MoBackHeader, MoPWAButton, MoAntGreenButton },
   data() {
     return { contactEmail, isLikelySupportPWA: isLikelySupportPWA() }
+  },
+  computed: {
+    isShopantEnable() {
+      return this.$API.user.isShopantEnable
+    },
+    customerBalance() {
+      let dt = this.$API.user.balance
+      if (_.isNil(dt)) {
+        return '#'
+      }
+      return formatDate(dt)
+    },
+  },
+  methods: {
+    goVip() {
+      this.$router.push('/vip')
+    },
   },
 }
 </script>
@@ -60,7 +94,7 @@ export default {
 .title,
 .sub-title {
   padding-top: 16px;
-  margin-top: 24px;
+  margin-top: 20px;
   text-align: center;
 }
 
@@ -90,5 +124,19 @@ export default {
 .weixin-mp {
   display: inline-block;
   margin-top: 8 * @pr;
+}
+
+.dt-avaliable {
+  margin-top: 8 * @pr;
+  .label {
+    padding-right: 8 * @pr;
+  }
+  .value {
+    font-weight: bold;
+  }
+}
+
+.go-vip {
+  margin-top: 12 * @pr;
 }
 </style>

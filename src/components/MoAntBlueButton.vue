@@ -1,8 +1,7 @@
 <template>
   <mu-button
-    class="ant-green-button"
-    :color="antGreen"
-    flat
+    class="ant-blue-button"
+    :color="antBlue"
     data-mu-loading-size="24"
     v-bind="$attrs"
     v-on="$listeners"
@@ -12,12 +11,12 @@
 </template>
 
 <script>
-import { antGreen } from '@/plugin/common'
+import { antBlue } from '@/plugin/common'
 
 export default {
   data() {
     return {
-      antGreen,
+      antBlue,
     }
   },
 }
@@ -26,14 +25,17 @@ export default {
 <style lang="less" scoped>
 @import '~@/styles/common';
 
-.ant-green-button {
-  height: 32 * @pr;
-  font-size: 15 * @pr;
-  border: solid 1px @antGreen;
+.ant-blue-button {
+  width: 144 * @pr;
+  height: 36 * @pr;
+  font-size: 16 * @pr;
+  font-weight: bold;
+  box-shadow: none;
 }
 
-.ant-green-button.disabled {
+.ant-blue-button.disabled {
+  background: @antBlue;
+  color: #ffffff;
   opacity: 0.8;
-  border: solid 1px @antLineGrey;
 }
 </style>

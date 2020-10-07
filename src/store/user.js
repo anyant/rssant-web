@@ -2,6 +2,39 @@ import _ from 'lodash'
 import Loading from '@/plugin/loading'
 import { API } from '@/plugin/api'
 import localFeeds from '@/plugin/localFeeds'
+import shopantClient from '@/plugin/shopant'
+
+function isShopantEnable(state) {
+  if (_.isNil(state.loginUser)) {
+    return false
+  }
+  return _.defaultTo(state.loginUser.shopant_enable, false)
+}
+
+async function syncCustomerBalance(DAO) {
+  if (!isShopantEnable(DAO.state)) {
+    return
+  }
+  await shopantClient
+    .call('customer.get', {
+      customer: DAO.shopantCustomerParameter,
+    })
+    .then(customer => {
+      DAO.SET_SHOPANT_CUSTOMER(customer)
+    })
+    .catch(ex => {
+      // eslint-disable-next-line
+      console.log(ex)
+    })
+}
+
+function getBalance(state) {
+  if (_.isNil(state.shopantCustomer)) {
+    return null
+  }
+  let balance = state.shopantCustomer.balance
+  return new Date(balance * 1000)
+}
 
 export default {
   state: {
@@ -9,6 +42,8 @@ export default {
     loginUser: null,
     loginToken: null,
     loginDate: null,
+    shopantCustomer: null,
+    shopantProduct: null,
   },
   mutations: {
     LOGIN(state, loginUser) {
@@ -18,6 +53,12 @@ export default {
       if (!_.isNil(state.loginUser)) {
         state.loginUser.has_usable_password = true
       }
+    },
+    SET_SHOPANT_CUSTOMER(state, customer) {
+      state.shopantCustomer = customer
+    },
+    SET_SHOPANT_PRODUCT(state, product) {
+      state.shopantProduct = product
     },
   },
   getters: {
@@ -29,6 +70,29 @@ export default {
     },
     loginUser(state) {
       return state.loginUser
+    },
+    isShopantEnable(state) {
+      return isShopantEnable(state)
+    },
+    shopantCustomerParameter(state) {
+      if (_.isNil(state.loginUser)) {
+        return null
+      }
+      let user = state.loginUser
+      return {
+        external_id: user.id,
+        external_dt_created: user.dt_created,
+        nickname: user.username,
+      }
+    },
+    shopantCustomer(state) {
+      return state.shopantCustomer
+    },
+    balance(state) {
+      return getBalance(state)
+    },
+    shopantProduct(state) {
+      return state.shopantProduct
     },
   },
   actions: {
@@ -42,7 +106,21 @@ export default {
         await API.user.login({ account, password }).then(user => {
           DAO.LOGIN(user)
         })
+        syncCustomerBalance(DAO)
       })
+    },
+    async syncCustomerBalance(DAO) {
+      await syncCustomerBalance(DAO)
+    },
+    async syncProduct(DAO) {
+      if (!_.isNil(DAO.state.shopantProduct)) {
+        return
+      }
+      if (!isShopantEnable(DAO.state)) {
+        return
+      }
+      let product = await shopantClient.call('product.get')
+      DAO.SET_SHOPANT_PRODUCT(product)
     },
     async register(DAO, { username, email, password }) {
       await API.user.register({ username, email, password })

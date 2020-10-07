@@ -33,9 +33,6 @@
             <mu-list-item button @click="goAccount">
               <mu-list-item-title>账号设置</mu-list-item-title>
             </mu-list-item>
-            <mu-list-item button @click="exportOPML">
-              <mu-list-item-title>导出订阅</mu-list-item-title>
-            </mu-list-item>
             <mu-list-item button @click="goFeedClean">
               <mu-list-item-title>清理订阅</mu-list-item-title>
             </mu-list-item>
@@ -252,10 +249,6 @@ export default {
   methods: {
     numTextOf(n) {
       return n > 0 ? n : ''
-    },
-    exportOPML() {
-      this.$API.feed.exportOPML({ download: true })
-      this.isMenuOpen = false
     },
     routeTo(path) {
       if (this.$route.path === path) {

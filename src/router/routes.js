@@ -15,6 +15,9 @@ import MoResetPasswordConfirmPage from '@/views/MoResetPasswordConfirmPage'
 import MoAccountPage from '@/views/MoAccountPage'
 import MoAboutPage from '@/views/MoAboutPage'
 import MoHelpPage from '@/views/MoHelpPage'
+import MoVipPage from '@/views/MoVipPage'
+import MoVipRedeemCodePage from '@/views/MoVipRedeemCodePage'
+import MoVipBalanceLogsPage from '@/views/MoVipBalanceLogsPage'
 import MoNotFoundPage from '@/views/MoNotFoundPage'
 
 const boardRoutes = [
@@ -28,6 +31,24 @@ const boardRoutes = [
     path: 'help',
     name: 'Help',
     component: MoHelpPage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: 'vip',
+    name: 'Vip',
+    component: MoVipPage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: 'vip-redeem-code',
+    name: 'VipRedeemCode',
+    component: MoVipRedeemCodePage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: 'vip-balance-logs',
+    name: 'VipBalanceLogs',
+    component: MoVipBalanceLogsPage,
     meta: { loginRequired: true },
   },
   {

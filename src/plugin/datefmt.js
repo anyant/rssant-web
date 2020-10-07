@@ -5,6 +5,10 @@ export function formatDate(date) {
   return format(new Date(date), 'yyyy-MM-dd')
 }
 
+export function formatFullDate(date) {
+  return format(new Date(date), 'yyyy-MM-dd HH:mm:ss')
+}
+
 /**
  * 10:35
  * 昨天
