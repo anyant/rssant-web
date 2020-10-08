@@ -223,8 +223,7 @@ export default {
 @import '~@/styles/common';
 
 .main {
-  padding: 16 * @pr;
-  padding-bottom: 32 * @pr;
+  padding: 8 * @pr 16 * @pr;
 }
 
 .action-redeem-code {
@@ -280,7 +279,7 @@ export default {
 }
 
 .package {
-  width: 136 * @pr;
+  width: 148 * @pr;
   height: 88 * @pr;
   display: flex;
   flex-direction: column;
