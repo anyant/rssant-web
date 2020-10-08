@@ -279,7 +279,7 @@ export default {
 }
 
 .package {
-  width: 148 * @pr;
+  width: 142 * @pr;
   height: 88 * @pr;
   display: flex;
   flex-direction: column;
