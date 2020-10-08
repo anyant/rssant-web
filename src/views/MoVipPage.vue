@@ -56,6 +56,44 @@ import MoBackHeader from '@/components/MoBackHeader'
 import shopantClient from '@/plugin/shopant'
 import { formatDate } from '@/plugin/datefmt'
 
+// https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
+const isMobile = window.innerWidth < 600 || /Mobi/i.test(window.navigator.userAgent)
+
+const PAYMENT_CHANNEL_PRIORITY = [
+  'STANDARD_HUPIJIAO_WEIXIN',
+  'STANDARD_HUPIJIAO_ALIPAY',
+  'SIMPLE_WEIXIN',
+  'SIMPLE_ALIPAY',
+  'SIMPLE_BITCOIN',
+]
+
+function selectPriceList(prices) {
+  let channelMap = {}
+  for (let item of prices) {
+    channelMap[item.payment_channel.type] = true
+  }
+  // 微信不支持相册扫码支付，所以移动端用 SIMPLE_WEIXIN，桌面端用 STANDARD_HUPIJIAO_WEIXIN
+  if (channelMap['STANDARD_HUPIJIAO_WEIXIN'] && channelMap['SIMPLE_WEIXIN']) {
+    prices = _.filter(prices, item => {
+      if (isMobile) {
+        return item.payment_channel.type !== 'STANDARD_HUPIJIAO_WEIXIN'
+      } else {
+        return item.payment_channel.type !== 'SIMPLE_WEIXIN'
+      }
+    })
+  }
+  prices = _.sortBy(prices, [
+    function(item) {
+      let priority = PAYMENT_CHANNEL_PRIORITY.indexOf(item.payment_channel.type)
+      if (priority < 0) {
+        priority = PAYMENT_CHANNEL_PRIORITY.length
+      }
+      return priority
+    },
+  ])
+  return prices
+}
+
 export default {
   components: { MoLayout, MoBackHeader },
   data() {
@@ -120,7 +158,7 @@ export default {
     getPackagePriceList(amount) {
       for (let pkg of this.packages) {
         if (pkg.amount === amount) {
-          return _.defaultTo(pkg.prices, [])
+          return selectPriceList(_.defaultTo(pkg.prices, []))
         }
       }
       return []
@@ -137,11 +175,23 @@ export default {
       }
       return prices[0]
     },
+    formatPriceValue(price) {
+      let parts = price.toFixed(8).split('.')
+      if (parts.length !== 2) {
+        return price
+      }
+      let fraction = parts[1].replace(/0+$/, '')
+      if (fraction.length > 0) {
+        return parts[0] + '.' + fraction
+      } else {
+        return parts[0]
+      }
+    },
     getPackagePrice(amount) {
       let item = this.getPackagePriceItem(amount)
       let currency = item.payment_channel.currency
       let price = item.price / currency.unit
-      return price
+      return this.formatPriceValue(price)
     },
     getPackageCurrency(amount) {
       let item = this.getPackagePriceItem(amount)
@@ -230,7 +280,7 @@ export default {
 }
 
 .package {
-  width: 144 * @pr;
+  width: 136 * @pr;
   height: 88 * @pr;
   display: flex;
   flex-direction: column;
@@ -240,6 +290,10 @@ export default {
   border: 1 * @pr solid @antLineGrey;
   color: @antTextSemi;
   cursor: pointer;
+}
+
+.package:last-child {
+  margin-right: 0;
 }
 
 .package-name {
