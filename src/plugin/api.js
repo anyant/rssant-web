@@ -28,16 +28,19 @@ const client = axios.create({
   baseURL: BASE_URL,
 })
 
-client.interceptors.request.use(function(config) {
-  let csrftoken = Cookies.get('csrftoken')
-  if (!_.isNil(csrftoken)) {
-    if (_.isNil(config.headers)) {
-      config.headers = {}
+const REQUEST_ITERCEPTORS = [
+  function(config) {
+    let csrftoken = Cookies.get('csrftoken')
+    if (!_.isNil(csrftoken)) {
+      if (_.isNil(config.headers)) {
+        config.headers = {}
+      }
+      config.headers['X-CSRFToken'] = csrftoken
     }
-    config.headers['X-CSRFToken'] = csrftoken
-  }
-  return config
-})
+    return config
+  },
+]
+REQUEST_ITERCEPTORS.forEach(x => client.interceptors.request.use(x))
 
 client.interceptors.response.use(
   function(response) {
@@ -274,4 +277,4 @@ const API = {
 }
 
 export default API
-export { API, BASE_URL, client }
+export { API, BASE_URL, REQUEST_ITERCEPTORS, client }
