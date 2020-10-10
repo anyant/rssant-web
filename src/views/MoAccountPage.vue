@@ -76,7 +76,7 @@ export default {
     customerBalance() {
       let dt = this.$API.user.balance
       if (_.isNil(dt)) {
-        return '#'
+        return '####-##-##'
       }
       return formatDate(dt)
     },

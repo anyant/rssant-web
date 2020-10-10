@@ -8,7 +8,9 @@
       <div class="balance">
         <div class="balance-info">
           <span>会员</span>
-          <span class="balance-date">{{ customerBalance }}</span>
+          <transition-group name="balance-transition" tag="div" class="balance-date-wrapper">
+            <span class="balance-date" v-for="item in customerBalanceList" :key="item">{{ item }}</span>
+          </transition-group>
           <span>到期</span>
         </div>
         <router-link class="button-balance-logs" to="/vip-balance-logs">充值兑换记录</router-link>
@@ -136,9 +138,12 @@ export default {
     customerBalance() {
       let dt = this.$API.user.balance
       if (_.isNil(dt)) {
-        return '#'
+        return ''
       }
       return formatDate(dt)
+    },
+    customerBalanceList() {
+      return [this.customerBalance]
     },
     isPayEnable() {
       return !_.isNil(this.package_amount) && !_.isNil(this.payment_channel_id)
@@ -245,6 +250,8 @@ export default {
 
 .balance-info {
   font-weight: bold;
+  display: flex;
+  align-items: center;
 }
 
 .button-balance-logs {
@@ -258,8 +265,35 @@ export default {
 }
 
 .balance-date {
+  position: absolute;
   padding-left: 4 * @pr;
   padding-right: 4 * @pr;
+}
+
+.balance-date-wrapper {
+  width: 84 * @pr;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.balance-transition-enter-active,
+.balance-transition-leave-active {
+  transition: all 3s ease;
+}
+
+.balance-transition-enter,
+.balance-transition-leave-to {
+  opacity: 0;
+}
+
+.balance-transition-enter {
+  transform: translateY(-13 * @pr);
+}
+
+.balance-transition-leave-to {
+  transform: translateY(13 * @pr);
 }
 
 .description {
