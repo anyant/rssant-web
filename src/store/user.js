@@ -81,7 +81,6 @@ export default {
       let user = state.loginUser
       return {
         external_id: user.id,
-        external_dt_created: user.dt_created,
         nickname: user.username,
       }
     },
