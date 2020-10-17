@@ -7,6 +7,21 @@
       </mu-button>
     </MoBackHeader>
     <div class="feed-info">
+      <div class="item title-item">
+        <span class="item-name">标题</span>
+        <template v-if="form.isEdit">
+          <input class="item-input" v-model="form.title" />
+          <span class="item-button item-button-save" @click="onSaveTitle()">
+            <fa-icon class="item-button-icon" :color="antBlue" icon="save" />
+          </span>
+        </template>
+        <template v-else>
+          <span class="item-value">{{ feedTitle }}</span>
+          <span class="item-button item-button-edit" @click="onEditTitle()">
+            <fa-icon class="item-button-icon" icon="edit" />
+          </span>
+        </template>
+      </div>
       <div class="item" v-for="item in feedInfo" :key="item.name">
         <span class="item-name">{{ item.name }}</span>
         <a
@@ -26,12 +41,9 @@ import _ from 'lodash'
 import MoLayout from '@/components/MoLayout.vue'
 import MoBackHeader from '@/components/MoBackHeader'
 import { formatFullDateFriendly } from '@/plugin/datefmt'
+import { antBlue } from '@/plugin/common'
 
 const FEED_FIELDS = [
-  {
-    name: '名称',
-    key: 'title',
-  },
   {
     name: '状态',
     key: 'status',
@@ -150,7 +162,13 @@ const FEED_FIELDS = [
 export default {
   components: { MoBackHeader, MoLayout },
   data() {
-    return {}
+    return {
+      antBlue,
+      form: {
+        isEdit: false,
+        title: null,
+      },
+    }
   },
   mounted() {
     this.$API.feed.load({ feedId: this.feedId, detail: true })
@@ -191,6 +209,18 @@ export default {
     },
   },
   methods: {
+    onEditTitle() {
+      this.form.title = this.feedTitle
+      this.form.isEdit = true
+    },
+    async onSaveTitle() {
+      try {
+        await this.$API.feed.update({ feedId: this.feedId, title: this.form.title })
+      } catch (ex) {
+        this.$toast.error(`更新失败: ${ex.message}`)
+      }
+      this.form.isEdit = false
+    },
     deleteFeed() {
       this.$confirm(`删除订阅 “${this.feedTitle}” ？`, '提示', {
         type: 'warning',
@@ -225,6 +255,62 @@ export default {
   display: flex;
   align-items: center;
   padding-top: 13 * @pr;
+  font-size: 15 * @pr;
+}
+
+.title-item {
+  padding-top: 20 * @pr;
+  min-height: 52 * @pr;
+
+  .item-value,
+  .item-input {
+    overflow: auto;
+    appearance: none;
+    outline: none;
+    border: none;
+    background: none;
+    box-shadow: none;
+    resize: none;
+    display: block;
+    padding: 0;
+    margin: 0;
+  }
+
+  .item-value,
+  .item-input {
+    width: 100%;
+    overflow-y: hidden;
+    line-height: 1.1;
+    font-size: 15 * @pr;
+    color: @antTextSemi;
+    vertical-align: middle;
+  }
+  .item-input {
+    height: 24 * @pr;
+    border-bottom: 1 * @pr solid @antBlue;
+  }
+
+  .item-button {
+    padding-right: 8 * @pr;
+    padding-left: 8 * @pr;
+    cursor: pointer;
+  }
+  .item-button .item-button-icon {
+    display: inline-block;
+    width: 24 * @pr;
+  }
+  .item-button-save {
+    margin-right: -4 * @pr;
+    .item-button-icon {
+      height: 18 * @pr;
+    }
+  }
+  .item-button-edit {
+    margin-right: -5 * @pr;
+    .item-button-icon {
+      height: 16 * @pr;
+    }
+  }
 }
 
 .item-name {

@@ -101,6 +101,8 @@ function updateFeedList(state) {
 }
 
 function updateStateFeed(state, feed) {
+  let old = _.defaultTo(state.feeds[feed.id], {})
+  feed = Object.assign(old, feed)
   feed = fixTitle(feed)
   feed = normalizeFeedStoryOffset(feed)
   Vue.set(state.feeds, feed.id, feed)

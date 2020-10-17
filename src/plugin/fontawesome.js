@@ -27,6 +27,8 @@ faLibrary.add(fas.faPlayCircle)
 faLibrary.add(fas.faPauseCircle)
 faLibrary.add(far.faStar)
 faLibrary.add(fab.faGithub)
+faLibrary.add(fas.faEdit)
+faLibrary.add(fas.faSave)
 
 /**
  * solid icons:
