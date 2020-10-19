@@ -46,7 +46,9 @@ import { antBlue } from '@/plugin/common'
 const FEED_FIELDS = [
   {
     name: '状态',
-    key: 'status',
+    key: function(feed) {
+      return `${_.defaultTo(feed.status, '')} / ${_.defaultTo(feed.response_status, '')}`
+    },
     type: 'status',
   },
   {
@@ -193,7 +195,11 @@ export default {
         let item = {
           name: field.name,
           type: field.type,
-          value: feed[field.key],
+        }
+        if (_.isFunction(field.key)) {
+          item.value = field.key(feed)
+        } else {
+          item.value = feed[field.key]
         }
         if (!_.isNil(field.process)) {
           item.value = field.process(item.value)
