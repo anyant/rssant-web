@@ -54,6 +54,7 @@
 import _ from 'lodash'
 import { formatFullDateFriendly } from '@/plugin/datefmt'
 import initMathjax from '@/plugin/mathjax'
+import * as ImageHelper from '@/plugin/image'
 import MoAudioPlayer from '@/components/MoAudioPlayer'
 
 export default {
@@ -63,6 +64,9 @@ export default {
     source: String,
     nextFeed: Object,
     nextStory: Object,
+  },
+  data() {
+    return {}
   },
   computed: {
     storyLinkUnquoted() {
@@ -80,13 +84,16 @@ export default {
     link() {
       return _.isNil(this.story) ? '' : this.story.link
     },
+    imageToken() {
+      return _.isNil(this.story) ? '' : this.story.image_token
+    },
     titleForRender() {
       let content = _.isNil(this.story) ? '' : this.story.title
       return { content, link: this.link }
     },
     storyForRender() {
       let content = _.isNil(this.story) ? '' : this.story.content
-      return { content, link: this.link }
+      return { content, link: this.link, callback: this.setupImageProxy.bind(this) }
     },
     wrapperStyle() {
       return {
@@ -116,6 +123,36 @@ export default {
     initMathjax()
   },
   methods: {
+    setupImageProxy(dom) {
+      let imageNodes = dom.querySelectorAll('img,source')
+      imageNodes.forEach(node => {
+        let src = ImageHelper.fixImageSrc(node, this.link)
+        if (_.isEmpty(src) || ImageHelper.isDataUrl(src) || ImageHelper.isSameOriginUrl(src)) {
+          console.log(`skip: ${src}`)
+          return
+        }
+        node.setAttribute('referrerPolicy', 'no-referrer')
+        node.onerror = () => {
+          this.onImageError(node)
+        }
+      })
+    },
+    onImageError(node) {
+      if (_.isEmpty(this.imageToken)) {
+        return
+      }
+      let src = node.src
+      if (ImageHelper.isSameOriginUrl(src)) {
+        return
+      }
+      console.log(`fix: ${src}`)
+      node.style.visibility = 'hidden'
+      let proxyUrl = new URL('/api/v1/image/proxy', location.origin)
+      proxyUrl.searchParams.set('url', src)
+      proxyUrl.searchParams.set('token', this.imageToken)
+      node.setAttribute('src', proxyUrl)
+      node.style.visibility = 'visible'
+    },
     openNextStory() {
       if (_.isNil(this.nextStory)) {
         return

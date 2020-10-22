@@ -157,6 +157,9 @@ const StoryRender = {
       let content = (newContent || '').trim()
       let hasMath = hasStrictMathJax(content) || isHasMathStoryLink(binding.value.link)
       el.innerHTML = content
+      if (!_.isNil(binding.value) && !_.isNil(binding.value.callback)) {
+        binding.value.callback(el)
+      }
       if (hasMath && !_.isEmpty(el.id)) {
         renderMathjaxIfReady(el, el.id)
       }
