@@ -36,6 +36,18 @@ function addOrUpdateStory(feedStorys, story) {
   }
 }
 
+function setFeedTotalStorysIfUpdated(DAO, feedId, storys) {
+  let maxOffset = -1
+  storys.forEach(story => {
+    if (story.offset > maxOffset) {
+      maxOffset = story.offset
+    }
+  })
+  if (maxOffset >= 0) {
+    DAO.API.feed.SET_TOTAL_STORYS_IF_UPDATED({ id: feedId, total: maxOffset + 1 })
+  }
+}
+
 export default {
   state: {
     storys: {},
@@ -213,6 +225,7 @@ export default {
       }
       DAO.ADD_OR_UPDATE_LIST({ feedId, storys: data.storys })
       DAO.UPDATE_LOADED_OFFSET({ feedId, begin: offset, end: offset + size - 1 })
+      setFeedTotalStorysIfUpdated(DAO, feedId, data.storys)
     },
     async loadMushrooms(DAO, { mushroomKeys, detail }) {
       await DAO.state.mushroomsLoading.begin(async () => {

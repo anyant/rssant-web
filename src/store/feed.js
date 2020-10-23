@@ -233,6 +233,13 @@ export default {
       feed.story_offset = offset
       feed.num_unread_storys = feed.total_storys - offset
     },
+    SET_TOTAL_STORYS_IF_UPDATED(state, { id, total }) {
+      let feed = state.feeds[id]
+      if (total > feed.total_storys) {
+        feed.total_storys = total
+        feed.num_unread_storys = feed.total_storys - feed.story_offset
+      }
+    },
     SET_ALL_READED(state, { feedIds }) {
       feedIds.forEach(feedId => {
         let feed = state.feeds[feedId]
