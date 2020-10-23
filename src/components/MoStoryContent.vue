@@ -93,7 +93,7 @@ export default {
     },
     storyForRender() {
       let content = _.isNil(this.story) ? '' : this.story.content
-      return { content, link: this.link, callback: this.setupImageProxy.bind(this) }
+      return { content, link: this.link, callback: this.onStoryRendered.bind(this) }
     },
     wrapperStyle() {
       return {
@@ -123,6 +123,35 @@ export default {
     initMathjax()
   },
   methods: {
+    onStoryRendered(dom) {
+      this.setupImageProxy(dom)
+      this.setupVideoFallback(dom)
+    },
+    setupVideoFallback(dom) {
+      let videoNodes = dom.querySelectorAll('video')
+      videoNodes.forEach(node => {
+        let src = node.getAttribute('src')
+        if (_.isEmpty(src)) {
+          node.removeAttribute('src')
+          return
+        }
+        src = ImageHelper.makeAbsoluteUrl(src, this.link)
+        if (ImageHelper.isSameOriginUrl(src)) {
+          return
+        }
+        node.setAttribute('src', src)
+        node.onerror = () => {
+          console.log(`fix: ${src}`)
+          let newNode = document.createElement('a')
+          newNode.setAttribute('href', node.src)
+          newNode.setAttribute('referrerpolicy', 'no-referrer')
+          newNode.setAttribute('rel', 'noreferrer')
+          newNode.setAttribute('target', '_blank')
+          newNode.innerText = node.src
+          node.parentNode.replaceChild(newNode, node)
+        }
+      })
+    },
     setupImageProxy(dom) {
       let imageNodes = dom.querySelectorAll('img,source')
       imageNodes.forEach(node => {
@@ -131,7 +160,7 @@ export default {
           console.log(`skip: ${src}`)
           return
         }
-        node.setAttribute('referrerPolicy', 'no-referrer')
+        node.setAttribute('referrerpolicy', 'no-referrer')
         node.onerror = () => {
           this.onImageError(node)
         }
