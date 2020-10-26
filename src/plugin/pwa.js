@@ -88,4 +88,12 @@ function initPWA() {
   }
 }
 
-export { hasPWA, isLikelySupportPWA, initPWA, registerServiceWorker, unregisterServiceWorker }
+function isLaunchFromPWA() {
+  // https://stackoverflow.com/questions/51735869/check-if-user-has-already-installed-pwa-to-homescreen-on-chrome
+  if (_.isNil(window.matchMedia)) {
+    return false
+  }
+  return !!window.matchMedia('(display-mode: standalone)').matches
+}
+
+export { hasPWA, isLikelySupportPWA, initPWA, registerServiceWorker, unregisterServiceWorker, isLaunchFromPWA }

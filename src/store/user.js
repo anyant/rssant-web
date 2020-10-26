@@ -1,6 +1,8 @@
 import _ from 'lodash'
 import Loading from '@/plugin/loading'
 import { API } from '@/plugin/api'
+import { isLaunchFromPWA } from '@/plugin/pwa'
+import { reportEvent } from '@/plugin/metric'
 import localFeeds from '@/plugin/localFeeds'
 import shopantClient from '@/plugin/shopant'
 
@@ -102,6 +104,9 @@ export default {
         }
       }
       await DAO.state.loading.begin(async () => {
+        if (!isLaunchFromPWA()) {
+          reportEvent('LOGIN_PWA')
+        }
         await API.user.login({ account, password }).then(user => {
           DAO.LOGIN(user)
         })
