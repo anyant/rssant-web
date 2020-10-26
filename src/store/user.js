@@ -104,13 +104,12 @@ export default {
         }
       }
       await DAO.state.loading.begin(async () => {
-        if (!isLaunchFromPWA()) {
+        let user = await API.user.login({ account, password })
+        DAO.LOGIN(user)
+        syncCustomerBalance(DAO)
+        if (isLaunchFromPWA()) {
           reportEvent('LOGIN_PWA')
         }
-        await API.user.login({ account, password }).then(user => {
-          DAO.LOGIN(user)
-        })
-        syncCustomerBalance(DAO)
       })
     },
     async syncCustomerBalance(DAO) {
