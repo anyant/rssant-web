@@ -55,8 +55,18 @@ router.beforeEach((to, from, next) => {
   } else {
     API.user
       .login()
-      .catch(() => null)
-      .finally(goNext)
+      .then(() => {
+        const isAuthPage = to.name === 'Login' || to.name === 'Register'
+        if (isAuthPage) {
+          next({
+            path: '/',
+            replace: true,
+          })
+        } else {
+          goNext()
+        }
+      })
+      .catch(goNext)
   }
 })
 
