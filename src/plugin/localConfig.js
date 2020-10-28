@@ -5,6 +5,7 @@ const CONFIGS = {
   DEBUG: { defaultValue: false },
   PWA_ENABLE: { defaultValue: false },
   HELP_READED: { defaultValue: false },
+  HAS_LOGIN_HISTORY: { defaultValue: false },
 }
 
 const localConfig = (function() {

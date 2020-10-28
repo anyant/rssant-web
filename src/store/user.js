@@ -4,6 +4,7 @@ import { API } from '@/plugin/api'
 import { isLaunchFromPWA } from '@/plugin/pwa'
 import { reportEvent } from '@/plugin/metric'
 import localFeeds from '@/plugin/localFeeds'
+import localConfig from '@/plugin/localConfig'
 import shopantClient from '@/plugin/shopant'
 
 function isShopantEnable(state) {
@@ -106,6 +107,7 @@ export default {
       await DAO.state.loading.begin(async () => {
         let user = await API.user.login({ account, password })
         DAO.LOGIN(user)
+        localConfig.HAS_LOGIN_HISTORY.set(true)
         syncCustomerBalance(DAO)
         if (isLaunchFromPWA()) {
           reportEvent('LOGIN_PWA')

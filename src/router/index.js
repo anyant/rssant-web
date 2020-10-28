@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Toast from 'muse-ui-toast'
 import _ from 'lodash'
 
+import localConfig from '@/plugin/localConfig'
 import routes from './routes'
 import { API } from '@/store'
 
@@ -41,8 +42,9 @@ router.beforeEach((to, from, next) => {
       Toast.error(error.message)
       return next(false)
     }
+    let hasLoginHistory = localConfig.HAS_LOGIN_HISTORY.get()
     next({
-      path: '/login',
+      path: hasLoginHistory ? '/login' : '/register',
       replace: true,
     })
   }
