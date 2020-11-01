@@ -118,6 +118,10 @@ export default {
   color: lighten(@antTextSemi, 5%);
 }
 
+.list {
+  padding-bottom: 8 * @pr;
+}
+
 .list .feed-story-item {
   margin-top: 8 * @pr;
   cursor: pointer;

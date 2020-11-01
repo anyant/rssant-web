@@ -158,6 +158,6 @@ export default {
 .message-title-line {
   flex: 1;
   height: 0;
-  border-bottom: 1px solid @antLineGrey;
+  border-bottom: 1px solid darken(@antLineGrey, 5%);
 }
 </style>
