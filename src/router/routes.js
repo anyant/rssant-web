@@ -3,6 +3,7 @@ import MoHomePage from '@/views/MoHomePage'
 import MoFavoritedPage from '@/views/MoFavoritedPage'
 import MoCreationDetailPage from '@/views/MoCreationDetailPage'
 import MoStoryListPage from '@/views/MoStoryListPage'
+import MoMushroomPage from '@/views/MoMushroomPage'
 import MoLoginPage from '@/views/MoLoginPage'
 import MoRegisterPage from '@/views/MoRegisterPage'
 import MoFeedCreationPage from '@/views/MoFeedCreationPage'
@@ -79,6 +80,12 @@ const boardRoutes = [
     path: 'feed/:feedId',
     name: 'StoryList',
     component: MoStoryListPage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: 'mushroom',
+    name: 'Mushroom',
+    component: MoMushroomPage,
     meta: { loginRequired: true },
   },
   {

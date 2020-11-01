@@ -11,7 +11,7 @@
 export default {
   data() {
     return {
-      keepAlivePages: ['MoHomePage', 'MoAccountPage', 'MoFeedCreationPage'],
+      keepAlivePages: ['MoHomePage', 'MoMushroomPage', 'MoAccountPage', 'MoFeedCreationPage'],
     }
   },
   async created() {},

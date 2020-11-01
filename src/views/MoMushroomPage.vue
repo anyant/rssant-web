@@ -1,0 +1,144 @@
+<template>
+  <MoLayout grey header>
+    <MoBackHeader border>
+      <template v-slot:title>{{ numUnreadText }}品读</template>
+      <mu-button icon class="action-readed" @click="setAllReaded">
+        <fa-icon icon="check" />
+      </mu-button>
+      <mu-button icon class="action-detail" @click="goMushroomDetail">
+        <fa-icon size="18" icon="info-circle" />
+      </mu-button>
+    </MoBackHeader>
+    <div class="list" ref="mainRef">
+      <MoFeedStoryItem
+        v-for="story in mushrooms"
+        :key="`${story.feed.id}:${story.offset}`"
+        :feedId="story.feed.id"
+        :offset="story.offset"
+        :feedTitle="getFeedTitle(story.feed.id)"
+        :isReaded="isReaded(story)"
+        :storyTitle="story.title"
+        :storyDate="story.dt_published"
+        source="mushroom"
+      ></MoFeedStoryItem>
+    </div>
+  </MoLayout>
+</template>
+
+<script>
+import _ from 'lodash'
+import MoBackHeader from '@/components/MoBackHeader'
+import MoLayout from '@/components/MoLayout'
+import MoFeedStoryItem from '@/components/MoFeedStoryItem'
+
+export default {
+  name: 'MoMushroomPage',
+  components: {
+    MoBackHeader,
+    MoLayout,
+    MoFeedStoryItem,
+  },
+  props: {
+    vid: {
+      type: String,
+      default: '/mushroom',
+    },
+  },
+  computed: {
+    mushrooms() {
+      return this.$API.story.mushrooms
+    },
+    numUnreadText() {
+      let num = this.$API.story.numUnreadMushrooms
+      return num > 0 ? `#${num}# ` : ''
+    },
+    _upperSize() {
+      let upperSize = 0
+      for (var i = 0; i < this.mushrooms.length; i++) {
+        if (!this.isReaded(this.mushrooms[i])) {
+          break
+        }
+        upperSize += 1
+      }
+      return upperSize
+    },
+  },
+  async mounted() {
+    await this.$API.syncFeedLoadMushrooms()
+    this.setupScrollPosition()
+  },
+  activated() {
+    let scrollTop = this.$pageState.get('scrollTop')
+    if (!_.isNil(scrollTop) && scrollTop > 0) {
+      this._scrollTo(scrollTop)
+    }
+  },
+  savePageState() {
+    let el = this.$refs.mainRef
+    if (!_.isNil(el)) {
+      this.$pageState.set('scrollTop', el.scrollTop)
+      this.$pageState.commit()
+    }
+  },
+  methods: {
+    setupScrollPosition() {
+      let scrollTop = this.$pageState.get('scrollTop')
+      if (_.isNil(scrollTop) || scrollTop <= 0) {
+        scrollTop = this._upperSize * 48
+      }
+      if (scrollTop > 0) {
+        setTimeout(() => {
+          this._scrollTo(scrollTop)
+        }, 0)
+      }
+    },
+    _scrollTo(top) {
+      let el = this.$refs.mainRef
+      if (!_.isNil(el)) {
+        el.scrollTo(0, top)
+        return true
+      }
+      return false
+    },
+    isReaded(story) {
+      return this.$API.story.isReaded(story)
+    },
+    getFeedTitle(feedId) {
+      return this.$API.feed.get(feedId).title
+    },
+    setAllReaded() {
+      let feedIds = {}
+      this.mushrooms.forEach(story => {
+        feedIds[story.feed.id] = true
+      })
+      this.$API.feed.setAllReaded({ feedIds: _.keys(feedIds) })
+    },
+    goMushroomDetail() {
+      this.$router.push('/mushroom-detail')
+    },
+  },
+}
+</script>
+
+<style lang="less" scoped>
+@import '~@/styles/common';
+
+.action-readed,
+.action-detail {
+  position: relative;
+  width: 32 * @pr;
+  height: 32 * @pr;
+  margin-left: 16 * @pr;
+}
+
+.action-detail {
+  position: relative;
+  right: -4 * @pr;
+  color: lighten(@antTextSemi, 5%);
+}
+
+.list .feed-story-item {
+  margin-top: 8 * @pr;
+  cursor: pointer;
+}
+</style>

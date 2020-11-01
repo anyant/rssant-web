@@ -48,6 +48,14 @@ function setFeedTotalStorysIfUpdated(DAO, feedId, storys) {
   }
 }
 
+function isReaded(API, story) {
+  let feed = API.feed.get(story.feed.id)
+  if (_.isNil(feed)) {
+    return false
+  }
+  return story.offset < feed.story_offset
+}
+
 export default {
   state: {
     storys: {},
@@ -152,6 +160,15 @@ export default {
     mushrooms(state) {
       return state.mushrooms
     },
+    numUnreadMushrooms(state, API) {
+      return state.mushrooms.filter(story => !isReaded(API, story)).length
+    },
+    latestMushroom(state) {
+      if (state.mushrooms.length <= 0) {
+        return null
+      }
+      return state.mushrooms[state.mushrooms.length - 1]
+    },
     nextMushroom(state) {
       return ({ feedId, offset }) => {
         let index = state.mushrooms.findIndex(story => {
@@ -175,13 +192,7 @@ export default {
       return _.orderBy(favorited, ['dt_created', 'id'], ['desc', 'desc'])
     },
     isReaded(state, API) {
-      return story => {
-        let feed = API.feed.get(story.feed.id)
-        if (_.isNil(feed)) {
-          return false
-        }
-        return story.offset < feed.story_offset
-      }
+      return story => isReaded(API, story)
     },
     loadedOffset(state) {
       return feedId => {

@@ -78,7 +78,7 @@
           v-for="item in virtualUpperList"
           :key="item.id"
           :feed="item.feed"
-          :story="item.story"
+          :group="item.group"
           :routeTo="routeTo"
           @click.native.capture="setActiveItem(item.id)"
           :class="{'active-item': isActiveItem(item.id)}"
@@ -94,7 +94,7 @@
           v-for="item in virtualLowerList"
           :key="item.id"
           :feed="item.feed"
-          :story="item.story"
+          :group="item.group"
           :routeTo="routeTo"
           @click.native.capture="setActiveItem(item.id)"
           :class="{'active-item': isActiveItem(item.id)}"
@@ -112,7 +112,7 @@ import Vue from 'vue'
 import MoHeader from '@/components/MoHeader'
 import MoDebugTool from '@/components/MoDebugTool'
 import MoFeedItem from '@/components/MoFeedItem.vue'
-import MoFeedStoryItem from '@/components/MoFeedStoryItem.vue'
+import MoFeedGroupItem from '@/components/MoFeedGroupItem.vue'
 
 import initMathjax from '@/plugin/mathjax'
 import localConfig from '@/plugin/localConfig'
@@ -126,22 +126,26 @@ const VirtualItem = Vue.component('VirtualItem', {
     feed: {
       type: Object,
     },
-    story: {
+    group: {
       type: Object,
     },
     routeTo: Function,
   },
   methods: {
-    getFeedTitle(feedId) {
-      return this.$API.feed.get(feedId).title
+    numberOfGroup(group) {
+      return this.$API.story.numUnreadMushrooms
     },
-    isReaded(story) {
-      return this.$API.story.isReaded(story)
+    dateOfGroup(group) {
+      let date = null
+      if (!_.isNil(this.$API.story.latestMushroom)) {
+        date = this.$API.story.latestMushroom.dt_published
+      }
+      return date
     },
   },
   render(h) {
     let feed = this.feed
-    let story = this.story
+    let group = this.group
     if (!_.isNil(feed)) {
       return h(MoFeedItem, {
         props: {
@@ -153,15 +157,12 @@ const VirtualItem = Vue.component('VirtualItem', {
         },
       })
     } else {
-      return h(MoFeedStoryItem, {
+      return h(MoFeedGroupItem, {
         props: {
-          feedId: story.feed.id,
-          offset: story.offset,
-          feedTitle: this.getFeedTitle(story.feed.id),
-          storyTitle: story.title,
-          storyDate: story.dt_published,
-          isReaded: this.isReaded(story),
-          source: 'mushroom',
+          title: group.title,
+          number: this.numberOfGroup(group),
+          date: this.dateOfGroup(group),
+          link: group.link,
           routeTo: this.routeTo,
         },
       })
@@ -194,8 +195,13 @@ export default {
     }
   },
   computed: {
-    mushrooms() {
-      return this.$API.story.mushrooms
+    groups() {
+      return [
+        {
+          title: '品读',
+          link: '/mushroom',
+        },
+      ]
     },
     feedList() {
       return this.$API.feed.feedList
@@ -247,6 +253,9 @@ export default {
     }
   },
   methods: {
+    numberOfGroup(group) {
+      return this.$API.story.numUnreadMushrooms
+    },
     numTextOf(n) {
       return n > 0 ? n : ''
     },
@@ -317,8 +326,8 @@ export default {
     },
     _upperSize() {
       let upperSize = 0
-      for (var i = 0; i < this.mushrooms.length; i++) {
-        if (!this.isReaded(this.mushrooms[i])) {
+      for (var i = 0; i < this.groups.length; i++) {
+        if (this.numberOfGroup(this.groups[i]) > 0) {
           break
         }
         upperSize += 1
@@ -341,10 +350,10 @@ export default {
     _virtualListBuffer() {
       // prepare virtual list data
       let result = []
-      _.forEach(this.mushrooms, story => {
+      _.forEach(this.groups, group => {
         let item = {
-          id: `${story.feed.id}:${story.offset}`,
-          story: story,
+          id: `GROUP:${group.title}`,
+          group: group,
           visible: false,
         }
         result.push(item)
@@ -589,7 +598,7 @@ export default {
   font-size: 15 * @pr;
 }
 
-.list .feed-story-item,
+.list .feed-group-item,
 .list .feed-item {
   margin-top: 8 * @pr;
   cursor: pointer;
