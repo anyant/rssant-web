@@ -216,8 +216,11 @@ const API = {
     get({ id, detail }) {
       return client.get(`/feed/${id}`, { params: { detail } })
     },
-    update({ id, title }) {
-      return client.put(`/feed/${id}`, { title })
+    setTitle({ id, title }) {
+      return client.put(`/feed/set-title`, { id, title })
+    },
+    setGroup({ id, group }) {
+      return client.put(`/feed/set-group`, { id, group })
     },
     delete({ id }) {
       return client.delete(`/feed/${id}`)

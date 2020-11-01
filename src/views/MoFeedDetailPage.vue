@@ -221,7 +221,7 @@ export default {
     },
     async onSaveTitle() {
       try {
-        await this.$API.feed.update({ feedId: this.feedId, title: this.form.title })
+        await this.$API.feed.setTitle({ feedId: this.feedId, title: this.form.title })
       } catch (ex) {
         this.$toast.error(`更新失败: ${ex.message}`)
       }

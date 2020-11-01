@@ -314,11 +314,12 @@ export default {
       let creation = await API.feed.getCreation({ id: creationId, detail })
       DAO.ADD_OR_UPDATE_CREATION(creation)
     },
-    async update(DAO, { feedId, title }) {
-      let newFeed = await API.feed.update({
-        id: feedId,
-        title: title,
-      })
+    async setTitle(DAO, { feedId, title }) {
+      let newFeed = await API.feed.setTitle({ id: feedId, title: title })
+      DAO.ADD_OR_UPDATE(newFeed)
+    },
+    async setGroup(DAO, { feedId, group }) {
+      let newFeed = await API.feed.setGroup({ id: feedId, group: group })
       DAO.ADD_OR_UPDATE(newFeed)
     },
     async delete(DAO, { feedId }) {
