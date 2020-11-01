@@ -13,6 +13,14 @@ function isReadedFeed(feed) {
   return feed.num_unread_storys <= 0
 }
 
+function isMushroomFeed(feed) {
+  if (_.isEmpty(feed.group)) {
+    return feed.dryness >= 500
+  } else {
+    return feed.group === 'SYS:MUSHROOM'
+  }
+}
+
 function sortFeedList(feedList) {
   return _.reverse(
     _.sortBy(feedList, [
@@ -60,7 +68,7 @@ function groupFeedList(feedList) {
   feedList.forEach(feed => {
     if (isEmptyFeed(feed)) {
       trash.push(feed)
-    } else if (feed.dryness >= 500) {
+    } else if (isMushroomFeed(feed)) {
       if (isReadedFeed(feed)) {
         gardenReaded.push(feed)
       } else {
@@ -275,6 +283,9 @@ export default {
       return feedId => {
         return state.feeds[feedId]
       }
+    },
+    isMushroom(state) {
+      return feed => isMushroomFeed(feed)
     },
   },
   actions: {

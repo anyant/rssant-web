@@ -22,6 +22,27 @@
           </span>
         </template>
       </div>
+      <div class="item group-item">
+        <span class="item-name">品读</span>
+        <span class="item-value">
+          <mu-radio
+            class="group-radio"
+            v-model="form.isMushroomGroup"
+            :value="true"
+            label="是"
+            :ripple="false"
+            @click="onSaveGroup"
+          ></mu-radio>
+          <mu-radio
+            class="group-radio"
+            v-model="form.isMushroomGroup"
+            :value="false"
+            label="否"
+            :ripple="false"
+            @click="onSaveGroup"
+          ></mu-radio>
+        </span>
+      </div>
       <div class="item" v-for="item in feedInfo" :key="item.name">
         <span class="item-name">{{ item.name }}</span>
         <a
@@ -169,11 +190,13 @@ export default {
       form: {
         isEdit: false,
         title: null,
+        isMushroomGroup: null,
       },
     }
   },
-  mounted() {
-    this.$API.feed.load({ feedId: this.feedId, detail: true })
+  async mounted() {
+    await this.$API.feed.load({ feedId: this.feedId, detail: true })
+    this.form.isMushroomGroup = this.isMushroomGroup
   },
   computed: {
     feedId() {
@@ -184,6 +207,9 @@ export default {
     },
     feedTitle() {
       return _.isNil(this.feed) ? '' : this.feed.title
+    },
+    isMushroomGroup() {
+      return this.$API.feed.isMushroom(this.feed)
     },
     feedInfo() {
       let feed = this.feed
@@ -226,6 +252,20 @@ export default {
         this.$toast.error(`更新失败: ${ex.message}`)
       }
       this.form.isEdit = false
+    },
+    async onSaveGroup() {
+      if (_.isNil(this.form.isMushroomGroup)) {
+        return
+      }
+      if (this.form.isMushroomGroup === this.isMushroomGroup) {
+        return
+      }
+      try {
+        let group = this.form.isMushroomGroup ? 'SYS:MUSHROOM' : 'SYS:SOLO'
+        await this.$API.feed.setGroup({ feedId: this.feedId, group: group })
+      } catch (ex) {
+        this.$toast.error(`更新失败: ${ex.message}`)
+      }
     },
     deleteFeed() {
       this.$confirm(`删除订阅 “${this.feedTitle}” ？`, '提示', {
@@ -315,6 +355,30 @@ export default {
     margin-right: -5 * @pr;
     .item-button-icon {
       height: 16 * @pr;
+    }
+  }
+}
+
+.group-item {
+  .item-value {
+    display: flex;
+  }
+  .group-radio {
+    margin-right: 40 * @pr;
+
+    /deep/ .mu-radio-icon {
+      width: 18 * @pr;
+      height: 18 * @pr;
+      line-height: 18 * @pr;
+    }
+
+    /deep/ .mu-radio-svg-icon {
+      width: 18 * @pr;
+      height: 18 * @pr;
+    }
+
+    /deep/ .mu-radio-label {
+      font-size: 15 * @pr;
     }
   }
 }
