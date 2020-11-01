@@ -48,24 +48,16 @@ export default {
     mushrooms() {
       return this.$API.story.mushrooms
     },
-    numUnreadText() {
-      let num = this.$API.story.numUnreadMushrooms
-      return num > 0 ? `#${num}# ` : ''
+    numUnreadMushrooms() {
+      return this.$API.story.numUnreadMushrooms
     },
-    _upperSize() {
-      let upperSize = 0
-      for (var i = 0; i < this.mushrooms.length; i++) {
-        if (!this.isReaded(this.mushrooms[i])) {
-          break
-        }
-        upperSize += 1
-      }
-      return upperSize
+    numUnreadText() {
+      let num = this.numUnreadMushrooms
+      return num > 0 ? `#${num}# ` : ''
     },
   },
   async mounted() {
     await this.$API.syncFeedLoadMushrooms()
-    this.setupScrollPosition()
   },
   activated() {
     let scrollTop = this.$pageState.get('scrollTop')
@@ -81,17 +73,6 @@ export default {
     }
   },
   methods: {
-    setupScrollPosition() {
-      let scrollTop = this.$pageState.get('scrollTop')
-      if (_.isNil(scrollTop) || scrollTop <= 0) {
-        scrollTop = this._upperSize * 48
-      }
-      if (scrollTop > 0) {
-        setTimeout(() => {
-          this._scrollTo(scrollTop)
-        }, 0)
-      }
-    },
     _scrollTo(top) {
       let el = this.$refs.mainRef
       if (!_.isNil(el)) {

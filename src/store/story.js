@@ -6,7 +6,7 @@ import { API } from '@/plugin/api'
 function sortMushrooms(mushrooms, API) {
   return _.sortBy(mushrooms, [
     function(x) {
-      return !API.story.isReaded(x)
+      return API.story.isReaded(x)
     },
     function(x) {
       return new Date(x.dt_published)
