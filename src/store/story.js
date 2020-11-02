@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import Vue from 'vue'
+import { isAfter } from 'date-fns'
 import Loading from '@/plugin/loading'
 import { API } from '@/plugin/api'
 
@@ -16,6 +17,19 @@ function sortMushrooms(mushrooms, API) {
     },
     'offset',
   ])
+}
+
+function getLatestMushroom(mushrooms) {
+  let latest = null
+  let result = null
+  for (let story of mushrooms) {
+    let dt = new Date(story.dt_published)
+    if (_.isNil(latest) || isAfter(dt, latest)) {
+      latest = dt
+      result = story
+    }
+  }
+  return result
 }
 
 function addOrUpdateList(state, storys) {
@@ -164,10 +178,7 @@ export default {
       return state.mushrooms.filter(story => !isReaded(API, story)).length
     },
     latestMushroom(state) {
-      if (state.mushrooms.length <= 0) {
-        return null
-      }
-      return state.mushrooms[state.mushrooms.length - 1]
+      return getLatestMushroom(state.mushrooms)
     },
     nextMushroom(state) {
       return ({ feedId, offset }) => {
