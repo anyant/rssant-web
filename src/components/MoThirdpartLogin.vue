@@ -21,7 +21,8 @@ export default {
     }
   },
   methods: {
-    loginGithub() {
+    async loginGithub() {
+      await this.$API.user.safeLogout()
       this.githubLoading = true
       this.$API.user.loginGithub({ next: '/' })
     },

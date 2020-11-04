@@ -77,29 +77,21 @@ export default {
     },
   },
   methods: {
-    login() {
-      // try logout first to workaround django auth issues
-      // need more investigation on root cause
-      this.$API.user
-        .logout()
-        .catch(error => {
-          // eslint-disable-next-line no-console
-          console.warn(`logout failed ${error}`)
-        })
-        .finally(() => {
-          this.$API.user
-            .login({
-              account: this.loginForm.account,
-              password: this.loginForm.password,
-            })
-            .then(() => {
-              localFeeds.clear()
-              this.$router.replace('/')
-            })
-            .catch(error => {
-              this.loginForm.errorText = error.message
-            })
-        })
+    async login() {
+      this.$API.user.safeLogout().finally(() => {
+        this.$API.user
+          .login({
+            account: this.loginForm.account,
+            password: this.loginForm.password,
+          })
+          .then(() => {
+            localFeeds.clear()
+            this.$router.replace('/')
+          })
+          .catch(error => {
+            this.loginForm.errorText = error.message
+          })
+      })
     },
     clearErrorText() {
       this.loginForm.errorText = null

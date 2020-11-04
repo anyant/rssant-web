@@ -39,6 +39,22 @@ function getBalance(state) {
   return new Date(balance * 1000)
 }
 
+async function logout() {
+  localFeeds.clear()
+  await API.user.logout()
+}
+
+async function safeLogout() {
+  // try logout first to workaround django auth issues
+  // need more investigation on root cause
+  try {
+    await logout()
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.warn(`logout failed ${error}`)
+  }
+}
+
 export default {
   state: {
     loading: new Loading(),
@@ -145,8 +161,10 @@ export default {
       await API.user.confirmResetPassword({ token, uid, new_password })
     },
     async logout(DAO) {
-      localFeeds.clear()
-      await API.user.logout()
+      await logout()
+    },
+    async safeLogout(DAO) {
+      await safeLogout()
     },
     loginGithub(DAO, { next, scope } = {}) {
       API.user.loginGithub({ next, scope })
