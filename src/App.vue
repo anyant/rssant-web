@@ -8,10 +8,12 @@
 </template>
 
 <script>
+import { keepAlivePages } from '@/router'
+
 export default {
   data() {
     return {
-      keepAlivePages: ['MoHomePage', 'MoMushroomPage', 'MoAccountPage', 'MoFeedCreationPage'],
+      keepAlivePages: keepAlivePages,
     }
   },
   async created() {},

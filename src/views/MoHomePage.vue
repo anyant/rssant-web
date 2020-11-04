@@ -10,7 +10,9 @@
           <div class="placeholder-title">蚁阅</div>
         </div>
       </MoLayout>
-      <router-view :key="this.$route.path" />
+      <keep-alive :include="keepAlivePages">
+        <router-view :key="this.$route.path" />
+      </keep-alive>
     </div>
   </div>
 </template>
@@ -19,6 +21,7 @@
 import MoLayout from '@/components/MoLayout'
 import MoHome from '@/components/MoHome'
 import MoHeader from '@/components/MoHeader'
+import { keepAlivePages } from '@/router'
 
 export default {
   name: 'MoHomePage',
@@ -26,6 +29,7 @@ export default {
   data() {
     return {
       isReady: false,
+      keepAlivePages: keepAlivePages,
     }
   },
   mounted() {

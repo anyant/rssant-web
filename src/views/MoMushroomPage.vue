@@ -66,16 +66,14 @@ export default {
   },
   async mounted() {
     await this.$API.syncFeedLoadMushrooms()
+    this.restoreScroll()
     this.keyboard.setup()
   },
   destroyed() {
     this.keyboard.destroy()
   },
   activated() {
-    let scrollTop = this.$pageState.get('scrollTop')
-    if (!_.isNil(scrollTop) && scrollTop > 0) {
-      this._scrollTo(scrollTop)
-    }
+    this.restoreScroll()
     this.keyboard.setup()
   },
   deactivated() {
@@ -96,6 +94,12 @@ export default {
         return true
       }
       return false
+    },
+    restoreScroll() {
+      let scrollTop = this.$pageState.get('scrollTop')
+      if (!_.isNil(scrollTop) && scrollTop > 0) {
+        this._scrollTo(scrollTop)
+      }
     },
     isReaded(story) {
       return this.$API.story.isReaded(story)
