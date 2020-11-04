@@ -80,26 +80,13 @@ export default {
     this.keyboard.destroy()
   },
   savePageState() {
-    let el = this.$refs.mainRef
-    if (!_.isNil(el)) {
-      this.$pageState.set('scrollTop', el.scrollTop)
+    if (this.$pageState.saveScrollTop({ el: this.$refs.mainRef })) {
       this.$pageState.commit()
     }
   },
   methods: {
-    _scrollTo(top) {
-      let el = this.$refs.mainRef
-      if (!_.isNil(el)) {
-        el.scrollTo(0, top)
-        return true
-      }
-      return false
-    },
     restoreScroll() {
-      let scrollTop = this.$pageState.get('scrollTop')
-      if (!_.isNil(scrollTop) && scrollTop > 0) {
-        this._scrollTo(scrollTop)
-      }
+      this.$pageState.restoreScrollTop({ el: this.$refs.mainRef })
     },
     isReaded(story) {
       return this.$API.story.isReaded(story)

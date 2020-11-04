@@ -59,7 +59,7 @@
           </div>
         </div>
       </transition>
-      <MoCreationList class="creation-list"></MoCreationList>
+      <MoCreationList ref="creationListRef" class="creation-list"></MoCreationList>
     </div>
   </MoLayout>
 </template>
@@ -75,6 +75,12 @@ import { antBlue } from '@/plugin/common'
 export default {
   name: 'MoFeedCreationPage',
   components: { MoLayout, MoBackHeader, MoCreationList },
+  props: {
+    vid: {
+      type: String,
+      default: '/feed-creation',
+    },
+  },
   data() {
     return {
       antBlue,
@@ -102,7 +108,15 @@ export default {
         })
       }
     })
-    window.scrollTo(0, 0)
+    this.$pageState.restoreScrollTop({ el: this.$refs.creationListRef })
+  },
+  activated() {
+    this.$pageState.restoreScrollTop({ el: this.$refs.creationListRef })
+  },
+  savePageState() {
+    if (this.$pageState.saveScrollTop({ el: this.$refs.creationListRef })) {
+      this.$pageState.commit()
+    }
   },
   methods: {
     toggleMode() {

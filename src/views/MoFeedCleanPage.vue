@@ -101,22 +101,15 @@ export default {
   },
   mounted() {
     this.$API.feed.sync().then(() => {
-      let scrollTop = this.$pageState.get('scrollTop')
+      this.$pageState.restoreScrollTop({ el: this.$refs.mainRef })
       let selectedFeedIds = this.$pageState.get('selectedFeedIds')
-      let el = this.$refs.mainRef
-      if (!_.isNil(el)) {
-        el.scrollTo(0, _.defaultTo(scrollTop, 0))
-      }
       if (!_.isNil(selectedFeedIds)) {
         selectedFeedIds.forEach(x => this.selectedFeedIds.push(x))
       }
     })
   },
   savePageState() {
-    let el = this.$refs.mainRef
-    if (!_.isNil(el)) {
-      this.$pageState.set('scrollTop', el.scrollTop)
-    }
+    this.$pageState.saveScrollTop({ el: this.$refs.mainRef })
     this.$pageState.set('selectedFeedIds', this.selectedFeedIds)
     this.$pageState.commit()
   },

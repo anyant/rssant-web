@@ -234,11 +234,7 @@ export default {
   activated() {
     this.openWizard = this.isReady && this.isEmpty
     this.isActive = true
-    let el = this.$refs.mainRef
-    let scrollTop = this.$pageState.get('scrollTop')
-    if (!_.isNil(el) && !_.isNil(scrollTop) && scrollTop > 0) {
-      el.scrollTo(0, scrollTop)
-    }
+    this.$pageState.restoreScrollTop({ el: this.$refs.mainRef })
   },
   deactivated() {
     this.openWizard = false
@@ -246,9 +242,7 @@ export default {
     this.isActive = false
   },
   savePageState() {
-    let el = this.$refs.mainRef
-    if (!_.isNil(el)) {
-      this.$pageState.set('scrollTop', el.scrollTop)
+    if (this.$pageState.saveScrollTop({ el: this.$refs.mainRef })) {
       this.$pageState.commit()
     }
   },

@@ -40,11 +40,7 @@ export default {
       .loadFavorited()
       .then(this.$API.syncFeedLoadMushrooms())
       .then(() => {
-        let scrollTop = this.$pageState.get('scrollTop')
-        let el = this.$refs.mainRef
-        if (!_.isNil(el)) {
-          el.scrollTo(0, _.defaultTo(scrollTop, 0))
-        }
+        this.$pageState.restoreScrollTop({ el: this.$refs.mainRef })
       })
   },
   computed: {
@@ -59,10 +55,7 @@ export default {
     },
   },
   savePageState() {
-    let el = this.$refs.mainRef
-    if (!_.isNil(el)) {
-      this.$pageState.set('scrollTop', el.scrollTop)
-    }
+    this.$pageState.saveScrollTop({ el: this.$refs.mainRef })
     this.$pageState.commit()
   },
 }
