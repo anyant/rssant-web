@@ -36,7 +36,7 @@
         :date="story.dt_published"
         :link="story.link"
         :isFavorited="story.is_favorited"
-        :isCtrlKeyHold="isCtrlKeyHold"
+        :isCtrlKeyHold="keyboard.isCtrlKeyHold"
         @read="onRead(story)"
         @toggleFavorited="toggleFavorited(story)"
       ></MoStoryItem>
@@ -49,16 +49,14 @@ import MoBackHeader from '@/components/MoBackHeader'
 import MoLayout from '@/components/MoLayout'
 import MoStoryItem from '@/components/MoStoryItem'
 import MoScrollList from '@/components/MoScrollList'
-
-const isMacLike = /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)
-const TARGET_KEY = isMacLike ? 'meta' : 'control'
+import Keyboard from '@/plugin/keyboard'
 
 export default {
   components: { MoBackHeader, MoLayout, MoStoryItem, MoScrollList },
   data() {
     return {
       storyOpened: {},
-      isCtrlKeyHold: false,
+      keyboard: Keyboard(),
     }
   },
   computed: {
@@ -114,16 +112,10 @@ export default {
       await this.$API.feed.load({ feedId: this.feedId })
     }
     await this.$API.syncFeedLoadMushrooms()
-    document.addEventListener('keydown', this.handleKeyDown)
-    document.addEventListener('keyup', this.handleKeyUp)
-    document.addEventListener('visibilitychange', this.handleVisibilityChange)
-    window.addEventListener('blur', this.handleVisibilityChange)
+    this.keyboard.setup()
   },
   destroyed() {
-    document.removeEventListener('keydown', this.handleKeyDown)
-    document.removeEventListener('keyup', this.handleKeyUp)
-    document.removeEventListener('visibilitychange', this.handleVisibilityChange)
-    window.removeEventListener('blur', this.handleVisibilityChange)
+    this.keyboard.destroy()
   },
   methods: {
     loadStorys({ offset, size, resetLoadedOffset }) {
@@ -157,21 +149,6 @@ export default {
       _.forEach(_.keys(this.storyOpened), key => {
         this.storyOpened[key] = false
       })
-    },
-    handleKeyDown(event) {
-      if (event.key.toLowerCase() === TARGET_KEY.toLowerCase()) {
-        this.isCtrlKeyHold = true
-      } else {
-        if (this.isCtrlKeyHold) {
-          this.isCtrlKeyHold = false
-        }
-      }
-    },
-    handleKeyUp(event) {
-      this.isCtrlKeyHold = false
-    },
-    handleVisibilityChange(event) {
-      this.isCtrlKeyHold = false
     },
   },
 }

@@ -19,6 +19,8 @@
         :isReaded="isReaded(story)"
         :storyTitle="story.title"
         :storyDate="story.dt_published"
+        :storyLink="story.link"
+        :isCtrlKeyHold="keyboard.isCtrlKeyHold"
         source="mushroom"
       ></MoFeedStoryItem>
     </div>
@@ -30,6 +32,7 @@ import _ from 'lodash'
 import MoBackHeader from '@/components/MoBackHeader'
 import MoLayout from '@/components/MoLayout'
 import MoFeedStoryItem from '@/components/MoFeedStoryItem'
+import Keyboard from '@/plugin/keyboard'
 
 export default {
   name: 'MoMushroomPage',
@@ -43,6 +46,11 @@ export default {
       type: String,
       default: '/mushroom',
     },
+  },
+  data() {
+    return {
+      keyboard: Keyboard(),
+    }
   },
   computed: {
     mushrooms() {
@@ -58,12 +66,20 @@ export default {
   },
   async mounted() {
     await this.$API.syncFeedLoadMushrooms()
+    this.keyboard.setup()
+  },
+  destroyed() {
+    this.keyboard.destroy()
   },
   activated() {
     let scrollTop = this.$pageState.get('scrollTop')
     if (!_.isNil(scrollTop) && scrollTop > 0) {
       this._scrollTo(scrollTop)
     }
+    this.keyboard.setup()
+  },
+  deactivated() {
+    this.keyboard.destroy()
   },
   savePageState() {
     let el = this.$refs.mainRef

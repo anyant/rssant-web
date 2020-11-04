@@ -20,6 +20,11 @@ export default {
     isReaded: Boolean,
     source: String,
     routeTo: Function,
+    storyLink: String,
+    isCtrlKeyHold: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {}
@@ -44,11 +49,15 @@ export default {
       if (!_.isNil(this.isReaded) && !this.isReaded) {
         this.$API.feed.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
       }
-      let link = `/story/${this.feedId}-${this.offset}`
-      if (!_.isNil(this.source)) {
-        link = link + `?source=${this.source}`
+      if (this.isCtrlKeyHold && !_.isEmpty(this.storyLink)) {
+        window.open(this.storyLink, '_blank')
+      } else {
+        let link = `/story/${this.feedId}-${this.offset}`
+        if (!_.isNil(this.source)) {
+          link = link + `?source=${this.source}`
+        }
+        this.myRouteTo(link)
       }
-      this.myRouteTo(link)
     },
   },
 }
