@@ -22,9 +22,11 @@
         </mu-button>
       </div>
       <div class="story-preview-summary" @click="handleSummaryClick">{{ summary }}</div>
-      <mu-button icon class="story-preview-link" @click.stop="goLink">
-        <fa-icon icon="external-link-alt" />
-      </mu-button>
+      <div class="story-preview-link" @click="goLink">
+        <MoIconAngleRight3 class="story-preview-link-fade" />
+        <MoIconAngleRight3 class="story-preview-link-main" />
+        <MoIconAngleRight3 class="story-preview-link-fade" />
+      </div>
     </div>
   </div>
 </template>
@@ -33,8 +35,10 @@
 import _ from 'lodash'
 import { antGold } from '@/plugin/common'
 import { formatDateFriendly } from '@/plugin/datefmt'
+import MoIconAngleRight3 from '@/components/MoIconAngleRight3'
 
 export default {
+  components: { MoIconAngleRight3 },
   props: {
     isOpened: {
       type: Boolean,
@@ -178,9 +182,8 @@ export default {
 
 .story-preview {
   padding-top: 9 * @pr;
-  padding-bottom: 9 * @pr;
+  padding-bottom: 1 * @pr;
   position: relative;
-  min-height: 72 * @pr;
 }
 
 .story-preview-header {
@@ -198,7 +201,6 @@ export default {
 
 .story-preview-summary {
   padding-top: 8 * @pr;
-  min-height: 21 * @pr;
   max-height: 480 * @pr;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -220,20 +222,19 @@ export default {
 }
 
 .story-preview-link {
-  position: absolute;
-  right: 16 * @pr;
-  bottom: 12 * @pr;
-  font-size: 14 * @pr;
-  width: 24 * @pr;
-  height: 24 * @pr;
-  color: @antBlue;
-  box-shadow: 0 0 2 * @pr 1 * @pr @antBlue;
-  background: rgba(#fff, 90%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 6 * @pr;
+  padding-bottom: 3 * @pr;
+  margin-top: -4 * @pr;
+  cursor: pointer;
 
-  .fa {
-    position: relative;
-    left: 1 * @pr;
-    top: 1 * @pr;
+  .story-preview-link-main {
+    color: @antBlue;
+  }
+  .story-preview-link-fade {
+    color: @antLineGrey;
   }
 }
 
