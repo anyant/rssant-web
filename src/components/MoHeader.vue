@@ -34,6 +34,6 @@ export default {
 .header-border {
   height: 49 * @pr;
   margin-bottom: -1 * @pr;
-  border-bottom: 1px solid @antLineGrey;
+  border-bottom: 1px solid @antBackGrey;
 }
 </style>

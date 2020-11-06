@@ -18,7 +18,7 @@ export const antTextWhite = '#FFFFFF' // 文字白
 export const antBackWhite = '#FFFFFF' // 背景白
 export const antRippleGrey = '#090909' // 涟漪黑
 export const antBackGrey = '#FAFAFA' // 背景浅灰
-export const antLineGrey = '#FAFAFA' // 线条浅灰
+export const antLineGrey = '#F3F3F3' // 线条浅灰
 
 // 页面布局
 function computeLayout(windowInnerWidth) {

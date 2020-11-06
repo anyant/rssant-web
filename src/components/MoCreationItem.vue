@@ -16,7 +16,7 @@ export default {
     status: String,
     title: String,
     date: String,
-    routerLink: String
+    routerLink: String,
   },
   computed: {
     dateText() {
@@ -27,13 +27,13 @@ export default {
         ready: antGreen,
         error: antRed,
         updating: antBlue,
-        pending: antRippleGrey
+        pending: antRippleGrey,
       }
       return _.defaultTo(colorMap[this.status], antRippleGrey)
     },
     statusStyle() {
       return { background: this.color }
-    }
+    },
   },
   data() {
     return {}
@@ -41,8 +41,8 @@ export default {
   methods: {
     onClick() {
       this.$router.push(this.routerLink)
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -58,6 +58,7 @@ export default {
   align-items: center;
   justify-content: space-between;
   background: #fff;
+  cursor: pointer;
 }
 
 .status {

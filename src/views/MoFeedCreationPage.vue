@@ -317,6 +317,6 @@ export default {
   bottom: 0;
   overflow-y: auto;
   padding-bottom: 8 * @pr;
-  border-top: solid 1px @antLineGrey;
+  border-top: solid 1px @antBackGrey;
 }
 </style>

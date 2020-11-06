@@ -469,10 +469,6 @@ export default {
   height: 48 * @pr;
   font-weight: bold;
 }
-
-.action-menu-list > li:not(:first-child) .mu-item {
-  border-top: solid 1px lighten(@antLineGrey, 4%);
-}
 </style>
 
 <style lang="less" scoped>
