@@ -44,10 +44,9 @@ export default {
 
 .back {
   position: relative;
-  margin-left: 6 * @pr;
-  margin-right: 8 * @pr;
-  width: 32 * @pr;
-  height: 32 * @pr;
+  margin-right: 2 * @pr;
+  width: 48 * @pr;
+  height: 48 * @pr;
   color: @antTextBlack;
 }
 

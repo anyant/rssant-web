@@ -496,7 +496,7 @@ export default {
 .action-menu {
   width: 32 * @pr;
   height: 32 * @pr;
-  margin-left: 16 * @pr;
+  margin-left: 24 * @pr;
   color: @antTextSemi;
   position: relative;
   right: -8 * @pr;
