@@ -195,6 +195,9 @@ export default {
   },
   computed: {
     groups() {
+      if (this.isEmpty) {
+        return []
+      }
       return [
         {
           title: '品读',
