@@ -1,9 +1,11 @@
 <template>
   <MoHeader :border="border">
     <div class="left" :class="{'center-title': centerTitle}">
-      <mu-button icon class="back" @click="goBack">
-        <fa-icon size="18" icon="chevron-left" />
-      </mu-button>
+      <div class="back" @click="goBack">
+        <mu-button icon class="back-button">
+          <fa-icon size="18" icon="chevron-left" />
+        </mu-button>
+      </div>
       <div class="title">
         <slot name="title"></slot>
       </div>
@@ -43,10 +45,21 @@ export default {
 }
 
 .back {
-  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-right: 2 * @pr;
   width: 48 * @pr;
   height: 48 * @pr;
+  cursor: pointer;
+}
+
+.back-button {
+  position: relative;
+  margin-left: 6 * @pr;
+  margin-right: 8 * @pr;
+  width: 32 * @pr;
+  height: 32 * @pr;
   color: @antTextBlack;
 }
 
