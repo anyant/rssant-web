@@ -2,9 +2,7 @@
   <MoLayout grey header>
     <MoBackHeader border>
       <template v-slot:title>{{ numUnreadText }}品读</template>
-      <mu-button icon class="action-readed" @click="setAllReaded">
-        <fa-icon icon="check" />
-      </mu-button>
+      <MoReadedButton @click="setAllReaded" class="action-readed"></MoReadedButton>
       <mu-button icon class="action-detail" @click="goMushroomDetail">
         <fa-icon size="18" icon="info-circle" />
       </mu-button>
@@ -32,6 +30,7 @@ import _ from 'lodash'
 import MoBackHeader from '@/components/MoBackHeader'
 import MoLayout from '@/components/MoLayout'
 import MoFeedStoryItem from '@/components/MoFeedStoryItem'
+import MoReadedButton from '@/components/MoReadedButton'
 import Keyboard from '@/plugin/keyboard'
 
 export default {
@@ -40,6 +39,7 @@ export default {
     MoBackHeader,
     MoLayout,
     MoFeedStoryItem,
+    MoReadedButton,
   },
   props: {
     vid: {

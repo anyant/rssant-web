@@ -10,7 +10,7 @@
       >{{ isFromText?'导入文件':'输入链接' }}</mu-button>
     </MoBackHeader>
     <div class="main">
-      <transition name="fade">
+      <transition name="mu-fade-transition">
         <div class="workspace workspace-text" v-if="isFromText" key="workspace-text">
           <mu-text-field
             class="input-text"
@@ -254,16 +254,6 @@ export default {
 
 .workspace-file {
   margin-top: 26 * @pr;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
 }
 
 .input-text {

@@ -310,6 +310,7 @@ export default {
   justify-content: left;
   align-items: center;
   margin-top: 32 * @pr;
+  min-height: 88 * @pr;
 }
 
 .package {

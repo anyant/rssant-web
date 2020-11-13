@@ -45,13 +45,24 @@ export default {
 <style lang="less">
 @import '~@/styles/common';
 
-.rssant-menu-popover-center {
+.rssant-menu-popover-center,
+.rssant-menu-popover-right {
   .header-menu-popover;
+  &.transition-bottom {
+    // unset muse-ui transition
+    transform-origin: unset;
+    &.mu-popover-transition-enter,
+    &.mu-popover-transition-leave-active {
+      transform: none;
+    }
+  }
+}
+
+.rssant-menu-popover-center {
   right: unset;
 }
 
 .rssant-menu-popover-right {
-  .header-menu-popover;
   right: 8 * @pr;
 }
 </style>

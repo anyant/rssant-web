@@ -3,16 +3,7 @@
     <MoHeader border board v-show="showHeader">
       <MoDebugTool class="title">蚁阅</MoDebugTool>
       <div class="right">
-        <MoHeaderMenu :open.sync="isReadedMenuOpen" placement="center" class="action-readed-menu">
-          <mu-button slot="default" icon class="action-readed">
-            <fa-icon class="action-icon" icon="check" />
-          </mu-button>
-          <mu-list slot="content">
-            <mu-list-item button @click="setAllReaded">
-              <mu-list-item-title>全标已读</mu-list-item-title>
-            </mu-list-item>
-          </mu-list>
-        </MoHeaderMenu>
+        <MoReadedButton @click="setAllReaded" class="action-readed"></MoReadedButton>
         <mu-button
           ref="wizardTrigger"
           icon
@@ -35,7 +26,7 @@
           <fa-icon class="action-icon" icon="bars" />
           <span v-if="showMenuDot" class="action-menu-dot"></span>
         </mu-button>
-        <transition name="fade">
+        <transition name="mu-fade-transition">
           <mu-list ref="actionMenuListRef" class="action-menu-list" v-show="isMenuOpen">
             <mu-list-item button @click="goAccount">
               <mu-list-item-title>账号设置</mu-list-item-title>
@@ -62,7 +53,7 @@
           <div class="bounce3"></div>
         </div>
       </div>
-      <transition name="fade" v-if="isReady && isEmpty">
+      <transition name="mu-fade-transition" v-if="isReady && isEmpty">
         <div class="empty-placeholder-wrapper">
           <div class="empty-placeholder">
             <span>
@@ -120,7 +111,7 @@ import MoHeader from '@/components/MoHeader'
 import MoDebugTool from '@/components/MoDebugTool'
 import MoFeedItem from '@/components/MoFeedItem.vue'
 import MoFeedGroupItem from '@/components/MoFeedGroupItem.vue'
-import MoHeaderMenu from '@/components/MoHeaderMenu.vue'
+import MoReadedButton from '@/components/MoReadedButton.vue'
 
 import initMathjax from '@/plugin/mathjax'
 import localConfig from '@/plugin/localConfig'
@@ -179,7 +170,7 @@ const VirtualItem = Vue.component('VirtualItem', {
 })
 
 export default {
-  components: { MoHeader, MoDebugTool, VirtualItem, MoHeaderMenu },
+  components: { MoHeader, MoDebugTool, VirtualItem, MoReadedButton },
   props: {
     vid: {
       type: String,
@@ -192,7 +183,6 @@ export default {
       rippleColor: antRippleGrey,
       openWizard: false,
       wizardTrigger: null,
-      isReadedMenuOpen: false,
       isMenuOpen: false,
       isReady: false,
       activeItemKey: null,
@@ -315,7 +305,6 @@ export default {
       }
     },
     setAllReaded() {
-      this.isReadedMenuOpen = false
       let feedIds = this.feedList.map(x => x.id)
       this.$API.feed.setAllReaded({ feedIds })
     },
@@ -489,37 +478,16 @@ export default {
   cursor: pointer;
 }
 
-.action-readed-menu,
 .action-readed,
 .action-add,
 .action-menu {
   width: 32 * @pr;
   height: 32 * @pr;
   color: @antTextSemi;
-}
-
-.action-readed-menu,
-.action-add,
-.action-menu {
-  position: relative;
-  right: -24 * @pr;
-}
-
-.action-add,
-.action-menu {
   margin-left: 16 * @pr;
   margin-right: 16 * @pr;
-}
-
-.action-readed-menu {
-  padding-left: 2 * @pr;
-  margin-left: 14 * @pr;
-  margin-right: 16 * @pr;
-}
-
-.action-readed {
-  margin-left: 0;
-  margin-right: 0;
+  position: relative;
+  right: -24 * @pr;
 }
 
 .action-menu-dot,
@@ -706,16 +674,6 @@ export default {
     -webkit-transform: scale(1);
     transform: scale(1);
   }
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: all 0.3s ease;
-}
-
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
 }
 
 .list-enter-active,

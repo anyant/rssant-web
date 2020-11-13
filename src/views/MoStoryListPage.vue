@@ -2,9 +2,7 @@
   <MoLayout grey header>
     <MoBackHeader border>
       <template v-slot:title>{{ numUnreadText }}{{ feedTitle }}</template>
-      <mu-button icon class="action-readed" @click="setAllReaded">
-        <fa-icon icon="check" />
-      </mu-button>
+      <MoReadedButton @click="setAllReaded" class="action-readed"></MoReadedButton>
       <mu-button icon class="action-detail" @click="goFeedDetail">
         <fa-icon size="18" icon="info-circle" />
       </mu-button>
@@ -49,10 +47,11 @@ import MoBackHeader from '@/components/MoBackHeader'
 import MoLayout from '@/components/MoLayout'
 import MoStoryItem from '@/components/MoStoryItem'
 import MoScrollList from '@/components/MoScrollList'
+import MoReadedButton from '@/components/MoReadedButton'
 import Keyboard from '@/plugin/keyboard'
 
 export default {
-  components: { MoBackHeader, MoLayout, MoStoryItem, MoScrollList },
+  components: { MoBackHeader, MoLayout, MoStoryItem, MoScrollList, MoReadedButton },
   data() {
     return {
       storyOpened: {},
