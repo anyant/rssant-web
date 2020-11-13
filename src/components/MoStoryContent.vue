@@ -141,7 +141,6 @@ export default {
         }
         node.setAttribute('src', src)
         node.onerror = () => {
-          console.log(`fix: ${src}`)
           let newNode = document.createElement('a')
           newNode.setAttribute('href', node.src)
           newNode.setAttribute('referrerpolicy', 'no-referrer')
@@ -157,7 +156,6 @@ export default {
       imageNodes.forEach(node => {
         let src = ImageHelper.fixImageSrc(node, this.link)
         if (_.isEmpty(src) || ImageHelper.isDataUrl(src) || ImageHelper.isSameOriginUrl(src)) {
-          console.log(`skip: ${src}`)
           return
         }
         node.setAttribute('referrerpolicy', 'no-referrer')
@@ -174,7 +172,6 @@ export default {
       if (ImageHelper.isSameOriginUrl(src)) {
         return
       }
-      console.log(`fix: ${src}`)
       node.style.visibility = 'hidden'
       let proxyUrl = new URL('/api/v1/image/proxy', location.origin)
       proxyUrl.searchParams.set('url', src)
