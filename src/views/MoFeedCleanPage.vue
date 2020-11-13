@@ -11,8 +11,8 @@
         <fa-icon icon="trash" />
         <span class="action-delete-info">{{ selectedFeedIds.length }} 订阅</span>
       </mu-button>
-      <mu-menu placement="bottom" popover-class="feed-clean-menu-popover">
-        <mu-button icon class="menu-delete-all">
+      <MoHeaderMenu>
+        <mu-button slot="default" icon class="menu-delete-all">
           <fa-icon icon="ellipsis-v" />
         </mu-button>
         <mu-list slot="content">
@@ -20,7 +20,7 @@
             <mu-list-item-title>删除全部</mu-list-item-title>
           </mu-list-item>
         </mu-list>
-      </mu-menu>
+      </MoHeaderMenu>
     </MoBackHeader>
     <div class="feed-list" ref="mainRef">
       <div v-for="feed in feedList" :key="feed.id" class="feed-item">
@@ -53,11 +53,12 @@ import _ from 'lodash'
 import { differenceInDays } from 'date-fns'
 import { formatDate } from '@/plugin/datefmt'
 import { antGold } from '@/plugin/common'
-import MoBackHeader from '@/components/MoBackHeader'
-import MoLayout from '@/components/MoLayout'
+import MoBackHeader from '@/components/MoBackHeader.vue'
+import MoLayout from '@/components/MoLayout.vue'
+import MoHeaderMenu from '@/components/MoHeaderMenu.vue'
 
 export default {
-  components: { MoBackHeader, MoLayout },
+  components: { MoBackHeader, MoLayout, MoHeaderMenu },
   props: {
     vid: {
       type: String,
@@ -173,29 +174,6 @@ export default {
 }
 </script>
 
-<style lang="less">
-@import '~@/styles/common';
-
-.feed-clean-menu-popover {
-  position: absolute;
-  top: 48 * @pr !important;
-  right: 8 * @pr;
-  background: @antBackWhite;
-  width: auto;
-  padding: 0;
-  border-radius: 4 * @pr;
-  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
-  .mu-list {
-    padding: 0;
-  }
-}
-
-.feed-clean-menu-popover .mu-item {
-  height: 48 * @pr;
-  font-weight: bold;
-}
-</style>
-
 <style lang="less" scoped>
 @import '~@/styles/common';
 
@@ -295,19 +273,15 @@ export default {
   color: @antTextGrey;
 }
 
+.action-delete /deep/ .mu-button-wrapper {
+  padding: 0 12px;
+}
+
 .menu-delete-all {
   position: relative;
   width: 32 * @pr;
   height: 32 * @pr;
   margin-right: -4 * @pr;
   margin-left: 16 * @pr;
-}
-</style>
-
-<style lang="less">
-@import '~@/styles/common';
-
-.action-delete.mu-flat-button .mu-button-wrapper {
-  padding: 0 12px;
 }
 </style>

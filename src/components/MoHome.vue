@@ -3,9 +3,16 @@
     <MoHeader border board v-show="showHeader">
       <MoDebugTool class="title">蚁阅</MoDebugTool>
       <div class="right">
-        <mu-button icon class="action-readed" @click="setAllReaded">
-          <fa-icon class="action-icon" icon="check" />
-        </mu-button>
+        <MoHeaderMenu :open.sync="isReadedMenuOpen" placement="center" class="action-readed-menu">
+          <mu-button slot="default" icon class="action-readed">
+            <fa-icon class="action-icon" icon="check" />
+          </mu-button>
+          <mu-list slot="content">
+            <mu-list-item button @click="setAllReaded">
+              <mu-list-item-title>全标已读</mu-list-item-title>
+            </mu-list-item>
+          </mu-list>
+        </MoHeaderMenu>
         <mu-button
           ref="wizardTrigger"
           icon
@@ -113,6 +120,7 @@ import MoHeader from '@/components/MoHeader'
 import MoDebugTool from '@/components/MoDebugTool'
 import MoFeedItem from '@/components/MoFeedItem.vue'
 import MoFeedGroupItem from '@/components/MoFeedGroupItem.vue'
+import MoHeaderMenu from '@/components/MoHeaderMenu.vue'
 
 import initMathjax from '@/plugin/mathjax'
 import localConfig from '@/plugin/localConfig'
@@ -171,7 +179,7 @@ const VirtualItem = Vue.component('VirtualItem', {
 })
 
 export default {
-  components: { MoHeader, MoDebugTool, VirtualItem },
+  components: { MoHeader, MoDebugTool, VirtualItem, MoHeaderMenu },
   props: {
     vid: {
       type: String,
@@ -184,6 +192,7 @@ export default {
       rippleColor: antRippleGrey,
       openWizard: false,
       wizardTrigger: null,
+      isReadedMenuOpen: false,
       isMenuOpen: false,
       isReady: false,
       activeItemKey: null,
@@ -306,6 +315,7 @@ export default {
       }
     },
     setAllReaded() {
+      this.isReadedMenuOpen = false
       let feedIds = this.feedList.map(x => x.id)
       this.$API.feed.setAllReaded({ feedIds })
     },
@@ -455,19 +465,7 @@ export default {
 @import '~@/styles/common';
 
 .action-menu-list {
-  position: absolute;
-  top: 48 * @pr;
-  right: 8 * @pr;
-  background: @antBackWhite;
-  width: auto;
-  padding: 0;
-  border-radius: 4 * @pr;
-  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
-}
-
-.action-menu-list .mu-item {
-  height: 48 * @pr;
-  font-weight: bold;
+  .header-menu-popover;
 }
 </style>
 
@@ -491,15 +489,37 @@ export default {
   cursor: pointer;
 }
 
+.action-readed-menu,
 .action-readed,
 .action-add,
 .action-menu {
   width: 32 * @pr;
   height: 32 * @pr;
-  margin-left: 24 * @pr;
   color: @antTextSemi;
+}
+
+.action-readed-menu,
+.action-add,
+.action-menu {
   position: relative;
-  right: -8 * @pr;
+  right: -24 * @pr;
+}
+
+.action-add,
+.action-menu {
+  margin-left: 16 * @pr;
+  margin-right: 16 * @pr;
+}
+
+.action-readed-menu {
+  padding-left: 2 * @pr;
+  margin-left: 14 * @pr;
+  margin-right: 16 * @pr;
+}
+
+.action-readed {
+  margin-left: 0;
+  margin-right: 0;
 }
 
 .action-menu-dot,
