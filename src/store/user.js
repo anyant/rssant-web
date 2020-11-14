@@ -145,6 +145,7 @@ export default {
     },
     async register(DAO, { username, email, password }) {
       await API.user.register({ username, email, password })
+      reportEvent('REGISTER')
     },
     async confirmEmail(DAO, { key }) {
       await API.user.confirmEmail({ key })
