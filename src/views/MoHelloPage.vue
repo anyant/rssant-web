@@ -64,11 +64,10 @@ export default {
 }
 
 .hello-page {
-  position: fixed;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  min-height: 480 * @pr;
+  overflow: hidden;
   display: flex;
   justify-content: center;
   background: @antBackWhite;
@@ -145,6 +144,7 @@ export default {
   .content {
     position: relative;
     padding-top: 80 * @pr;
+    padding-bottom: 32 * @pr;
   }
 
   .mockup {
@@ -203,7 +203,7 @@ export default {
 
   .header {
     height: 48 * @pr;
-    border-bottom: 1px solid @antLineGrey;
+    border-bottom: 1px solid @antBackGrey;
   }
 
   .header,
@@ -215,6 +215,7 @@ export default {
   .content {
     position: relative;
     padding-top: 40 * @pr;
+    padding-bottom: 16 * @pr;
   }
 
   .mockup {
