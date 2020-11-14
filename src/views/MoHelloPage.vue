@@ -22,7 +22,7 @@
           </div>
         </div>
         <div class="action">
-          <mu-button class="action-button" round large :color="antBlue" to="/register">开始使用</mu-button>
+          <mu-button class="action-button" round large :color="antBlue" replace to="/register">开始使用</mu-button>
         </div>
         <div class="mockup">
           <div class="phone">
