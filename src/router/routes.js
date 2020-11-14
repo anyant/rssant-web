@@ -16,6 +16,7 @@ import MoResetPasswordPage from '@/views/MoResetPasswordPage'
 import MoResetPasswordConfirmPage from '@/views/MoResetPasswordConfirmPage'
 import MoAccountPage from '@/views/MoAccountPage'
 import MoAboutPage from '@/views/MoAboutPage'
+import MoHelloPage from '@/views/MoHelloPage'
 import MoHelpPage from '@/views/MoHelpPage'
 import MoVipPage from '@/views/MoVipPage'
 import MoVipRedeemCodePage from '@/views/MoVipRedeemCodePage'
@@ -127,6 +128,11 @@ const routes = [
     path: '/about',
     name: 'About',
     component: MoAboutPage,
+  },
+  {
+    path: '/hello',
+    name: 'Hello',
+    component: MoHelloPage,
   },
   {
     path: '/login',

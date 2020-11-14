@@ -46,7 +46,7 @@ router.beforeEach((to, from, next) => {
     }
     let hasLoginHistory = localConfig.HAS_LOGIN_HISTORY.get()
     next({
-      path: hasLoginHistory ? '/login' : '/register',
+      path: hasLoginHistory ? '/login' : '/hello',
       replace: true,
     })
   }
@@ -60,7 +60,7 @@ router.beforeEach((to, from, next) => {
     API.user
       .login()
       .then(() => {
-        const isAuthPage = to.name === 'Login' || to.name === 'Register'
+        const isAuthPage = to.name === 'Login' || to.name === 'Register' || to.name === 'Hello'
         if (isAuthPage) {
           next({
             path: '/',

@@ -34,7 +34,7 @@ export default {
 <style lang="less">
 @import '~@/styles/common';
 
-.header + div {
+.layout .header + div {
   position: absolute;
   overflow: auto;
   top: 48 * @pr;
