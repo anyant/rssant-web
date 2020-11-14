@@ -1,5 +1,5 @@
 <template>
-  <div class="hello-page">
+  <div class="hello-page" :style="pageStyle">
     <div class="wrapper">
       <div class="header">
         <div class="logo">
@@ -40,6 +40,14 @@ import { antBlue } from '@/plugin/common'
 export default {
   data() {
     return { antBlue }
+  },
+  computed: {
+    pageStyle() {
+      // fix mobile browser auto-hide toolbar
+      return {
+        height: `${this.$LAYOUT.windowInnerHeight}px`,
+      }
+    },
   },
 }
 </script>
