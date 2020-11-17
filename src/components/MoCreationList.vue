@@ -13,7 +13,7 @@
       :status="creation.status"
       :title="creation.url"
       :date="creation.dt_created"
-      :router-link="`/creation/${creation.id}`"
+      :router-link="`/creation-detail?id=${creation.id}`"
     ></MoCreationItem>
   </transition-group>
 </template>

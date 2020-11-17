@@ -83,7 +83,7 @@ export default {
       }
     },
     routerLink() {
-      return `/story/${this.feedId}-${this.offset}`
+      return `/story?feed=${this.feedId}&offset=${this.offset}`
     },
   },
   methods: {

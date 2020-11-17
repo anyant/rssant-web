@@ -10,7 +10,7 @@
     <MoScrollList
       v-if="feed"
       class="story-list"
-      :vid="`/feed/${feedId}`"
+      :vid="`/feed?id=${feedId}`"
       :itemSize="48"
       :items="storyList"
       :init-offset="feed.story_offset"
@@ -60,7 +60,7 @@ export default {
   },
   computed: {
     feedId() {
-      return this.$route.params.feedId
+      return this.$route.query.id
     },
     feed() {
       return this.$API.feed.get(this.feedId)
@@ -135,7 +135,7 @@ export default {
       this.$API.feed.setStoryOffset({ feedId: this.feed.id, offset: this.feed.total_storys })
     },
     goFeedDetail() {
-      this.$router.push(`/feed/${this.feedId}/detail`)
+      this.$router.push(`/feed-detail?id=${this.feedId}`)
     },
     toggleFavorited(story) {
       let is_favorited = !story.is_favorited

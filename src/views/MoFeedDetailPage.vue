@@ -200,7 +200,7 @@ export default {
   },
   computed: {
     feedId() {
-      return this.$route.params.feedId
+      return this.$route.query.id
     },
     feed() {
       return this.$API.feed.get(this.feedId)

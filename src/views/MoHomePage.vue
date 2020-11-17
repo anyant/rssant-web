@@ -11,7 +11,7 @@
         </div>
       </MoLayout>
       <keep-alive :include="keepAlivePages">
-        <router-view :key="this.$route.path" />
+        <router-view :key="this.$route.fullPath" />
       </keep-alive>
     </div>
   </div>

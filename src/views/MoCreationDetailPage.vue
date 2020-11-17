@@ -42,7 +42,7 @@ export default {
   },
   computed: {
     creationId() {
-      return this.$route.params.creationId
+      return this.$route.query.id
     },
     creation() {
       return this.$API.feed.getCreation(this.creationId)
@@ -67,7 +67,7 @@ export default {
       if (_.isNil(this.feedId)) {
         return null
       }
-      return `/feed/${this.feedId}`
+      return `/feed?id=${this.feedId}`
     },
     feedTitle() {
       if (_.isNil(this.feedId)) {

@@ -146,7 +146,7 @@ export default {
       })
     },
     onFeedClick(feed) {
-      this.$router.push(`/feed/${feed.id}`)
+      this.$router.push(`/feed?id=${feed.id}`)
     },
     totalStorys(feed) {
       if (feed.total_storys > 999) {

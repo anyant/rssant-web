@@ -31,10 +31,10 @@ export default {
   },
   computed: {
     feedId() {
-      return this.$route.params.feedId
+      return this.$route.query.feed
     },
     offset() {
-      return parseInt(this.$route.params.offset)
+      return parseInt(this.$route.query.offset)
     },
     source() {
       return _.defaultTo(this.$route.query.source, '').toLowerCase()

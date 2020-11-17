@@ -73,13 +73,13 @@ const boardRoutes = [
     meta: { loginRequired: true },
   },
   {
-    path: 'creation/:creationId',
+    path: 'creation-detail',
     name: 'CreationDetail',
     component: MoCreationDetailPage,
     meta: { loginRequired: true },
   },
   {
-    path: 'feed/:feedId',
+    path: 'feed',
     name: 'StoryList',
     component: MoStoryListPage,
     meta: { loginRequired: true },
@@ -97,13 +97,13 @@ const boardRoutes = [
     meta: { loginRequired: true },
   },
   {
-    path: 'story/:feedId-:offset',
+    path: 'story',
     name: 'Story',
     component: MoStoryPage,
     meta: { loginRequired: true },
   },
   {
-    path: 'feed/:feedId/detail',
+    path: 'feed-detail',
     name: 'FeedDetail',
     component: MoFeedDetailPage,
     meta: { loginRequired: true },

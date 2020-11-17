@@ -185,7 +185,7 @@ export default {
       }
       let feedId = this.nextStory.feed.id
       let offset = this.nextStory.offset
-      let link = `/story/${feedId}-${offset}`
+      let link = `/story?feed=${feedId}&offset=${offset}`
       let query = {}
       if (!_.isEmpty(this.source)) {
         query.source = this.source

@@ -151,7 +151,7 @@ const VirtualItem = Vue.component('VirtualItem', {
           title: feed.title,
           number: feed.num_unread_storys,
           date: feed.dt_latest_story_published || feed.dt_created,
-          link: `/feed/${feed.id}`,
+          link: `/feed?id=${feed.id}`,
           routeTo: this.routeTo,
         },
       })

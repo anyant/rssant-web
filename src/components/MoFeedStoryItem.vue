@@ -43,7 +43,7 @@ export default {
       }
     },
     goFeed() {
-      this.myRouteTo(`/feed/${this.feedId}`)
+      this.myRouteTo(`/feed?id=${this.feedId}`)
     },
     goStory() {
       if (!_.isNil(this.isReaded) && !this.isReaded) {
@@ -52,9 +52,9 @@ export default {
       if (this.isCtrlKeyHold && !_.isEmpty(this.storyLink)) {
         window.open(this.storyLink, '_blank')
       } else {
-        let link = `/story/${this.feedId}-${this.offset}`
+        let link = `/story?feed=${this.feedId}&offset=${this.offset}`
         if (!_.isNil(this.source)) {
-          link = link + `?source=${this.source}`
+          link = link + `&source=${this.source}`
         }
         this.myRouteTo(link)
       }
