@@ -18,7 +18,11 @@
             <span class="title-line">轻松订阅博客和资讯</span>
           </h1>
           <div class="description">
-            <span class="description-line">蚁阅是无广告，无推荐，专注阅读的全平台阅读器，体验丝滑流畅，支持全文阅读，图片代理，播客，全球 RSS 均可订阅</span>
+            <span class="description-line">
+              <span>蚁阅是无广告，无推荐，专注阅读的</span>
+              <span class="description-desktop-bold">全平台</span>
+              <span>阅读器，体验丝滑流畅，支持全文阅读，图片代理，播客，全球 RSS 均可订阅</span>
+            </span>
           </div>
         </div>
         <div class="action">
@@ -187,6 +191,11 @@ export default {
     margin-top: 24 * @pr;
     width: 540 * @pr;
     font-size: 18 * @pr;
+    .description-desktop-bold {
+      font-weight: bold;
+      margin-left: 4 * @pr;
+      margin-right: 4 * @pr;
+    }
   }
 
   .action {
