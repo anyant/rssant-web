@@ -135,24 +135,24 @@ export default {
       }
     },
     openLinkInNewTab() {
-      if (!_.isEmpty(this.link)) {
-        window.open(this.link, '_blank')
+      if (!_.isEmpty(this.story.link)) {
+        window.open(this.story.link, '_blank')
       } else if (!_.isEmpty(this.routerLink)) {
         this.$router.push(this.routerLink)
       }
     },
     goLink() {
-      let isPoorContent = _.isEmpty(this.content) || this.content.length <= 20
-      if (!_.isEmpty(this.link) && (this.isCtrlKeyHold || isPoorContent)) {
+      let isPoorContent = _.isEmpty(this.story.content) || this.story.content.length <= 20
+      if (!_.isEmpty(this.story.link) && (this.isCtrlKeyHold || isPoorContent)) {
         this.openLinkInNewTab()
       } else if (!_.isEmpty(this.routerLink)) {
         this.$router.push(this.routerLink)
       }
     },
     async onOpen() {
-      if (_.isEmpty(this.summary) || _.isEmpty(this.content)) {
+      if (_.isEmpty(this.story.summary) || _.isEmpty(this.story.content)) {
         let promise = this.$API.story.load({ feedId: this.feedId, offset: this.offset, detail: true })
-        if (_.isEmpty(this.summary) && _.isEmpty(this.content)) {
+        if (_.isEmpty(this.story.summary) && _.isEmpty(this.story.content)) {
           await promise
         }
       }
