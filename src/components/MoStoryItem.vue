@@ -6,7 +6,7 @@
       v-if="!isOpened"
       @click="onOpen"
     >
-      <div class="story-title">{{ title || link }}</div>
+      <div class="story-title">{{ title }}</div>
       <div class="story-date">{{ dateText }}</div>
     </div>
     <div
@@ -21,7 +21,16 @@
           <fa-icon size="18" v-else icon="far/star" :color="starColor" />
         </mu-button>
       </div>
-      <div class="story-preview-summary" @click="handleSummaryClick">{{ summary }}</div>
+      <div class="story-preview-summary" @click="handleSummaryClick">
+        <img
+          v-if="showImage"
+          @error="onPreviewImageError"
+          referrerpolicy="no-referrer"
+          class="story-preview-image"
+          :src="imageUrl"
+        />
+        {{ story.summary }}
+      </div>
       <div class="story-preview-link" @click="goLink">
         <MoIconAngleRight3 class="story-preview-link-fade" />
         <MoIconAngleRight3 class="story-preview-link-main" />
@@ -36,6 +45,7 @@ import _ from 'lodash'
 import { antGold } from '@/plugin/common'
 import { formatDateFriendly } from '@/plugin/datefmt'
 import MoIconAngleRight3 from '@/components/MoIconAngleRight3'
+import * as ImageHelper from '@/plugin/image'
 
 export default {
   components: { MoIconAngleRight3 },
@@ -60,20 +70,30 @@ export default {
       type: Boolean,
       default: false,
     },
-    feedId: String,
-    offset: Number,
-    title: String,
-    date: String,
-    summary: String,
-    content: String,
-    link: String,
+    feedId: {
+      type: String,
+      required: true,
+    },
+    offset: {
+      type: Number,
+      required: true,
+    },
+    story: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
-    return {}
+    return {
+      isImageNeedProxy: false,
+    }
   },
   computed: {
+    title() {
+      return this.story.title || this.story.link
+    },
     dateText() {
-      return formatDateFriendly(this.date)
+      return formatDateFriendly(this.story.dt_published)
     },
     starColor() {
       if (this.isFavorited) {
@@ -82,11 +102,30 @@ export default {
         return null
       }
     },
+    imageUrl() {
+      let src = this.story.image_url
+      if (_.isEmpty(src) || _.isEmpty(this.story.image_token)) {
+        return src
+      }
+      if (!this.isImageNeedProxy || ImageHelper.isSameOriginUrl(src)) {
+        return src
+      }
+      let proxyUrl = new URL('/api/v1/image/proxy', location.origin)
+      proxyUrl.searchParams.set('url', src)
+      proxyUrl.searchParams.set('token', this.story.image_token)
+      return proxyUrl.toString()
+    },
+    showImage() {
+      return !_.isEmpty(this.imageUrl)
+    },
     routerLink() {
       return `/story?feed=${this.feedId}&offset=${this.offset}`
     },
   },
   methods: {
+    onPreviewImageError() {
+      this.isImageNeedProxy = true
+    },
     toggleFavorited() {
       this.$emit('toggleFavorited')
     },
@@ -201,11 +240,18 @@ export default {
 
 .story-preview-summary {
   padding-top: 8 * @pr;
-  max-height: 480 * @pr;
+  max-height: 320 * @pr;
   overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1.4;
+  line-height: 1.5;
   font-size: 15 * @pr;
+}
+
+.story-preview-image {
+  width: 150 * @pr;
+  float: left;
+  margin-right: 16 * @pr;
+  margin-top: 4 * @pr;
+  margin-bottom: 4 * @pr;
 }
 
 .story-item-ctrl .story-preview-summary:hover {
