@@ -51,6 +51,7 @@ export default {
   data() {
     return {
       storyOpened: {},
+      readingStoryOffset: null,
       keyboard: Keyboard(),
     }
   },
@@ -98,7 +99,9 @@ export default {
     isReading() {
       let feed = this.feed
       return story => {
-        return story.offset === feed.story_offset - 1
+        let isReading = !_.isNil(this.readingStoryOffset) && story.offset === this.readingStoryOffset
+        let isLastOpened = story.offset === feed.story_offset - 1
+        return isReading || isLastOpened
       }
     },
   },
@@ -123,6 +126,7 @@ export default {
       })
     },
     onRead(story) {
+      this.readingStoryOffset = story.offset
       if (!this.isReaded(story)) {
         this.$API.feed.setStoryOffset({ feedId: story.feed.id, offset: story.offset + 1 })
       }
