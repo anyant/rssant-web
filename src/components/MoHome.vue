@@ -12,16 +12,7 @@
         >
           <fa-icon class="action-icon" icon="plus" />
         </mu-button>
-        <mu-popover
-          class="wizard"
-          :class="{'wizard-hidden':!isActive}"
-          :open.sync="openWizard"
-          :trigger="wizardTrigger"
-          placement="bottom"
-        >
-          <span class="wizard-triangle"></span>
-          <div class="wizard-info">点这里添加订阅</div>
-        </mu-popover>
+        <MoHeaderTip :open.sync="openWizard" :trigger="wizardTrigger" content="点这里添加订阅" />
         <mu-button ref="actionMenuRef" icon class="action-menu" @click="toggleMenu">
           <fa-icon class="action-icon" icon="bars" />
           <span v-if="showMenuDot" class="action-menu-dot"></span>
@@ -112,6 +103,7 @@ import MoDebugTool from '@/components/MoDebugTool'
 import MoFeedItem from '@/components/MoFeedItem.vue'
 import MoFeedGroupItem from '@/components/MoFeedGroupItem.vue'
 import MoReadedButton from '@/components/MoReadedButton.vue'
+import MoHeaderTip from '@/components/MoHeaderTip.vue'
 
 import initMathjax from '@/plugin/mathjax'
 import localConfig from '@/plugin/localConfig'
@@ -170,7 +162,7 @@ const VirtualItem = Vue.component('VirtualItem', {
 })
 
 export default {
-  components: { MoHeader, MoDebugTool, VirtualItem, MoReadedButton },
+  components: { MoHeader, MoDebugTool, VirtualItem, MoReadedButton, MoHeaderTip },
   props: {
     vid: {
       type: String,
@@ -256,7 +248,7 @@ export default {
       return n > 0 ? n : ''
     },
     routeTo(path) {
-      if (this.$route.path === path) {
+      if (this.$route.fullPath === path) {
         return
       }
       if (this.replaceRouter) {
@@ -512,63 +504,6 @@ export default {
 .action-menu-help-dot {
   right: 5 * @pr;
   top: 20 * @pr;
-}
-
-.wizard {
-  margin-top: 8px;
-  box-shadow: none;
-  background-color: @antBackDark;
-  opacity: 0.9;
-  overflow: visible;
-  cursor: default;
-}
-
-.wizard-hidden {
-  display: none;
-}
-
-.wizard.mu-popover.transition-bottom {
-  transform: none;
-  &.mu-popover-transition-enter {
-    transform: translate3d(0, 10%, 0);
-  }
-  &.mu-popover-transition-leave-to {
-    transform: none;
-  }
-  &.mu-popover-transition-enter,
-  &.mu-popover-transition-leave-to {
-    opacity: 0;
-  }
-  &.mu-popover-transition-enter-active,
-  &.mu-popover-transition-leave-active {
-    transition: transform 0.3s ease, opacity 0.3s ease;
-    backface-visibility: hidden;
-  }
-}
-
-.wizard-info {
-  font-size: 10px;
-  line-height: 22px;
-  padding: 4px 8px;
-  color: @antTextWhite;
-  border-radius: 2px;
-}
-
-.wizard-triangle {
-  // https://juejin.im/post/5cdc0458f265da03a1584fd0
-  display: block;
-  height: 14px;
-  width: 14px;
-  background-color: inherit;
-  border: inherit;
-  position: absolute;
-  top: -6px;
-  left: calc(50% - 7px);
-  // ---start---
-  clip-path: polygon(0% 0%, 100% 100%, 0% 100%);
-  transform: rotate(135deg);
-  // ---end---
-  border-radius: 0 0 0 2px;
 }
 
 .menu-list {

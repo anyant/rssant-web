@@ -1,30 +1,109 @@
 <template>
-  <MoHeaderMenu :open.sync="isReadedMenuOpen" placement="center" class="readed-button-menu">
-    <mu-button slot="default" icon class="readed-button">
-      <fa-icon icon="check" />
-    </mu-button>
-    <mu-list slot="content">
-      <mu-list-item button @click="onClick">
-        <mu-list-item-title>
-          <slot>全标已读</slot>
-        </mu-list-item-title>
-      </mu-list-item>
-    </mu-list>
-  </MoHeaderMenu>
+  <div class="readed-button" ref="readedButtonRef" :class="{'long-press': isLongPressActive}">
+    <div class="readed-action">
+      <fa-icon class="readed-icon" icon="check" :size="16" />
+    </div>
+    <MoHeaderTip :open.sync="isTipActive" :trigger="tipTrigger" content="按住全标已读" />
+  </div>
 </template>
 
 <script>
-import MoHeaderMenu from '@/components/MoHeaderMenu.vue'
+import _ from 'lodash'
+import MoHeaderTip from '@/components/MoHeaderTip.vue'
+
+// https://stackoverflow.com/questions/1930895/how-long-is-the-event-onlongpress-in-the-android
+const LONG_PRESS_DURATION = 500
+const TIP_DURATION = 3000
 
 export default {
-  components: { MoHeaderMenu },
+  components: { MoHeaderTip },
   data() {
-    return { isReadedMenuOpen: false }
+    return {
+      tipTrigger: null,
+      pressTimer: null,
+      tipTimer: null,
+      isTipActive: false,
+      isLongPressActive: false,
+    }
+  },
+  mounted() {
+    let el = this.$refs.readedButtonRef
+    this.tipTrigger = el
+    el.addEventListener('touchstart', this.handlePressStart)
+    el.addEventListener('mousedown', this.handlePressStart)
+  },
+  beforeDestroy() {
+    this.isTipActive = false
+    this.isLongPressActive = false
+    let el = this.$refs.readedButtonRef
+    el.removeEventListener('touchstart', this.handlePressStart)
+    el.removeEventListener('mousedown', this.handlePressStart)
+    this.removeDocumentListeners()
+    this.clearPressTimer()
+    this.clearTipTimer()
   },
   methods: {
-    onClick(event) {
-      this.isReadedMenuOpen = false
-      this.$emit('click', event)
+    removeDocumentListeners() {
+      document.removeEventListener('touchend', this.handlePressEnd)
+      document.removeEventListener('touchcancel', this.handlePressEnd)
+      document.removeEventListener('mouseup', this.handlePressEnd)
+    },
+    setupDocumentListeners() {
+      this.removeDocumentListeners()
+      document.addEventListener('touchend', this.handlePressEnd)
+      document.addEventListener('touchcancel', this.handlePressEnd)
+      document.addEventListener('mouseup', this.handlePressEnd)
+    },
+    setupPressTimer() {
+      this.clearPressTimer()
+      this.pressTimer = setTimeout(() => {
+        this.isTipActive = false
+        this.isLongPressActive = true
+        this.clearPressTimer()
+        this.clearTipTimer()
+        this.onLongPress()
+      }, LONG_PRESS_DURATION)
+    },
+    clearPressTimer() {
+      if (!_.isNil(this.pressTimer)) {
+        clearTimeout(this.pressTimer)
+        this.pressTimer = null
+      }
+    },
+    setupTipTimer() {
+      this.clearTipTimer()
+      this.tipTimer = setTimeout(() => {
+        this.isTipActive = false
+        this.clearTipTimer()
+      }, TIP_DURATION)
+    },
+    clearTipTimer() {
+      if (!_.isNil(this.tipTimer)) {
+        clearTimeout(this.tipTimer)
+        this.tipTimer = null
+      }
+    },
+    handlePressStart(e) {
+      if (e.cancelable) {
+        e.preventDefault()
+      }
+      this.setupDocumentListeners()
+      this.setupPressTimer()
+    },
+    handlePressEnd(e) {
+      if (e.cancelable) {
+        e.preventDefault()
+      }
+      this.removeDocumentListeners()
+      if (!_.isNil(this.pressTimer)) {
+        this.isTipActive = true
+        this.setupTipTimer()
+      }
+      this.clearPressTimer()
+      this.isLongPressActive = false
+    },
+    onLongPress() {
+      this.$emit('click')
     },
   },
 }
@@ -33,17 +112,31 @@ export default {
 <style lang="less" scoped>
 @import '~@/styles/common';
 
-.readed-button-menu,
 .readed-button {
   width: 32 * @pr;
   height: 32 * @pr;
-  color: @antTextSemi;
 }
 
-.readed-button {
+.readed-action {
+  width: 32 * @pr;
+  height: 32 * @pr;
+  color: @antTextSemi;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16 * @pr;
+  cursor: pointer;
+  &:hover {
+    background: fade(@antTextSemi, 12%);
+  }
+}
+
+.long-press .readed-icon {
+  color: @antGold;
+}
+
+.readed-icon {
   margin-left: 0;
   margin-right: 0;
-  position: relative;
-  left: 1 * @pr;
 }
 </style>
