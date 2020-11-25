@@ -104,7 +104,7 @@ export default {
     this.initAudio()
     this.initSlider()
   },
-  destroyed() {
+  beforeDestroy() {
     this.destroySlider()
     this.destroyAudio()
   },
