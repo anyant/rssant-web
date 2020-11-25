@@ -29,15 +29,15 @@ export default {
   mounted() {
     let el = this.$refs.readedButtonRef
     this.tipTrigger = el
-    el.addEventListener('touchstart', this.handlePressStart)
-    el.addEventListener('mousedown', this.handlePressStart)
+    el.addEventListener('touchstart', this.handleTouchStart)
+    el.addEventListener('mousedown', this.handleMouseStart)
   },
   beforeDestroy() {
     this.isTipActive = false
     this.isLongPressActive = false
     let el = this.$refs.readedButtonRef
-    el.removeEventListener('touchstart', this.handlePressStart)
-    el.removeEventListener('mousedown', this.handlePressStart)
+    el.removeEventListener('touchstart', this.handleTouchStart)
+    el.removeEventListener('mousedown', this.handleMouseStart)
     this.removeDocumentListeners()
     this.clearPressTimer()
     this.clearTipTimer()
@@ -83,7 +83,17 @@ export default {
         this.tipTimer = null
       }
     },
-    handlePressStart(e) {
+    handleTouchStart(e) {
+      this._handlePressStart(e)
+    },
+    handleMouseStart(e) {
+      // 0: Main button, usually the left button
+      if (!_.isNil(e.button) && e.button !== 0) {
+        return
+      }
+      this._handlePressStart(e)
+    },
+    _handlePressStart(e) {
       if (e.cancelable) {
         e.preventDefault()
       }
