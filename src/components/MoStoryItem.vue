@@ -21,12 +21,21 @@
           <fa-icon size="18" v-else icon="far/star" :color="starColor" />
         </mu-button>
       </div>
-      <div class="story-preview-summary" @click="handleSummaryClick">
+      <div
+        class="story-preview-summary"
+        @click="handleSummaryClick"
+        :class="{
+          'story-preview-summary-show-image': isShowImage,
+          'story-preview-summary-ignore-image': isIgnoreImage,
+        }"
+      >
         <img
-          v-if="showImage"
+          v-if="isShowImage"
+          @load="onPreviewImageLoad"
           @error="onPreviewImageError"
           referrerpolicy="no-referrer"
           class="story-preview-image"
+          :class="{'story-preview-image-loading': !isImageReady}"
           :src="imageUrl"
         />
         {{ story.summary }}
@@ -85,7 +94,9 @@ export default {
   },
   data() {
     return {
+      isImageReady: false,
       isImageNeedProxy: false,
+      isImageProxyFailed: false,
     }
   },
   computed: {
@@ -115,16 +126,27 @@ export default {
       proxyUrl.searchParams.set('token', this.story.image_token)
       return proxyUrl.toString()
     },
-    showImage() {
+    isShowImage() {
       return !_.isEmpty(this.imageUrl) && !this.story.is_image_duplicated
+    },
+    isIgnoreImage() {
+      let isImageFailed = _.isEmpty(this.story.image_token) && this.isImageNeedProxy
+      return isImageFailed || this.isImageProxyFailed
     },
     routerLink() {
       return `/story?feed=${this.feedId}&offset=${this.offset}`
     },
   },
   methods: {
+    onPreviewImageLoad() {
+      this.isImageReady = true
+    },
     onPreviewImageError() {
-      this.isImageNeedProxy = true
+      if (this.isImageNeedProxy) {
+        this.isImageProxyFailed = true
+      } else {
+        this.isImageNeedProxy = true
+      }
     },
     toggleFavorited() {
       this.$emit('toggleFavorited')
@@ -239,6 +261,7 @@ export default {
 }
 
 .story-preview-summary {
+  position: relative;
   padding-top: 8 * @pr;
   max-height: 320 * @pr;
   overflow: hidden;
@@ -246,12 +269,27 @@ export default {
   font-size: 15 * @pr;
 }
 
+.story-preview-summary-show-image {
+  min-height: 24 * @pr;
+}
+
 .story-preview-image {
-  width: 150 * @pr;
+  max-width: 150 * @pr;
   float: left;
   margin-right: 16 * @pr;
   margin-top: 4 * @pr;
   margin-bottom: 4 * @pr;
+}
+
+.story-preview-image-loading {
+  position: absolute;
+}
+
+.story-preview-summary-ignore-image .story-preview-image {
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: 0;
 }
 
 .story-item-ctrl .story-preview-summary:hover {
