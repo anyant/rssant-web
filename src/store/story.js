@@ -32,6 +32,29 @@ function getLatestMushroom(mushrooms) {
   return result
 }
 
+function detectDuplicatedStoryImages(storys) {
+  let total = 0
+  let counts = {}
+  for (let story of storys) {
+    if (!_.isEmpty(story.image_url)) {
+      if (_.isNil(counts[story.image_url])) {
+        counts[story.image_url] = 0
+      }
+      counts[story.image_url] += 1
+      total += 1
+    }
+  }
+  let threshold = Math.max(5, Math.min(10, total * 0.5))
+  for (let story of storys) {
+    if (!_.isEmpty(story.image_url)) {
+      if (counts[story.image_url] >= threshold) {
+        story.is_image_duplicated = true
+      }
+    }
+  }
+  return storys
+}
+
 function addOrUpdateList(state, storys) {
   storys.forEach(story => {
     let feedStorys = state.storys[story.feed.id]
@@ -44,10 +67,17 @@ function addOrUpdateList(state, storys) {
 }
 
 function addOrUpdateStory(feedStorys, story) {
+  let updated = {}
   let old = feedStorys[story.offset]
-  if (_.isNil(old) || !_.isEmpty(story.content)) {
-    Vue.set(feedStorys, story.offset, story)
+  if (!_.isNil(old)) {
+    Object.assign(updated, old)
   }
+  _.forEach(_.entries(story), ([key, value]) => {
+    if (!_.isNil(value) && value !== '') {
+      updated[key] = value
+    }
+  })
+  Vue.set(feedStorys, story.offset, updated)
 }
 
 function setFeedTotalStorysIfUpdated(DAO, feedId, storys) {
@@ -245,9 +275,10 @@ export default {
       if (resetLoadedOffset) {
         DAO.RESET_LOADED_OFFSET(feedId)
       }
-      DAO.ADD_OR_UPDATE_LIST({ feedId, storys: data.storys })
+      let storys = detectDuplicatedStoryImages(data.storys)
+      DAO.ADD_OR_UPDATE_LIST({ feedId, storys: storys })
       DAO.UPDATE_LOADED_OFFSET({ feedId, begin: offset, end: offset + size - 1 })
-      setFeedTotalStorysIfUpdated(DAO, feedId, data.storys)
+      setFeedTotalStorysIfUpdated(DAO, feedId, storys)
     },
     async loadMushrooms(DAO, { mushroomKeys, detail }) {
       await DAO.state.mushroomsLoading.begin(async () => {

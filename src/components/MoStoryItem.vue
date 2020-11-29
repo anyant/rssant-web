@@ -116,7 +116,7 @@ export default {
       return proxyUrl.toString()
     },
     showImage() {
-      return !_.isEmpty(this.imageUrl)
+      return !_.isEmpty(this.imageUrl) && !this.story.is_image_duplicated
     },
     routerLink() {
       return `/story?feed=${this.feedId}&offset=${this.offset}`
