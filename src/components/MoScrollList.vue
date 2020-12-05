@@ -26,6 +26,9 @@
 import _ from 'lodash'
 import { antBlue } from '@/plugin/common'
 
+const MIN_PAD_HEIGHT = 52
+const ITEM_LIST_PADDING = 2
+
 export default {
   props: {
     itemSize: {
@@ -142,24 +145,53 @@ export default {
         this.mescroll.showNoMore()
       }
     },
+    setInitUnreadPad() {
+      // 让未读故事恰好能撑满一页
+      let pad = this.mescroll.upwarp
+      if (this.hasNext || _.isNil(pad)) {
+        return
+      }
+      let readedCount = 0
+      for (let item of this.items) {
+        if (item.offset < this.initOffset) {
+          readedCount += 1
+        } else {
+          break
+        }
+      }
+      let unreadCount = this.items.length - readedCount
+      if (unreadCount <= 0) {
+        return
+      }
+      let padHeight = this.pageSize - unreadCount * this.itemSize - ITEM_LIST_PADDING
+      if (padHeight <= MIN_PAD_HEIGHT) {
+        return
+      }
+      pad.style.height = `${padHeight}px`
+    },
     loadInit() {
       let initOffset = this.initOffset
       if (this.total > 0 && this.items.length <= this.numPageItems) {
         if (this.hasNext) {
-          this.load({ offset: initOffset, size: this.numPageItems })
+          this.load({ offset: initOffset, size: this.numPageItems, isInit: true })
             .then(() => {
               this.loadNext()
             })
-            .finally(this.endSuccess)
+            .finally(() => {
+              this.endSuccess()
+              this.setInitUnreadPad()
+              this.updateScrollTop(initOffset)
+            })
           return
         } else if (this.hasPrev && this.items.length <= 0) {
           let size = Math.ceil(this.numPageItems * 0.8)
           let offset = Math.max(0, initOffset - size)
-          this.load({ offset, size }).finally(this.endSuccess)
+          this.load({ offset, size, isInit: true }).finally(this.endSuccess)
           return
         }
       }
       this.endSuccess()
+      this.setInitUnreadPad()
       this.updateScrollTop(initOffset)
     },
     updateScrollTop(offset) {

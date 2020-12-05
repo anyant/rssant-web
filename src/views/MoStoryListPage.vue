@@ -116,13 +116,14 @@ export default {
     this.keyboard.destroy()
   },
   methods: {
-    loadStorys({ offset, size, resetLoadedOffset }) {
+    loadStorys({ offset, size, resetLoadedOffset, isInit }) {
       return this.$API.story.loadList({
         feedId: this.feedId,
         offset: offset,
         detail: true,
         size: size,
         resetLoadedOffset: resetLoadedOffset,
+        isInit: isInit,
       })
     },
     onRead(story) {

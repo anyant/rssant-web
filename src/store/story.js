@@ -32,10 +32,32 @@ function getLatestMushroom(mushrooms) {
   return result
 }
 
-function detectDuplicatedStoryImages(storys) {
+const MIN_STORYS_FOR_IMAGE_DEDUP = 10
+
+function getLoadedStorysForImageDedup(storys, feedStorys) {
+  let loadedStorys = []
+  if (_.isEmpty(storys)) {
+    return loadedStorys
+  }
+  let minOffset = _.minBy(storys, x => x.offset).offset
+  for (let i = 0; i < MIN_STORYS_FOR_IMAGE_DEDUP - storys.length; i++) {
+    let offset = minOffset - i - 1
+    if (offset < 0) {
+      break
+    }
+    let story = feedStorys[offset]
+    if (!_.isNil(story)) {
+      loadedStorys.push(story)
+    }
+  }
+  return loadedStorys
+}
+
+function detectDuplicatedStoryImages(storys, feedStorys) {
   let total = 0
   let counts = {}
-  for (let story of storys) {
+  let loadedStorys = getLoadedStorysForImageDedup(storys, feedStorys)
+  for (let story of _.concat(storys, loadedStorys)) {
     if (!_.isEmpty(story.image_url)) {
       if (_.isNil(counts[story.image_url])) {
         counts[story.image_url] = 0
@@ -44,7 +66,7 @@ function detectDuplicatedStoryImages(storys) {
       total += 1
     }
   }
-  let threshold = Math.max(5, Math.min(10, total * 0.5))
+  let threshold = Math.max(MIN_STORYS_FOR_IMAGE_DEDUP * 0.5, Math.min(MIN_STORYS_FOR_IMAGE_DEDUP, total * 0.5))
   for (let story of storys) {
     if (!_.isEmpty(story.image_url)) {
       if (counts[story.image_url] >= threshold) {
@@ -270,12 +292,19 @@ export default {
       let story = await API.story.get({ feed_id: feedId, offset, detail })
       DAO.ADD_OR_UPDATE(story)
     },
-    async loadList(DAO, { feedId, offset, detail, size, resetLoadedOffset }) {
+    async loadList(DAO, { feedId, offset, detail, size, resetLoadedOffset, isInit }) {
+      if (isInit) {
+        // load at least N items to support image dedup
+        let total = DAO.API.feed.get(feedId).total_storys
+        offset = Math.max(0, Math.min(offset, total - MIN_STORYS_FOR_IMAGE_DEDUP))
+        size = Math.max(size, MIN_STORYS_FOR_IMAGE_DEDUP)
+      }
       let data = await API.story.query({ feed_id: feedId, offset, detail, size })
       if (resetLoadedOffset) {
         DAO.RESET_LOADED_OFFSET(feedId)
       }
-      let storys = detectDuplicatedStoryImages(data.storys)
+      let feedStorys = _.defaultTo(DAO.state.storys[feedId], {})
+      let storys = detectDuplicatedStoryImages(data.storys, feedStorys)
       DAO.ADD_OR_UPDATE_LIST({ feedId, storys: storys })
       DAO.UPDATE_LOADED_OFFSET({ feedId, begin: offset, end: offset + size - 1 })
       setFeedTotalStorysIfUpdated(DAO, feedId, storys)
