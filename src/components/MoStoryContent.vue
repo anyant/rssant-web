@@ -159,6 +159,7 @@ export default {
           return
         }
         node.setAttribute('referrerpolicy', 'no-referrer')
+        node.setAttribute('loading', 'lazy')
         node.onerror = () => {
           this.onImageError(node)
         }
