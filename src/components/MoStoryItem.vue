@@ -283,9 +283,9 @@ export default {
 
 .story-preview-image-loading {
   position: absolute;
+  max-width: 15 * @pr;
 }
 
-.story-preview-image-loading,
 .story-preview-summary-ignore-image .story-preview-image {
   width: 1px;
   height: 1px;
