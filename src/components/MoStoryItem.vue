@@ -285,6 +285,7 @@ export default {
   position: absolute;
 }
 
+.story-preview-image-loading,
 .story-preview-summary-ignore-image .story-preview-image {
   width: 1px;
   height: 1px;
