@@ -19,19 +19,6 @@ function sortMushrooms(mushrooms, API) {
   ])
 }
 
-function getLatestMushroom(mushrooms) {
-  let latest = null
-  let result = null
-  for (let story of mushrooms) {
-    let dt = new Date(story.dt_published)
-    if (_.isNil(latest) || isAfter(dt, latest)) {
-      latest = dt
-      result = story
-    }
-  }
-  return result
-}
-
 const MIN_STORYS_FOR_IMAGE_DEDUP = 10
 
 function getLoadedStorysForImageDedup(storys, feedStorys) {
@@ -122,10 +109,23 @@ function isReaded(API, story) {
   return story.offset < feed.story_offset
 }
 
+function groupOfStory(API, storyKey) {
+  let feed = API.feed.get(storyKey.feedId)
+  return API.feed.groupOf(feed)
+}
+
+function getStory(state, { feedId, offset }) {
+  return _.defaultTo(state.storys[feedId], {})[offset]
+}
+
+function getStoryListByKeys(state, keys) {
+  return keys.map(key => getStory(state, key)).filter(x => !_.isNil(x))
+}
+
 export default {
   state: {
     storys: {},
-    mushrooms: [],
+    mushroomKeys: [],
     loadedOffsetBegin: {}, // include
     loadedOffsetEnd: {}, // include
     mushroomsLoading: new Loading(),
@@ -176,20 +176,20 @@ export default {
     },
     ADD_OR_UPDATE_MUSHROOMS(state, storys) {
       addOrUpdateList(state, storys)
-      state.mushrooms = storys
+      state.mushroomKeys = storys.map(s => ({ feedId: s.feed.id, offset: s.offset }))
     },
     DELETE_STORYS_OF_FEED(state, feedId) {
       Vue.delete(state.storys, feedId)
       Vue.delete(state.loadedOffsetBegin, feedId)
       Vue.delete(state.loadedOffsetEnd, feedId)
-      state.mushrooms = state.mushrooms.filter(x => {
-        return x.feed.id !== feedId
+      state.mushroomKeys = state.mushroomKeys.filter(x => {
+        return x.feedId !== feedId
       })
     },
     DELETE_STORYS_OF_ALL_FEED(state, { feedIds = null } = {}) {
       if (_.isNil(feedIds)) {
         state.storys = {}
-        state.mushrooms = []
+        state.mushroomKeys = []
         state.loadedOffsetBegin = {}
         state.loadedOffsetEnd = {}
         return
@@ -203,16 +203,14 @@ export default {
         Vue.delete(state.loadedOffsetBegin, feedId)
         Vue.delete(state.loadedOffsetEnd, feedId)
       })
-      state.mushrooms = state.mushrooms.filter(x => {
-        return _.isNil(feedIdsMap[x.feed.id])
+      state.mushroomKeys = state.mushroomKeys.filter(x => {
+        return _.isNil(feedIdsMap[x.feedId])
       })
     },
   },
   getters: {
     get(state) {
-      return ({ feedId, offset }) => {
-        return _.defaultTo(state.storys[feedId], {})[offset]
-      }
+      return ({ feedId, offset }) => getStory(state, { feedId, offset })
     },
     getListByFeed(state) {
       return feedId => {
@@ -223,22 +221,42 @@ export default {
         return _.sortBy(_.values(feedStorys), ['offset'])
       }
     },
-    mushrooms(state) {
-      return state.mushrooms
+    mushroomsOfGroup(state, API) {
+      return group => {
+        let keys = _.filter(state.mushroomKeys, key => {
+          return group === groupOfStory(API, key)
+        })
+        return getStoryListByKeys(state, keys)
+      }
     },
-    numUnreadMushrooms(state, API) {
-      return state.mushrooms.filter(story => !isReaded(API, story)).length
+    mushroomsOfHome(state, API) {
+      let keys = _.filter(state.mushroomKeys, key => {
+        return _.startsWith(groupOfStory(API, key), 'SYS:')
+      })
+      return getStoryListByKeys(state, keys)
     },
-    latestMushroom(state) {
-      return getLatestMushroom(state.mushrooms)
+    numUnreadOf(state, API) {
+      return storys => storys.filter(story => !isReaded(API, story)).length
     },
-    nextMushroom(state) {
-      return ({ feedId, offset }) => {
-        let index = state.mushrooms.findIndex(story => {
+    latestDateOf(state) {
+      return storys => {
+        let latest = null
+        for (let story of storys) {
+          let dt = new Date(story.dt_published)
+          if (_.isNil(latest) || isAfter(dt, latest)) {
+            latest = dt
+          }
+        }
+        return latest
+      }
+    },
+    nextMushroomOf(state) {
+      return ({ mushrooms, feedId, offset }) => {
+        let index = mushrooms.findIndex(story => {
           return story.feed.id === feedId && story.offset === offset
         })
-        if (index >= 0 && index + 1 < state.mushrooms.length) {
-          return state.mushrooms[index + 1]
+        if (index >= 0 && index + 1 < mushrooms.length) {
+          return mushrooms[index + 1]
         }
         return null
       }

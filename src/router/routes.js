@@ -5,6 +5,7 @@ import MoCreationDetailPage from '@/views/MoCreationDetailPage'
 import MoStoryListPage from '@/views/MoStoryListPage'
 import MoMushroomPage from '@/views/MoMushroomPage'
 import MoMushroomDetailPage from '@/views/MoMushroomDetailPage'
+import MoFeedGroupPage from '@/views/MoFeedGroupPage'
 import MoLoginPage from '@/views/MoLoginPage'
 import MoRegisterPage from '@/views/MoRegisterPage'
 import MoFeedCreationPage from '@/views/MoFeedCreationPage'
@@ -94,6 +95,12 @@ const boardRoutes = [
     path: 'mushroom-detail',
     name: 'MushroomDetail',
     component: MoMushroomDetailPage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: 'group',
+    name: 'FeedGroup',
+    component: MoFeedGroupPage,
     meta: { loginRequired: true },
   },
   {

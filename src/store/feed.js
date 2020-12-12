@@ -13,40 +13,71 @@ function isReadedFeed(feed) {
   return feed.num_unread_storys <= 0
 }
 
-function isMushroomFeed(feed) {
-  if (_.isEmpty(feed.group)) {
-    return feed.dryness >= 500
-  } else {
-    return feed.group === 'SYS:MUSHROOM'
+const GROUP_MUSHROOM = 'SYS:MUSHROOM'
+const GROUP_SOLO = 'SYS:SOLO'
+
+function getFeedGroup(feed) {
+  let group = feed.group
+  if (_.isEmpty(group)) {
+    group = feed.dryness >= 500 ? GROUP_MUSHROOM : GROUP_SOLO
   }
+  return group
 }
 
-function sortFeedList(feedList) {
+function isMushroomFeed(feed) {
+  return getFeedGroup(feed) === GROUP_MUSHROOM
+}
+
+function _sortGroupFeedList(feedList) {
   return _.reverse(
     _.sortBy(feedList, [
       function(x) {
-        let dt = x.dt_latest_story_published || x.dt_created
-        return new Date(dt)
+        return new Date(x.dt_latest_story_published || x.dt_created)
       },
       'id',
     ])
   )
 }
 
-function groupFeedList(feedList) {
+function sortFeedList(feedList) {
   // jungle 丛林    干度<500的订阅
-  // garden 菌圃    干度>=500的订阅或空订阅
-  // mushroom 蘑菇  最近2周菌圃中产出的故事
+  // garden 菌圃    干度>=500的订阅
+  // trash  废墟    没有任何内容的订阅
   let trash = []
   let gardenReaded = []
   let jungleReaded = []
   let gardenNotReaded = []
   let jungleNotReaded = []
+  feedList.forEach(feed => {
+    if (isEmptyFeed(feed)) {
+      trash.push(feed)
+    } else if (isMushroomFeed(feed)) {
+      if (isReadedFeed(feed)) {
+        gardenReaded.push(feed)
+      } else {
+        gardenNotReaded.push(feed)
+      }
+    } else {
+      if (isReadedFeed(feed)) {
+        jungleReaded.push(feed)
+      } else {
+        jungleNotReaded.push(feed)
+      }
+    }
+  })
+  return _.concat(
+    _sortGroupFeedList(jungleNotReaded),
+    _sortGroupFeedList(gardenNotReaded),
+    _sortGroupFeedList(jungleReaded),
+    _sortGroupFeedList(gardenReaded),
+    _sortGroupFeedList(trash)
+  )
+}
+
+function _pickMushroomKeys(feed, dt_recent) {
   let mushroomKeys = []
-
-  const dt_recent = subDays(new Date(), 14)
-
-  let pickMushroom = feed => {
+  if (isMushroomFeed(feed)) {
+    // 品读: 未读1-3的订阅文章或最近14天的文章
     if (feed.num_unread_storys >= 1 && feed.num_unread_storys <= 3) {
       mushroomKeys.push({
         feed_id: feed.id,
@@ -63,49 +94,76 @@ function groupFeedList(feedList) {
         })
       }
     }
-  }
-
-  feedList.forEach(feed => {
-    if (isEmptyFeed(feed)) {
-      trash.push(feed)
-    } else if (isMushroomFeed(feed)) {
-      if (isReadedFeed(feed)) {
-        gardenReaded.push(feed)
-      } else {
-        gardenNotReaded.push(feed)
-      }
-      pickMushroom(feed)
-    } else {
-      if (isReadedFeed(feed)) {
-        jungleReaded.push(feed)
-      } else {
-        jungleNotReaded.push(feed)
-      }
+  } else {
+    // 自定义分组: 未读=1的订阅文章直接展示
+    if (feed.num_unread_storys === 1) {
+      mushroomKeys.push({
+        feed_id: feed.id,
+        offset: feed.story_offset,
+        limit: feed.num_unread_storys,
+      })
     }
-  })
-  return {
-    trash,
-    gardenReaded,
-    jungleReaded,
-    gardenNotReaded,
-    jungleNotReaded,
-    mushroomKeys,
   }
+  return mushroomKeys
 }
 
 function updateFeedList(state) {
-  let { trash, gardenReaded, jungleReaded, gardenNotReaded, jungleNotReaded, mushroomKeys } = groupFeedList(
-    _.values(state.feeds)
-  )
+  // compute mushroom keys
+  let mushroomKeys = []
+  const dt_recent = subDays(new Date(), 14)
+  _.forEach(_.values(state.feeds), feed => {
+    _pickMushroomKeys(feed, dt_recent).forEach(x => mushroomKeys.push(x))
+  })
+  // compute feed groups and home feeds
+  let feedGroupMap = {}
+  _.forEach(_.values(state.feeds), feed => {
+    let group = getFeedGroup(feed)
+    if (_.isNil(feedGroupMap[group])) {
+      feedGroupMap[group] = []
+    }
+    feedGroupMap[group].push(feed)
+  })
+  let mushroomFeeds = _.defaultTo(feedGroupMap[GROUP_MUSHROOM], [])
+  let soloFeeds = _.defaultTo(feedGroupMap[GROUP_SOLO], [])
+  let homeFeedList = sortFeedList(_.concat(mushroomFeeds, soloFeeds))
+  delete feedGroupMap[GROUP_MUSHROOM]
+  delete feedGroupMap[GROUP_SOLO]
+  let feedGroups = []
+  _.forEach(_.toPairs(feedGroupMap), ([group, groupFeeds]) => {
+    let groupFeedIds = sortFeedList(groupFeeds).map(x => x.id)
+    feedGroups.push({
+      name: group,
+      feedIds: groupFeedIds,
+    })
+  })
+  let sortKeys = [x => getNumUnreadOfGroup(state, x) <= 0, x => getLatestDateOfGroup(state, x)]
+  feedGroups = _.reverse(_.sortBy(feedGroups, sortKeys))
+  state.feedGroups = feedGroups
+  state.homeFeedIds = homeFeedList.map(x => x.id)
   state.mushroomKeys = mushroomKeys
-  let feedList = _.concat(
-    sortFeedList(jungleNotReaded),
-    sortFeedList(gardenNotReaded),
-    sortFeedList(jungleReaded),
-    sortFeedList(gardenReaded),
-    sortFeedList(trash)
-  )
-  state.feedList = feedList
+}
+
+function getNumUnreadOfGroup(state, group) {
+  let feedList = group.feedIds.map(x => state.feeds[x])
+  return feedList.filter(x => !_.isNil(x) && !isReadedFeed(x)).length
+}
+
+function getLatestDateOfGroup(state, group) {
+  // group feeds are sorted, the first is latest
+  for (let feedId of group.feedIds) {
+    let feed = state.feeds[feedId]
+    if (!_.isNil(feed)) {
+      let dt = feed.dt_latest_story_published || feed.dt_created
+      if (!_.isNil(dt) && dt !== '') {
+        return new Date(dt)
+      }
+    }
+  }
+  return null
+}
+
+function _getFeedsByIds(state, ids) {
+  return ids.map(x => state.feeds[x]).filter(x => !_.isNil(x))
 }
 
 function updateStateFeed(state, feed) {
@@ -191,7 +249,8 @@ export default {
     loadingCreations: new Loading(),
     creations: {},
     feeds: {},
-    feedList: [],
+    feedGroups: [],
+    homeFeedIds: [],
     mushroomKeys: [],
   },
   mutations: {
@@ -273,19 +332,34 @@ export default {
         return state.creations[creationId]
       }
     },
-    feedList(state) {
-      return state.feedList
+    feedGroups(state) {
+      return state.feedGroups
+    },
+    homeFeedList(state) {
+      return _getFeedsByIds(state, state.homeFeedIds)
+    },
+    feedListOfGroup(state) {
+      return group => {
+        let feedIds = _.isNil(group) ? [] : group.feedIds
+        return _getFeedsByIds(state, feedIds)
+      }
     },
     mushroomKeys(state) {
       return state.mushroomKeys
+    },
+    numUnreadOfGroup(state) {
+      return group => (_.isNil(group) ? null : getNumUnreadOfGroup(state, group))
+    },
+    latestDateOfGroup(state) {
+      return group => (_.isNil(group) ? null : getLatestDateOfGroup(state, group))
+    },
+    groupOf(state) {
+      return feed => (_.isNil(feed) ? null : getFeedGroup(feed))
     },
     get(state) {
       return feedId => {
         return state.feeds[feedId]
       }
-    },
-    isMushroom(state) {
-      return feed => isMushroomFeed(feed)
     },
   },
   actions: {
@@ -306,7 +380,7 @@ export default {
             updatedFeeds: result.feeds,
             deletedFeedIds: result.deleted_ids,
           })
-          localFeeds.set(DAO.feedList)
+          localFeeds.set(_.values(DAO.state.feeds))
         })
       })
     },

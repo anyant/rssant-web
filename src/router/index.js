@@ -15,7 +15,7 @@ const router = new Router({
   routes: routes,
 })
 
-export const keepAlivePages = ['MoHomePage', 'MoMushroomPage', 'MoAccountPage', 'MoFeedCreationPage']
+export const keepAlivePages = ['MoHomePage', 'MoMushroomPage', 'MoFeedGroupPage', 'MoAccountPage', 'MoFeedCreationPage']
 
 // when landing page not '/', router.back() may be a trouble
 router._numRouteVistied = -1

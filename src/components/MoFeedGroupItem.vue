@@ -13,7 +13,7 @@ export default {
       type: Number,
       default: 0,
     },
-    date: String,
+    date: [String, Date],
     link: String,
     routeTo: Function,
   },

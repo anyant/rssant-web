@@ -63,7 +63,7 @@
         tag="div"
         :style="{ height: virtualUpperHeight + 'px' }"
       >
-        <VirtualItem
+        <MoFeedVirtualItem
           v-for="item in virtualUpperList"
           :key="item.id"
           :feed="item.feed"
@@ -71,7 +71,7 @@
           :routeTo="routeTo"
           @click.native.capture="setActiveItem(item.id)"
           :class="{'active-item': isActiveItem(item.id)}"
-        ></VirtualItem>
+        ></MoFeedVirtualItem>
       </transition-group>
       <transition-group
         class="list list-lower"
@@ -79,7 +79,7 @@
         tag="div"
         :style="{ height: virtualLowerHeight + 'px' }"
       >
-        <VirtualItem
+        <MoFeedVirtualItem
           v-for="item in virtualLowerList"
           :key="item.id"
           :feed="item.feed"
@@ -87,7 +87,7 @@
           :routeTo="routeTo"
           @click.native.capture="setActiveItem(item.id)"
           :class="{'active-item': isActiveItem(item.id)}"
-        ></VirtualItem>
+        ></MoFeedVirtualItem>
       </transition-group>
     </div>
     <!-- pre-load muse-ui icons -->
@@ -97,11 +97,9 @@
 </template>
 <script>
 import _ from 'lodash'
-import Vue from 'vue'
 import MoHeader from '@/components/MoHeader'
 import MoDebugTool from '@/components/MoDebugTool'
-import MoFeedItem from '@/components/MoFeedItem.vue'
-import MoFeedGroupItem from '@/components/MoFeedGroupItem.vue'
+import MoFeedVirtualItem from '@/components/MoFeedVirtualItem.vue'
 import MoReadedButton from '@/components/MoReadedButton.vue'
 import MoHeaderTip from '@/components/MoHeaderTip.vue'
 
@@ -112,57 +110,8 @@ import { antRippleGrey } from '@/plugin/common'
 const ITEM_HEIGHT = 48
 const PAGE_SIZE = Math.ceil(window.innerHeight / ITEM_HEIGHT)
 
-const VirtualItem = Vue.component('VirtualItem', {
-  props: {
-    feed: {
-      type: Object,
-    },
-    group: {
-      type: Object,
-    },
-    routeTo: Function,
-  },
-  methods: {
-    numberOfGroup(group) {
-      return this.$API.story.numUnreadMushrooms
-    },
-    dateOfGroup(group) {
-      let date = null
-      if (!_.isNil(this.$API.story.latestMushroom)) {
-        date = this.$API.story.latestMushroom.dt_published
-      }
-      return date
-    },
-  },
-  render(h) {
-    let feed = this.feed
-    let group = this.group
-    if (!_.isNil(feed)) {
-      return h(MoFeedItem, {
-        props: {
-          title: feed.title,
-          number: feed.num_unread_storys,
-          date: feed.dt_latest_story_published || feed.dt_created,
-          link: `/feed?id=${feed.id}`,
-          routeTo: this.routeTo,
-        },
-      })
-    } else {
-      return h(MoFeedGroupItem, {
-        props: {
-          title: group.title,
-          number: this.numberOfGroup(group),
-          date: this.dateOfGroup(group),
-          link: group.link,
-          routeTo: this.routeTo,
-        },
-      })
-    }
-  },
-})
-
 export default {
-  components: { MoHeader, MoDebugTool, VirtualItem, MoReadedButton, MoHeaderTip },
+  components: { MoHeader, MoDebugTool, MoFeedVirtualItem, MoReadedButton, MoHeaderTip },
   props: {
     vid: {
       type: String,
@@ -190,15 +139,39 @@ export default {
       if (this.isEmpty) {
         return []
       }
-      return [
-        {
-          title: '品读',
-          link: '/mushroom',
-        },
-      ]
+      let ret = []
+      _.forEach(this.$API.feed.feedGroups, group => {
+        let groupName = encodeURIComponent(group.name)
+        ret.push({
+          title: group.name,
+          link: `/group?name=${groupName}`,
+          getNumber: () => this.$API.feed.numUnreadOfGroup(group),
+          getDate: () => this.$API.feed.latestDateOfGroup(group),
+        })
+      })
+      let mushroomsOfHome = this.$API.story.mushroomsOfHome
+      let mushroomGroup = {
+        title: '品读',
+        link: '/mushroom',
+        getNumber: () => this.$API.story.numUnreadOf(mushroomsOfHome),
+        getDate: () => this.$API.story.latestDateOf(mushroomsOfHome),
+      }
+      if (mushroomGroup.getNumber() <= 0) {
+        ret.splice(0, 0, mushroomGroup)
+      } else {
+        // insert mushroomGroup after all readed groups
+        let pos = 0
+        for (let g of ret) {
+          if (g.getNumber() <= 0) {
+            pos += 1
+          }
+        }
+        ret.splice(pos, 0, mushroomGroup)
+      }
+      return ret
     },
     feedList() {
-      return this.$API.feed.feedList
+      return this.$API.feed.homeFeedList
     },
     isEmpty() {
       return _.isNil(this.feedList) || this.feedList.length <= 0
@@ -241,9 +214,6 @@ export default {
     }
   },
   methods: {
-    numberOfGroup(group) {
-      return this.$API.story.numUnreadMushrooms
-    },
     numTextOf(n) {
       return n > 0 ? n : ''
     },
@@ -315,7 +285,7 @@ export default {
     _upperSize() {
       let upperSize = 0
       for (var i = 0; i < this.groups.length; i++) {
-        if (this.numberOfGroup(this.groups[i]) > 0) {
+        if (this.groups[i].getNumber() > 0) {
           break
         }
         upperSize += 1

@@ -1,9 +1,9 @@
 <template>
   <MoLayout grey header>
     <MoBackHeader border>
-      <template v-slot:title>{{ numUnreadText }}品读</template>
+      <template v-slot:title>{{ numUnreadText }}{{ name }}</template>
       <MoReadedButton @click="setAllReaded" class="action-readed"></MoReadedButton>
-      <mu-button icon class="action-detail" @click="goMushroomDetail">
+      <mu-button icon class="action-detail" @click="goFeedGroupDetail">
         <fa-icon size="18" icon="info-circle" />
       </mu-button>
     </MoBackHeader>
@@ -11,9 +11,9 @@
       <MoFeedVirtualItem
         v-for="item in virtualList"
         :key="item.id"
+        :feed="item.feed"
         :story="item.story"
         :keyboard="keyboard"
-        source="mushroom"
       ></MoFeedVirtualItem>
     </div>
   </MoLayout>
@@ -28,42 +28,66 @@ import MoReadedButton from '@/components/MoReadedButton'
 import Keyboard from '@/plugin/keyboard'
 
 export default {
-  name: 'MoMushroomPage',
+  name: 'MoFeedGroupPage',
   components: {
     MoBackHeader,
     MoLayout,
     MoFeedVirtualItem,
     MoReadedButton,
   },
-  props: {
-    vid: {
-      type: String,
-      default: '/mushroom',
-    },
-  },
   data() {
     return {
+      mountedName: null,
       keyboard: Keyboard(),
     }
   },
   computed: {
-    mushrooms() {
-      return this.$API.story.mushroomsOfHome
+    computedVid() {
+      return `/group?name=${this.mountedName}`
     },
-    numUnreadMushrooms() {
-      return this.$API.story.numUnreadOf(this.mushrooms)
+    name() {
+      return decodeURIComponent(this.$route.query.name)
+    },
+    group() {
+      for (let g of this.$API.feed.feedGroups) {
+        if (g.name === this.name) {
+          return g
+        }
+      }
+      return null
     },
     numUnreadText() {
-      let num = this.numUnreadMushrooms
+      let num = this.$API.feed.numUnreadOfGroup(this.group)
       return num > 0 ? `#${num}# ` : ''
     },
+    feeds() {
+      return this.$API.feed.feedListOfGroup(this.group)
+    },
+    mushrooms() {
+      return this.$API.story.mushroomsOfGroup(this.name)
+    },
     virtualList() {
-      return this.mushrooms.map(story => {
-        return { story: story, id: `${story.feed.id}:${story.offset}` }
+      let mushroomFeedIds = {}
+      _.forEach(this.mushrooms, story => {
+        mushroomFeedIds[story.feed.id] = true
       })
+      let items = []
+      _.forEach(this.mushrooms, story => {
+        items.push({
+          id: `${story.feed.id}:${story.offset}`,
+          story: story,
+        })
+      })
+      _.forEach(this.feeds, feed => {
+        if (!mushroomFeedIds[feed.id]) {
+          items.push({ feed: feed, id: feed.id })
+        }
+      })
+      return items
     },
   },
   async mounted() {
+    this.mountedName = this.name
     await this.$API.syncFeedLoadMushrooms()
     this.restoreScroll()
     this.keyboard.setup()
@@ -79,28 +103,27 @@ export default {
     this.keyboard.destroy()
   },
   savePageState() {
-    if (this.$pageState.saveScrollTop({ el: this.$refs.mainRef })) {
-      this.$pageState.commit()
-    }
+    this.saveScroll()
+  },
+  // https://forum.vuejs.org/t/in-component-guard-beforerouteleave-not-working-solved/4658/3
+  beforeRouteUpdate(to, from, next) {
+    this.saveScroll()
+    next()
   },
   methods: {
+    saveScroll() {
+      if (this.$pageState.saveScrollTop({ el: this.$refs.mainRef })) {
+        this.$pageState.commit()
+      }
+    },
     restoreScroll() {
       this.$pageState.restoreScrollTop({ el: this.$refs.mainRef })
     },
-    isReaded(story) {
-      return this.$API.story.isReaded(story)
-    },
-    getFeedTitle(feedId) {
-      return this.$API.feed.get(feedId).title
-    },
     setAllReaded() {
-      let feedIds = {}
-      this.mushrooms.forEach(story => {
-        feedIds[story.feed.id] = true
-      })
-      this.$API.feed.setAllReaded({ feedIds: _.keys(feedIds) })
+      let feedIds = this.feeds.map(x => x.id)
+      this.$API.feed.setAllReaded({ feedIds })
     },
-    goMushroomDetail() {
+    goFeedGroupDetail() {
       this.$router.push('/mushroom-detail')
     },
   },
@@ -128,6 +151,7 @@ export default {
   padding-bottom: 8 * @pr;
 }
 
+.list .feed-item,
 .list .feed-story-item {
   margin-top: 8 * @pr;
   cursor: pointer;

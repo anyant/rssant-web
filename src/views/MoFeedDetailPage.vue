@@ -9,7 +9,7 @@
     <div class="feed-info">
       <div class="item title-item">
         <span class="item-name">标题</span>
-        <template v-if="form.isEdit">
+        <template v-if="form.isTitleEdit">
           <input class="item-input" v-model="form.title" />
           <span class="item-button item-button-save" @click="onSaveTitle()">
             <fa-icon class="item-button-icon" :color="antBlue" icon="save" />
@@ -23,25 +23,19 @@
         </template>
       </div>
       <div class="item group-item">
-        <span class="item-name">品读</span>
-        <span class="item-value">
-          <mu-radio
-            class="group-radio"
-            v-model="form.isMushroomGroup"
-            :value="true"
-            label="是"
-            :ripple="false"
-            @click="onSaveGroup"
-          ></mu-radio>
-          <mu-radio
-            class="group-radio"
-            v-model="form.isMushroomGroup"
-            :value="false"
-            label="否"
-            :ripple="false"
-            @click="onSaveGroup"
-          ></mu-radio>
-        </span>
+        <span class="item-name">分组</span>
+        <template v-if="form.isGroupEdit">
+          <input class="item-input" v-model="form.group" />
+          <span class="item-button item-button-save" @click="onSaveGroup()">
+            <fa-icon class="item-button-icon" :color="antBlue" icon="save" />
+          </span>
+        </template>
+        <template v-else>
+          <span class="item-value">{{ groupNameOf(feedGroup) }}</span>
+          <span class="item-button item-button-edit" @click="onEditGroup()">
+            <fa-icon class="item-button-icon" icon="edit" />
+          </span>
+        </template>
       </div>
       <div class="item" v-for="item in feedInfo" :key="item.name">
         <span class="item-name">{{ item.name }}</span>
@@ -182,15 +176,25 @@ const FEED_FIELDS = [
   },
 ]
 
+const GROUP_NAME_MAP = {
+  'SYS:MUSHROOM': '品读',
+  'SYS:SOLO': '无',
+}
+const GROUP_ID_MAP = {}
+_.forEach(_.toPairs(GROUP_NAME_MAP), ([name, id]) => {
+  GROUP_ID_MAP[name] = id
+})
+
 export default {
   components: { MoBackHeader, MoLayout },
   data() {
     return {
       antBlue,
       form: {
-        isEdit: false,
         title: null,
-        isMushroomGroup: null,
+        isTitleEdit: false,
+        group: null,
+        isGroupEdit: false,
       },
     }
   },
@@ -208,8 +212,8 @@ export default {
     feedTitle() {
       return _.isNil(this.feed) ? '' : this.feed.title
     },
-    isMushroomGroup() {
-      return this.$API.feed.isMushroom(this.feed)
+    feedGroup() {
+      return this.$API.feed.groupOf(this.feed)
     },
     feedInfo() {
       let feed = this.feed
@@ -241,31 +245,48 @@ export default {
     },
   },
   methods: {
+    groupNameOf(group) {
+      return _.defaultTo(GROUP_NAME_MAP[group], group)
+    },
+    groupIdOf(name) {
+      name = _.trim(name)
+      if (_.isEmpty(name)) {
+        return 'SYS:SOLO'
+      }
+      return _.defaultTo(GROUP_ID_MAP[name], name)
+    },
     onEditTitle() {
       this.form.title = this.feedTitle
-      this.form.isEdit = true
+      this.form.isTitleEdit = true
     },
     async onSaveTitle() {
-      try {
-        await this.$API.feed.setTitle({ feedId: this.feedId, title: this.form.title })
-      } catch (ex) {
-        this.$toast.error(`更新失败: ${ex.message}`)
+      if (this.form.title !== this.feedTitle) {
+        try {
+          await this.$API.feed.setTitle({ feedId: this.feedId, title: this.form.title })
+        } catch (ex) {
+          this.$toast.error(`更新失败: ${ex.message}`)
+        }
       }
-      this.form.isEdit = false
+      this.form.isTitleEdit = false
+    },
+    onEditGroup() {
+      if (this.feedGroup === 'SYS:SOLO') {
+        this.form.group = null
+      } else {
+        this.form.group = this.groupNameOf(this.feedGroup)
+      }
+      this.form.isGroupEdit = true
     },
     async onSaveGroup() {
-      if (_.isNil(this.form.isMushroomGroup)) {
-        return
+      let group = this.groupIdOf(this.form.group)
+      if (group !== this.feedGroup) {
+        try {
+          await this.$API.feed.setGroup({ feedId: this.feedId, group: group })
+        } catch (ex) {
+          this.$toast.error(`更新失败: ${ex.message}`)
+        }
       }
-      if (this.form.isMushroomGroup === this.isMushroomGroup) {
-        return
-      }
-      try {
-        let group = this.form.isMushroomGroup ? 'SYS:MUSHROOM' : 'SYS:SOLO'
-        await this.$API.feed.setGroup({ feedId: this.feedId, group: group })
-      } catch (ex) {
-        this.$toast.error(`更新失败: ${ex.message}`)
-      }
+      this.form.isGroupEdit = false
     },
     deleteFeed() {
       this.$confirm(`删除订阅 “${this.feedTitle}” ？`, '提示', {
@@ -304,7 +325,8 @@ export default {
   font-size: 15 * @pr;
 }
 
-.title-item {
+.title-item,
+.group-item {
   padding-top: 20 * @pr;
   min-height: 52 * @pr;
 
@@ -355,30 +377,6 @@ export default {
     margin-right: -5 * @pr;
     .item-button-icon {
       height: 16 * @pr;
-    }
-  }
-}
-
-.group-item {
-  .item-value {
-    display: flex;
-  }
-  .group-radio {
-    margin-right: 40 * @pr;
-
-    /deep/ .mu-radio-icon {
-      width: 18 * @pr;
-      height: 18 * @pr;
-      line-height: 18 * @pr;
-    }
-
-    /deep/ .mu-radio-svg-icon {
-      width: 18 * @pr;
-      height: 18 * @pr;
-    }
-
-    /deep/ .mu-radio-label {
-      font-size: 15 * @pr;
     }
   }
 }
