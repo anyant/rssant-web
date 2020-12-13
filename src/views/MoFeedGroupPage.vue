@@ -82,6 +82,11 @@ export default {
   },
   async mounted() {
     await this.$API.syncFeedLoadMushrooms()
+    // when group rename, exit this page
+    if (_.isEmpty(this.feeds)) {
+      this.$router.back()
+      return
+    }
     this.restoreScroll()
     this.keyboard.setup()
     const groupName = this.name // keep groupName after this page destroyed

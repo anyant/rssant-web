@@ -27,7 +27,7 @@ import MoLayout from '@/components/MoLayout.vue'
 import MoBackHeader from '@/components/MoBackHeader.vue'
 import MoFeedDetailInfoItem from '@/components/MoFeedDetailInfoItem.vue'
 import MoGroupNameSelector from '@/components/MoGroupNameSelector.vue'
-
+import { getGroupId, isSystemGroup } from '@/plugin/feedGroupHelper'
 import { formatFullDateFriendly } from '@/plugin/datefmt'
 
 export default {
@@ -66,9 +66,24 @@ export default {
         groupItemRef.setEditValue(name)
       }
     },
-    onSaveName({ value, done }) {
-      this.$toast.info('修改分组名称功能正在开发中')
-      done()
+    async onSaveName({ value, done }) {
+      let group = getGroupId(value)
+      let feedIds = this.feeds.map(x => x.id)
+      let goNext = null
+      if (isSystemGroup(group)) {
+        goNext = () => this.$router.back()
+      } else {
+        let newRoute = { path: this.$route.path, query: { name: value } }
+        goNext = () => this.$router.replace(newRoute)
+      }
+      try {
+        await this.$API.feed.setAllGroup({ feedIds: feedIds, group: group })
+        goNext()
+      } catch (ex) {
+        this.$toast.error(`更新失败: ${ex.message}`)
+      } finally {
+        done()
+      }
     },
   },
 }

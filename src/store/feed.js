@@ -286,6 +286,12 @@ export default {
       })
       updateFeedList(state)
     },
+    UPDATE_ALL_GROUP(state, { feedIds, group }) {
+      _.forEach(_getFeedsByIds(state, feedIds), feed => {
+        Vue.set(feed, 'group', group)
+      })
+      updateFeedList(state)
+    },
     REMOVE(state, { id }) {
       Vue.delete(state.feeds, id)
       updateFeedList(state)
@@ -424,9 +430,12 @@ export default {
       let newFeed = await API.feed.setTitle({ id: feedId, title: title })
       DAO.ADD_OR_UPDATE(newFeed)
     },
-    async setGroup(DAO, { feedId, group }) {
-      let newFeed = await API.feed.setGroup({ id: feedId, group: group })
-      DAO.ADD_OR_UPDATE(newFeed)
+    async setAllGroup(DAO, { feedIds, group }) {
+      if (_.isEmpty(feedIds)) {
+        return
+      }
+      await API.feed.setAllGroup({ ids: feedIds, group: group })
+      DAO.UPDATE_ALL_GROUP({ feedIds, group })
     },
     async delete(DAO, { feedId }) {
       await API.feed.delete({

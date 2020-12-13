@@ -233,7 +233,7 @@ export default {
       let group = getGroupId(value)
       if (!_.isEmpty(group) && group !== this.feedGroup) {
         try {
-          await this.$API.feed.setGroup({ feedId: this.feedId, group: group })
+          await this.$API.feed.setAllGroup({ feedIds: [this.feedId], group: group })
         } catch (ex) {
           this.$toast.error(`更新失败: ${ex.message}`)
         }
