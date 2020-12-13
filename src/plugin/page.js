@@ -124,16 +124,18 @@ export const pageMixin = {
   },
   computed: {
     $pageState() {
-      if (_.isEmpty(this.vid)) {
+      let vid = this.vid
+      if (_.isEmpty(vid)) {
+        vid = this.computedVid
+      }
+      if (_.isEmpty(vid)) {
         return new FakePageComponentState()
       }
-      return this.$API.page.of(this.vid)
+      return this.$API.page.of(vid)
     },
   },
   beforeRouteLeave(to, from, next) {
     saveComponentPageState(this)
-    if (_.isNil(this.beforeRouteLeave)) {
-      next()
-    }
+    next()
   },
 }

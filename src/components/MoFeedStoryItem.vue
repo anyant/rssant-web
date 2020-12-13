@@ -18,7 +18,6 @@ export default {
     storyTitle: String,
     storyDate: String,
     isReaded: Boolean,
-    source: String,
     routeTo: Function,
     storyLink: String,
     isCtrlKeyHold: {
@@ -53,9 +52,6 @@ export default {
         window.open(this.storyLink, '_blank')
       } else {
         let link = `/story?feed=${this.feedId}&offset=${this.offset}`
-        if (!_.isNil(this.source)) {
-          link = link + `&source=${this.source}`
-        }
         this.myRouteTo(link)
       }
     },

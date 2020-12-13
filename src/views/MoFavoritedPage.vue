@@ -16,7 +16,6 @@
         :storyTitle="story.title"
         :storyDate="story.dt_published"
         :isReaded="null"
-        source="favorited"
       ></MoFeedStoryItem>
     </div>
   </MoLayout>
@@ -42,6 +41,7 @@ export default {
       .then(() => {
         this.$pageState.restoreScrollTop({ el: this.$refs.mainRef })
       })
+    this.$API.story.setNextStoryGetter(null)
   },
   computed: {
     favorited() {

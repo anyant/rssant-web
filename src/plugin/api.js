@@ -219,8 +219,8 @@ const API = {
     setTitle({ id, title }) {
       return client.put(`/feed/set-title`, { id, title })
     },
-    setGroup({ id, group }) {
-      return client.put(`/feed/set-group`, { id, group })
+    setAllGroup({ ids, group }) {
+      return client.put(`/feed/set-all-group`, { ids, group })
     },
     delete({ id }) {
       return client.delete(`/feed/${id}`)

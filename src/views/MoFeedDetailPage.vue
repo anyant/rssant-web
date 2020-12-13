@@ -7,52 +7,30 @@
       </mu-button>
     </MoBackHeader>
     <div class="feed-info">
-      <div class="item title-item">
-        <span class="item-name">标题</span>
-        <template v-if="form.isEdit">
-          <input class="item-input" v-model="form.title" />
-          <span class="item-button item-button-save" @click="onSaveTitle()">
-            <fa-icon class="item-button-icon" :color="antBlue" icon="save" />
-          </span>
-        </template>
-        <template v-else>
-          <span class="item-value">{{ feedTitle }}</span>
-          <span class="item-button item-button-edit" @click="onEditTitle()">
-            <fa-icon class="item-button-icon" icon="edit" />
-          </span>
-        </template>
-      </div>
-      <div class="item group-item">
-        <span class="item-name">品读</span>
-        <span class="item-value">
-          <mu-radio
-            class="group-radio"
-            v-model="form.isMushroomGroup"
-            :value="true"
-            label="是"
-            :ripple="false"
-            @click="onSaveGroup"
-          ></mu-radio>
-          <mu-radio
-            class="group-radio"
-            v-model="form.isMushroomGroup"
-            :value="false"
-            label="否"
-            :ripple="false"
-            @click="onSaveGroup"
-          ></mu-radio>
-        </span>
-      </div>
-      <div class="item" v-for="item in feedInfo" :key="item.name">
-        <span class="item-name">{{ item.name }}</span>
-        <a
-          v-if="item.type === 'link'"
-          class="item-link"
-          :href="item.value"
-          target="_blank"
-        >{{ item.value }}</a>
-        <span v-else class="item-value">{{ item.value }}</span>
-      </div>
+      <MoFeedDetailInfoItem
+        class="title-item"
+        name="标题"
+        :value="feedTitle"
+        editable
+        @save="onSaveTitle"
+      ></MoFeedDetailInfoItem>
+      <MoFeedDetailInfoItem
+        ref="groupItemRef"
+        class="group-item"
+        name="分组"
+        :value="getGroupName(feedGroup)"
+        editable
+        @save="onSaveGroup"
+      >
+        <MoGroupNameSelector @select="onSelectGroup"></MoGroupNameSelector>
+      </MoFeedDetailInfoItem>
+      <MoFeedDetailInfoItem
+        v-for="item in feedInfo"
+        :key="item.name"
+        :name="item.name"
+        :type="item.type"
+        :value="item.value"
+      ></MoFeedDetailInfoItem>
     </div>
   </MoLayout>
 </template>
@@ -60,9 +38,11 @@
 <script>
 import _ from 'lodash'
 import MoLayout from '@/components/MoLayout.vue'
-import MoBackHeader from '@/components/MoBackHeader'
+import MoBackHeader from '@/components/MoBackHeader.vue'
+import MoFeedDetailInfoItem from '@/components/MoFeedDetailInfoItem.vue'
+import MoGroupNameSelector from '@/components/MoGroupNameSelector.vue'
 import { formatFullDateFriendly } from '@/plugin/datefmt'
-import { antBlue } from '@/plugin/common'
+import { getGroupName, getGroupId } from '@/plugin/feedGroupHelper'
 
 const FEED_FIELDS = [
   {
@@ -183,20 +163,13 @@ const FEED_FIELDS = [
 ]
 
 export default {
-  components: { MoBackHeader, MoLayout },
+  components: { MoBackHeader, MoLayout, MoFeedDetailInfoItem, MoGroupNameSelector },
   data() {
-    return {
-      antBlue,
-      form: {
-        isEdit: false,
-        title: null,
-        isMushroomGroup: null,
-      },
-    }
+    return {}
   },
   async mounted() {
     await this.$API.feed.load({ feedId: this.feedId, detail: true })
-    this.form.isMushroomGroup = this.isMushroomGroup
+    await this.$API.syncFeedLoadMushrooms()
   },
   computed: {
     feedId() {
@@ -208,8 +181,8 @@ export default {
     feedTitle() {
       return _.isNil(this.feed) ? '' : this.feed.title
     },
-    isMushroomGroup() {
-      return this.$API.feed.isMushroom(this.feed)
+    feedGroup() {
+      return this.$API.feed.groupOf(this.feed)
     },
     feedInfo() {
       let feed = this.feed
@@ -241,31 +214,31 @@ export default {
     },
   },
   methods: {
-    onEditTitle() {
-      this.form.title = this.feedTitle
-      this.form.isEdit = true
-    },
-    async onSaveTitle() {
+    getGroupName,
+    async onSaveTitle({ value, done }) {
       try {
-        await this.$API.feed.setTitle({ feedId: this.feedId, title: this.form.title })
+        await this.$API.feed.setTitle({ feedId: this.feedId, title: value })
       } catch (ex) {
         this.$toast.error(`更新失败: ${ex.message}`)
       }
-      this.form.isEdit = false
+      done()
     },
-    async onSaveGroup() {
-      if (_.isNil(this.form.isMushroomGroup)) {
-        return
+    onSelectGroup(name) {
+      let groupItemRef = this.$refs.groupItemRef
+      if (!_.isNil(groupItemRef)) {
+        groupItemRef.setEditValue(name)
       }
-      if (this.form.isMushroomGroup === this.isMushroomGroup) {
-        return
+    },
+    async onSaveGroup({ value, done }) {
+      let group = getGroupId(value)
+      if (!_.isEmpty(group) && group !== this.feedGroup) {
+        try {
+          await this.$API.feed.setAllGroup({ feedIds: [this.feedId], group: group })
+        } catch (ex) {
+          this.$toast.error(`更新失败: ${ex.message}`)
+        }
       }
-      try {
-        let group = this.form.isMushroomGroup ? 'SYS:MUSHROOM' : 'SYS:SOLO'
-        await this.$API.feed.setGroup({ feedId: this.feedId, group: group })
-      } catch (ex) {
-        this.$toast.error(`更新失败: ${ex.message}`)
-      }
+      done()
     },
     deleteFeed() {
       this.$confirm(`删除订阅 “${this.feedTitle}” ？`, '提示', {
@@ -297,111 +270,17 @@ export default {
   padding-bottom: 16 * @pr;
 }
 
-.item {
-  display: flex;
-  align-items: center;
-  padding-top: 13 * @pr;
-  font-size: 15 * @pr;
-}
-
 .title-item {
   padding-top: 20 * @pr;
-  min-height: 52 * @pr;
-
-  .item-value,
-  .item-input {
-    overflow: auto;
-    appearance: none;
-    outline: none;
-    border: none;
-    background: none;
-    box-shadow: none;
-    resize: none;
-    display: block;
-    padding: 0;
-    margin: 0;
-  }
-
-  .item-value,
-  .item-input {
-    width: 100%;
-    overflow-y: hidden;
-    line-height: 1.1;
-    font-size: 15 * @pr;
-    color: @antTextSemi;
-    vertical-align: middle;
-  }
-  .item-input {
-    height: 24 * @pr;
-    border-bottom: 1 * @pr solid @antBlue;
-  }
-
-  .item-button {
-    padding-right: 8 * @pr;
-    padding-left: 8 * @pr;
-    cursor: pointer;
-  }
-  .item-button .item-button-icon {
-    display: inline-block;
-    width: 24 * @pr;
-  }
-  .item-button-save {
-    margin-right: -4 * @pr;
-    .item-button-icon {
-      height: 18 * @pr;
-    }
-  }
-  .item-button-edit {
-    margin-right: -5 * @pr;
-    .item-button-icon {
-      height: 16 * @pr;
-    }
-  }
 }
 
 .group-item {
-  .item-value {
-    display: flex;
-  }
-  .group-radio {
-    margin-right: 40 * @pr;
-
-    /deep/ .mu-radio-icon {
-      width: 18 * @pr;
-      height: 18 * @pr;
-      line-height: 18 * @pr;
-    }
-
-    /deep/ .mu-radio-svg-icon {
-      width: 18 * @pr;
-      height: 18 * @pr;
-    }
-
-    /deep/ .mu-radio-label {
-      font-size: 15 * @pr;
-    }
-  }
+  padding-top: 7 * @pr;
+  padding-bottom: 7 * @pr;
 }
 
-.item-name {
-  flex-shrink: 0;
-  display: inline-block;
-  text-align: right;
-  width: 64 * @pr;
-  margin-right: 24 * @pr;
-  font-size: 15 * @pr;
-}
-
-.item-value,
-.item-link {
-  font-size: 15 * @pr;
-  max-height: 4 * 22 * @pr;
-  overflow: hidden;
-  text-overflow: clip;
-}
-
-.item-link {
-  color: @antBlue;
+.group-name-selector {
+  margin-left: 80 * @pr;
 }
 
 .action-icon {

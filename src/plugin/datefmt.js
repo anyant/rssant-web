@@ -17,7 +17,7 @@ export function formatFullDate(date) {
  * 2019-04
  */
 export function formatDateFriendly(date, now) {
-  if (_.isNil(date) || _.isEmpty(date)) {
+  if (_.isNil(date) || date === '') {
     return ''
   }
   date = new Date(date)
@@ -38,7 +38,7 @@ export function formatDateFriendly(date, now) {
 }
 
 export function formatFullDateFriendly(date) {
-  if (_.isNil(date) || _.isEmpty(date)) {
+  if (_.isNil(date) || date === '') {
     return ''
   }
   date = new Date(date)

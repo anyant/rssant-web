@@ -8,19 +8,12 @@
       </mu-button>
     </MoBackHeader>
     <div class="list" ref="mainRef">
-      <MoFeedStoryItem
-        v-for="story in mushrooms"
-        :key="`${story.feed.id}:${story.offset}`"
-        :feedId="story.feed.id"
-        :offset="story.offset"
-        :feedTitle="getFeedTitle(story.feed.id)"
-        :isReaded="isReaded(story)"
-        :storyTitle="story.title"
-        :storyDate="story.dt_published"
-        :storyLink="story.link"
-        :isCtrlKeyHold="keyboard.isCtrlKeyHold"
-        source="mushroom"
-      ></MoFeedStoryItem>
+      <MoFeedVirtualItem
+        v-for="item in virtualList"
+        :key="item.id"
+        :story="item.story"
+        :keyboard="keyboard"
+      ></MoFeedVirtualItem>
     </div>
   </MoLayout>
 </template>
@@ -29,7 +22,7 @@
 import _ from 'lodash'
 import MoBackHeader from '@/components/MoBackHeader'
 import MoLayout from '@/components/MoLayout'
-import MoFeedStoryItem from '@/components/MoFeedStoryItem'
+import MoFeedVirtualItem from '@/components/MoFeedVirtualItem'
 import MoReadedButton from '@/components/MoReadedButton'
 import Keyboard from '@/plugin/keyboard'
 
@@ -38,7 +31,7 @@ export default {
   components: {
     MoBackHeader,
     MoLayout,
-    MoFeedStoryItem,
+    MoFeedVirtualItem,
     MoReadedButton,
   },
   props: {
@@ -54,14 +47,19 @@ export default {
   },
   computed: {
     mushrooms() {
-      return this.$API.story.mushrooms
+      return this.$API.story.mushroomsOfHome
     },
     numUnreadMushrooms() {
-      return this.$API.story.numUnreadMushrooms
+      return this.$API.story.numUnreadOf(this.mushrooms)
     },
     numUnreadText() {
       let num = this.numUnreadMushrooms
       return num > 0 ? `#${num}# ` : ''
+    },
+    virtualList() {
+      return this.mushrooms.map(story => {
+        return { story: story, id: `${story.feed.id}:${story.offset}` }
+      })
     },
   },
   async mounted() {
@@ -75,6 +73,7 @@ export default {
   activated() {
     this.restoreScroll()
     this.keyboard.setup()
+    this.$API.story.setNextStoryGetter(this.getNextStoryInfo.bind(this))
   },
   deactivated() {
     this.keyboard.destroy()
@@ -85,6 +84,14 @@ export default {
     }
   },
   methods: {
+    getNextStoryInfo({ feedId, offset }) {
+      let story = this.$API.story.nextMushroomOf({
+        mushrooms: this.mushrooms,
+        feedId: feedId,
+        offset: offset,
+      })
+      return { story, showFeedTitle: true }
+    },
     restoreScroll() {
       this.$pageState.restoreScrollTop({ el: this.$refs.mainRef })
     },
