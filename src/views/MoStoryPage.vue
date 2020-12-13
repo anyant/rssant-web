@@ -10,9 +10,9 @@
     <MoStoryContent
       ref="contentRef"
       :story="story"
-      :source="source"
       :next-feed="nextFeed"
       :next-story="nextStory"
+      :show-next-feed-title="showNextFeedTitle"
     ></MoStoryContent>
   </MoLayout>
 </template>
@@ -36,15 +36,6 @@ export default {
     offset() {
       return parseInt(this.$route.query.offset)
     },
-    source() {
-      return _.defaultTo(this.$route.query.source, '').toLowerCase()
-    },
-    isSourceMushroom() {
-      return this.source === 'mushroom'
-    },
-    isSourceFavorited() {
-      return this.source === 'favorited'
-    },
     isFavorited() {
       return !_.isNil(this.story) && this.story.is_favorited
     },
@@ -67,20 +58,17 @@ export default {
     story() {
       return this.$API.story.get({ feedId: this.feedId, offset: this.offset })
     },
+    nextStoryInfo() {
+      return this.$API.story.nextStoryInfo({
+        feedId: this.feedId,
+        offset: this.offset,
+      })
+    },
+    showNextFeedTitle() {
+      return this.nextStoryInfo.showFeedTitle
+    },
     nextStory() {
-      let story = null
-      if (this.isSourceMushroom) {
-        story = this.$API.story.nextMushroom({
-          feedId: this.feedId,
-          offset: this.offset,
-        })
-      } else if (!this.isSourceFavorited) {
-        story = this.$API.story.get({
-          feedId: this.feedId,
-          offset: this.offset + 1,
-        })
-      }
-      return story
+      return this.nextStoryInfo.story
     },
     nextFeed() {
       if (_.isNil(this.nextStory)) {
@@ -140,7 +128,7 @@ export default {
         this.$API.feed.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
       }
       this.scrollToTop()
-      if (!this.isSourceMushroom && !this.isSourceFavorited) {
+      if (this.nextStoryInfo.shouldLoadNext) {
         let hasNext = this.offset + 1 < this.feed.total_storys
         if (hasNext) {
           let next = this.$API.story.get({

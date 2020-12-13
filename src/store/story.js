@@ -125,6 +125,7 @@ function getStoryListByKeys(state, keys) {
 
 export default {
   state: {
+    nextStoryGetter: null,
     storys: {},
     mushroomKeys: [],
     loadedOffsetBegin: {}, // include
@@ -138,6 +139,9 @@ export default {
     },
     SET_WATCHED(state, { feed_id, offset, is_watched }) {
       state.storys[feed_id][offset].is_watched = is_watched
+    },
+    SET_NEXT_STORY_GETTER(state, getter) {
+      state.nextStoryGetter = getter
     },
     ADD_OR_UPDATE(state, story) {
       let feedStorys = state.storys[story.feed.id]
@@ -262,6 +266,12 @@ export default {
         return null
       }
     },
+    nextStoryInfo(state) {
+      return ({ feedId, offset }) => {
+        let getter = state.nextStoryGetter
+        return _.isNil(getter) ? {} : getter({ feedId, offset })
+      }
+    },
     favorited(state) {
       let favorited = []
       _.forEach(_.values(state.storys), feedStorys => {
@@ -299,6 +309,9 @@ export default {
     },
   },
   actions: {
+    async setNextStoryGetter(DAO, getter) {
+      DAO.SET_NEXT_STORY_GETTER(getter)
+    },
     async setFavorited(DAO, { feedId, offset, is_favorited }) {
       await API.story.setFavorited({ feed_id: feedId, offset, is_favorited: is_favorited })
       DAO.SET_FAVORITED({ feed_id: feedId, offset, is_favorited })

@@ -43,7 +43,7 @@ export default {
   },
   computed: {
     computedVid() {
-      return `/group?name=${this.mountedName}`
+      return `/group?name=${this.name}`
     },
     name() {
       return decodeURIComponent(this.$route.query.name)
@@ -87,19 +87,15 @@ export default {
     },
   },
   async mounted() {
-    this.mountedName = this.name
     await this.$API.syncFeedLoadMushrooms()
     this.restoreScroll()
     this.keyboard.setup()
+    const groupName = this.name // keep groupName after this page destroyed
+    this.$API.story.setNextStoryGetter(({ feedId, offset }) => {
+      return this.getNextStoryInfo({ groupName, feedId, offset })
+    })
   },
   destroyed() {
-    this.keyboard.destroy()
-  },
-  activated() {
-    this.restoreScroll()
-    this.keyboard.setup()
-  },
-  deactivated() {
     this.keyboard.destroy()
   },
   savePageState() {
@@ -111,6 +107,15 @@ export default {
     next()
   },
   methods: {
+    getNextStoryInfo({ groupName, feedId, offset }) {
+      let mushrooms = this.$API.story.mushroomsOfGroup(groupName)
+      let story = this.$API.story.nextMushroomOf({
+        mushrooms: mushrooms,
+        feedId: feedId,
+        offset: offset,
+      })
+      return { story, showFeedTitle: true }
+    },
     saveScroll() {
       if (this.$pageState.saveScrollTop({ el: this.$refs.mainRef })) {
         this.$pageState.commit()

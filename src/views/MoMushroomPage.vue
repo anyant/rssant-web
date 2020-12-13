@@ -13,7 +13,6 @@
         :key="item.id"
         :story="item.story"
         :keyboard="keyboard"
-        source="mushroom"
       ></MoFeedVirtualItem>
     </div>
   </MoLayout>
@@ -74,6 +73,7 @@ export default {
   activated() {
     this.restoreScroll()
     this.keyboard.setup()
+    this.$API.story.setNextStoryGetter(this.getNextStoryInfo.bind(this))
   },
   deactivated() {
     this.keyboard.destroy()
@@ -84,6 +84,14 @@ export default {
     }
   },
   methods: {
+    getNextStoryInfo({ feedId, offset }) {
+      let story = this.$API.story.nextMushroomOf({
+        mushrooms: this.mushrooms,
+        feedId: feedId,
+        offset: offset,
+      })
+      return { story, showFeedTitle: true }
+    },
     restoreScroll() {
       this.$pageState.restoreScrollTop({ el: this.$refs.mainRef })
     },

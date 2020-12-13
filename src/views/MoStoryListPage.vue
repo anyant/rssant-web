@@ -111,11 +111,16 @@ export default {
     }
     await this.$API.syncFeedLoadMushrooms()
     this.keyboard.setup()
+    this.$API.story.setNextStoryGetter(this.getNextStoryInfo.bind(this))
   },
   destroyed() {
     this.keyboard.destroy()
   },
   methods: {
+    getNextStoryInfo({ feedId, offset }) {
+      let story = this.$API.story.get({ feedId, offset: offset + 1 })
+      return { story, shouldLoadNext: true }
+    },
     loadStorys({ offset, size, resetLoadedOffset, isInit }) {
       return this.$API.story.loadList({
         feedId: this.feedId,

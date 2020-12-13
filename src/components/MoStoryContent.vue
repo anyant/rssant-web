@@ -61,9 +61,9 @@ export default {
   components: { MoAudioPlayer },
   props: {
     story: Object,
-    source: String,
     nextFeed: Object,
     nextStory: Object,
+    showNextFeedTitle: Boolean,
   },
   data() {
     return {}
@@ -100,15 +100,12 @@ export default {
         minHeight: `${this.$LAYOUT.windowInnerHeight - 48}px`,
       }
     },
-    isSourceMushroom() {
-      return _.defaultTo(this.source, '').toLowerCase() === 'mushroom'
-    },
     nextTitle() {
       if (_.isNil(this.nextStory)) {
         return ''
       }
       let feedTitle = null
-      if (this.isSourceMushroom && !_.isNil(this.nextFeed)) {
+      if (this.showNextFeedTitle && !_.isNil(this.nextFeed)) {
         feedTitle = this.nextFeed.title
       }
       let storyTitle = this.nextStory.title || decodeURI(this.nextStory.link)
@@ -187,11 +184,7 @@ export default {
       let feedId = this.nextStory.feed.id
       let offset = this.nextStory.offset
       let link = `/story?feed=${feedId}&offset=${offset}`
-      let query = {}
-      if (!_.isEmpty(this.source)) {
-        query.source = this.source
-      }
-      this.$router.replace({ path: link, query: query })
+      this.$router.replace({ path: link })
     },
   },
 }

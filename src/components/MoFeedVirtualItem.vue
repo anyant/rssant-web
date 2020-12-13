@@ -16,7 +16,6 @@ export default Vue.component('MoFeedVirtualItem', {
     feed: {
       type: Object,
     },
-    source: String,
     keyboard: {},
     routeTo: Function,
   },
@@ -54,7 +53,6 @@ export default Vue.component('MoFeedVirtualItem', {
           storyDate: story.dt_published,
           storyLink: story.link,
           isCtrlKeyHold: this.keyboard.isCtrlKeyHold,
-          source: this.source,
         },
       })
     } else {
