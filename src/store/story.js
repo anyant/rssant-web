@@ -3,6 +3,7 @@ import Vue from 'vue'
 import { isAfter } from 'date-fns'
 import Loading from '@/plugin/loading'
 import { API } from '@/plugin/api'
+import * as feedGroupHelper from '@/plugin/feedGroupHelper'
 
 function sortMushrooms(mushrooms, API) {
   return _.sortBy(mushrooms, [
@@ -231,7 +232,7 @@ export default {
     },
     mushroomsOfHome(state, API) {
       let keys = _.filter(state.mushroomKeys, key => {
-        return _.startsWith(groupOfStory(API, key), 'SYS:')
+        return feedGroupHelper.isSystemGroup(groupOfStory(API, key))
       })
       return getStoryListByKeys(state, keys)
     },

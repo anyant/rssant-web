@@ -9,43 +9,60 @@
     <div class="feed-info">
       <div class="item title-item">
         <span class="item-name">标题</span>
-        <template v-if="form.isTitleEdit">
-          <input class="item-input" v-model="form.title" />
-          <span class="item-button item-button-save" @click="onSaveTitle()">
-            <fa-icon class="item-button-icon" :color="antBlue" icon="save" />
-          </span>
-        </template>
-        <template v-else>
-          <span class="item-value">{{ feedTitle }}</span>
-          <span class="item-button item-button-edit" @click="onEditTitle()">
-            <fa-icon class="item-button-icon" icon="edit" />
-          </span>
-        </template>
+        <div class="item-info">
+          <template v-if="form.isTitleEdit">
+            <input class="item-input" v-model="form.title" />
+            <span class="item-button item-button-save" @click="onSaveTitle()">
+              <fa-icon class="item-button-icon" :color="antBlue" icon="save" />
+            </span>
+          </template>
+          <template v-else>
+            <span class="item-value">{{ feedTitle }}</span>
+            <span class="item-button item-button-edit" @click="onEditTitle()">
+              <fa-icon class="item-button-icon" icon="edit" />
+            </span>
+          </template>
+        </div>
       </div>
       <div class="item group-item">
         <span class="item-name">分组</span>
-        <template v-if="form.isGroupEdit">
-          <input class="item-input" v-model="form.group" />
-          <span class="item-button item-button-save" @click="onSaveGroup()">
-            <fa-icon class="item-button-icon" :color="antBlue" icon="save" />
-          </span>
-        </template>
-        <template v-else>
-          <span class="item-value">{{ groupNameOf(feedGroup) }}</span>
-          <span class="item-button item-button-edit" @click="onEditGroup()">
-            <fa-icon class="item-button-icon" icon="edit" />
-          </span>
-        </template>
+        <div class="item-info">
+          <template v-if="form.isGroupEdit">
+            <input class="item-input" v-model="form.group" />
+            <span class="item-button item-button-save" @click="onSaveGroup()">
+              <fa-icon class="item-button-icon" :color="antBlue" icon="save" />
+            </span>
+          </template>
+          <template v-else>
+            <span class="item-value">{{ getGroupName(feedGroup) }}</span>
+            <span class="item-button item-button-edit" @click="onEditGroup()">
+              <fa-icon class="item-button-icon" icon="edit" />
+            </span>
+          </template>
+        </div>
+      </div>
+      <div v-if="form.isGroupEdit" class="item group-item-selector">
+        <span class="item-name"></span>
+        <div class="item-info">
+          <span
+            class="group-name"
+            v-for="name in avaliableGroupNames"
+            :key="name"
+            @click="onSelectGroup(name)"
+          >{{ name }}</span>
+        </div>
       </div>
       <div class="item" v-for="item in feedInfo" :key="item.name">
         <span class="item-name">{{ item.name }}</span>
-        <a
-          v-if="item.type === 'link'"
-          class="item-link"
-          :href="item.value"
-          target="_blank"
-        >{{ item.value }}</a>
-        <span v-else class="item-value">{{ item.value }}</span>
+        <div class="item-info">
+          <a
+            v-if="item.type === 'link'"
+            class="item-link"
+            :href="item.value"
+            target="_blank"
+          >{{ item.value }}</a>
+          <span v-else class="item-value">{{ item.value }}</span>
+        </div>
       </div>
     </div>
   </MoLayout>
@@ -57,6 +74,7 @@ import MoLayout from '@/components/MoLayout.vue'
 import MoBackHeader from '@/components/MoBackHeader'
 import { formatFullDateFriendly } from '@/plugin/datefmt'
 import { antBlue } from '@/plugin/common'
+import { getGroupName, getGroupId } from '@/plugin/feedGroupHelper'
 
 const FEED_FIELDS = [
   {
@@ -176,15 +194,6 @@ const FEED_FIELDS = [
   },
 ]
 
-const GROUP_NAME_MAP = {
-  'SYS:MUSHROOM': '品读',
-  'SYS:SOLO': '无',
-}
-const GROUP_ID_MAP = {}
-_.forEach(_.toPairs(GROUP_NAME_MAP), ([name, id]) => {
-  GROUP_ID_MAP[name] = id
-})
-
 export default {
   components: { MoBackHeader, MoLayout },
   data() {
@@ -200,7 +209,7 @@ export default {
   },
   async mounted() {
     await this.$API.feed.load({ feedId: this.feedId, detail: true })
-    this.form.isMushroomGroup = this.isMushroomGroup
+    await this.$API.syncFeedLoadMushrooms()
   },
   computed: {
     feedId() {
@@ -211,6 +220,9 @@ export default {
     },
     feedTitle() {
       return _.isNil(this.feed) ? '' : this.feed.title
+    },
+    avaliableGroupNames() {
+      return this.$API.feed.avaliableGroupNames
     },
     feedGroup() {
       return this.$API.feed.groupOf(this.feed)
@@ -245,16 +257,8 @@ export default {
     },
   },
   methods: {
-    groupNameOf(group) {
-      return _.defaultTo(GROUP_NAME_MAP[group], group)
-    },
-    groupIdOf(name) {
-      name = _.trim(name)
-      if (_.isEmpty(name)) {
-        return 'SYS:SOLO'
-      }
-      return _.defaultTo(GROUP_ID_MAP[name], name)
-    },
+    getGroupName,
+    getGroupId,
     onEditTitle() {
       this.form.title = this.feedTitle
       this.form.isTitleEdit = true
@@ -270,16 +274,15 @@ export default {
       this.form.isTitleEdit = false
     },
     onEditGroup() {
-      if (this.feedGroup === 'SYS:SOLO') {
-        this.form.group = null
-      } else {
-        this.form.group = this.groupNameOf(this.feedGroup)
-      }
+      this.form.group = getGroupName(this.feedGroup)
       this.form.isGroupEdit = true
     },
+    onSelectGroup(name) {
+      this.form.group = name
+    },
     async onSaveGroup() {
-      let group = this.groupIdOf(this.form.group)
-      if (group !== this.feedGroup) {
+      let group = getGroupId(this.form.group)
+      if (!_.isEmpty(group) && group !== this.feedGroup) {
         try {
           await this.$API.feed.setGroup({ feedId: this.feedId, group: group })
         } catch (ex) {
@@ -325,14 +328,26 @@ export default {
   font-size: 15 * @pr;
 }
 
+.title-item {
+  padding-top: 20 * @pr;
+}
+
+.group-item {
+  padding-bottom: 8 * @pr;
+}
+
 .title-item,
 .group-item {
-  padding-top: 20 * @pr;
   min-height: 52 * @pr;
+
+  .item-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 
   .item-value,
   .item-input {
-    overflow: auto;
     appearance: none;
     outline: none;
     border: none;
@@ -347,12 +362,12 @@ export default {
   .item-value,
   .item-input {
     width: 100%;
-    overflow-y: hidden;
     line-height: 1.1;
     font-size: 15 * @pr;
     color: @antTextSemi;
     vertical-align: middle;
   }
+
   .item-input {
     height: 24 * @pr;
     border-bottom: 1 * @pr solid @antBlue;
@@ -363,20 +378,45 @@ export default {
     padding-left: 8 * @pr;
     cursor: pointer;
   }
+
   .item-button .item-button-icon {
     display: inline-block;
     width: 24 * @pr;
   }
+
   .item-button-save {
     margin-right: -4 * @pr;
     .item-button-icon {
       height: 18 * @pr;
     }
   }
+
   .item-button-edit {
     margin-right: -5 * @pr;
     .item-button-icon {
       height: 16 * @pr;
+    }
+  }
+}
+
+.group-item-selector {
+  padding-top: 0;
+  .item-info {
+    position: relative;
+    left: -8 * @pr;
+  }
+  .group-name {
+    display: inline-block;
+    min-width: 64 * @pr;
+    text-align: center;
+    margin-right: 16 * @pr;
+    margin-bottom: 8 * @pr;
+    padding: 1 * @pr 12 * @pr;
+    border: solid 1 * @pr @antBlue;
+    border-radius: 14 * @pr;
+    cursor: pointer;
+    &:active {
+      background: lighten(@antBlue, 30%);
     }
   }
 }
@@ -390,12 +430,16 @@ export default {
   font-size: 15 * @pr;
 }
 
+.item-info {
+  width: 100%;
+  overflow: hidden;
+  text-overflow: clip;
+}
+
 .item-value,
 .item-link {
   font-size: 15 * @pr;
   max-height: 4 * 22 * @pr;
-  overflow: hidden;
-  text-overflow: clip;
 }
 
 .item-link {

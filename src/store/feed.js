@@ -4,6 +4,7 @@ import { isAfter, subDays } from 'date-fns'
 import Loading from '@/plugin/loading'
 import { API } from '@/plugin/api'
 import localFeeds from '@/plugin/localFeeds'
+import { GROUP_MUSHROOM, GROUP_SOLO, getGroupName } from '@/plugin/feedGroupHelper'
 
 function isEmptyFeed(feed) {
   return feed.total_storys <= 0 || _.isEmpty(feed.dt_latest_story_published)
@@ -12,9 +13,6 @@ function isEmptyFeed(feed) {
 function isReadedFeed(feed) {
   return feed.num_unread_storys <= 0
 }
-
-const GROUP_MUSHROOM = 'SYS:MUSHROOM'
-const GROUP_SOLO = 'SYS:SOLO'
 
 function getFeedGroup(feed) {
   let group = feed.group
@@ -26,6 +24,13 @@ function getFeedGroup(feed) {
 
 function isMushroomFeed(feed) {
   return getFeedGroup(feed) === GROUP_MUSHROOM
+}
+
+function getAvaliableGroups(state) {
+  let sysNames = [GROUP_SOLO, GROUP_MUSHROOM]
+  let customNames = state.feedGroups.map(x => x.name)
+  customNames = _.sortBy(customNames)
+  return _.concat(sysNames, customNames)
 }
 
 function _sortGroupFeedList(feedList) {
@@ -355,6 +360,12 @@ export default {
     },
     groupOf(state) {
       return feed => (_.isNil(feed) ? null : getFeedGroup(feed))
+    },
+    avaliableGroups(state) {
+      return getAvaliableGroups(state)
+    },
+    avaliableGroupNames(state) {
+      return getAvaliableGroups(state).map(getGroupName)
     },
     get(state) {
       return feedId => {
