@@ -6,6 +6,7 @@ import MoStoryListPage from '@/views/MoStoryListPage'
 import MoMushroomPage from '@/views/MoMushroomPage'
 import MoMushroomDetailPage from '@/views/MoMushroomDetailPage'
 import MoFeedGroupPage from '@/views/MoFeedGroupPage'
+import MoFeedGroupDetailPage from '@/views/MoFeedGroupDetailPage'
 import MoLoginPage from '@/views/MoLoginPage'
 import MoRegisterPage from '@/views/MoRegisterPage'
 import MoFeedCreationPage from '@/views/MoFeedCreationPage'
@@ -101,6 +102,12 @@ const boardRoutes = [
     path: 'group',
     name: 'FeedGroup',
     component: MoFeedGroupPage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: 'group-detail',
+    name: 'FeedGroupDetail',
+    component: MoFeedGroupDetailPage,
     meta: { loginRequired: true },
   },
   {

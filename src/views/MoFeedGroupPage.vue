@@ -37,7 +37,6 @@ export default {
   },
   data() {
     return {
-      mountedName: null,
       keyboard: Keyboard(),
     }
   },
@@ -49,12 +48,7 @@ export default {
       return decodeURIComponent(this.$route.query.name)
     },
     group() {
-      for (let g of this.$API.feed.feedGroups) {
-        if (g.name === this.name) {
-          return g
-        }
-      }
-      return null
+      return this.$API.feed.getGroupByName(this.name)
     },
     numUnreadText() {
       let num = this.$API.feed.numUnreadOfGroup(this.group)
@@ -129,7 +123,10 @@ export default {
       this.$API.feed.setAllReaded({ feedIds })
     },
     goFeedGroupDetail() {
-      this.$router.push('/mushroom-detail')
+      this.$router.push({
+        path: '/group-detail',
+        query: { name: this.name },
+      })
     },
   },
 }

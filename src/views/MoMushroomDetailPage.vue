@@ -11,7 +11,10 @@
               品读聚合了更新频率较低的订阅最近的更新
               <br />通常是博客和长文，值得细细品读
             </h4>
-            <p class="sub-title">在订阅详情页面，也可以设置订阅是否品读</p>
+            <p class="sub-title">
+              在订阅详情页面，也可以设置订阅是否品读。
+              自定义分组中的订阅文章，不会显示在品读中。
+            </p>
           </div>
         </div>
       </div>
@@ -48,8 +51,9 @@ export default {
 
 .title,
 .sub-title {
-  padding-top: 16px;
-  margin-top: 20px;
+  padding-top: 16 * @pr;
+  margin-top: 20 * @pr;
+  max-width: 420 * @pr;
   line-height: 1.5;
 }
 </style>

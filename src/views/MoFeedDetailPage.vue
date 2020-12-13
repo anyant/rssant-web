@@ -7,63 +7,30 @@
       </mu-button>
     </MoBackHeader>
     <div class="feed-info">
-      <div class="item title-item">
-        <span class="item-name">标题</span>
-        <div class="item-info">
-          <template v-if="form.isTitleEdit">
-            <input class="item-input" v-model="form.title" />
-            <span class="item-button item-button-save" @click="onSaveTitle()">
-              <fa-icon class="item-button-icon" :color="antBlue" icon="save" />
-            </span>
-          </template>
-          <template v-else>
-            <span class="item-value">{{ feedTitle }}</span>
-            <span class="item-button item-button-edit" @click="onEditTitle()">
-              <fa-icon class="item-button-icon" icon="edit" />
-            </span>
-          </template>
-        </div>
-      </div>
-      <div class="item group-item">
-        <span class="item-name">分组</span>
-        <div class="item-info">
-          <template v-if="form.isGroupEdit">
-            <input class="item-input" v-model="form.group" />
-            <span class="item-button item-button-save" @click="onSaveGroup()">
-              <fa-icon class="item-button-icon" :color="antBlue" icon="save" />
-            </span>
-          </template>
-          <template v-else>
-            <span class="item-value">{{ getGroupName(feedGroup) }}</span>
-            <span class="item-button item-button-edit" @click="onEditGroup()">
-              <fa-icon class="item-button-icon" icon="edit" />
-            </span>
-          </template>
-        </div>
-      </div>
-      <div v-if="form.isGroupEdit" class="item group-item-selector">
-        <span class="item-name"></span>
-        <div class="item-info">
-          <span
-            class="group-name"
-            v-for="name in avaliableGroupNames"
-            :key="name"
-            @click="onSelectGroup(name)"
-          >{{ name }}</span>
-        </div>
-      </div>
-      <div class="item" v-for="item in feedInfo" :key="item.name">
-        <span class="item-name">{{ item.name }}</span>
-        <div class="item-info">
-          <a
-            v-if="item.type === 'link'"
-            class="item-link"
-            :href="item.value"
-            target="_blank"
-          >{{ item.value }}</a>
-          <span v-else class="item-value">{{ item.value }}</span>
-        </div>
-      </div>
+      <MoFeedDetailInfoItem
+        class="title-item"
+        name="标题"
+        :value="feedTitle"
+        editable
+        @save="onSaveTitle"
+      ></MoFeedDetailInfoItem>
+      <MoFeedDetailInfoItem
+        ref="groupItemRef"
+        class="group-item"
+        name="分组"
+        :value="getGroupName(feedGroup)"
+        editable
+        @save="onSaveGroup"
+      >
+        <MoGroupNameSelector @select="onSelectGroup"></MoGroupNameSelector>
+      </MoFeedDetailInfoItem>
+      <MoFeedDetailInfoItem
+        v-for="item in feedInfo"
+        :key="item.name"
+        :name="item.name"
+        :type="item.type"
+        :value="item.value"
+      ></MoFeedDetailInfoItem>
     </div>
   </MoLayout>
 </template>
@@ -71,9 +38,10 @@
 <script>
 import _ from 'lodash'
 import MoLayout from '@/components/MoLayout.vue'
-import MoBackHeader from '@/components/MoBackHeader'
+import MoBackHeader from '@/components/MoBackHeader.vue'
+import MoFeedDetailInfoItem from '@/components/MoFeedDetailInfoItem.vue'
+import MoGroupNameSelector from '@/components/MoGroupNameSelector.vue'
 import { formatFullDateFriendly } from '@/plugin/datefmt'
-import { antBlue } from '@/plugin/common'
 import { getGroupName, getGroupId } from '@/plugin/feedGroupHelper'
 
 const FEED_FIELDS = [
@@ -195,17 +163,9 @@ const FEED_FIELDS = [
 ]
 
 export default {
-  components: { MoBackHeader, MoLayout },
+  components: { MoBackHeader, MoLayout, MoFeedDetailInfoItem, MoGroupNameSelector },
   data() {
-    return {
-      antBlue,
-      form: {
-        title: null,
-        isTitleEdit: false,
-        group: null,
-        isGroupEdit: false,
-      },
-    }
+    return {}
   },
   async mounted() {
     await this.$API.feed.load({ feedId: this.feedId, detail: true })
@@ -220,9 +180,6 @@ export default {
     },
     feedTitle() {
       return _.isNil(this.feed) ? '' : this.feed.title
-    },
-    avaliableGroupNames() {
-      return this.$API.feed.avaliableGroupNames
     },
     feedGroup() {
       return this.$API.feed.groupOf(this.feed)
@@ -258,30 +215,22 @@ export default {
   },
   methods: {
     getGroupName,
-    getGroupId,
-    onEditTitle() {
-      this.form.title = this.feedTitle
-      this.form.isTitleEdit = true
-    },
-    async onSaveTitle() {
-      if (this.form.title !== this.feedTitle) {
-        try {
-          await this.$API.feed.setTitle({ feedId: this.feedId, title: this.form.title })
-        } catch (ex) {
-          this.$toast.error(`更新失败: ${ex.message}`)
-        }
+    async onSaveTitle({ value, done }) {
+      try {
+        await this.$API.feed.setTitle({ feedId: this.feedId, title: value })
+      } catch (ex) {
+        this.$toast.error(`更新失败: ${ex.message}`)
       }
-      this.form.isTitleEdit = false
-    },
-    onEditGroup() {
-      this.form.group = getGroupName(this.feedGroup)
-      this.form.isGroupEdit = true
+      done()
     },
     onSelectGroup(name) {
-      this.form.group = name
+      let groupItemRef = this.$refs.groupItemRef
+      if (!_.isNil(groupItemRef)) {
+        groupItemRef.setEditValue(name)
+      }
     },
-    async onSaveGroup() {
-      let group = getGroupId(this.form.group)
+    async onSaveGroup({ value, done }) {
+      let group = getGroupId(value)
       if (!_.isEmpty(group) && group !== this.feedGroup) {
         try {
           await this.$API.feed.setGroup({ feedId: this.feedId, group: group })
@@ -289,7 +238,7 @@ export default {
           this.$toast.error(`更新失败: ${ex.message}`)
         }
       }
-      this.form.isGroupEdit = false
+      done()
     },
     deleteFeed() {
       this.$confirm(`删除订阅 “${this.feedTitle}” ？`, '提示', {
@@ -321,129 +270,17 @@ export default {
   padding-bottom: 16 * @pr;
 }
 
-.item {
-  display: flex;
-  align-items: center;
-  padding-top: 13 * @pr;
-  font-size: 15 * @pr;
-}
-
 .title-item {
   padding-top: 20 * @pr;
 }
 
 .group-item {
-  padding-bottom: 8 * @pr;
+  padding-top: 7 * @pr;
+  padding-bottom: 7 * @pr;
 }
 
-.title-item,
-.group-item {
-  min-height: 52 * @pr;
-
-  .item-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .item-value,
-  .item-input {
-    appearance: none;
-    outline: none;
-    border: none;
-    background: none;
-    box-shadow: none;
-    resize: none;
-    display: block;
-    padding: 0;
-    margin: 0;
-  }
-
-  .item-value,
-  .item-input {
-    width: 100%;
-    line-height: 1.1;
-    font-size: 15 * @pr;
-    color: @antTextSemi;
-    vertical-align: middle;
-  }
-
-  .item-input {
-    height: 24 * @pr;
-    border-bottom: 1 * @pr solid @antBlue;
-  }
-
-  .item-button {
-    padding-right: 8 * @pr;
-    padding-left: 8 * @pr;
-    cursor: pointer;
-  }
-
-  .item-button .item-button-icon {
-    display: inline-block;
-    width: 24 * @pr;
-  }
-
-  .item-button-save {
-    margin-right: -4 * @pr;
-    .item-button-icon {
-      height: 18 * @pr;
-    }
-  }
-
-  .item-button-edit {
-    margin-right: -5 * @pr;
-    .item-button-icon {
-      height: 16 * @pr;
-    }
-  }
-}
-
-.group-item-selector {
-  padding-top: 0;
-  .item-info {
-    position: relative;
-    left: -8 * @pr;
-  }
-  .group-name {
-    display: inline-block;
-    min-width: 64 * @pr;
-    text-align: center;
-    margin-right: 16 * @pr;
-    margin-bottom: 8 * @pr;
-    padding: 1 * @pr 12 * @pr;
-    border: solid 1 * @pr @antBlue;
-    border-radius: 14 * @pr;
-    cursor: pointer;
-    &:active {
-      background: lighten(@antBlue, 30%);
-    }
-  }
-}
-
-.item-name {
-  flex-shrink: 0;
-  display: inline-block;
-  text-align: right;
-  width: 64 * @pr;
-  margin-right: 24 * @pr;
-  font-size: 15 * @pr;
-}
-
-.item-info {
-  width: 100%;
-  overflow: hidden;
-  text-overflow: clip;
-}
-
-.item-value,
-.item-link {
-  font-size: 15 * @pr;
-  max-height: 4 * 22 * @pr;
-}
-
-.item-link {
-  color: @antBlue;
+.group-name-selector {
+  margin-left: 80 * @pr;
 }
 
 .action-icon {

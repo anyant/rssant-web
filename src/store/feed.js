@@ -367,6 +367,16 @@ export default {
     avaliableGroupNames(state) {
       return getAvaliableGroups(state).map(getGroupName)
     },
+    getGroupByName(state) {
+      return name => {
+        for (let g of state.feedGroups) {
+          if (g.name === name) {
+            return g
+          }
+        }
+        return null
+      }
+    },
     get(state) {
       return feedId => {
         return state.feeds[feedId]
