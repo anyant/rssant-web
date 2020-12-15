@@ -2,7 +2,7 @@
   <MoLayout grey header>
     <MoBackHeader border>
       <template v-slot:title>
-        <template v-if=" selectedFeedIds.length <= 0">整理订阅</template>
+        <template v-if="!hasSelected">整理订阅</template>
         <template v-else>选中 {{ selectedFeedIds.length }} 项</template>
       </template>
       <mu-button
@@ -204,7 +204,7 @@ export default {
       return `设置 ${count} 个订阅的分组`
     },
     isSaveGroupEnable() {
-      return !_.isEmpty(this.form.groupName)
+      return this.hasSelected && !_.isEmpty(this.form.groupName)
     },
   },
   mounted() {
@@ -273,7 +273,7 @@ export default {
         okLabel: '确定',
       }).then(({ result }) => {
         if (result) {
-          let message = `成功删除 ${this.selectedFeedIds.length} 个订阅!`
+          let message = `成功删除 ${count} 个订阅!`
           this.$API.feed
             .deleteAll({ feedIds: this.selectedFeedIds })
             .then(() => {
