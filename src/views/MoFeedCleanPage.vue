@@ -1,15 +1,25 @@
 <template>
   <MoLayout grey header>
     <MoBackHeader border>
-      <template v-slot:title>清理订阅</template>
+      <template v-slot:title>
+        <template v-if=" selectedFeedIds.length <= 0">整理订阅</template>
+        <template v-else>选中 {{ selectedFeedIds.length }} 项</template>
+      </template>
+      <mu-button
+        flat
+        class="action-group"
+        @click="groupSelected"
+        :class="{ 'action-group-disable': !hasSelected }"
+      >
+        <fa-icon icon="folder-plus" :size="18" />
+      </mu-button>
       <mu-button
         flat
         class="action-delete"
         @click="deleteSelected"
-        :class="{ 'action-delete-disable': !canDelete }"
+        :class="{ 'action-delete-disable': !hasSelected }"
       >
-        <fa-icon icon="trash" />
-        <span class="action-delete-info">{{ selectedFeedIds.length }} 订阅</span>
+        <fa-icon icon="trash" :size="15" />
       </mu-button>
       <MoHeaderMenu>
         <mu-button slot="default" icon class="menu-delete-all">
@@ -160,7 +170,7 @@ export default {
 
       return feedGroups
     },
-    canDelete() {
+    hasSelected() {
       return this.selectedFeedIds.length > 0
     },
   },
@@ -186,14 +196,28 @@ export default {
     this.$pageState.commit()
   },
   methods: {
-    deleteSelected() {
-      if (!this.canDelete) {
+    groupSelected() {
+      if (!this.hasSelected) {
         return
       }
-      let message = `成功删除 ${this.selectedFeedIds.length} 个订阅!`
-      this.$API.feed.deleteAll({ feedIds: this.selectedFeedIds }).then(() => {
-        this.selectedFeedIds = []
-        this.$toast.success({ message, time: 10000 })
+      this.$toast.success({ message: '分组成功', time: 10000 })
+    },
+    deleteSelected() {
+      if (!this.hasSelected) {
+        return
+      }
+      let count = this.selectedFeedIds.length
+      this.$confirm(`确定要删除 ${count} 个订阅？`, '提示', {
+        type: 'warning',
+        okLabel: '确定',
+      }).then(({ result }) => {
+        if (result) {
+          let message = `成功删除 ${this.selectedFeedIds.length} 个订阅!`
+          this.$API.feed.deleteAll({ feedIds: this.selectedFeedIds }).then(() => {
+            this.selectedFeedIds = []
+            this.$toast.success({ message, time: 5000 })
+          })
+        }
       })
     },
     deleteAllFeed() {
@@ -355,25 +379,27 @@ export default {
   color: @antTextGrey;
 }
 
+.action-group,
 .action-delete {
   position: relative;
   margin-left: 4 * @pr;
   margin-right: 4 * @pr;
-  right: -16 * @pr;
+  width: 48 * @pr;
   height: 32 * @pr;
-  font-size: 14 * @pr;
   color: @antGold;
   min-width: auto;
-  .action-delete-info {
-    margin-left: 4 * @pr;
-    font-weight: bold;
-  }
 }
 
+.action-group {
+  margin-right: 12 * @pr;
+}
+
+.action-group-disable,
 .action-delete-disable {
   color: @antTextGrey;
 }
 
+.acction-group /deep/ .mu-button-wrapper,
 .action-delete /deep/ .mu-button-wrapper {
   padding: 0 12 * @pr;
 }

@@ -23,7 +23,7 @@
               <mu-list-item-title>账号设置</mu-list-item-title>
             </mu-list-item>
             <mu-list-item button @click="goFeedClean">
-              <mu-list-item-title>清理订阅</mu-list-item-title>
+              <mu-list-item-title>整理订阅</mu-list-item-title>
             </mu-list-item>
             <mu-list-item button @click="goFeedFavorited">
               <mu-list-item-title>我的收藏</mu-list-item-title>
