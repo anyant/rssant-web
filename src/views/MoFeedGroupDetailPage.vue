@@ -15,6 +15,7 @@
         <MoGroupNameSelector @select="onSelectGroup"></MoGroupNameSelector>
       </MoFeedDetailInfoItem>
       <MoFeedDetailInfoItem class="item" name="订阅数" :value="totalFeedCount"></MoFeedDetailInfoItem>
+      <MoFeedDetailInfoItem class="item" name="未读订阅" :value="numUnreadFeeds"></MoFeedDetailInfoItem>
       <MoFeedDetailInfoItem class="item" name="未读故事" :value="numUnreadStorys"></MoFeedDetailInfoItem>
       <MoFeedDetailInfoItem class="item" name="最新故事发布时间" :value="latestStoryDate"></MoFeedDetailInfoItem>
     </div>
@@ -29,6 +30,10 @@ import MoFeedDetailInfoItem from '@/components/MoFeedDetailInfoItem.vue'
 import MoGroupNameSelector from '@/components/MoGroupNameSelector.vue'
 import { getGroupId, isSystemGroup } from '@/plugin/feedGroupHelper'
 import { formatFullDateFriendly } from '@/plugin/datefmt'
+
+function isReadedFeed(feed) {
+  return feed.num_unread_storys <= 0
+}
 
 export default {
   components: { MoBackHeader, MoLayout, MoFeedDetailInfoItem, MoGroupNameSelector },
@@ -51,8 +56,11 @@ export default {
     totalFeedCount() {
       return this.feeds.length
     },
+    numUnreadFeeds() {
+      return this.feeds.filter(x => !isReadedFeed(x)).length
+    },
     numUnreadStorys() {
-      return _.sumBy(this.feeds, x => x.num_unread_storys)
+      return this.$API.feed.numUnreadOfGroup(this.group)
     },
     latestStoryDate() {
       let dt = this.$API.feed.latestDateOfGroup(this.group)

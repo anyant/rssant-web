@@ -1,16 +1,43 @@
 <template>
   <MoLayout grey header>
     <MoBackHeader border>
-      <template v-slot:title>清理订阅</template>
+      <template v-slot:title>
+        <template v-if="!hasSelected">整理订阅</template>
+        <template v-else>选中 {{ selectedFeedIds.length }} 项</template>
+      </template>
+      <mu-button
+        flat
+        class="action-group"
+        @click="groupSelected"
+        :class="{ 'action-group-disable': !hasSelected }"
+      >
+        <fa-icon icon="box" :size="15" />
+      </mu-button>
       <mu-button
         flat
         class="action-delete"
         @click="deleteSelected"
-        :class="{ 'action-delete-disable': !canDelete }"
+        :class="{ 'action-delete-disable': !hasSelected }"
       >
-        <fa-icon icon="trash" />
-        <span class="action-delete-info">{{ selectedFeedIds.length }} 订阅</span>
+        <fa-icon icon="trash" :size="16" />
       </mu-button>
+      <mu-dialog
+        class="group-dialog"
+        :title="groupDialogTitle"
+        :overlay-close="false"
+        :open.sync="openGroupDialog"
+      >
+        <mu-text-field ref="groupNameInputRef" full-width v-model="form.groupName"></mu-text-field>
+        <MoGroupNameSelector @select="onSelectGroup"></MoGroupNameSelector>
+        <mu-button slot="actions" flat @click="onCancelGroup()">取消</mu-button>
+        <mu-button
+          slot="actions"
+          :disabled="!isSaveGroupEnable"
+          flat
+          color="primary"
+          @click="onSaveGroup()"
+        >确定</mu-button>
+      </mu-dialog>
       <MoHeaderMenu>
         <mu-button slot="default" icon class="menu-delete-all">
           <fa-icon icon="ellipsis-v" />
@@ -22,33 +49,45 @@
         </mu-list>
       </MoHeaderMenu>
     </MoBackHeader>
-    <div class="feed-list" ref="mainRef">
-      <div v-for="feed in feedList" :key="feed.id" class="feed-item">
-        <mu-checkbox
-          v-model="selectedFeedIds"
-          :value="feed.id"
-          :ripple="false"
-          :color="checkboxColor"
-          class="feed-checkbox"
-        ></mu-checkbox>
-        <div class="feed-info" @click="onFeedClick(feed)">
-          <div class="feed-title">{{ feed.title }}</div>
-          <div class="feed-detail">
-            <div class="feed-date">{{ formatFeedDate(feed) }}</div>
-            <div class="feed-total-storys">
-              <span>{{ totalStorys(feed) }}#</span>
-            </div>
-            <div class="feed-dryness">
-              <span>{{ (feed.dryness / 10).toFixed(0) }}</span>
-              <mu-icon class="feed-dryness-icon" value="wb_sunny" />
-            </div>
+    <div class="main" ref="mainRef">
+      <div v-for="group in feedGroups" :key="group.name" class="feed-group">
+        <div class="group-title" @click="onToggleGroup(group.name)">
+          <div class="group-name">{{ group.name }}</div>
+          <div class="group-info">
+            <span class="group-size">{{ group.feeds.length }}</span>
+            <fa-icon v-if="isGroupOpen(group.name)" class="group-icon" icon="angle-down" />
+            <fa-icon v-else class="group-icon" icon="angle-right" />
           </div>
         </div>
+        <template v-if="isGroupOpen(group.name)">
+          <div v-for="feed in group.feeds" :key="feed.id" class="feed-item">
+            <mu-checkbox
+              v-model="selectedFeedIds"
+              :value="feed.id"
+              :ripple="false"
+              :color="checkboxColor"
+              class="feed-checkbox"
+            ></mu-checkbox>
+            <div class="feed-info" @click="onFeedClick(feed)">
+              <div class="feed-info-row1">
+                <div class="feed-title">{{ feed.title || feed.id }}</div>
+                <div class="feed-group-name">{{ getFeedGroupName(feed) }}</div>
+              </div>
+              <div class="feed-info-row2">
+                <div class="feed-date">{{ formatFeedDate(feed) }}</div>
+                <div class="feed-total-storys">
+                  <span>{{ totalStorys(feed) }} 篇</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
       </div>
     </div>
   </MoLayout>
 </template>
 <script>
+import Vue from 'vue'
 import _ from 'lodash'
 import { differenceInDays } from 'date-fns'
 import { formatDate } from '@/plugin/datefmt'
@@ -56,9 +95,12 @@ import { antGold } from '@/plugin/common'
 import MoBackHeader from '@/components/MoBackHeader.vue'
 import MoLayout from '@/components/MoLayout.vue'
 import MoHeaderMenu from '@/components/MoHeaderMenu.vue'
+import MoGroupNameSelector from '@/components/MoGroupNameSelector.vue'
+
+import { GROUP_MUSHROOM, getGroupId, getGroupName } from '../plugin/feedGroupHelper'
 
 export default {
-  components: { MoBackHeader, MoLayout, MoHeaderMenu },
+  components: { MoBackHeader, MoLayout, MoHeaderMenu, MoGroupNameSelector },
   props: {
     vid: {
       type: String,
@@ -69,35 +111,100 @@ export default {
     return {
       checkboxColor: antGold,
       selectedFeedIds: [],
+      closedGroups: {},
+      openGroupDialog: false,
+      form: {
+        groupName: null,
+      },
     }
   },
   computed: {
-    feedList() {
+    feedGroups() {
+      const feedAPI = this.$API.feed
+      let trashFeeds = []
+      let zombyFeeds = []
+      let soloFeeds = []
+      let mushroomFeeds = []
+      let customGroups = []
+
+      function isTrashFeed(feed) {
+        return feed.total_storys <= 0 || _.isEmpty(feed.dt_latest_story_published)
+      }
+
       let now = new Date()
-      let badFeeds = []
-      let goodFeeds = []
-      this.$API.feed.feedList.forEach(feed => {
-        if (feed.total_storys <= 0) {
-          badFeeds.push(feed)
-          return
+      function isZombyFeed(feed) {
+        let dt_latest = new Date(feed.dt_latest_story_published)
+        return differenceInDays(now, dt_latest) > 365
+      }
+
+      function isMushroomFeed(feed) {
+        return feedAPI.groupOf(feed) === GROUP_MUSHROOM
+      }
+
+      function sortFeeds(feeds) {
+        return _.sortBy(feeds, [feed => new Date(feed.dt_latest_story_published), 'id'])
+      }
+
+      feedAPI.homeFeedList.forEach(feed => {
+        if (isTrashFeed(feed)) {
+          trashFeeds.push(feed)
+        } else if (isZombyFeed(feed)) {
+          zombyFeeds.push(feed)
+        } else if (isMushroomFeed(feed)) {
+          mushroomFeeds.push(feed)
         } else {
-          if (_.isEmpty(feed.dt_latest_story_published)) {
-            badFeeds.push(feed)
-            return
-          }
-          let dt_latest = new Date(feed.dt_latest_story_published)
-          if (differenceInDays(now, dt_latest) > 365) {
-            badFeeds.push(feed)
-            return
-          }
+          soloFeeds.push(feed)
         }
-        goodFeeds.push(feed)
       })
-      let feeds = this.sortFeeds(badFeeds).concat(this.sortFeeds(goodFeeds))
-      return feeds
+
+      feedAPI.feedGroups.forEach(group => {
+        let groupFeeds = []
+        feedAPI.feedListOfGroup(group).forEach(feed => {
+          if (isTrashFeed(feed)) {
+            trashFeeds.push(feed)
+          } else if (isZombyFeed(feed)) {
+            zombyFeeds.push(feed)
+          } else {
+            groupFeeds.push(feed)
+          }
+        })
+        customGroups.push({
+          name: `分组:${group.name}`,
+          feeds: sortFeeds(groupFeeds),
+        })
+      })
+
+      let feedGroups = [
+        {
+          name: '无效订阅',
+          feeds: sortFeeds(trashFeeds),
+        },
+        {
+          name: '久未更新',
+          feeds: sortFeeds(zombyFeeds),
+        },
+        {
+          name: '无分组',
+          feeds: sortFeeds(soloFeeds),
+        },
+        {
+          name: '品读',
+          feeds: sortFeeds(mushroomFeeds),
+        },
+      ]
+      customGroups.forEach(x => feedGroups.push(x))
+
+      return feedGroups
     },
-    canDelete() {
+    hasSelected() {
       return this.selectedFeedIds.length > 0
+    },
+    groupDialogTitle() {
+      let count = this.selectedFeedIds.length
+      return `设置 ${count} 个订阅的分组`
+    },
+    isSaveGroupEnable() {
+      return this.hasSelected && !_.isEmpty(this.form.groupName)
     },
   },
   mounted() {
@@ -107,25 +214,76 @@ export default {
       if (!_.isNil(selectedFeedIds)) {
         selectedFeedIds.forEach(x => this.selectedFeedIds.push(x))
       }
+      let closedGroups = this.$pageState.get('closedGroups')
+      if (!_.isNil(closedGroups)) {
+        _.forEach(_.toPairs(closedGroups), ([key, value]) => {
+          Vue.set(this.closedGroups, key, value)
+        })
+      }
     })
   },
   savePageState() {
     this.$pageState.saveScrollTop({ el: this.$refs.mainRef })
     this.$pageState.set('selectedFeedIds', this.selectedFeedIds)
+    this.$pageState.set('closedGroups', this.closedGroups)
     this.$pageState.commit()
   },
   methods: {
-    sortFeeds(feeds) {
-      return _.sortBy(feeds, ['dryness', 'total_storys', 'id'])
-    },
-    deleteSelected() {
-      if (!this.canDelete) {
+    groupSelected() {
+      if (!this.hasSelected) {
         return
       }
-      let message = `成功删除 ${this.selectedFeedIds.length} 个订阅!`
-      this.$API.feed.deleteAll({ feedIds: this.selectedFeedIds }).then(() => {
+      this.openGroupDialog = true
+      setTimeout(() => {
+        let inputRef = this.$refs.groupNameInputRef
+        if (!_.isNil(inputRef)) {
+          inputRef.focus()
+        }
+      }, 300)
+    },
+    onSelectGroup(name) {
+      this.form.groupName = name
+    },
+    onCancelGroup() {
+      this.openGroupDialog = false
+      this.form.groupName = null
+    },
+    async onSaveGroup() {
+      if (!this.isSaveGroupEnable) {
+        return
+      }
+      let group = getGroupId(this.form.groupName)
+      try {
+        await this.$API.feed.setAllGroup({ feedIds: this.selectedFeedIds, group: group })
         this.selectedFeedIds = []
-        this.$toast.success({ message, time: 10000 })
+        this.$toast.success({ message: '设置订阅分组成功!' })
+      } catch (ex) {
+        this.$toast.error(`设置订阅分组失败: ${ex.message}`)
+      }
+      this.openGroupDialog = false
+      this.form.groupName = null
+    },
+    deleteSelected() {
+      if (!this.hasSelected) {
+        return
+      }
+      let count = this.selectedFeedIds.length
+      this.$confirm(`确定要删除 ${count} 个订阅？`, '提示', {
+        type: 'warning',
+        okLabel: '确定',
+      }).then(({ result }) => {
+        if (result) {
+          let message = `成功删除 ${count} 个订阅!`
+          this.$API.feed
+            .deleteAll({ feedIds: this.selectedFeedIds })
+            .then(() => {
+              this.selectedFeedIds = []
+              this.$toast.success({ message })
+            })
+            .catch(ex => {
+              this.$toast.error(`删除订阅失败: ${ex.message}`)
+            })
+        }
       })
     },
     deleteAllFeed() {
@@ -148,9 +306,18 @@ export default {
     onFeedClick(feed) {
       this.$router.push(`/feed?id=${feed.id}`)
     },
+    isGroupOpen(name) {
+      return !this.closedGroups[name]
+    },
+    onToggleGroup(name) {
+      Vue.set(this.closedGroups, name, !this.closedGroups[name])
+    },
+    getFeedGroupName(feed) {
+      return getGroupName(this.$API.feed.groupOf(feed))
+    },
     totalStorys(feed) {
       if (feed.total_storys > 999) {
-        return '999+'
+        return '999'
       } else {
         return `${feed.total_storys}`
       }
@@ -177,17 +344,50 @@ export default {
 <style lang="less" scoped>
 @import '~@/styles/common';
 
-.feed-list {
-  padding-bottom: 8 * @pr;
+.group-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 32 * @pr;
+  font-size: 14 * @pr;
+  padding-left: 14 * @pr;
+  padding-right: 16 * @pr;
+  background: lighten(@antBlue, 30%);
+  border-top: 1px solid @antBackWhite;
+  cursor: pointer;
+}
+
+.group-name {
+  color: darken(@antInk, 10%);
+}
+
+.group-info {
+  display: flex;
+  align-items: center;
+  color: @antTextGrey;
+}
+
+.group-size {
+  margin-right: 16 * @pr;
+  font-size: 12 * @pr;
+}
+
+.group-icon {
+  width: 12 * @pr;
+  margin-right: 6 * @pr;
 }
 
 .feed-item {
-  margin-top: 8 * @pr;
+  padding-top: 4 * @pr;
+  padding-bottom: 4 * @pr;
+  &:hover {
+    background: lighten(@antGold, 48%);
+  }
 }
 
 .feed-item {
   position: relative;
-  height: 48 * @pr;
+  height: 56 * @pr;
   padding-left: 16 * @pr;
   padding-right: 16 * @pr;
   display: flex;
@@ -197,18 +397,19 @@ export default {
 
 .feed-checkbox {
   position: relative;
-  left: -4px;
+  left: -4 * @pr;
 }
 
 .feed-info {
   flex: 1;
-  margin-left: 4px;
+  margin-left: 4 * @pr;
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: pointer;
 }
 
-.feed-detail {
+.feed-info-row1,
+.feed-info-row2 {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -222,8 +423,14 @@ export default {
   font-size: 15 * @pr;
 }
 
-.feed-total-storys,
-.feed-dryness {
+.feed-group-name {
+  font-size: 12 * @pr;
+  flex-shrink: 0;
+  margin-left: 4 * @pr;
+  color: lighten(@antInk, 10%);
+}
+
+.feed-total-storys {
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -236,11 +443,6 @@ export default {
   overflow: hidden;
   text-overflow: clip;
   color: @antTextGrey;
-
-  .feed-dryness-icon {
-    font-size: 14 * @pr;
-    margin-left: 1px;
-  }
 }
 
 .feed-date {
@@ -254,27 +456,39 @@ export default {
   color: @antTextGrey;
 }
 
+.action-group,
 .action-delete {
   position: relative;
-  margin-left: 4px;
-  margin-right: 4px;
-  right: -16 * @pr;
+  margin-left: 4 * @pr;
+  margin-right: 4 * @pr;
+  width: 48 * @pr;
   height: 32 * @pr;
-  font-size: 14 * @pr;
   color: @antGold;
   min-width: auto;
-  .action-delete-info {
-    margin-left: 4px;
-    font-weight: bold;
-  }
 }
 
+.action-group {
+  margin-right: 12 * @pr;
+}
+
+.action-group-disable,
 .action-delete-disable {
   color: @antTextGrey;
 }
 
+.acction-group /deep/ .mu-button-wrapper,
 .action-delete /deep/ .mu-button-wrapper {
-  padding: 0 12px;
+  padding: 0 12 * @pr;
+}
+
+.group-dialog /deep/ .mu-dialog {
+  max-width: 90%;
+}
+
+@media only screen and (min-width: 850px) {
+  .group-dialog /deep/ .mu-dialog {
+    max-width: 600 * @pr;
+  }
 }
 
 .menu-delete-all {

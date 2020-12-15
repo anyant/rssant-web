@@ -149,8 +149,8 @@ function updateFeedList(state) {
 }
 
 function getNumUnreadOfGroup(state, group) {
-  let feedList = group.feedIds.map(x => state.feeds[x])
-  return feedList.filter(x => !_.isNil(x) && !isReadedFeed(x)).length
+  let feedList = _getFeedsByIds(state, group.feedIds)
+  return _.sumBy(feedList, x => x.num_unread_storys)
 }
 
 function getLatestDateOfGroup(state, group) {
