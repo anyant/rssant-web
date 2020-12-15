@@ -28,7 +28,7 @@ faLibrary.add(fas.faEdit)
 faLibrary.add(fas.faSave)
 faLibrary.add(fas.faAngleRight)
 faLibrary.add(fas.faAngleDown)
-faLibrary.add(fas.faFolderPlus)
+faLibrary.add(fas.faBox)
 
 /**
  * solid icons:

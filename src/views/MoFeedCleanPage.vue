@@ -11,7 +11,7 @@
         @click="groupSelected"
         :class="{ 'action-group-disable': !hasSelected }"
       >
-        <fa-icon icon="folder-plus" :size="18" />
+        <fa-icon icon="box" :size="15" />
       </mu-button>
       <mu-button
         flat
@@ -19,8 +19,25 @@
         @click="deleteSelected"
         :class="{ 'action-delete-disable': !hasSelected }"
       >
-        <fa-icon icon="trash" :size="15" />
+        <fa-icon icon="trash" :size="16" />
       </mu-button>
+      <mu-dialog
+        class="group-dialog"
+        :title="groupDialogTitle"
+        :overlay-close="false"
+        :open.sync="openGroupDialog"
+      >
+        <mu-text-field ref="groupNameInputRef" full-width v-model="form.groupName"></mu-text-field>
+        <MoGroupNameSelector @select="onSelectGroup"></MoGroupNameSelector>
+        <mu-button slot="actions" flat @click="onCancelGroup()">取消</mu-button>
+        <mu-button
+          slot="actions"
+          :disabled="!isSaveGroupEnable"
+          flat
+          color="primary"
+          @click="onSaveGroup()"
+        >确定</mu-button>
+      </mu-dialog>
       <MoHeaderMenu>
         <mu-button slot="default" icon class="menu-delete-all">
           <fa-icon icon="ellipsis-v" />
@@ -52,8 +69,11 @@
               class="feed-checkbox"
             ></mu-checkbox>
             <div class="feed-info" @click="onFeedClick(feed)">
-              <div class="feed-title">{{ feed.title || feed.id }}</div>
-              <div class="feed-detail">
+              <div class="feed-info-row1">
+                <div class="feed-title">{{ feed.title || feed.id }}</div>
+                <div class="feed-group-name">{{ getFeedGroupName(feed) }}</div>
+              </div>
+              <div class="feed-info-row2">
                 <div class="feed-date">{{ formatFeedDate(feed) }}</div>
                 <div class="feed-total-storys">
                   <span>{{ totalStorys(feed) }} 篇</span>
@@ -75,10 +95,12 @@ import { antGold } from '@/plugin/common'
 import MoBackHeader from '@/components/MoBackHeader.vue'
 import MoLayout from '@/components/MoLayout.vue'
 import MoHeaderMenu from '@/components/MoHeaderMenu.vue'
-import { GROUP_MUSHROOM } from '../plugin/feedGroupHelper'
+import MoGroupNameSelector from '@/components/MoGroupNameSelector.vue'
+
+import { GROUP_MUSHROOM, getGroupId, getGroupName } from '../plugin/feedGroupHelper'
 
 export default {
-  components: { MoBackHeader, MoLayout, MoHeaderMenu },
+  components: { MoBackHeader, MoLayout, MoHeaderMenu, MoGroupNameSelector },
   props: {
     vid: {
       type: String,
@@ -90,6 +112,10 @@ export default {
       checkboxColor: antGold,
       selectedFeedIds: [],
       closedGroups: {},
+      openGroupDialog: false,
+      form: {
+        groupName: null,
+      },
     }
   },
   computed: {
@@ -173,6 +199,13 @@ export default {
     hasSelected() {
       return this.selectedFeedIds.length > 0
     },
+    groupDialogTitle() {
+      let count = this.selectedFeedIds.length
+      return `设置 ${count} 个订阅的分组`
+    },
+    isSaveGroupEnable() {
+      return !_.isEmpty(this.form.groupName)
+    },
   },
   mounted() {
     this.$API.feed.sync().then(() => {
@@ -200,7 +233,35 @@ export default {
       if (!this.hasSelected) {
         return
       }
-      this.$toast.success({ message: '分组成功', time: 10000 })
+      this.openGroupDialog = true
+      setTimeout(() => {
+        let inputRef = this.$refs.groupNameInputRef
+        if (!_.isNil(inputRef)) {
+          inputRef.focus()
+        }
+      }, 300)
+    },
+    onSelectGroup(name) {
+      this.form.groupName = name
+    },
+    onCancelGroup() {
+      this.openGroupDialog = false
+      this.form.groupName = null
+    },
+    async onSaveGroup() {
+      if (!this.isSaveGroupEnable) {
+        return
+      }
+      let group = getGroupId(this.form.groupName)
+      try {
+        await this.$API.feed.setAllGroup({ feedIds: this.selectedFeedIds, group: group })
+        this.selectedFeedIds = []
+        this.$toast.success({ message: '设置订阅分组成功!' })
+      } catch (ex) {
+        this.$toast.error(`设置订阅分组失败: ${ex.message}`)
+      }
+      this.openGroupDialog = false
+      this.form.groupName = null
     },
     deleteSelected() {
       if (!this.hasSelected) {
@@ -213,10 +274,15 @@ export default {
       }).then(({ result }) => {
         if (result) {
           let message = `成功删除 ${this.selectedFeedIds.length} 个订阅!`
-          this.$API.feed.deleteAll({ feedIds: this.selectedFeedIds }).then(() => {
-            this.selectedFeedIds = []
-            this.$toast.success({ message, time: 5000 })
-          })
+          this.$API.feed
+            .deleteAll({ feedIds: this.selectedFeedIds })
+            .then(() => {
+              this.selectedFeedIds = []
+              this.$toast.success({ message })
+            })
+            .catch(ex => {
+              this.$toast.error(`删除订阅失败: ${ex.message}`)
+            })
         }
       })
     },
@@ -245,6 +311,9 @@ export default {
     },
     onToggleGroup(name) {
       Vue.set(this.closedGroups, name, !this.closedGroups[name])
+    },
+    getFeedGroupName(feed) {
+      return getGroupName(this.$API.feed.groupOf(feed))
     },
     totalStorys(feed) {
       if (feed.total_storys > 999) {
@@ -339,7 +408,8 @@ export default {
   cursor: pointer;
 }
 
-.feed-detail {
+.feed-info-row1,
+.feed-info-row2 {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -351,6 +421,13 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: 15 * @pr;
+}
+
+.feed-group-name {
+  font-size: 12 * @pr;
+  flex-shrink: 0;
+  margin-left: 4 * @pr;
+  color: lighten(@antInk, 10%);
 }
 
 .feed-total-storys {
@@ -402,6 +479,16 @@ export default {
 .acction-group /deep/ .mu-button-wrapper,
 .action-delete /deep/ .mu-button-wrapper {
   padding: 0 12 * @pr;
+}
+
+.group-dialog /deep/ .mu-dialog {
+  max-width: 90%;
+}
+
+@media only screen and (min-width: 850px) {
+  .group-dialog /deep/ .mu-dialog {
+    max-width: 600 * @pr;
+  }
 }
 
 .menu-delete-all {
