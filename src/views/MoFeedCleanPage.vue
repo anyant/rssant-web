@@ -22,33 +22,42 @@
         </mu-list>
       </MoHeaderMenu>
     </MoBackHeader>
-    <div class="feed-list" ref="mainRef">
-      <div v-for="feed in feedList" :key="feed.id" class="feed-item">
-        <mu-checkbox
-          v-model="selectedFeedIds"
-          :value="feed.id"
-          :ripple="false"
-          :color="checkboxColor"
-          class="feed-checkbox"
-        ></mu-checkbox>
-        <div class="feed-info" @click="onFeedClick(feed)">
-          <div class="feed-title">{{ feed.title }}</div>
-          <div class="feed-detail">
-            <div class="feed-date">{{ formatFeedDate(feed) }}</div>
-            <div class="feed-total-storys">
-              <span>{{ totalStorys(feed) }}#</span>
-            </div>
-            <div class="feed-dryness">
-              <span>{{ (feed.dryness / 10).toFixed(0) }}</span>
-              <mu-icon class="feed-dryness-icon" value="wb_sunny" />
-            </div>
+    <div class="main" ref="mainRef">
+      <div v-for="group in feedGroups" :key="group.name" class="feed-group">
+        <div class="group-title" @click="onToggleGroup(group.name)">
+          <div class="group-name">{{ group.name }}</div>
+          <div class="group-info">
+            <span class="group-size">{{ group.feeds.length }}</span>
+            <fa-icon v-if="isGroupOpen(group.name)" class="group-icon" icon="angle-down" />
+            <fa-icon v-else class="group-icon" icon="angle-right" />
           </div>
         </div>
+        <template v-if="isGroupOpen(group.name)">
+          <div v-for="feed in group.feeds" :key="feed.id" class="feed-item">
+            <mu-checkbox
+              v-model="selectedFeedIds"
+              :value="feed.id"
+              :ripple="false"
+              :color="checkboxColor"
+              class="feed-checkbox"
+            ></mu-checkbox>
+            <div class="feed-info" @click="onFeedClick(feed)">
+              <div class="feed-title">{{ feed.title || feed.id }}</div>
+              <div class="feed-detail">
+                <div class="feed-date">{{ formatFeedDate(feed) }}</div>
+                <div class="feed-total-storys">
+                  <span>{{ totalStorys(feed) }} 篇</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
       </div>
     </div>
   </MoLayout>
 </template>
 <script>
+import Vue from 'vue'
 import _ from 'lodash'
 import { differenceInDays } from 'date-fns'
 import { formatDate } from '@/plugin/datefmt'
@@ -56,6 +65,7 @@ import { antGold } from '@/plugin/common'
 import MoBackHeader from '@/components/MoBackHeader.vue'
 import MoLayout from '@/components/MoLayout.vue'
 import MoHeaderMenu from '@/components/MoHeaderMenu.vue'
+import { GROUP_MUSHROOM } from '../plugin/feedGroupHelper'
 
 export default {
   components: { MoBackHeader, MoLayout, MoHeaderMenu },
@@ -69,32 +79,86 @@ export default {
     return {
       checkboxColor: antGold,
       selectedFeedIds: [],
+      closedGroups: {},
     }
   },
   computed: {
-    feedList() {
+    feedGroups() {
+      const feedAPI = this.$API.feed
+      let trashFeeds = []
+      let zombyFeeds = []
+      let soloFeeds = []
+      let mushroomFeeds = []
+      let customGroups = []
+
+      function isTrashFeed(feed) {
+        return feed.total_storys <= 0 || _.isEmpty(feed.dt_latest_story_published)
+      }
+
       let now = new Date()
-      let badFeeds = []
-      let goodFeeds = []
-      this.$API.feed.feedList.forEach(feed => {
-        if (feed.total_storys <= 0) {
-          badFeeds.push(feed)
-          return
+      function isZombyFeed(feed) {
+        let dt_latest = new Date(feed.dt_latest_story_published)
+        return differenceInDays(now, dt_latest) > 365
+      }
+
+      function isMushroomFeed(feed) {
+        return feedAPI.groupOf(feed) === GROUP_MUSHROOM
+      }
+
+      function sortFeeds(feeds) {
+        return _.sortBy(feeds, [feed => new Date(feed.dt_latest_story_published), 'id'])
+      }
+
+      feedAPI.homeFeedList.forEach(feed => {
+        if (isTrashFeed(feed)) {
+          trashFeeds.push(feed)
+        } else if (isZombyFeed(feed)) {
+          zombyFeeds.push(feed)
+        } else if (isMushroomFeed(feed)) {
+          mushroomFeeds.push(feed)
         } else {
-          if (_.isEmpty(feed.dt_latest_story_published)) {
-            badFeeds.push(feed)
-            return
-          }
-          let dt_latest = new Date(feed.dt_latest_story_published)
-          if (differenceInDays(now, dt_latest) > 365) {
-            badFeeds.push(feed)
-            return
-          }
+          soloFeeds.push(feed)
         }
-        goodFeeds.push(feed)
       })
-      let feeds = this.sortFeeds(badFeeds).concat(this.sortFeeds(goodFeeds))
-      return feeds
+
+      feedAPI.feedGroups.forEach(group => {
+        let groupFeeds = []
+        feedAPI.feedListOfGroup(group).forEach(feed => {
+          if (isTrashFeed(feed)) {
+            trashFeeds.push(feed)
+          } else if (isZombyFeed(feed)) {
+            zombyFeeds.push(feed)
+          } else {
+            groupFeeds.push(feed)
+          }
+        })
+        customGroups.push({
+          name: `分组:${group.name}`,
+          feeds: sortFeeds(groupFeeds),
+        })
+      })
+
+      let feedGroups = [
+        {
+          name: '无效订阅',
+          feeds: sortFeeds(trashFeeds),
+        },
+        {
+          name: '久未更新',
+          feeds: sortFeeds(zombyFeeds),
+        },
+        {
+          name: '无分组',
+          feeds: sortFeeds(soloFeeds),
+        },
+        {
+          name: '品读',
+          feeds: sortFeeds(mushroomFeeds),
+        },
+      ]
+      customGroups.forEach(x => feedGroups.push(x))
+
+      return feedGroups
     },
     canDelete() {
       return this.selectedFeedIds.length > 0
@@ -107,17 +171,21 @@ export default {
       if (!_.isNil(selectedFeedIds)) {
         selectedFeedIds.forEach(x => this.selectedFeedIds.push(x))
       }
+      let closedGroups = this.$pageState.get('closedGroups')
+      if (!_.isNil(closedGroups)) {
+        _.forEach(_.toPairs(closedGroups), ([key, value]) => {
+          Vue.set(this.closedGroups, key, value)
+        })
+      }
     })
   },
   savePageState() {
     this.$pageState.saveScrollTop({ el: this.$refs.mainRef })
     this.$pageState.set('selectedFeedIds', this.selectedFeedIds)
+    this.$pageState.set('closedGroups', this.closedGroups)
     this.$pageState.commit()
   },
   methods: {
-    sortFeeds(feeds) {
-      return _.sortBy(feeds, ['dryness', 'total_storys', 'id'])
-    },
     deleteSelected() {
       if (!this.canDelete) {
         return
@@ -148,9 +216,15 @@ export default {
     onFeedClick(feed) {
       this.$router.push(`/feed?id=${feed.id}`)
     },
+    isGroupOpen(name) {
+      return !this.closedGroups[name]
+    },
+    onToggleGroup(name) {
+      Vue.set(this.closedGroups, name, !this.closedGroups[name])
+    },
     totalStorys(feed) {
       if (feed.total_storys > 999) {
-        return '999+'
+        return '999'
       } else {
         return `${feed.total_storys}`
       }
@@ -177,17 +251,50 @@ export default {
 <style lang="less" scoped>
 @import '~@/styles/common';
 
-.feed-list {
-  padding-bottom: 8 * @pr;
+.group-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 32 * @pr;
+  font-size: 14 * @pr;
+  padding-left: 14 * @pr;
+  padding-right: 16 * @pr;
+  background: lighten(@antBlue, 30%);
+  border-top: 1px solid @antBackWhite;
+  cursor: pointer;
+}
+
+.group-name {
+  color: darken(@antInk, 10%);
+}
+
+.group-info {
+  display: flex;
+  align-items: center;
+  color: @antTextGrey;
+}
+
+.group-size {
+  margin-right: 16 * @pr;
+  font-size: 12 * @pr;
+}
+
+.group-icon {
+  width: 12 * @pr;
+  margin-right: 6 * @pr;
 }
 
 .feed-item {
-  margin-top: 8 * @pr;
+  padding-top: 4 * @pr;
+  padding-bottom: 4 * @pr;
+  &:hover {
+    background: lighten(@antGold, 48%);
+  }
 }
 
 .feed-item {
   position: relative;
-  height: 48 * @pr;
+  height: 56 * @pr;
   padding-left: 16 * @pr;
   padding-right: 16 * @pr;
   display: flex;
@@ -197,12 +304,12 @@ export default {
 
 .feed-checkbox {
   position: relative;
-  left: -4px;
+  left: -4 * @pr;
 }
 
 .feed-info {
   flex: 1;
-  margin-left: 4px;
+  margin-left: 4 * @pr;
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: pointer;
@@ -222,8 +329,7 @@ export default {
   font-size: 15 * @pr;
 }
 
-.feed-total-storys,
-.feed-dryness {
+.feed-total-storys {
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -236,11 +342,6 @@ export default {
   overflow: hidden;
   text-overflow: clip;
   color: @antTextGrey;
-
-  .feed-dryness-icon {
-    font-size: 14 * @pr;
-    margin-left: 1px;
-  }
 }
 
 .feed-date {
@@ -256,15 +357,15 @@ export default {
 
 .action-delete {
   position: relative;
-  margin-left: 4px;
-  margin-right: 4px;
+  margin-left: 4 * @pr;
+  margin-right: 4 * @pr;
   right: -16 * @pr;
   height: 32 * @pr;
   font-size: 14 * @pr;
   color: @antGold;
   min-width: auto;
   .action-delete-info {
-    margin-left: 4px;
+    margin-left: 4 * @pr;
     font-weight: bold;
   }
 }
@@ -274,7 +375,7 @@ export default {
 }
 
 .action-delete /deep/ .mu-button-wrapper {
-  padding: 0 12px;
+  padding: 0 12 * @pr;
 }
 
 .menu-delete-all {

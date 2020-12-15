@@ -11,8 +11,6 @@ import * as fab from '@fortawesome/free-brands-svg-icons'
  * register icons
  */
 faLibrary.add(fas.faAngleDoubleDown)
-faLibrary.add(fas.faLeaf)
-faLibrary.add(fas.faTrophy)
 faLibrary.add(fas.faCheck)
 faLibrary.add(fas.faPlus)
 faLibrary.add(fas.faBars)
@@ -29,6 +27,7 @@ faLibrary.add(fab.faGithub)
 faLibrary.add(fas.faEdit)
 faLibrary.add(fas.faSave)
 faLibrary.add(fas.faAngleRight)
+faLibrary.add(fas.faAngleDown)
 
 /**
  * solid icons:
