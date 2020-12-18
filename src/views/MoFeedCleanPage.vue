@@ -122,6 +122,7 @@ export default {
       selectedFeedIds: [],
       closedGroups: {},
       openGroupDialog: false,
+      isSaveGroupLoading: false,
       form: {
         groupName: null,
       },
@@ -244,6 +245,7 @@ export default {
         return
       }
       this.openGroupDialog = true
+      this.isSaveGroupLoading = false
     },
     onSelectGroup(name) {
       this.form.groupName = name
@@ -251,11 +253,13 @@ export default {
     onCancelGroup() {
       this.openGroupDialog = false
       this.form.groupName = null
+      this.isSaveGroupLoading = false
     },
     async onSaveGroup() {
-      if (!this.isSaveGroupEnable) {
+      if (!this.isSaveGroupEnable || this.isSaveGroupLoading) {
         return
       }
+      this.isSaveGroupLoading = true
       let group = getGroupId(this.form.groupName)
       try {
         await this.$API.feed.setAllGroup({ feedIds: this.selectedFeedIds, group: group })
@@ -266,6 +270,7 @@ export default {
       }
       this.openGroupDialog = false
       this.form.groupName = null
+      this.isSaveGroupLoading = false
     },
     deleteSelected() {
       if (!this.hasSelected) {

@@ -36,6 +36,7 @@ export default {
     return {
       antBlue,
       isEdit: false,
+      isSaveLoading: false,
       editValue: null,
     }
   },
@@ -46,10 +47,16 @@ export default {
     onEdit() {
       this.editValue = this.value
       this.isEdit = true
+      this.isSaveLoading = false
     },
     onSave() {
+      if (this.isSaveLoading) {
+        return
+      }
+      this.isSaveLoading = true
       let done = () => {
         this.isEdit = false
+        this.isSaveLoading = false
       }
       if (this.editValue !== this.value) {
         this.$emit('save', {
