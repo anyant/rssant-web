@@ -263,9 +263,9 @@ export default {
 .story-preview-summary {
   position: relative;
   padding-top: 8 * @pr;
-  max-height: 320 * @pr;
+  max-height: (14 * 22 + 8) * @pr;
   overflow: hidden;
-  line-height: 1.5;
+  line-height: 22 * @pr;
   font-size: 15 * @pr;
 }
 

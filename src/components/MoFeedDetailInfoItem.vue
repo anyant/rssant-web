@@ -110,12 +110,20 @@ export default {
 
 .item-value,
 .item-link {
-  font-size: 15 * @pr;
   max-height: 4 * 22 * @pr;
 }
 
 .item-link {
   color: @antBlue;
+}
+
+.item-value,
+.item-link,
+.item-input {
+  font-size: 15 * @pr;
+  min-height: 22 * @pr;
+  line-height: 22 * @pr;
+  border-bottom: 1 * @pr solid transparent;
 }
 
 .item-input {
@@ -132,11 +140,7 @@ export default {
 
 .item-input {
   width: 100%;
-  height: 24 * @pr;
-  line-height: 1.1;
-  font-size: 15 * @pr;
   color: @antTextSemi;
-  vertical-align: middle;
   border-bottom: 1 * @pr solid @antBlue;
 }
 
