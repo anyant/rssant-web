@@ -104,6 +104,10 @@ import MoGroupNameSelector from '@/components/MoGroupNameSelector.vue'
 
 import { GROUP_MUSHROOM, getGroupId, getGroupName } from '../plugin/feedGroupHelper'
 
+function isBlank(value) {
+  return _.isNil(value) || value === ''
+}
+
 export default {
   components: { MoBackHeader, MoLayout, MoHeaderMenu, MoGroupNameSelector },
   props: {
@@ -133,7 +137,8 @@ export default {
       let customGroups = []
 
       function isTrashFeed(feed) {
-        return feed.total_storys <= 0 || _.isEmpty(feed.dt_latest_story_published)
+        let noUpdate = isBlank(feed.dt_latest_story_published)
+        return feed.total_storys <= 0 || noUpdate
       }
 
       let now = new Date()
@@ -209,7 +214,7 @@ export default {
       return `设置 ${count} 个订阅的分组`
     },
     isSaveGroupEnable() {
-      return this.hasSelected && !_.isEmpty(this.form.groupName)
+      return this.hasSelected && !isBlank(this.form.groupName)
     },
   },
   mounted() {
@@ -324,14 +329,14 @@ export default {
     formatFeedDate(feed) {
       let dt_first = feed.dt_first_story_published
       let dt_latest = feed.dt_latest_story_published
-      dt_first = _.isEmpty(dt_first) ? '' : formatDate(dt_first)
-      dt_latest = _.isEmpty(dt_latest) ? '' : formatDate(dt_latest)
-      if (_.isEmpty(dt_first) && _.isEmpty(dt_latest)) {
+      dt_first = isBlank(dt_first) ? '' : formatDate(dt_first)
+      dt_latest = isBlank(dt_latest) ? '' : formatDate(dt_latest)
+      if (isBlank(dt_first) && isBlank(dt_latest)) {
         return '未知时间'
-      } else if (_.isEmpty(dt_first) && !_.isEmpty(dt_latest)) {
+      } else if (isBlank(dt_first) && !isBlank(dt_latest)) {
+        return `未知时间 ~ ${dt_latest}`
+      } else if (!isBlank(dt_first) && isBlank(dt_latest)) {
         return `${dt_first} ~ 未知时间`
-      } else if (!_.isEmpty(dt_first) && _.isEmpty(dt_latest)) {
-        return `很久以前 ~ ${dt_latest}`
       } else {
         return `${dt_first} ~ ${dt_latest}`
       }
