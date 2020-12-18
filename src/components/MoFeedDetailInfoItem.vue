@@ -130,6 +130,7 @@ export default {
   appearance: none;
   outline: none;
   border: none;
+  border-radius: 0;
   background: none;
   box-shadow: none;
   resize: none;
