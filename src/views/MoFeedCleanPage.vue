@@ -27,7 +27,12 @@
         :overlay-close="false"
         :open.sync="openGroupDialog"
       >
-        <mu-text-field ref="groupNameInputRef" full-width v-model="form.groupName"></mu-text-field>
+        <mu-text-field
+          ref="groupNameInputRef"
+          full-width
+          v-model="form.groupName"
+          placeholder="请输入或选择分组"
+        ></mu-text-field>
         <MoGroupNameSelector class="group-name-selector" @select="onSelectGroup"></MoGroupNameSelector>
         <mu-button slot="actions" flat @click="onCancelGroup()">取消</mu-button>
         <mu-button
@@ -234,12 +239,6 @@ export default {
         return
       }
       this.openGroupDialog = true
-      setTimeout(() => {
-        let inputRef = this.$refs.groupNameInputRef
-        if (!_.isNil(inputRef)) {
-          inputRef.focus()
-        }
-      }, 300)
     },
     onSelectGroup(name) {
       this.form.groupName = name
