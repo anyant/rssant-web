@@ -28,7 +28,7 @@
         :open.sync="openGroupDialog"
       >
         <mu-text-field ref="groupNameInputRef" full-width v-model="form.groupName"></mu-text-field>
-        <MoGroupNameSelector @select="onSelectGroup"></MoGroupNameSelector>
+        <MoGroupNameSelector class="group-name-selector" @select="onSelectGroup"></MoGroupNameSelector>
         <mu-button slot="actions" flat @click="onCancelGroup()">取消</mu-button>
         <mu-button
           slot="actions"
@@ -421,6 +421,10 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: 15 * @pr;
+}
+
+.group-name-selector {
+  margin-right: -16 * @pr;
 }
 
 .feed-group-name {
