@@ -486,7 +486,9 @@ export default {
 }
 
 .group-dialog /deep/ .mu-dialog {
+  margin-top: -32 * @pr;
   max-width: 90%;
+  max-width: calc(100vw - 30 * @pr);
 }
 
 @media only screen and (min-width: 850px) {
