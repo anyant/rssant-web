@@ -335,6 +335,9 @@ export default {
       let numFeedCreations = _.size(state.creations)
       return numFeeds <= 0 && numFeedCreations <= 0
     },
+    numFeeds(state) {
+      return _.size(state.feeds)
+    },
     creations(state) {
       return _.reverse(_.sortBy(_.values(state.creations), ['dt_created', 'status']))
     },

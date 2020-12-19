@@ -174,7 +174,7 @@ export default {
       return this.$API.feed.homeFeedList
     },
     isEmpty() {
-      return _.isNil(this.feedList) || this.feedList.length <= 0
+      return this.$API.feed.numFeeds <= 0
     },
     showHeader() {
       return this.isReady || !this.$LAYOUT.hasBoard
