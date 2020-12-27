@@ -234,13 +234,14 @@ const API = {
     setAllReaded({ ids } = {}) {
       return client.put(`/feed/all/readed`, { ids })
     },
-    import({ text }) {
-      return client.post('/feed/import', { text })
+    import({ text, group }) {
+      return client.post('/feed/import', { text, group })
     },
-    importFile({ file }) {
+    importFile({ file, group }) {
       var formData = new FormData()
       formData.append('file', file)
       return client.post(`/feed/import/file`, formData, {
+        params: { group },
         headers: {
           'Content-Type': 'multipart/form-data',
         },

@@ -4,22 +4,17 @@
       <template v-slot:title>{{ title }}</template>
     </MoBackHeader>
     <div class="creation-info" v-if="creation">
-      <div class="item">
-        <span class="item-name">URL</span>
-        <span class="item-value">{{ creation.url }}</span>
-      </div>
-      <div class="item">
-        <span class="item-name">状态</span>
-        <span class="item-value">{{ creation.status }}</span>
-      </div>
-      <div class="item" v-if="feedLink">
-        <span class="item-name">订阅</span>
-        <router-link class="item-link" :to="feedLink">{{ feedTitle }}</router-link>
-      </div>
-      <div class="item">
-        <span class="item-name">创建时间</span>
-        <span class="item-value">{{ dateText }}</span>
-      </div>
+      <MoFeedDetailInfoItem name="URL" :value="creation.url" />
+      <MoFeedDetailInfoItem name="状态" :value="creation.status" />
+      <MoFeedDetailInfoItem name="分组" :value="groupName" />
+      <MoFeedDetailInfoItem
+        v-if="feedLink"
+        name="订阅"
+        type="router-link"
+        :link="feedLink"
+        :value="feedTitle"
+      />
+      <MoFeedDetailInfoItem name="创建时间" :value="dateText" />
       <div class="message-title">
         <div class="message-title-line"></div>
         <span class="message-title-text">日志信息</span>
@@ -33,10 +28,12 @@
 import _ from 'lodash'
 import MoBackHeader from '@/components/MoBackHeader'
 import MoLayout from '@/components/MoLayout'
+import MoFeedDetailInfoItem from '@/components/MoFeedDetailInfoItem.vue'
 import { formatFullDateFriendly } from '@/plugin/datefmt'
+import { getGroupName } from '@/plugin/feedGroupHelper'
 
 export default {
-  components: { MoBackHeader, MoLayout },
+  components: { MoBackHeader, MoLayout, MoFeedDetailInfoItem },
   data() {
     return {}
   },
@@ -53,6 +50,12 @@ export default {
       } else {
         return this.creation.url
       }
+    },
+    groupName() {
+      if (_.isNil(this.creation) || _.isEmpty(this.creation.group)) {
+        return '无'
+      }
+      return getGroupName(this.creation.group)
     },
     dateText() {
       return formatFullDateFriendly(this.creation && this.creation.dt_created)
@@ -104,39 +107,6 @@ export default {
   padding-left: 16 * @pr;
   padding-right: 16 * @pr;
   padding-bottom: 16 * @pr;
-}
-
-.item {
-  display: flex;
-  align-items: center;
-  padding-top: 13 * @pr;
-}
-
-.item-name {
-  flex-shrink: 0;
-  display: inline-block;
-  text-align: right;
-  width: 64 * @pr;
-  margin-right: 24 * @pr;
-  font-size: 15 * @pr;
-}
-
-.item-value,
-.item-link {
-  font-size: 15 * @pr;
-  max-height: 4 * 22 * @pr;
-  overflow: hidden;
-  text-overflow: clip;
-
-  .fa {
-    position: relative;
-    left: 1 * @pr;
-    top: 1 * @pr;
-  }
-}
-
-.item-link {
-  color: @antBlue;
 }
 
 .message {

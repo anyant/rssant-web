@@ -455,12 +455,14 @@ export default {
         localFeeds.clear()
       }
     },
-    async import(DAO, { text }) {
-      let data = await API.feed.import({ text })
+    async import(DAO, { text, group }) {
+      group = group === GROUP_SOLO ? null : group
+      let data = await API.feed.import({ text, group })
       return handleImportedFeedResult(DAO, data)
     },
-    async importFile(DAO, { file }) {
-      let data = await API.feed.importFile({ file })
+    async importFile(DAO, { file, group }) {
+      group = group === GROUP_SOLO ? null : group
+      let data = await API.feed.importFile({ file, group })
       return handleImportedFeedResult(DAO, data)
     },
     exportOPML(DAO, { download } = {}) {

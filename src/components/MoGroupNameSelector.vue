@@ -35,6 +35,7 @@ export default {
     margin-right: 16 * @pr;
     margin-bottom: 8 * @pr;
     padding: 1 * @pr 12 * @pr;
+    font-size: 15 * @pr;
     border: solid 1 * @pr @antBlue;
     border-radius: 14 * @pr;
     cursor: pointer;

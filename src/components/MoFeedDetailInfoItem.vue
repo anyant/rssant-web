@@ -10,7 +10,17 @@
           </span>
         </template>
         <template v-else>
-          <a v-if="type === 'link'" class="item-link" :href="value" target="_blank">{{ value }}</a>
+          <a
+            v-if="type === 'link'"
+            class="item-link"
+            :href="link || value"
+            target="_blank"
+          >{{ value }}</a>
+          <router-link
+            v-else-if="type === 'router-link'"
+            class="item-link"
+            :to="link || value"
+          >{{ value }}</router-link>
           <span v-else class="item-value">{{ value }}</span>
           <span v-if="editable" class="item-button item-button-edit" @click="onEdit()">
             <fa-icon class="item-button-icon" icon="edit" />
@@ -30,6 +40,7 @@ export default {
     name: String,
     type: String,
     value: [Number, String],
+    link: String,
     editable: Boolean,
   },
   data() {
@@ -111,6 +122,7 @@ export default {
 .item-value,
 .item-link {
   max-height: 4 * 22 * @pr;
+  word-break: break-word;
 }
 
 .item-link {

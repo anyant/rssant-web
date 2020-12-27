@@ -21,28 +21,11 @@
       >
         <fa-icon icon="trash" :size="16" />
       </mu-button>
-      <mu-dialog
-        class="group-dialog"
+      <MoGroupNameSelectorDialog
         :title="groupDialogTitle"
-        :overlay-close="false"
         :open.sync="openGroupDialog"
-      >
-        <mu-text-field
-          ref="groupNameInputRef"
-          full-width
-          v-model="form.groupName"
-          placeholder="请输入或选择分组"
-        ></mu-text-field>
-        <MoGroupNameSelector class="group-name-selector" @select="onSelectGroup"></MoGroupNameSelector>
-        <mu-button slot="actions" flat @click="onCancelGroup()">取消</mu-button>
-        <mu-button
-          slot="actions"
-          :disabled="!isSaveGroupEnable"
-          flat
-          color="primary"
-          @click="onSaveGroup()"
-        >确定</mu-button>
-      </mu-dialog>
+        @confirm="onSaveGroup"
+      />
       <MoHeaderMenu>
         <mu-button slot="default" icon class="menu-delete-all">
           <fa-icon icon="ellipsis-v" />
@@ -100,7 +83,7 @@ import { antGold } from '@/plugin/common'
 import MoBackHeader from '@/components/MoBackHeader.vue'
 import MoLayout from '@/components/MoLayout.vue'
 import MoHeaderMenu from '@/components/MoHeaderMenu.vue'
-import MoGroupNameSelector from '@/components/MoGroupNameSelector.vue'
+import MoGroupNameSelectorDialog from '@/components/MoGroupNameSelectorDialog.vue'
 
 import { GROUP_MUSHROOM, getGroupId, getGroupName } from '../plugin/feedGroupHelper'
 
@@ -109,7 +92,7 @@ function isBlank(value) {
 }
 
 export default {
-  components: { MoBackHeader, MoLayout, MoHeaderMenu, MoGroupNameSelector },
+  components: { MoBackHeader, MoLayout, MoHeaderMenu, MoGroupNameSelectorDialog },
   props: {
     vid: {
       type: String,
@@ -122,10 +105,6 @@ export default {
       selectedFeedIds: [],
       closedGroups: {},
       openGroupDialog: false,
-      isSaveGroupLoading: false,
-      form: {
-        groupName: null,
-      },
     }
   },
   computed: {
@@ -214,9 +193,6 @@ export default {
       let count = this.selectedFeedIds.length
       return `设置 ${count} 个订阅的分组`
     },
-    isSaveGroupEnable() {
-      return this.hasSelected && !isBlank(this.form.groupName)
-    },
   },
   mounted() {
     this.$API.feed.sync().then(() => {
@@ -245,32 +221,18 @@ export default {
         return
       }
       this.openGroupDialog = true
-      this.isSaveGroupLoading = false
     },
-    onSelectGroup(name) {
-      this.form.groupName = name
-    },
-    onCancelGroup() {
-      this.openGroupDialog = false
-      this.form.groupName = null
-      this.isSaveGroupLoading = false
-    },
-    async onSaveGroup() {
-      if (!this.isSaveGroupEnable || this.isSaveGroupLoading) {
-        return
-      }
-      this.isSaveGroupLoading = true
-      let group = getGroupId(this.form.groupName)
+    async onSaveGroup({ value, done }) {
+      let group = getGroupId(value)
       try {
         await this.$API.feed.setAllGroup({ feedIds: this.selectedFeedIds, group: group })
         this.selectedFeedIds = []
         this.$toast.success({ message: '设置订阅分组成功!' })
       } catch (ex) {
         this.$toast.error(`设置订阅分组失败: ${ex.message}`)
+      } finally {
+        done()
       }
-      this.openGroupDialog = false
-      this.form.groupName = null
-      this.isSaveGroupLoading = false
     },
     deleteSelected() {
       if (!this.hasSelected) {
@@ -432,10 +394,6 @@ export default {
   font-size: 15 * @pr;
 }
 
-.group-name-selector {
-  margin-right: -16 * @pr;
-}
-
 .feed-group-name {
   font-size: 12 * @pr;
   flex-shrink: 0;
@@ -489,22 +447,9 @@ export default {
   color: @antTextGrey;
 }
 
-.acction-group /deep/ .mu-button-wrapper,
+.action-group /deep/ .mu-button-wrapper,
 .action-delete /deep/ .mu-button-wrapper {
   padding: 0 12 * @pr;
-}
-
-.group-dialog /deep/ .mu-dialog {
-  margin-top: -32 * @pr;
-  width: 600 * @pr;
-  max-width: 90%;
-  max-width: calc(100vw - 30 * @pr);
-}
-
-@media only screen and (min-width: 630*@pr) {
-  .group-dialog /deep/ .mu-dialog {
-    max-width: 600 * @pr;
-  }
 }
 
 .menu-delete-all {

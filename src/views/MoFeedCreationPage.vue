@@ -10,6 +10,11 @@
       >{{ isFromText?'导入文件':'输入链接' }}</mu-button>
     </MoBackHeader>
     <div class="main">
+      <MoGroupNameSelectorDialog
+        :open.sync="openGroupDialog"
+        :value="groupName"
+        @confirm="onSelectGroup"
+      ></MoGroupNameSelectorDialog>
       <transition name="mu-fade-transition">
         <div class="workspace workspace-text" v-if="isFromText" key="workspace-text">
           <mu-text-field
@@ -24,12 +29,18 @@
             :error-text="errorText"
             @focus="onFocus"
           />
-          <div class="button-text-wrapper">
+          <div
+            class="button-text-wrapper"
+            :class="{ 'button-disabled': isSaveDisabled, 'button-loading': isImportLoading }"
+          >
+            <MoFeedCreationGroupButton :group="groupName" @click="()=>this.openGroupDialog=true" />
             <mu-button
               class="button-text-save"
               :color="antBlue"
               @click="onSave"
               :disabled="isSaveDisabled"
+              data-mu-loading-size="24"
+              v-loading="isImportLoading"
             >确定</mu-button>
           </div>
         </div>
@@ -47,14 +58,14 @@
               @change="onImportFileChange"
             />
           </form>
-          <div class="button-file-wrapper">
+          <div class="button-file-wrapper" :class="{ 'button-loading': isImportLoading }">
+            <MoFeedCreationGroupButton :group="groupName" @click="()=>this.openGroupDialog=true" />
             <mu-button
               class="button-file-import"
               :color="antBlue"
-              flat
-              data-mu-loading-size="24"
               @click="onImportClick"
-              v-loading="importFileLoading"
+              data-mu-loading-size="24"
+              v-loading="isImportLoading"
             >导入文件</mu-button>
           </div>
         </div>
@@ -69,12 +80,15 @@ import _ from 'lodash'
 import MoLayout from '@/components/MoLayout'
 import MoBackHeader from '@/components/MoBackHeader'
 import MoCreationList from '@/components/MoCreationList'
+import MoGroupNameSelectorDialog from '@/components/MoGroupNameSelectorDialog.vue'
+import MoFeedCreationGroupButton from '@/components/MoFeedCreationGroupButton.vue'
 
 import { antBlue } from '@/plugin/common'
+import { getGroupId } from '../plugin/feedGroupHelper'
 
 export default {
   name: 'MoFeedCreationPage',
-  components: { MoLayout, MoBackHeader, MoCreationList },
+  components: { MoLayout, MoBackHeader, MoCreationList, MoGroupNameSelectorDialog, MoFeedCreationGroupButton },
   props: {
     vid: {
       type: String,
@@ -89,12 +103,17 @@ export default {
       errorText: null,
       importFile: null,
       importFileTarget: null,
-      importFileLoading: false,
+      isImportLoading: false,
+      openGroupDialog: false,
+      groupName: null,
     }
   },
   computed: {
     isSaveDisabled() {
       return !this.inputText
+    },
+    groupId() {
+      return getGroupId(this.groupName)
     },
   },
   mounted() {
@@ -119,6 +138,10 @@ export default {
     }
   },
   methods: {
+    onSelectGroup({ value, done }) {
+      this.groupName = value
+      done()
+    },
     toggleMode() {
       this.isFromText = !this.isFromText
     },
@@ -170,14 +193,18 @@ export default {
       return this.handleFeedImportedResult({ isImport: true, ...result })
     },
     onSave() {
-      if (this.isSaveDisabled) {
+      if (this.isSaveDisabled || this.isImportLoading) {
         return
       }
+      this.isImportLoading = true
       this.$API.feed
-        .import({ text: this.inputText })
+        .import({ text: this.inputText, group: this.groupId })
         .then(this.onFeedSavedResult.bind(this))
         .catch(error => {
           this.errorText = error.message
+        })
+        .finally(() => {
+          this.isImportLoading = false
         })
     },
     onFocus() {
@@ -203,9 +230,12 @@ export default {
       }
     },
     onImportFile(file) {
-      this.importFileLoading = true
+      if (this.isImportLoading) {
+        return
+      }
+      this.isImportLoading = true
       this.$API.feed
-        .importFile({ file })
+        .importFile({ file, group: this.groupId })
         .then(this.onFeedImportedResult.bind(this))
         .catch(error => {
           this.$toast.error({
@@ -214,7 +244,7 @@ export default {
           })
         })
         .finally(() => {
-          this.importFileLoading = false
+          this.isImportLoading = false
         })
     },
   },
@@ -280,14 +310,20 @@ export default {
   box-shadow: none;
 }
 
-.button-file-import {
-  border: solid 1px @antBlue;
+.button-disabled {
+  .feed-creation-group-button {
+    border-color: mix(@antBlue, @antBackWhite, 80%);
+  }
+  .button-text-save {
+    background: mix(@antBlue, @antBackWhite, 80%);
+    color: @antTextWhite;
+  }
 }
 
-.button-text-save.disabled {
-  background: @antBlue;
-  color: #ffffff;
-  opacity: 0.8;
+.button-loading {
+  .feed-creation-group-button {
+    opacity: 0.2;
+  }
 }
 
 .import-file-info {
