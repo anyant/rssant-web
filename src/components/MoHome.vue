@@ -270,7 +270,7 @@ export default {
       }
     },
     setAllReaded() {
-      let feedIds = this.feedList.map(x => x.id)
+      let feedIds = this.$API.feed.feedIds
       this.$API.feed.setAllReaded({ feedIds })
     },
     isReaded(story) {

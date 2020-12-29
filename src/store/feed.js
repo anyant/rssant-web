@@ -338,6 +338,9 @@ export default {
     numFeeds(state) {
       return _.size(state.feeds)
     },
+    feedIds(state) {
+      return _.keys(state.feeds)
+    },
     creations(state) {
       return _.reverse(_.sortBy(_.values(state.creations), ['dt_created', 'status']))
     },
