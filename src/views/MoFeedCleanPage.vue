@@ -434,12 +434,16 @@ export default {
   margin-right: 4 * @pr;
   width: 48 * @pr;
   height: 32 * @pr;
-  color: @antGold;
   min-width: auto;
 }
 
 .action-group {
+  color: @antBlue;
   margin-right: 12 * @pr;
+}
+
+.action-delete {
+  color: @antGold;
 }
 
 .action-group-disable,
