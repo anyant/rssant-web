@@ -26,16 +26,6 @@
         :open.sync="openGroupDialog"
         @confirm="onSaveGroup"
       />
-      <MoHeaderMenu>
-        <mu-button slot="default" icon class="menu-delete-all">
-          <fa-icon icon="ellipsis-v" />
-        </mu-button>
-        <mu-list slot="content">
-          <mu-list-item button @click="deleteAllFeed">
-            <mu-list-item-title>删除全部</mu-list-item-title>
-          </mu-list-item>
-        </mu-list>
-      </MoHeaderMenu>
     </MoBackHeader>
     <div class="main" ref="mainRef">
       <div v-for="group in feedGroups" :key="group.name" class="feed-group">
@@ -90,7 +80,6 @@ import { formatDate } from '@/plugin/datefmt'
 import { antGold, antInk } from '@/plugin/common'
 import MoBackHeader from '@/components/MoBackHeader.vue'
 import MoLayout from '@/components/MoLayout.vue'
-import MoHeaderMenu from '@/components/MoHeaderMenu.vue'
 import MoGroupNameSelectorDialog from '@/components/MoGroupNameSelectorDialog.vue'
 
 import { GROUP_MUSHROOM, getGroupId, getGroupName } from '../plugin/feedGroupHelper'
@@ -100,7 +89,7 @@ function isBlank(value) {
 }
 
 export default {
-  components: { MoBackHeader, MoLayout, MoHeaderMenu, MoGroupNameSelectorDialog },
+  components: { MoBackHeader, MoLayout, MoGroupNameSelectorDialog },
   props: {
     vid: {
       type: String,
@@ -321,23 +310,6 @@ export default {
         }
       })
     },
-    deleteAllFeed() {
-      this.$confirm(`要删除你的全部订阅吗？此操作不可恢复！`, '危险操作', {
-        type: 'warning',
-        okLabel: '删除全部订阅',
-      }).then(({ result }) => {
-        if (result) {
-          this.$API.feed
-            .deleteAll()
-            .then(() => {
-              this.$toast.success('删除成功')
-            })
-            .catch(error => {
-              this.$toast.message('删除失败: ' + error.message)
-            })
-        }
-      })
-    },
     onFeedClick(feed) {
       this.$router.push(`/feed?id=${feed.id}`)
     },
@@ -507,6 +479,7 @@ export default {
 .action-group,
 .action-delete {
   position: relative;
+  right: -16 * @pr;
   margin-left: 4 * @pr;
   margin-right: 4 * @pr;
   width: 48 * @pr;
@@ -516,11 +489,11 @@ export default {
 
 .action-group {
   color: @antBlue;
-  margin-right: 12 * @pr;
+  margin-right: 16 * @pr;
 }
 
 .action-delete {
-  color: @antGold;
+  color: @antTextSemi;
 }
 
 .action-group-disable,
@@ -531,13 +504,5 @@ export default {
 .action-group /deep/ .mu-button-wrapper,
 .action-delete /deep/ .mu-button-wrapper {
   padding: 0 12 * @pr;
-}
-
-.menu-delete-all {
-  position: relative;
-  width: 32 * @pr;
-  height: 32 * @pr;
-  margin-right: -4 * @pr;
-  margin-left: 16 * @pr;
 }
 </style>
