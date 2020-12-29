@@ -2,7 +2,7 @@
   <MoLayout grey header>
     <MoBackHeader border>
       <template v-slot:title>
-        <template v-if="!hasSelected">整理订阅</template>
+        <template v-if="!hasSelected">整理订阅 #{{ numFeeds }}</template>
         <template v-else>选中 {{ selectedFeedIds.length }} 项</template>
       </template>
       <mu-button
@@ -39,10 +39,18 @@
     </MoBackHeader>
     <div class="main" ref="mainRef">
       <div v-for="group in feedGroups" :key="group.name" class="feed-group">
-        <div class="group-title" @click="onToggleGroup(group.name)">
-          <div class="group-name">{{ group.name }}</div>
-          <div class="group-info">
-            <span class="group-size">{{ group.feeds.length }}</span>
+        <div class="group-title">
+          <mu-checkbox
+            class="group-checkbox"
+            @change="onCheckGroup(group)"
+            :ripple="false"
+            :input-value="isGroupHasCheccked(group)"
+            :checked-icon="isGroupAllChecked(group) ? null : 'indeterminate_check_box'"
+            :color="groupCheckboxColor"
+          ></mu-checkbox>
+          <div class="group-name" @click="onToggleGroup(group.name)">{{ group.name }}</div>
+          <div class="group-info" @click="onToggleGroup(group.name)">
+            <span class="group-size">{{ sizeOfGroup(group) }}</span>
             <fa-icon v-if="isGroupOpen(group.name)" class="group-icon" icon="angle-down" />
             <fa-icon v-else class="group-icon" icon="angle-right" />
           </div>
@@ -53,7 +61,7 @@
               v-model="selectedFeedIds"
               :value="feed.id"
               :ripple="false"
-              :color="checkboxColor"
+              :color="feedCheckboxColor"
               class="feed-checkbox"
             ></mu-checkbox>
             <div class="feed-info" @click="onFeedClick(feed)">
@@ -79,7 +87,7 @@ import Vue from 'vue'
 import _ from 'lodash'
 import { differenceInDays } from 'date-fns'
 import { formatDate } from '@/plugin/datefmt'
-import { antGold } from '@/plugin/common'
+import { antGold, antInk } from '@/plugin/common'
 import MoBackHeader from '@/components/MoBackHeader.vue'
 import MoLayout from '@/components/MoLayout.vue'
 import MoHeaderMenu from '@/components/MoHeaderMenu.vue'
@@ -101,13 +109,17 @@ export default {
   },
   data() {
     return {
-      checkboxColor: antGold,
+      groupCheckboxColor: antInk,
+      feedCheckboxColor: antGold,
       selectedFeedIds: [],
       closedGroups: {},
       openGroupDialog: false,
     }
   },
   computed: {
+    numFeeds() {
+      return this.$API.feed.numFeeds
+    },
     feedGroups() {
       const feedAPI = this.$API.feed
       let trashFeeds = []
@@ -184,6 +196,7 @@ export default {
       ]
       customGroups.forEach(x => feedGroups.push(x))
 
+      feedGroups = _.filter(feedGroups, group => group.feeds.length > 0)
       return feedGroups
     },
     hasSelected() {
@@ -192,6 +205,43 @@ export default {
     groupDialogTitle() {
       let count = this.selectedFeedIds.length
       return `设置 ${count} 个订阅的分组`
+    },
+    selectedFeedIdMap() {
+      let selected = {}
+      this.selectedFeedIds.forEach(x => (selected[x] = true))
+      return selected
+    },
+    isGroupHasCheccked() {
+      return group => {
+        for (let feed of group.feeds) {
+          if (this.selectedFeedIdMap[feed.id]) {
+            return true
+          }
+        }
+        return false
+      }
+    },
+    isGroupAllChecked() {
+      return group => {
+        for (let feed of group.feeds) {
+          if (!this.selectedFeedIdMap[feed.id]) {
+            return false
+          }
+        }
+        return true
+      }
+    },
+    sizeOfGroup() {
+      return group => {
+        let total = group.feeds.length
+        let numSelected = 0
+        for (let feed of group.feeds) {
+          if (this.selectedFeedIdMap[feed.id]) {
+            numSelected += 1
+          }
+        }
+        return numSelected > 0 ? `${numSelected} / ${total}` : `${total}`
+      }
     },
   },
   mounted() {
@@ -216,6 +266,20 @@ export default {
     this.$pageState.commit()
   },
   methods: {
+    onCheckGroup(group) {
+      let selected = {}
+      this.selectedFeedIds.forEach(x => (selected[x] = true))
+      if (this.isGroupAllChecked(group)) {
+        for (let feed of group.feeds) {
+          delete selected[feed.id]
+        }
+      } else {
+        for (let feed of group.feeds) {
+          selected[feed.id] = true
+        }
+      }
+      this.selectedFeedIds = _.keys(selected)
+    },
     groupSelected() {
       if (!this.hasSelected) {
         return
@@ -321,19 +385,30 @@ export default {
   justify-content: space-between;
   height: 32 * @pr;
   font-size: 14 * @pr;
-  padding-left: 14 * @pr;
+  padding-left: 16 * @pr;
   padding-right: 16 * @pr;
   background: lighten(@antBlue, 30%);
   border-top: 1px solid @antBackWhite;
   cursor: pointer;
 }
 
+.group-checkbox {
+  flex-grow: 0;
+  flex-shrink: 0;
+  color: @antInk;
+}
+
 .group-name {
   color: darken(@antInk, 10%);
+  flex-grow: 1;
+  flex-shrink: 0;
 }
 
 .group-info {
+  flex-grow: 0;
+  flex-shrink: 0;
   display: flex;
+  justify-content: flex-end;
   align-items: center;
   color: @antTextGrey;
 }
@@ -366,11 +441,13 @@ export default {
   background: #fff;
 }
 
+.group-checkbox,
 .feed-checkbox {
   position: relative;
   left: -4 * @pr;
 }
 
+.group-name,
 .feed-info {
   flex: 1;
   margin-left: 4 * @pr;

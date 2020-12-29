@@ -6,6 +6,7 @@ export const antGreen = '#66BB6A'
 export const antBlue = '#60bbf3'
 export const antGold = '#FFBA00'
 export const antRed = '#f44336'
+export const antInk = '#768fa1'
 
 // 字体黑白灰
 export const antTextBlack = '#000000' // 主内容
