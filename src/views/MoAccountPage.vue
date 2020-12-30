@@ -108,7 +108,9 @@ export default {
       return _.isNil(user) ? '' : user.username
     },
   },
-  mounted() {},
+  mounted() {
+    this.$API.user.syncProduct()
+  },
   methods: {
     configurePassword() {
       if (this.isPasswordConfigured) {

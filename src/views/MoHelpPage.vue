@@ -75,6 +75,9 @@ export default {
       return formatDate(dt)
     },
   },
+  mounted() {
+    this.$API.user.syncProduct()
+  },
   methods: {
     goVip() {
       this.$router.push('/vip')

@@ -62,6 +62,7 @@ export default {
     loginToken: null,
     loginDate: null,
     shopantCustomer: null,
+    shopantProductLoading: new Loading(),
     shopantProduct: null,
   },
   mutations: {
@@ -140,8 +141,10 @@ export default {
       if (!isShopantEnable(DAO.state)) {
         return
       }
-      let product = await shopantClient.call('product.get')
-      DAO.SET_SHOPANT_PRODUCT(product)
+      await DAO.state.shopantProductLoading.begin(async () => {
+        let product = await shopantClient.call('product.get')
+        DAO.SET_SHOPANT_PRODUCT(product)
+      })
     },
     async register(DAO, { username, email, password }) {
       await API.user.register({ username, email, password })
