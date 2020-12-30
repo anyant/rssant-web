@@ -15,61 +15,59 @@
         :value="groupName"
         @confirm="onSelectGroup"
       ></MoGroupNameSelectorDialog>
-      <transition name="mu-fade-transition">
-        <div class="workspace workspace-text" v-if="isFromText" key="workspace-text">
-          <mu-text-field
-            class="input-text"
-            ref="inputText"
-            v-model="inputText"
-            placeholder="请输入链接或含有链接的文本"
-            full-width
-            multi-line
-            :rows="1"
-            :rows-max="2"
-            :error-text="errorText"
-            @focus="onFocus"
+      <div class="workspace workspace-text" v-if="isFromText" key="workspace-text">
+        <mu-text-field
+          class="input-text"
+          ref="inputText"
+          v-model="inputText"
+          placeholder="请输入链接或含有链接的文本"
+          full-width
+          multi-line
+          :rows="1"
+          :rows-max="2"
+          :error-text="errorText"
+          @focus="onFocus"
+        />
+        <div
+          class="button-text-wrapper"
+          :class="{ 'button-disabled': isSaveDisabled, 'button-loading': isImportLoading }"
+        >
+          <MoFeedCreationGroupButton :group="groupName" @click="()=>this.openGroupDialog=true" />
+          <mu-button
+            class="button-text-save"
+            :color="antBlue"
+            @click="onSave"
+            :disabled="isSaveDisabled"
+            data-mu-loading-size="24"
+            v-loading="isImportLoading"
+          >确定</mu-button>
+        </div>
+      </div>
+      <div class="workspace workspace-file" v-else key="workspace-file">
+        <div class="import-file-info">
+          <span>支持 XML/OPML/HTML</span>
+          <span>或任意格式含有链接的文本文件</span>
+        </div>
+        <form style="display: none;" ref="importFeedForm">
+          <input
+            type="file"
+            name="import-file-input"
+            ref="importFileInput"
+            style="display: none;"
+            @change="onImportFileChange"
           />
-          <div
-            class="button-text-wrapper"
-            :class="{ 'button-disabled': isSaveDisabled, 'button-loading': isImportLoading }"
-          >
-            <MoFeedCreationGroupButton :group="groupName" @click="()=>this.openGroupDialog=true" />
-            <mu-button
-              class="button-text-save"
-              :color="antBlue"
-              @click="onSave"
-              :disabled="isSaveDisabled"
-              data-mu-loading-size="24"
-              v-loading="isImportLoading"
-            >确定</mu-button>
-          </div>
+        </form>
+        <div class="button-file-wrapper" :class="{ 'button-loading': isImportLoading }">
+          <MoFeedCreationGroupButton :group="groupName" @click="()=>this.openGroupDialog=true" />
+          <mu-button
+            class="button-file-import"
+            :color="antBlue"
+            @click="onImportClick"
+            data-mu-loading-size="24"
+            v-loading="isImportLoading"
+          >导入文件</mu-button>
         </div>
-        <div class="workspace workspace-file" v-else key="workspace-file">
-          <div class="import-file-info">
-            <span>支持 XML/OPML/HTML</span>
-            <span>或任意格式含有链接的文本文件</span>
-          </div>
-          <form style="display: none;" ref="importFeedForm">
-            <input
-              type="file"
-              name="import-file-input"
-              ref="importFileInput"
-              style="display: none;"
-              @change="onImportFileChange"
-            />
-          </form>
-          <div class="button-file-wrapper" :class="{ 'button-loading': isImportLoading }">
-            <MoFeedCreationGroupButton :group="groupName" @click="()=>this.openGroupDialog=true" />
-            <mu-button
-              class="button-file-import"
-              :color="antBlue"
-              @click="onImportClick"
-              data-mu-loading-size="24"
-              v-loading="isImportLoading"
-            >导入文件</mu-button>
-          </div>
-        </div>
-      </transition>
+      </div>
       <MoCreationList ref="creationListRef" class="creation-list"></MoCreationList>
     </div>
   </MoLayout>
