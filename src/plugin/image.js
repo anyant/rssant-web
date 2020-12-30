@@ -79,3 +79,23 @@ export function fixImageSrc(node, baseUrl) {
   node.setAttribute('src', src)
   return src
 }
+
+/**
+ * check if the image node inside link tag or not
+ */
+export function isLinkImage(node) {
+  // node: img -> span -> a
+  // depth: 3      2      1
+  let depth = 3
+  while (depth > 0) {
+    if (node.tagName === 'BODY' || node.tagName === 'HTML') {
+      break
+    }
+    if (node.tagName === 'A') {
+      return true
+    }
+    node = node.parentNode
+    depth -= 1
+  }
+  return false
+}

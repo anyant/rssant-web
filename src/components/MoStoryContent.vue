@@ -56,6 +56,8 @@ import { formatFullDateFriendly } from '@/plugin/datefmt'
 import initMathjax from '@/plugin/mathjax'
 import * as ImageHelper from '@/plugin/image'
 import MoAudioPlayer from '@/components/MoAudioPlayer'
+import 'viewerjs/dist/viewer.css'
+import Viewer from 'viewerjs'
 
 export default {
   components: { MoAudioPlayer },
@@ -122,6 +124,7 @@ export default {
   methods: {
     onStoryRendered(dom) {
       this.setupImageProxy(dom)
+      this.setupImageViewer(dom)
       this.setupVideoFallback(dom)
     },
     setupVideoFallback(dom) {
@@ -176,6 +179,34 @@ export default {
       proxyUrl.searchParams.set('token', this.imageToken)
       node.setAttribute('src', proxyUrl)
       node.style.visibility = 'visible'
+    },
+    setupImageViewer(dom) {
+      let imageNodes = dom.querySelectorAll('img,source')
+      imageNodes.forEach(node => {
+        if (_.isEmpty(node.src)) {
+          return
+        }
+        if (ImageHelper.isLinkImage(node)) {
+          return
+        }
+        node.style.cursor = 'zoom-in'
+        node.addEventListener('click', event => {
+          event.preventDefault()
+          this.onViewImage(node)
+        })
+      })
+    },
+    onViewImage(node) {
+      const viewer = new Viewer(node, {
+        navbar: false,
+        toolbar: false,
+        title: false,
+        keyboard: false,
+        hidden() {
+          viewer.destroy()
+        },
+      })
+      viewer.show()
     },
     openNextStory() {
       if (_.isNil(this.nextStory)) {
