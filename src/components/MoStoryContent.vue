@@ -1,5 +1,6 @@
 <template>
   <div class="story-content">
+    <div class="story-image-viewer"></div>
     <div class="story-wrapper" :style="wrapperStyle">
       <div class="story-info" v-if="story">
         <div id="story-info-title" class="info-title" v-story="titleForRender"></div>
@@ -197,11 +198,13 @@ export default {
       })
     },
     onViewImage(node) {
+      let container = this.$el.querySelector('.story-image-viewer')
       const viewer = new Viewer(node, {
         navbar: false,
         toolbar: false,
         title: false,
         keyboard: false,
+        container: container,
         hidden() {
           viewer.destroy()
         },
