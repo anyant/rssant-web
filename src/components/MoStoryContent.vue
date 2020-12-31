@@ -198,6 +198,9 @@ export default {
       })
     },
     onViewImage(node) {
+      // viewerjs will copy image attrbutes, and loading="lazy" may
+      // cause image not show in firefox (mobile simulation)
+      node.removeAttribute('loading')
       let container = this.$el.querySelector('.story-image-viewer')
       const viewer = new Viewer(node, {
         navbar: false,
