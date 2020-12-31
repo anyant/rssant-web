@@ -1,6 +1,5 @@
 <template>
   <div class="story-content">
-    <div class="story-image-viewer"></div>
     <div class="story-wrapper" :style="wrapperStyle">
       <div class="story-info" v-if="story">
         <div id="story-info-title" class="info-title" v-story="titleForRender"></div>
@@ -67,6 +66,7 @@ export default {
     nextFeed: Object,
     nextStory: Object,
     showNextFeedTitle: Boolean,
+    imageViewerContainerGetter: Function,
   },
   data() {
     return {}
@@ -201,7 +201,12 @@ export default {
       // viewerjs will copy image attrbutes, and loading="lazy" may
       // cause image not show in firefox (mobile simulation)
       node.removeAttribute('loading')
-      let container = this.$el.querySelector('.story-image-viewer')
+      // on iOS mobile, fixed element (image container) can not outside this component
+      // so need story page pass the container down to ensure correct display
+      let container = null
+      if (!_.isNil(this.imageViewerContainerGetter)) {
+        container = this.imageViewerContainerGetter()
+      }
       const viewer = new Viewer(node, {
         navbar: false,
         toolbar: false,

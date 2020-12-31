@@ -1,5 +1,6 @@
 <template>
   <MoLayout header class="story">
+    <div class="story-image-viewer"></div>
     <MoBackHeader border>
       <template v-slot:title>{{ headerTitle }}</template>
       <mu-button icon class="action-favorited" @click="toggleFavorited">
@@ -13,6 +14,7 @@
       :next-feed="nextFeed"
       :next-story="nextStory"
       :show-next-feed-title="showNextFeedTitle"
+      :image-viewer-container-getter="imageViewerContainerGetter"
     ></MoStoryContent>
   </MoLayout>
 </template>
@@ -98,6 +100,9 @@ export default {
     })
   },
   methods: {
+    imageViewerContainerGetter() {
+      return this.$el.querySelector('.story-image-viewer')
+    },
     toggleFavorited() {
       let is_favorited = !this.isFavorited
       this.$API.story.setFavorited({ feedId: this.feedId, offset: this.offset, is_favorited })

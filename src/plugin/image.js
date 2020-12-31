@@ -88,6 +88,9 @@ export function isLinkImage(node) {
   // depth: 3      2      1
   let depth = 3
   while (depth > 0) {
+    if (_.isNil(node)) {
+      break
+    }
     if (node.tagName === 'BODY' || node.tagName === 'HTML') {
       break
     }
