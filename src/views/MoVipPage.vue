@@ -104,6 +104,7 @@ function selectPriceList(prices) {
 
 export default {
   components: { MoLayout, MoBackHeader },
+  name: 'MoVipPage',
   data() {
     return {
       form: {
@@ -402,5 +403,10 @@ export default {
   &:active {
     background: lighten(@antGreen, 5%);
   }
+}
+
+// avoid loading icon cover the payment view
+.button-pay /deep/ .mu-loading-wrap {
+  z-index: 2019;
 }
 </style>
