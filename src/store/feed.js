@@ -4,7 +4,7 @@ import { isAfter, subDays } from 'date-fns'
 import Loading from '@/plugin/loading'
 import { API } from '@/plugin/api'
 import localFeeds from '@/plugin/localFeeds'
-import { GROUP_MUSHROOM, GROUP_SOLO, getGroupName } from '@/plugin/feedGroupHelper'
+import { GROUP_MUSHROOM, GROUP_SOLO, getGroupName, isSystemGroup } from '@/plugin/feedGroupHelper'
 
 function isEmptyFeed(feed) {
   return feed.total_storys <= 0 || _.isEmpty(feed.dt_latest_story_published)
@@ -99,7 +99,7 @@ function _pickMushroomKeys(feed, dt_recent) {
         })
       }
     }
-  } else {
+  } else if (!isSystemGroup(getFeedGroup(feed))) {
     // 自定义分组: 未读=1的订阅文章直接展示
     if (feed.num_unread_storys === 1) {
       mushroomKeys.push({
