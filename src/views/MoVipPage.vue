@@ -46,7 +46,13 @@
         </div>
       </div>
       <div class="pay">
-        <div class="button-pay" @click="onPay">充值</div>
+        <mu-button
+          class="button-pay"
+          :ripple="false"
+          @click="onPay"
+          data-mu-loading-size="24"
+          v-loading="isPaymentLoading"
+        >充值</mu-button>
       </div>
     </div>
   </MoLayout>
@@ -104,6 +110,7 @@ export default {
         package_amount: null,
         payment_channel_id: null,
       },
+      isPaymentLoading: false,
     }
   },
   computed: {
@@ -209,15 +216,26 @@ export default {
       this.form.package_amount = pkg.amount
     },
     async onPay() {
-      if (!this.isPayEnable) {
+      if (!this.isPayEnable || this.isPaymentLoading) {
         return
       }
-      let data = await shopantClient.call('payment.start', {
-        customer: this.$API.user.shopantCustomerParameter,
-        package_amount: this.package_amount,
-        payment_channel_id: this.payment_channel_id,
-      })
+      this.isPaymentLoading = true
+      let data = null
+      try {
+        data = await shopantClient.call('payment.start', {
+          customer: this.$API.user.shopantCustomerParameter,
+          package_amount: this.package_amount,
+          payment_channel_id: this.payment_channel_id,
+        })
+      } catch (ex) {
+        this.isPaymentLoading = false
+        throw ex
+      }
+      setTimeout(() => {
+        this.isPaymentLoading = false
+      }, 2500)
       await shopantClient.show(data)
+      this.isPaymentLoading = false
       await this.$API.user.syncCustomerBalance()
     },
   },
@@ -370,16 +388,19 @@ export default {
 }
 
 .button-pay {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   width: 168 * @pr;
   height: 36 * @pr;
   border-radius: 2 * @pr;
-  cursor: pointer;
-  background: @antGreen;
-  color: #ffffff;
   font-weight: bold;
   font-size: 16 * @pr;
+  box-shadow: none;
+  color: @antTextWhite;
+  background: @antGreen;
+  &.hover::before {
+    display: none;
+  }
+  &:active {
+    background: lighten(@antGreen, 5%);
+  }
 }
 </style>
