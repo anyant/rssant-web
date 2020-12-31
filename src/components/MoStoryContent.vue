@@ -204,12 +204,13 @@ export default {
         toolbar: false,
         title: false,
         keyboard: false,
+        loading: false,
         container: container,
         hidden() {
           viewer.destroy()
         },
       })
-      viewer.show()
+      viewer.show(true)
     },
     openNextStory() {
       if (_.isNil(this.nextStory)) {
