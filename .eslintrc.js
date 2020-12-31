@@ -15,6 +15,9 @@ module.exports = {
     camelcase: 'off',
     // allow async-await
     'generator-star-spacing': 'off',
+    // not need force
+    'prefer-const': 'off',
+    'dot-notation': 'off',
   },
   parserOptions: {
     parser: 'babel-eslint',
