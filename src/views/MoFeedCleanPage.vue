@@ -280,7 +280,6 @@ export default {
   },
   mounted() {
     this.$API.feed.sync().then(() => {
-      this.$pageState.restoreScrollTop({ el: this.$refs.mainRef })
       let selectedFeedIds = this.$pageState.get('selectedFeedIds')
       if (!_.isNil(selectedFeedIds)) {
         selectedFeedIds.forEach(x => this.selectedFeedIds.push(x))
@@ -291,6 +290,9 @@ export default {
           Vue.set(this.closedGroups, key, value)
         })
       }
+      this.$nextTick(() => {
+        this.$pageState.restoreScrollTop({ el: this.$refs.mainRef })
+      })
     })
   },
   savePageState() {
