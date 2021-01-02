@@ -1,5 +1,5 @@
 <template>
-  <MoLayout header border>
+  <MoLayout header border solo>
     <MoBackHeader>
       <template v-slot:title>蚁阅</template>
     </MoBackHeader>
@@ -13,12 +13,11 @@
         <h4 class="sub-title">主要特点</h4>
         <div class="center-wrapper">
           <ul>
-            <li>非社交，无广告，无推荐，专注阅读</li>
-            <li>为移动端优化，全平台适配，沉浸式体验</li>
-            <li>支持订阅播客和视频内容</li>
-            <li>智能查找订阅，智能图片代理</li>
+            <li>全平台，无广告，无推荐，专注阅读</li>
+            <li>支持全文阅读，支持播客和视频内容</li>
+            <li>智能查找订阅源，智能裂图修复</li>
             <li>智能 RSS 代理，全球 RSS 均可订阅</li>
-            <li>开源，可以直接用在线版，也可以自己部署</li>
+            <li>开源，开箱即用，也支持自己部署</li>
           </ul>
         </div>
 
@@ -33,13 +32,6 @@
 
         <h4 class="sub-title">开放源码</h4>
         <p class="center">
-          码云(主仓库):
-          <br />
-          <a href="https://gitee.com/anyant/rssant" target="_blank">https://gitee.com/anyant/rssant</a>
-        </p>
-        <p class="center">
-          GitHub(镜像):
-          <br />
           <a
             href="https://github.com/anyant/rssant"
             target="_blank"
@@ -98,6 +90,9 @@ export default {
   border-bottom: 1px solid lighten(@antTextSemi, 15%);
   text-decoration: none;
   line-height: 1.15;
+  &:hover {
+    text-decoration: none;
+  }
 }
 
 .changelog {

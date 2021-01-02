@@ -4,6 +4,7 @@
     :class="{
       'layout-grey': grey,
       'layout-header': header,
+      'layout-solo': solo,
     }"
     :style="wrapperStyle"
   >
@@ -18,6 +19,10 @@ export default {
       default: false,
     },
     header: {
+      type: Boolean,
+      default: false,
+    },
+    solo: {
       type: Boolean,
       default: false,
     },
@@ -51,8 +56,12 @@ export default {
   min-height: 100vh;
   background: #ffffff;
   overflow: hidden;
-  max-width: @pageMaxWidth;
+  max-width: @boardPageMaxWidth;
   margin: 0 auto;
+}
+
+.layout-solo {
+  max-width: @soloPageMaxWidth;
 }
 
 .layout-header {

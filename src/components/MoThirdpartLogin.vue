@@ -1,6 +1,5 @@
 <template>
   <div class="thirdpart-login">
-    <span class="label">第三方登录注册:</span>
     <mu-ripple
       class="button"
       v-loading="githubLoading"
@@ -39,11 +38,6 @@ export default {
   justify-content: center;
 }
 
-.label {
-  font-size: 15 * @pr;
-  color: @antTextLight;
-}
-
 .button {
   position: relative;
   height: 32 * @pr;
@@ -52,6 +46,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
 
 .button-text {

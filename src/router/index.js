@@ -46,7 +46,7 @@ router.beforeEach((to, from, next) => {
     }
     let hasLoginHistory = localConfig.HAS_LOGIN_HISTORY.get()
     next({
-      path: hasLoginHistory ? '/login' : '/hello',
+      path: hasLoginHistory ? '/login' : '/register',
       replace: true,
     })
   }

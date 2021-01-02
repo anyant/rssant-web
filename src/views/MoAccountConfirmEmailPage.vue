@@ -1,5 +1,5 @@
 <template>
-  <MoLayout>
+  <MoLayout solo>
     <template v-if="isError">
       <h2>邮箱验证失败，链接已失效</h2>
       <p>
@@ -16,13 +16,13 @@ export default {
   components: { MoLayout },
   data() {
     return {
-      isError: false
+      isError: false,
     }
   },
   computed: {
     key() {
       return this.$route.params.key
-    }
+    },
   },
   mounted() {
     this.$API.user
@@ -38,7 +38,7 @@ export default {
       .catch(() => {
         this.isError = true
       })
-  }
+  },
 }
 </script>
 

@@ -1,8 +1,8 @@
 <template>
-  <MoLayout footer>
+  <MoLayout footer solo>
     <div class="register">
       <div class="register-wrapper" :style="wrapperStyle">
-        <div class="title">创建蚁阅账号</div>
+        <div class="title">蚁阅 - RSS轻松订阅</div>
         <mu-text-field
           full-width
           placeholder="邮箱地址"

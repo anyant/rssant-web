@@ -1,5 +1,5 @@
 <template>
-  <MoLayout>
+  <MoLayout solo>
     <div class="reset-password">
       <div class="title">蚁阅 - 重置密码</div>
       <mu-text-field
