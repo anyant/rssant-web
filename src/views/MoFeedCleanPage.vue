@@ -46,23 +46,23 @@
           </div>
         </div>
         <template v-if="isGroupOpen(group.name)">
-          <div v-for="feed in group.feeds" :key="feed.id" class="feed-item">
+          <div v-for="item in group.items" :key="item.feed.id" class="feed-item">
             <mu-checkbox
               v-model="selectedFeedIds"
-              :value="feed.id"
+              :value="item.feed.id"
               :ripple="false"
               :color="feedCheckboxColor"
               class="feed-checkbox"
             ></mu-checkbox>
-            <div class="feed-info" @click="onFeedClick(feed)">
+            <div class="feed-info" @click="onFeedClick(item.feed)">
               <div class="feed-info-row1">
-                <div class="feed-title">{{ feed.title || feed.id }}</div>
-                <div class="feed-group-name">{{ getFeedGroupName(feed) }}</div>
+                <div class="feed-title">{{ item.feed.title || item.feed.id }}</div>
+                <div class="feed-issue">{{ getFeedIssueName(item.issue) }}</div>
               </div>
               <div class="feed-info-row2">
-                <div class="feed-date">{{ formatFeedDate(feed) }}</div>
+                <div class="feed-date">{{ formatFeedDate(item.feed) }}</div>
                 <div class="feed-total-storys">
-                  <span>{{ totalStorys(feed) }} 篇</span>
+                  <span>{{ totalStorys(item.feed) }} 篇</span>
                 </div>
               </div>
             </div>
@@ -88,6 +88,32 @@ function isBlank(value) {
   return _.isNil(value) || value === ''
 }
 
+const FEED_ISSUE_TRASH = 'trash'
+const FEED_ISSUE_ERROR_CONNECT = 'error-connect'
+const FEED_ISSUE_ERROR_DENY = 'error-deny'
+const FEED_ISSUE_ERROR_HTTP = 'error-http'
+const FEED_ISSUE_ERROR_PARSE = 'error-parse'
+const FEED_ISSUE_ERROR_STATUS = 'error-status'
+const FEED_ISSUE_ZOMBY = 'zomby'
+
+const FEED_ISSUE_LIST = [
+  { key: FEED_ISSUE_TRASH, name: '无效订阅' },
+  { key: FEED_ISSUE_ERROR_CONNECT, name: '无法连接' },
+  { key: FEED_ISSUE_ERROR_DENY, name: '请求被拒' },
+  { key: FEED_ISSUE_ERROR_HTTP, name: '请求失败' },
+  { key: FEED_ISSUE_ERROR_PARSE, name: '无法解析' },
+  { key: FEED_ISSUE_ERROR_STATUS, name: '状态异常' },
+  { key: FEED_ISSUE_ZOMBY, name: '久未更新' },
+]
+
+const FEED_ISSUE_NAME_MAP = {}
+FEED_ISSUE_LIST.forEach(x => (FEED_ISSUE_NAME_MAP[x.key] = x.name))
+
+const FEED_ISSUE_LEVEL_MAP = {}
+FEED_ISSUE_LIST.forEach((issue, index) => {
+  FEED_ISSUE_LEVEL_MAP[issue.key] = -(FEED_ISSUE_LIST.length - index)
+})
+
 export default {
   components: { MoBackHeader, MoLayout, MoGroupNameSelectorDialog },
   props: {
@@ -109,83 +135,102 @@ export default {
     numFeeds() {
       return this.$API.feed.numFeeds
     },
-    feedGroups() {
-      const feedAPI = this.$API.feed
-      let trashFeeds = []
-      let zombyFeeds = []
-      let soloFeeds = []
-      let mushroomFeeds = []
-      let customGroups = []
-
+    getFeedIssue() {
       function isTrashFeed(feed) {
         let noUpdate = isBlank(feed.dt_latest_story_published)
         return feed.total_storys <= 0 || noUpdate
       }
-
+      function isErrorFeed(feed) {
+        return _.lowerCase(feed.status) === 'error'
+      }
       let now = new Date()
       function isZombyFeed(feed) {
         let dt_latest = new Date(feed.dt_latest_story_published)
         return differenceInDays(now, dt_latest) > 365
       }
+      return feed => {
+        if (isTrashFeed(feed)) {
+          return FEED_ISSUE_TRASH
+        }
+        if (isErrorFeed(feed)) {
+          if (!_.isNil(feed.response_status)) {
+            if (feed.response_status < 0) {
+              return FEED_ISSUE_ERROR_CONNECT
+            } else if (feed.response_status === 401 || feed.response_status === 403) {
+              return FEED_ISSUE_ERROR_DENY
+            } else if (feed.response_status >= 400) {
+              return FEED_ISSUE_ERROR_HTTP
+            } else if (feed.response_status === 200 || feed.response_status === 304) {
+              return FEED_ISSUE_ERROR_PARSE
+            }
+          }
+          return FEED_ISSUE_ERROR_STATUS
+        }
+        if (isZombyFeed(feed)) {
+          return FEED_ISSUE_ZOMBY
+        }
+        return null
+      }
+    },
+    getFeedIssueName() {
+      return key => _.defaultTo(FEED_ISSUE_NAME_MAP[key], key)
+    },
+    getFeedIssueLevel() {
+      return key => _.defaultTo(FEED_ISSUE_LEVEL_MAP[key], 0)
+    },
+    feedGroups() {
+      const self = this
+      const feedAPI = this.$API.feed
+
+      let soloItems = []
+      let mushroomItems = []
+      let customGroups = []
 
       function isMushroomFeed(feed) {
         return feedAPI.groupOf(feed) === GROUP_MUSHROOM
       }
 
-      function sortFeeds(feeds) {
-        return _.sortBy(feeds, [feed => new Date(feed.dt_latest_story_published), 'id'])
+      function sortFeedItems(items) {
+        return _.sortBy(items, [
+          item => self.getFeedIssueLevel(item.issue),
+          item => new Date(item.feed.dt_latest_story_published),
+          item => item.feed.id,
+        ])
       }
 
       feedAPI.homeFeedList.forEach(feed => {
-        if (isTrashFeed(feed)) {
-          trashFeeds.push(feed)
-        } else if (isZombyFeed(feed)) {
-          zombyFeeds.push(feed)
-        } else if (isMushroomFeed(feed)) {
-          mushroomFeeds.push(feed)
+        let issue = self.getFeedIssue(feed)
+        if (isMushroomFeed(feed)) {
+          mushroomItems.push({ feed, issue })
         } else {
-          soloFeeds.push(feed)
+          soloItems.push({ feed, issue })
         }
       })
 
       feedAPI.feedGroups.forEach(group => {
-        let groupFeeds = []
+        let items = []
         feedAPI.feedListOfGroup(group).forEach(feed => {
-          if (isTrashFeed(feed)) {
-            trashFeeds.push(feed)
-          } else if (isZombyFeed(feed)) {
-            zombyFeeds.push(feed)
-          } else {
-            groupFeeds.push(feed)
-          }
+          items.push({ feed, issue: self.getFeedIssue(feed) })
         })
         customGroups.push({
           name: `分组:${group.name}`,
-          feeds: sortFeeds(groupFeeds),
+          items: sortFeedItems(items),
         })
       })
 
       let feedGroups = [
         {
-          name: '无效订阅',
-          feeds: sortFeeds(trashFeeds),
-        },
-        {
-          name: '久未更新',
-          feeds: sortFeeds(zombyFeeds),
-        },
-        {
           name: '无分组',
-          feeds: sortFeeds(soloFeeds),
+          items: sortFeedItems(soloItems),
         },
         {
           name: '品读',
-          feeds: sortFeeds(mushroomFeeds),
+          items: sortFeedItems(mushroomItems),
         },
       ]
       customGroups.forEach(x => feedGroups.push(x))
 
-      feedGroups = _.filter(feedGroups, group => group.feeds.length > 0)
+      feedGroups = _.filter(feedGroups, group => group.items.length > 0)
       return feedGroups
     },
     hasSelected() {
@@ -202,8 +247,8 @@ export default {
     },
     isGroupHasCheccked() {
       return group => {
-        for (let feed of group.feeds) {
-          if (this.selectedFeedIdMap[feed.id]) {
+        for (let item of group.items) {
+          if (this.selectedFeedIdMap[item.feed.id]) {
             return true
           }
         }
@@ -212,8 +257,8 @@ export default {
     },
     isGroupAllChecked() {
       return group => {
-        for (let feed of group.feeds) {
-          if (!this.selectedFeedIdMap[feed.id]) {
+        for (let item of group.items) {
+          if (!this.selectedFeedIdMap[item.feed.id]) {
             return false
           }
         }
@@ -222,10 +267,10 @@ export default {
     },
     sizeOfGroup() {
       return group => {
-        let total = group.feeds.length
+        let total = group.items.length
         let numSelected = 0
-        for (let feed of group.feeds) {
-          if (this.selectedFeedIdMap[feed.id]) {
+        for (let item of group.items) {
+          if (this.selectedFeedIdMap[item.feed.id]) {
             numSelected += 1
           }
         }
@@ -259,12 +304,12 @@ export default {
       let selected = {}
       this.selectedFeedIds.forEach(x => (selected[x] = true))
       if (this.isGroupAllChecked(group)) {
-        for (let feed of group.feeds) {
-          delete selected[feed.id]
+        for (let item of group.items) {
+          delete selected[item.feed.id]
         }
       } else {
-        for (let feed of group.feeds) {
-          selected[feed.id] = true
+        for (let item of group.items) {
+          selected[item.feed.id] = true
         }
       }
       this.selectedFeedIds = _.keys(selected)
@@ -443,7 +488,8 @@ export default {
   font-size: 15 * @pr;
 }
 
-.feed-group-name {
+.feed-issue {
+  min-width: 48 * @pr;
   font-size: 12 * @pr;
   flex-shrink: 0;
   margin-left: 4 * @pr;

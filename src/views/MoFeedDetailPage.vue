@@ -48,9 +48,23 @@ const FEED_FIELDS = [
   {
     name: '状态',
     key: function(feed) {
-      return `${_.defaultTo(feed.status, '')} / ${_.defaultTo(feed.response_status, '')}`
+      let status = `${_.defaultTo(feed.status, '')} / ${_.defaultTo(feed.response_status, '')}`
+      if (!_.isEmpty(feed.response_status_name)) {
+        status = `${status} / ${feed.response_status_name}`
+      }
+      return status
     },
     type: 'status',
+  },
+  {
+    name: '异常',
+    key: 'warnings',
+    process: function(value) {
+      if (_.isEmpty(value)) {
+        return '无'
+      }
+      return value
+    },
   },
   {
     name: '主页',
@@ -73,16 +87,6 @@ const FEED_FIELDS = [
   {
     name: '供稿格式',
     key: 'version',
-  },
-  {
-    name: '异常信息',
-    key: 'warnings',
-    process: function(value) {
-      if (_.isEmpty(value)) {
-        return '无'
-      }
-      return value
-    },
   },
   {
     name: '未读故事',
