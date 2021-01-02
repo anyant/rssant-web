@@ -6,6 +6,7 @@ const CONFIGS = {
   PWA_ENABLE: { defaultValue: false },
   HELP_READED: { defaultValue: false },
   HAS_LOGIN_HISTORY: { defaultValue: false },
+  VIP_NOTICED_TIMESTAMP: { defaultValue: 0 },
 }
 
 const localConfig = (function() {

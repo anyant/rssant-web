@@ -158,6 +158,9 @@ export default {
     },
   },
   async mounted() {
+    if (this.$API.user.shouldNoticeVip) {
+      this.$API.user.UPDATE_VIP_NOTICED_TIMESTAMP()
+    }
     try {
       await this.$API.user.syncProduct()
     } catch (ex) {

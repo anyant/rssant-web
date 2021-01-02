@@ -15,12 +15,13 @@
         <MoHeaderTip :open.sync="openWizard" :trigger="wizardTrigger" content="点这里添加订阅" />
         <mu-button ref="actionMenuRef" icon class="action-menu" @click="toggleMenu">
           <fa-icon class="action-icon" icon="bars" />
-          <span v-if="showMenuDot" class="action-menu-dot"></span>
+          <span v-if="showMenuAccountDot || showMenuHelpDot" class="action-menu-dot"></span>
         </mu-button>
         <transition name="mu-fade-transition">
           <mu-list ref="actionMenuListRef" class="action-menu-list" v-show="isMenuOpen">
             <mu-list-item button @click="goAccount">
               <mu-list-item-title>账号设置</mu-list-item-title>
+              <span v-if="showMenuAccountDot" class="action-menu-account-dot"></span>
             </mu-list-item>
             <mu-list-item button @click="goFeedClean">
               <mu-list-item-title>整理订阅</mu-list-item-title>
@@ -30,7 +31,7 @@
             </mu-list-item>
             <mu-list-item button @click="goHelp">
               <mu-list-item-title>蚁阅锦囊</mu-list-item-title>
-              <span v-if="showMenuDot" class="action-menu-help-dot"></span>
+              <span v-if="showMenuHelpDot" class="action-menu-help-dot"></span>
             </mu-list-item>
           </mu-list>
         </transition>
@@ -179,7 +180,10 @@ export default {
     showHeader() {
       return this.isReady || !this.$LAYOUT.hasBoard
     },
-    showMenuDot() {
+    showMenuAccountDot() {
+      return this.isReady && !this.isEmpty && this.$API.user.shouldNoticeVip
+    },
+    showMenuHelpDot() {
       return this.isReady && !this.isEmpty && !this.isHelpReaded
     },
     replaceRouter() {
@@ -456,6 +460,7 @@ export default {
 }
 
 .action-menu-dot,
+.action-menu-account-dot,
 .action-menu-help-dot {
   position: absolute;
   display: inline-block;
@@ -471,6 +476,7 @@ export default {
   top: 6 * @pr;
 }
 
+.action-menu-account-dot,
 .action-menu-help-dot {
   right: 5 * @pr;
   top: 20 * @pr;

@@ -4,11 +4,15 @@
       <template v-slot:title>{{ username }}</template>
     </MoBackHeader>
     <div class="main">
-      <div class="action-group action-group-vip" v-if="isShopantEnable">
+      <div
+        class="action-group action-group-vip"
+        :class="{'balance-not-enough': !isBalanceEnough}"
+        v-if="isShopantEnable"
+      >
         <div class="action-row" @click="goVip">
           <span class="action-label">蚁阅会员</span>
           <span>
-            <span>{{ customerBalance }} 到期</span>
+            <span class="vip-balance">{{ customerBalance }} 到期</span>
             <fa-icon class="action-icon" icon="chevron-right" />
           </span>
         </div>
@@ -79,6 +83,9 @@ export default {
         return '####-##-##'
       }
       return formatDate(dt)
+    },
+    isBalanceEnough() {
+      return this.$API.user.isBalanceEnough
     },
     isGithubConnected() {
       let user = this.$API.user.loginUser
@@ -183,6 +190,11 @@ export default {
   color: @antTextBlack;
 }
 
+.balance-not-enough .vip-balance {
+  color: @antGold;
+  font-weight: bold;
+}
+
 .action-row {
   display: flex;
   justify-content: space-between;
@@ -209,9 +221,5 @@ export default {
   color: lighten(@antTextSemi, 10%);
   position: relative;
   top: 1 * @pr;
-}
-
-.action-logout {
-  color: @antRed;
 }
 </style>

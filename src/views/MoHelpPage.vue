@@ -25,7 +25,7 @@
           <div class="center">
             <div>会员可享受全部功能，订阅数量不限</div>
             <div>首月免费试用，预售期间一折购买</div>
-            <div class="dt-avaliable">
+            <div class="dt-avaliable" :class="{'balance-not-enough': !isBalanceEnough}">
               <span class="label">会员到期时间:</span>
               <span class="value">{{ customerBalance }}</span>
             </div>
@@ -73,6 +73,9 @@ export default {
         return '####-##-##'
       }
       return formatDate(dt)
+    },
+    isBalanceEnough() {
+      return this.$API.user.isBalanceEnough
     },
   },
   mounted() {
@@ -140,6 +143,10 @@ export default {
   .value {
     font-weight: bold;
   }
+}
+
+.balance-not-enough .value {
+  color: @antGold;
 }
 
 .go-vip {

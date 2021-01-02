@@ -39,6 +39,20 @@ function getBalance(state) {
   return new Date(balance * 1000)
 }
 
+const NOW = Date.now()
+const HOURS = 60 * 60 * 1000
+
+function isBalanceEnough(state) {
+  if (!isShopantEnable(state)) {
+    return true
+  }
+  let balance = getBalance(state)
+  if (_.isNil(balance)) {
+    return true
+  }
+  return balance.getTime() - NOW > 24 * HOURS
+}
+
 async function logout() {
   localFeeds.clear()
   await API.user.logout()
@@ -61,6 +75,7 @@ export default {
     loginUser: null,
     loginToken: null,
     loginDate: null,
+    vipNoticedTimestamp: localConfig.VIP_NOTICED_TIMESTAMP.get(),
     shopantCustomer: null,
     shopantProductLoading: new Loading(),
     shopantProduct: null,
@@ -73,6 +88,11 @@ export default {
       if (!_.isNil(state.loginUser)) {
         state.loginUser.has_usable_password = true
       }
+    },
+    UPDATE_VIP_NOTICED_TIMESTAMP(state) {
+      let value = Math.floor(Date.now() / 1000)
+      state.vipNoticedTimestamp = value
+      localConfig.VIP_NOTICED_TIMESTAMP.set(value)
     },
     SET_SHOPANT_CUSTOMER(state, customer) {
       state.shopantCustomer = customer
@@ -90,6 +110,13 @@ export default {
     },
     loginUser(state) {
       return state.loginUser
+    },
+    shouldNoticeVip(state) {
+      if (isBalanceEnough(state)) {
+        return false
+      }
+      let noticed = state.vipNoticedTimestamp
+      return _.isNil(noticed) || NOW - noticed * 1000 > 16 * HOURS
     },
     isShopantEnable(state) {
       return isShopantEnable(state)
@@ -109,6 +136,9 @@ export default {
     },
     balance(state) {
       return getBalance(state)
+    },
+    isBalanceEnough(state) {
+      return isBalanceEnough(state)
     },
     shopantProduct(state) {
       return state.shopantProduct
