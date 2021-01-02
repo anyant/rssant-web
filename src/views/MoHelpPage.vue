@@ -17,7 +17,7 @@
         <div class="center">
           <div>
             一份帮你快速上手的
-            <a href="https://github.com/anyant/hellorss" target="_blank">RSS阅读指南</a>
+            <a href="https://www.yuque.com/guyskk/rssant/lmq3kk" target="_blank">RSS阅读指南</a>
           </div>
         </div>
         <template v-if="isShopantEnable">
@@ -122,6 +122,9 @@ export default {
   border-bottom: 1px solid lighten(@antTextSemi, 15%);
   text-decoration: none;
   line-height: 1.15;
+  &:hover {
+    text-decoration: none;
+  }
 }
 
 .weixin-mp {

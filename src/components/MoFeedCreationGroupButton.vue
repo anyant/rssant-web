@@ -23,6 +23,7 @@ export default {
   background: @antBackWhite;
   border: solid 1px;
   border-color: @antBlue;
+  text-transform: none;
   // cover button border-radius
   margin-right: -4 * @pr;
 
