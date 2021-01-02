@@ -27,10 +27,7 @@
             :color="antGreen"
             :disabled="isLoginDisabled"
           >登录</mu-button>
-          <mu-ripple
-            class="button-forgot"
-            @click="()=>this.$router.replace('/reset-password')"
-          >忘了密码？</mu-ripple>
+          <mu-ripple class="button-forgot" @click="()=>this.$router.push('/reset-password')">忘了密码？</mu-ripple>
         </div>
         <div class="register">
           <MoAntGreenButton @click="()=>{this.$router.replace('/register')}">没有账号？去注册</MoAntGreenButton>
