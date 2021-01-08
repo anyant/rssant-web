@@ -214,7 +214,7 @@ function addOrUpdateCreation(state, creation) {
   Vue.set(state.creations, creation.id, creation)
 }
 
-function watchFeedCreation(DAO, { creationId, numTry = 30 }) {
+function watchFeedCreation(DAO, { creationId, numTry = 10 }) {
   const token = setInterval(() => {
     API.feed
       .getCreation({ id: creationId })
@@ -223,7 +223,7 @@ function watchFeedCreation(DAO, { creationId, numTry = 30 }) {
         if (creation.status === 'ready') {
           setTimeout(() => {
             clearInterval(token)
-          }, 3000)
+          }, 3500)
           DAO.API.feed.load({ feedId: creation.feed_id, detail: true })
         } else if (creation.status === 'error' || numTry <= 0) {
           clearInterval(token)
@@ -232,7 +232,7 @@ function watchFeedCreation(DAO, { creationId, numTry = 30 }) {
       .finally(() => {
         numTry -= 1
       })
-  }, 1000)
+  }, 3000)
 }
 
 function handleImportedFeedResult(DAO, data) {
