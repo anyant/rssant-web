@@ -237,7 +237,7 @@ export default {
       }
       setTimeout(() => {
         this.isPaymentLoading = false
-      }, 2500)
+      }, 6000)
       await shopantClient.show(data)
       this.isPaymentLoading = false
       await this.$API.user.syncCustomerBalance()
