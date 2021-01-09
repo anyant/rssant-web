@@ -100,8 +100,8 @@ function _pickMushroomKeys(feed, dt_recent) {
       }
     }
   } else if (!isSystemGroup(getFeedGroup(feed))) {
-    // 自定义分组: 未读=1的订阅文章直接展示
-    if (feed.num_unread_storys === 1) {
+    // 自定义分组: 未读1-3的订阅文章直接展示
+    if (feed.num_unread_storys >= 1 && feed.num_unread_storys <= 3) {
       mushroomKeys.push({
         feed_id: feed.id,
         offset: feed.story_offset,
