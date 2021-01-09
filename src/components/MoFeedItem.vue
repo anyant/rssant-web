@@ -32,8 +32,8 @@ export default {
       if (_.isNil(this.number)) {
         return ''
       }
-      if (this.number > 9999) {
-        return '9999'
+      if (this.number > 999) {
+        return '999'
       }
       return this.number.toString()
     },
