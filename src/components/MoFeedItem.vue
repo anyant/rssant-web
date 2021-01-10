@@ -80,7 +80,7 @@ export default {
 
 .feed-title {
   flex-grow: 1;
-  margin-right: 16 * @pr;
+  margin-right: 8 * @pr;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -91,7 +91,7 @@ export default {
   flex-shrink: 0;
   display: inline-block;
   width: 32 * @pr;
-  margin-right: 12 * @pr;
+  margin-right: 8 * @pr;
   border-radius: 4 * @pr;
   font-size: 12 * @pr;
   text-align: center;

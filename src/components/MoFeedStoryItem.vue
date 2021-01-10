@@ -84,7 +84,8 @@ export default {
 
 .feed-title {
   flex-shrink: 0;
-  width: 64 * @pr;
+  width: 20%;
+  min-width: 64 * @pr;
   margin-right: 18 * @pr;
   white-space: nowrap;
   overflow: hidden;

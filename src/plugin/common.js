@@ -21,11 +21,11 @@ export const antRippleGrey = '#090909' // 涟漪黑
 export const antBackGrey = '#FAFAFA' // 背景浅灰
 export const antLineGrey = '#F3F3F3' // 线条浅灰
 
-// 页面布局
+// 页面布局，注意和 common.less 保持一致
 function computeLayout(windowInnerWidth) {
   const appWidth = Math.min(1500, windowInnerWidth)
-  const hasBoard = appWidth >= 850
-  const mainWidth = Math.max(375, Math.round(appWidth / 3))
+  const hasBoard = appWidth >= 800
+  const mainWidth = Math.max(320, Math.min(480, Math.round(appWidth / 2.618)))
   const boardWidth = appWidth - mainWidth
   return {
     windowInnerWidth: windowInnerWidth,
