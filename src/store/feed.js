@@ -245,6 +245,7 @@ function handleImportedFeedResult(DAO, data) {
     numFeedCreations: data.feed_creations.length,
     numCreatedFeeds: data.created_feeds.length,
     numExistedFeeds: data.num_existed_feeds,
+    firstExistedFeed: data.first_existed_feed,
   }
 }
 

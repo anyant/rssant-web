@@ -143,13 +143,17 @@ export default {
     toggleMode() {
       this.isFromText = !this.isFromText
     },
-    handleFeedImportedResult({ isImport, numFeedCreations, numCreatedFeeds, numExistedFeeds }) {
+    handleFeedImportedResult({ isImport, numFeedCreations, numCreatedFeeds, numExistedFeeds, firstExistedFeed }) {
       if (numFeedCreations <= 0 && numCreatedFeeds <= 0) {
         let message = ''
         if (numExistedFeeds <= 0) {
           message = '未找到任何订阅'
         } else if (numExistedFeeds === 1 && !isImport) {
-          message = '订阅已存在'
+          if (_.isNil(firstExistedFeed)) {
+            message = '订阅已存在'
+          } else {
+            message = `订阅 #${firstExistedFeed.id} 已存在: ${firstExistedFeed.title}`
+          }
         } else {
           message = `共 ${numExistedFeeds} 个订阅均已存在`
         }
