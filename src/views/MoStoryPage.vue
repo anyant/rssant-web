@@ -3,6 +3,15 @@
     <div class="story-image-viewer"></div>
     <MoBackHeader border>
       <template v-slot:title>{{ headerTitle }}</template>
+      <mu-button
+        icon
+        class="action-fetch"
+        @click="onFetchFulltext"
+        data-mu-loading-size="16"
+        v-loading="isFetchLoading"
+      >
+        <fa-icon size="16" icon="sync-alt" />
+      </mu-button>
       <mu-button icon class="action-favorited" @click="toggleFavorited">
         <fa-icon size="18" v-if="isFavorited" icon="star" :color="starColor" />
         <fa-icon size="18" v-else icon="far/star" :color="starColor" />
@@ -29,7 +38,9 @@ import MoStoryContent from '@/components/MoStoryContent'
 export default {
   components: { MoBackHeader, MoLayout, MoStoryContent },
   data() {
-    return {}
+    return {
+      isFetchLoading: false,
+    }
   },
   computed: {
     feedId() {
@@ -107,6 +118,27 @@ export default {
       let is_favorited = !this.isFavorited
       this.$API.story.setFavorited({ feedId: this.feedId, offset: this.offset, is_favorited })
     },
+    async onFetchFulltext() {
+      this.isFetchLoading = true
+      let result = null
+      try {
+        result = await this.$API.story.fetchFulltext({ feedId: this.feedId, offset: this.offset })
+      } catch (ex) {
+        this.$toast.error({ message: `抓取全文失败: ${ex.message}`, time: 10000 })
+      } finally {
+        this.isFetchLoading = false
+      }
+      if (!_.isNil(result)) {
+        if (result.response_status === 200) {
+          if (result.accept === 'REJECT') {
+            this.$toast.info(`抓取全文: 内容没有变化`)
+          }
+        } else {
+          let message = `抓取全文失败: ${result.response_status} ${result.response_status_name}`
+          this.$toast.warning({ message: message, time: 10000 })
+        }
+      }
+    },
     async loadFeed({ feed, feedId }) {
       if (_.isNil(feed)) {
         await this.$API.feed.load({ feedId: feedId })
@@ -166,10 +198,19 @@ export default {
   background: #ffffff;
 }
 
+.action-fetch,
 .action-favorited {
   position: relative;
   right: -4 * @pr;
   width: 32 * @pr;
   height: 32 * @pr;
+}
+
+.action-fetch {
+  margin-right: 16 * @pr;
+}
+
+.action-favorited {
+  color: @antTextBlack;
 }
 </style>
