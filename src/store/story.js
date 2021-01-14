@@ -354,5 +354,12 @@ export default {
         DAO.ADD_OR_UPDATE_LIST({ storys: data.storys })
       })
     },
+    async fetchFulltext(DAO, { feedId, offset }) {
+      let result = await API.story.fetchFulltext({ feed_id: feedId, offset: offset })
+      if (!_.isNil(result.story)) {
+        DAO.ADD_OR_UPDATE(result.story)
+      }
+      return result
+    },
   },
 }

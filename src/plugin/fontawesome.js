@@ -30,6 +30,7 @@ faLibrary.add(fas.faSave)
 faLibrary.add(fas.faAngleRight)
 faLibrary.add(fas.faAngleDown)
 faLibrary.add(fas.faBox)
+faLibrary.add(fas.faSyncAlt)
 
 /**
  * solid icons:

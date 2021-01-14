@@ -277,6 +277,9 @@ const API = {
     setFavorited({ feed_id, offset, is_favorited }) {
       return client.put(`/story/${feed_id}-${offset}/favorited`, { is_favorited })
     },
+    fetchFulltext({ feed_id, offset }) {
+      return client.post('/story/fetch-fulltext', { feed_id, offset })
+    },
   },
 }
 
