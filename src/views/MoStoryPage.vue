@@ -119,6 +119,9 @@ export default {
       this.$API.story.setFavorited({ feedId: this.feedId, offset: this.offset, is_favorited })
     },
     async onFetchFulltext() {
+      if (this.isFetchLoading) {
+        return
+      }
       this.isFetchLoading = true
       let result = null
       try {
