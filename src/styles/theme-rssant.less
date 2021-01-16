@@ -41,3 +41,16 @@ a {
 .mu-snackbar {
   font-size: 15 * @pr;
 }
+
+// https://stackoverflow.com/questions/2781549/removing-input-background-colour-for-chrome-autocomplete
+/* Change the white to any color ;) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  box-shadow: 0 0 0 30px @antBackWhite inset !important;
+}
+/*Change text in autofill textbox*/
+input:-webkit-autofill {
+  -webkit-text-fill-color: @antGold !important;
+}
