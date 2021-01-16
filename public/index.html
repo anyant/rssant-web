@@ -66,8 +66,8 @@
       height: 54px;
       font-family: Helvetica, Arial, sans-serif;
       margin-bottom: 24px;
-      font-weight: bold;
-      color: #ECECEC;
+      color: #C7C7C7;
+      opacity: 0.33;
     }
 
     .sk-spinner-three-bounce.sk-spinner {
@@ -128,6 +128,27 @@
         transform: scale(1);
       }
     }
+
+    /*
+      https://github.com/darkreader/darkreader
+      const CSS = await DarkReader.exportGeneratedCSS();
+    */
+    @media (prefers-color-scheme: dark) {
+
+      html,
+      body,
+      .rssant-spinner-wrapper {
+        background-color: #1c1e1f;
+      }
+
+      .rssant-spinner .spinner-title {
+        color: rgb(184, 180, 172);
+      }
+
+      .sk-spinner-three-bounce div {
+        background-color: rgb(38, 41, 42);
+      }
+    }
   </style>
 </head>
 
@@ -137,13 +158,11 @@
   </noscript>
   <h1 class="screen-reader-text">蚁阅 - RSS阅读器 - 让RSS更好用，轻松订阅你喜欢的博客和资讯</h1>
   <ul class="screen-reader-text">
-    <li>非社交，无广告，无推荐，专注阅读</li>
-    <li>为移动端优化，全平台适配，可添加到主屏，沉浸式体验</li>
-    <li>支持订阅播客和视频内容</li>
-    <li>输入链接，智能查找订阅，支持批量导入导出</li>
-    <li>智能图片代理，解决图片无法加载问题</li>
+    <li>全平台，无广告，无推荐，专注阅读</li>
+    <li>支持全文阅读，支持播客和视频内容</li>
+    <li>智能查找订阅源，智能裂图修复</li>
     <li>智能 RSS 代理，全球 RSS 均可订阅</li>
-    <li>开源，可以直接用在线版，也可以自己用 Docker 部署</li>
+    <li>开源，开箱即用，也支持自己部署</li>
   </ul>
   <p class="screen-reader-text">
     <span>开箱即用:</span>

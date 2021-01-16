@@ -62,8 +62,8 @@ export default {
   font-size: 32 * @pr;
   font-family: Helvetica, Arial, sans-serif;
   color: darken(@antBackGrey, 20%);
-  text-align: center;
   opacity: 0.33;
+  text-align: center;
 }
 
 .creation-list {

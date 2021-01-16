@@ -94,7 +94,8 @@ export default {
   font-size: 54 * @pr;
   margin: auto;
   font-family: Helvetica, Arial, sans-serif;
-  color: darken(@antBackGrey, 5%);
+  color: darken(@antBackGrey, 20%);
+  opacity: 0.33;
   cursor: default;
 }
 </style>
