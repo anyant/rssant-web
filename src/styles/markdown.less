@@ -1,64 +1,69 @@
 @import '~github-markdown-css';
 
 .markdown-body {
-    font-size: 15 * @pr;
-    color    : @antTextSemi;
+  font-size: 15 * @pr;
+  color: @antTextSemi;
 }
 
 .markdown-body img {
-    height: auto; // FIX: img标签指定了高度导致异常拉伸的问题
+  height: auto; // FIX: img标签指定了高度导致异常拉伸的问题
+}
+
+// 去除GitHub锚点图标
+.markdown-body .octicon {
+  display: none;
 }
 
 .markdown-body hr {
-    height: 1px;
+  height: 1px;
 }
 
 // 代码块样式优化
 .markdown-body figure,
 .markdown-body .highlight {
-    position: relative;
-    margin  : 1em 0;
+  position: relative;
+  margin: 1em 0;
 
-    tbody,
-    tr,
-    td {
-        display: block;
-        width  : 100%;
-    }
+  tbody,
+  tr,
+  td {
+    display: block;
+    width: 100%;
+  }
 
-    tr {
-        border: none;
-    }
+  tr {
+    border: none;
+  }
 
-    td.gutter {
-        display: none;
-    }
+  td.gutter {
+    display: none;
+  }
 
-    td.code {
-        padding: 0;
-    }
+  td.code {
+    padding: 0;
+  }
 }
 
 // 数学公式过长，水平滚动
 .markdown-body .MathJax_Display,
 .markdown-body .MathJax {
-    max-width : 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-    outline   : none;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  outline: none;
 }
 
 // fix content overflow, eg: inline MathJax
-.markdown-body>*,
-.markdown-body>div>* {
-    max-width : 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
+.markdown-body > *,
+.markdown-body > div > * {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 /* Fix: font-weight: 600 not working in Android Chrome */
 .markdown-body strong {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .markdown-body h1,
@@ -67,14 +72,14 @@
 .markdown-body h4,
 .markdown-body h5,
 .markdown-body h6 {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .markdown-body dl dt,
 .markdown-body table th {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .markdown-body pre {
-    white-space: pre;
+  white-space: pre;
 }
