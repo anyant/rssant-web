@@ -8,7 +8,7 @@ import 'material-design-icons/iconfont/material-icons.css'
 import 'typeface-roboto'
 // others
 import Mescroll from 'mescroll.js/mescroll.vue'
-import { auto as DarkReaderAuto } from 'darkreader'
+import autoDarkMode from '@/plugin/darkmode'
 
 // rssant
 import App from './App'
@@ -28,12 +28,7 @@ import { initPWA } from '@/plugin/pwa'
 
 initPWA()
 initREM(true, 32, 1)
-
-// https://github.com/darkreader/darkreader
-DarkReaderAuto({
-  brightness: 95,
-  contrast: 95,
-})
+autoDarkMode()
 
 Vue.config.productionTip = false
 
