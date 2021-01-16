@@ -78,7 +78,8 @@ export default {
   .feed-title,
   .story-title,
   .story-date {
-    color: @antTextLight;
+    color: @antTextGrey;
+    opacity: 0.6;
   }
 }
 

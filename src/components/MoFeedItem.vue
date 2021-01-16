@@ -74,7 +74,8 @@ export default {
   }
   .feed-title,
   .feed-date {
-    color: @antTextLight;
+    color: @antTextGrey;
+    opacity: 0.6;
   }
 }
 
