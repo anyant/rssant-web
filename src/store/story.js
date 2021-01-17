@@ -320,9 +320,12 @@ export default {
       await API.story.setWatched({ feed_id: feedId, offset, is_watched: is_watched })
       DAO.SET_WATCHED({ feed_id: feedId, offset, is_watched })
     },
-    async load(DAO, { feedId, offset, detail }) {
-      let story = await API.story.get({ feed_id: feedId, offset, detail })
+    async load(DAO, { feedId, offset, detail, setReaded }) {
+      let story = await API.story.get({ feed_id: feedId, offset, detail, set_readed: setReaded })
       DAO.ADD_OR_UPDATE(story)
+      if (setReaded) {
+        DAO.API.feed.SET_STORY_OFFSET({ id: feedId, offset: offset + 1 })
+      }
     },
     async loadList(DAO, { feedId, offset, detail, size, resetLoadedOffset, isInit }) {
       if (isInit) {

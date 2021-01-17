@@ -86,19 +86,19 @@ export default {
         return []
       }
       let storys = this.$API.story.getListByFeed(this.feedId)
-      return _.filter(storys, s => {
+      return _.filter(storys, (s) => {
         return s.offset >= offset.begin && s.offset <= offset.end
       })
     },
     isReaded() {
       let feed = this.feed
-      return story => {
+      return (story) => {
         return story.offset < feed.story_offset
       }
     },
     isReading() {
       let feed = this.feed
-      return story => {
+      return (story) => {
         let isReading = !_.isNil(this.readingStoryOffset) && story.offset === this.readingStoryOffset
         let isLastOpened = story.offset === feed.story_offset - 1
         return isReading || isLastOpened
@@ -133,9 +133,6 @@ export default {
     },
     onRead(story) {
       this.readingStoryOffset = story.offset
-      if (!this.isReaded(story)) {
-        this.$API.feed.setStoryOffset({ feedId: story.feed.id, offset: story.offset + 1 })
-      }
     },
     setAllReaded() {
       this.$API.feed.setStoryOffset({ feedId: this.feed.id, offset: this.feed.total_storys })
@@ -151,7 +148,7 @@ export default {
       await this.$API.syncFeedLoadMushrooms()
       this.$API.feed.setStoryOffset({ feedId: this.feed.id, offset: offset })
       // close all story cards so that scroll position can be computed correctly
-      _.forEach(_.keys(this.storyOpened), key => {
+      _.forEach(_.keys(this.storyOpened), (key) => {
         this.storyOpened[key] = false
       })
     },

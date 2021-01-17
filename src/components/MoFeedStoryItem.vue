@@ -45,10 +45,10 @@ export default {
       this.myRouteTo(`/feed?id=${this.feedId}`)
     },
     goStory() {
-      if (!_.isNil(this.isReaded) && !this.isReaded) {
-        this.$API.feed.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
-      }
       if (this.isCtrlKeyHold && !_.isEmpty(this.storyLink)) {
+        if (!_.isNil(this.isReaded) && !this.isReaded) {
+          this.$API.feed.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
+        }
         window.open(this.storyLink, '_blank')
       } else {
         let link = `/story?feed=${this.feedId}&offset=${this.offset}`

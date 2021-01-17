@@ -262,8 +262,8 @@ const API = {
     queryBatch({ storys, detail }) {
       return client.post('/story/query-batch', { storys, detail })
     },
-    get({ feed_id, offset, detail }) {
-      return client.get(`/story/${feed_id}-${offset}`, { params: { detail } })
+    get({ feed_id, offset, detail, set_readed }) {
+      return client.get(`/story/${feed_id}-${offset}`, { params: { detail, set_readed } })
     },
     listWatched({ detail } = {}) {
       return client.get('/story/watched', { params: { detail } })

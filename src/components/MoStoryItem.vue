@@ -1,19 +1,10 @@
 <template>
-  <div class="story-item" :class="{'story-item-ctrl':isCtrlKeyHold}">
-    <div
-      class="story-header"
-      :class="{ 'story-header-readed': isReaded }"
-      v-if="!isOpened"
-      @click="onOpen"
-    >
+  <div class="story-item" :class="{ 'story-item-ctrl': isCtrlKeyHold }">
+    <div class="story-header" :class="{ 'story-header-readed': isReaded }" v-if="!isOpened" @click="onOpen">
       <div class="story-title">{{ title }}</div>
       <div class="story-date">{{ dateText }}</div>
     </div>
-    <div
-      class="story-preview"
-      :class="{'story-preview-readed': isReaded && !isReading}"
-      v-if="isOpened"
-    >
+    <div class="story-preview" :class="{ 'story-preview-readed': isReaded && !isReading }" v-if="isOpened">
       <div class="story-preview-header" @click="onOpen">
         <div class="story-preview-title">{{ title }}</div>
         <mu-button icon class="story-favorited" @click.stop="toggleFavorited">
@@ -35,7 +26,7 @@
           @error="onPreviewImageError"
           referrerpolicy="no-referrer"
           class="story-preview-image"
-          :class="{'story-preview-image-loading': !isImageReady}"
+          :class="{ 'story-preview-image-loading': !isImageReady }"
           :src="imageUrl"
         />
         {{ story.summary }}
@@ -173,10 +164,17 @@ export default {
     },
     async onOpen() {
       if (_.isEmpty(this.story.summary) || _.isEmpty(this.story.content)) {
-        let promise = this.$API.story.load({ feedId: this.feedId, offset: this.offset, detail: true })
+        let promise = this.$API.story.load({
+          feedId: this.feedId,
+          offset: this.offset,
+          detail: true,
+          setReaded: !this.isReaded,
+        })
         if (_.isEmpty(this.story.summary) && _.isEmpty(this.story.content)) {
           await promise
         }
+      } else if (!this.isReaded) {
+        this.$API.feed.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
       }
       this.$emit('read')
       if (!this.isOpened && this.isCtrlKeyHold) {

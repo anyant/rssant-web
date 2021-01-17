@@ -147,9 +147,9 @@ export default {
         await this.$API.feed.load({ feedId: feedId })
       }
     },
-    async loadStory({ story, feedId, offset }) {
+    async loadStory({ story, feedId, offset, setReaded }) {
       if (_.isNil(story) || _.isEmpty(story.content)) {
-        await this.$API.story.load({ feedId, offset, detail: true })
+        await this.$API.story.load({ feedId, offset, setReaded, detail: true })
       }
     },
     async loadFeedAndStory() {
@@ -161,9 +161,11 @@ export default {
         story: this.story,
         feedId: this.feedId,
         offset: this.offset,
+        setReaded: !this.isReaded,
       })
       await feedLoaded
       await storyLoaded
+      // 当 story 已加载但仍未读时，loadStory 不会更新已读状态，需要单独更新
       if (!_.isNil(this.feed) && !_.isNil(this.story) && !this.isReaded) {
         this.$API.feed.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
       }
