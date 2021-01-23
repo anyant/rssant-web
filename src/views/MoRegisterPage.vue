@@ -8,7 +8,7 @@
           placeholder="邮箱地址"
           :error-text="registerForm.emailErrorText"
           @focus="clearErrorText"
-          v-model="registerForm.email"
+          v-model="email"
         ></mu-text-field>
         <mu-text-field
           full-width
@@ -29,10 +29,11 @@
             :disabled="isRegisterDisabled"
             data-mu-loading-size="24"
             v-loading="isRegisterLoading"
-          >注册</mu-button>
+            >注册</mu-button
+          >
         </div>
         <div class="login">
-          <MoAntGreenButton @click="()=>{this.$router.replace('/login')}">已有账号？去登录</MoAntGreenButton>
+          <MoAntGreenButton @click="goLogin">已有账号？去登录</MoAntGreenButton>
         </div>
         <div class="thirdpart">
           <MoThirdpartLogin></MoThirdpartLogin>
@@ -59,7 +60,6 @@ export default {
       antTextGrey,
       isRegisterLoading: false,
       registerForm: {
-        email: null,
         password: null,
         passwordVisibility: false,
         emailErrorText: null,
@@ -68,8 +68,16 @@ export default {
     }
   },
   computed: {
+    email: {
+      get() {
+        return this.$API.user.inputAccount
+      },
+      set(value) {
+        this.$API.user.SET_INPUT_ACCOUNT(value)
+      },
+    },
     isRegisterDisabled() {
-      return !(this.registerForm.email && this.registerForm.password)
+      return !(this.email && this.registerForm.password)
     },
     wrapperStyle() {
       return {
@@ -78,18 +86,21 @@ export default {
     },
   },
   methods: {
+    goLogin() {
+      this.$router.replace('/login')
+    },
     register() {
       this.isRegisterLoading = true
       this.$API.user
         .register({
-          email: this.registerForm.email,
+          email: this.email,
           password: this.registerForm.password,
         })
         .then(() => {
           this.$toast.success({ message: '注册成功，请查收邮件验证邮箱！', time: 5000 })
           this.$API.user
             .login({
-              account: this.registerForm.email,
+              account: this.email,
               password: this.registerForm.password,
             })
             .then(() => {
@@ -99,7 +110,7 @@ export default {
               this.$router.replace('/login')
             })
         })
-        .catch(error => {
+        .catch((error) => {
           if (!_.isNil(error.response) && error.response.status === 400) {
             let data = error.response.data
             if (!_.isEmpty(data.email)) {

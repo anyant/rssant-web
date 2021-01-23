@@ -7,7 +7,7 @@
           full-width
           placeholder="用户名或邮箱地址"
           @focus="clearErrorText"
-          v-model="loginForm.account"
+          v-model="account"
         ></mu-text-field>
         <mu-text-field
           full-width
@@ -21,16 +21,11 @@
           v-model="loginForm.password"
         ></mu-text-field>
         <div class="button-wrapper">
-          <mu-button
-            @click="login"
-            class="button-login"
-            :color="antGreen"
-            :disabled="isLoginDisabled"
-          >登录</mu-button>
-          <mu-ripple class="button-forgot" @click="()=>this.$router.push('/reset-password')">忘了密码？</mu-ripple>
+          <mu-button @click="login" class="button-login" :color="antGreen" :disabled="isLoginDisabled">登录</mu-button>
+          <mu-ripple class="button-forgot" @click="() => this.$router.push('/reset-password')">忘了密码？</mu-ripple>
         </div>
         <div class="register">
-          <MoAntGreenButton @click="()=>{this.$router.replace('/register')}">没有账号？去注册</MoAntGreenButton>
+          <MoAntGreenButton @click="goRegister">没有账号？去注册</MoAntGreenButton>
         </div>
         <div class="thirdpart">
           <MoThirdpartLogin></MoThirdpartLogin>
@@ -56,7 +51,6 @@ export default {
       antGreen,
       antTextGrey,
       loginForm: {
-        account: null,
         password: null,
         passwordVisibility: false,
         errorText: null,
@@ -64,8 +58,16 @@ export default {
     }
   },
   computed: {
+    account: {
+      get() {
+        return this.$API.user.inputAccount
+      },
+      set(value) {
+        this.$API.user.SET_INPUT_ACCOUNT(value)
+      },
+    },
     isLoginDisabled() {
-      return !(this.loginForm.account && this.loginForm.password)
+      return !(this.account && this.loginForm.password)
     },
     wrapperStyle() {
       return {
@@ -74,18 +76,21 @@ export default {
     },
   },
   methods: {
+    goRegister() {
+      this.$router.replace('/register')
+    },
     async login() {
       this.$API.user.safeLogout().finally(() => {
         this.$API.user
           .login({
-            account: this.loginForm.account,
+            account: this.account,
             password: this.loginForm.password,
           })
           .then(() => {
             localFeeds.clear()
             this.$router.replace('/')
           })
-          .catch(error => {
+          .catch((error) => {
             this.loginForm.errorText = error.message
           })
       })

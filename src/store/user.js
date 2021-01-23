@@ -71,6 +71,7 @@ async function safeLogout() {
 
 export default {
   state: {
+    inputAccount: null,
     loading: new Loading(),
     loginUser: null,
     loginToken: null,
@@ -81,6 +82,9 @@ export default {
     shopantProduct: null,
   },
   mutations: {
+    SET_INPUT_ACCOUNT(state, value) {
+      state.inputAccount = value
+    },
     LOGIN(state, loginUser) {
       state.loginUser = loginUser
     },
@@ -102,6 +106,9 @@ export default {
     },
   },
   getters: {
+    inputAccount(state) {
+      return state.inputAccount
+    },
     isLoading(state) {
       return state.loading.isLoading
     },
