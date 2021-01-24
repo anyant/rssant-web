@@ -1,11 +1,6 @@
 <template>
   <div class="thirdpart-login">
-    <mu-ripple
-      class="button"
-      v-loading="githubLoading"
-      data-mu-loading-size="24"
-      @click="loginGithub"
-    >
+    <mu-ripple class="button" v-loading="githubLoading" data-mu-loading-size="24" @click="loginGithub">
       <fa-icon size="20" class="button-icon" icon="fab/github" />
       <span class="button-text">GitHub</span>
     </mu-ripple>
@@ -24,8 +19,8 @@ export default {
       if (this.githubLoading) {
         return
       }
-      await this.$API.user.safeLogout()
       this.githubLoading = true
+      await this.$API.user.safeLogout()
       this.$API.user.loginGithub({ next: '/' })
     },
   },
