@@ -17,13 +17,13 @@
       </div>
       <div class="description">
         <div>会员可享受全部功能，订阅数量不限</div>
-        <div>到期后订阅将停止更新（预售结束后执行）</div>
-        <div class="description-highlight">原价 5 元每月，预售期间一折购买</div>
+        <div>到期后订阅将停止更新</div>
+        <div class="description-highlight">{{ promotionMessage }}</div>
       </div>
       <div class="package-list">
         <div
           class="package"
-          :class="{'package-highlight': isHighlightPackage(pkg)}"
+          :class="{ 'package-highlight': isHighlightPackage(pkg) }"
           v-for="pkg in packages"
           :key="pkg.amount"
           @click="onPackageClick(pkg)"
@@ -52,7 +52,8 @@
           @click="onPay"
           data-mu-loading-size="24"
           v-loading="isPaymentLoading"
-        >充值</mu-button>
+          >充值
+        </mu-button>
       </div>
     </div>
   </MoLayout>
@@ -82,7 +83,7 @@ function selectPriceList(prices) {
   }
   // 微信不支持相册扫码支付，所以移动端用 SIMPLE_WEIXIN，桌面端用 STANDARD_HUPIJIAO_WEIXIN
   if (channelMap['STANDARD_HUPIJIAO_WEIXIN'] && channelMap['SIMPLE_WEIXIN']) {
-    prices = _.filter(prices, item => {
+    prices = _.filter(prices, (item) => {
       if (isMobile) {
         return item.payment_channel.type !== 'STANDARD_HUPIJIAO_WEIXIN'
       } else {
@@ -91,7 +92,7 @@ function selectPriceList(prices) {
     })
   }
   prices = _.sortBy(prices, [
-    function(item) {
+    function (item) {
       let priority = PAYMENT_CHANNEL_PRIORITY.indexOf(item.payment_channel.type)
       if (priority < 0) {
         priority = PAYMENT_CHANNEL_PRIORITY.length
@@ -155,6 +156,32 @@ export default {
     },
     isPayEnable() {
       return !_.isNil(this.package_amount) && !_.isNil(this.payment_channel_id)
+    },
+    yearCNYPrice() {
+      for (let pkg of this.packages) {
+        if (pkg.name.indexOf('一年') >= 0) {
+          for (let item of selectPriceList(pkg.prices)) {
+            if (item.payment_channel.currency.name === 'CNY') {
+              return item.price
+            }
+          }
+        }
+      }
+      return null
+    },
+    promotionMessage() {
+      if (_.isNil(this.yearCNYPrice)) {
+        return null
+      }
+      if (this.yearCNYPrice === 4800) {
+        return '原价 5 元每月，现在年付八折购买'
+      } else if (this.yearCNYPrice >= 2400 && this.yearCNYPrice <= 3000) {
+        return '原价 5 元每月，现在年付半价购买'
+      } else if (this.yearCNYPrice <= 480) {
+        return '原价 5 元每月，现在年付一折购买'
+      } else {
+        return null
+      }
     },
   },
   async mounted() {
