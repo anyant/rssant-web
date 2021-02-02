@@ -8,7 +8,9 @@
         <h4 class="sub-title">将蚁阅添加到主屏</h4>
         <div class="center">
           <div>获得和App一样沉浸式的体验</div>
-          <div v-if="!isLikelySupportPWA" class="pwa-tip">推荐用Chrome，Safari，火狐，微软Edge，或小米浏览器打开蚁阅</div>
+          <div v-if="!isLikelySupportPWA" class="pwa-tip">
+            推荐用Chrome，Safari，火狐，微软Edge，或小米浏览器打开蚁阅
+          </div>
           <div class="button-wrapper">
             <MoPWAButton />
           </div>
@@ -24,8 +26,8 @@
           <h4 class="sub-title">蚁阅会员</h4>
           <div class="center">
             <div>会员可享受全部功能，订阅数量不限</div>
-            <div>首月免费试用，预售期间一折购买</div>
-            <div class="dt-avaliable" :class="{'balance-not-enough': !isBalanceEnough}">
+            <div>首月免费试用，到期后订阅将停止更新</div>
+            <div class="dt-avaliable" :class="{ 'balance-not-enough': !isBalanceEnough }">
               <span class="label">会员到期时间:</span>
               <span class="value">{{ customerBalance }}</span>
             </div>
