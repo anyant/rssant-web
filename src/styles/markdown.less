@@ -41,6 +41,23 @@
 
   td.code {
     padding: 0;
+    border: none;
+  }
+}
+
+// Hugo chroma 代码块样式
+.markdown-body .highlight {
+  .chroma .lntd {
+    padding: 0;
+    margin: 0;
+    border: 0;
+  }
+  // 去掉行号
+  .chroma .lntd:first-child {
+    display: none;
+  }
+  .chroma .lntd:last-child {
+    display: block;
   }
 }
 
