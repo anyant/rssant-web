@@ -2,11 +2,12 @@
   <MoLayout header>
     <MoBackHeader center-title>
       <template v-slot:title>{{ username }}</template>
+      <MoDarkModeDialog :open.sync="isDarkModeDialogOpen" @change="onDarkModeChange" />
     </MoBackHeader>
     <div class="main">
       <div
         class="action-group action-group-vip"
-        :class="{'balance-not-enough': !isBalanceEnough}"
+        :class="{ 'balance-not-enough': !isBalanceEnough }"
         v-if="isShopantEnable"
       >
         <div class="action-row" @click="goVip">
@@ -18,18 +19,14 @@
         </div>
       </div>
       <div class="action-group">
-        <div class="action-row" :class="{'disabled': isGithubConnected}" @click="connectGithub">
+        <div class="action-row" :class="{ disabled: isGithubConnected }" @click="connectGithub">
           <span class="action-label">GitHub登录</span>
           <span>
             <span>{{ isGithubConnected ? '已绑定' : '绑定' }}</span>
             <fa-icon class="action-icon" icon="chevron-right" />
           </span>
         </div>
-        <div
-          class="action-row"
-          :class="{'disabled': isPasswordConfigured}"
-          @click="configurePassword"
-        >
+        <div class="action-row" :class="{ disabled: isPasswordConfigured }" @click="configurePassword">
           <span class="action-label">密码登录</span>
           <span>
             <span>{{ isPasswordConfigured ? '已设置' : '设置密码' }}</span>
@@ -39,6 +36,13 @@
         <div class="action-row" @click="exportOPML">
           <span class="action-label">导出订阅</span>
           <fa-icon class="action-icon" icon="chevron-right" />
+        </div>
+        <div class="action-row" @click="onClickDarkMode">
+          <span class="action-label">夜间模式</span>
+          <span>
+            <span>{{ darkModeStatus }}</span>
+            <fa-icon class="action-icon" icon="chevron-right" />
+          </span>
         </div>
         <div class="action-row" @click="goAbout">
           <span class="action-label">蚁阅介绍</span>
@@ -60,17 +64,21 @@
 import _ from 'lodash'
 import MoLayout from '@/components/MoLayout'
 import MoBackHeader from '@/components/MoBackHeader'
+import MoDarkModeDialog from '@/components/MoDarkModeDialog'
 import { antGold, antRed, antGreen } from '@/plugin/common'
 import { formatDate } from '@/plugin/datefmt'
+import DarkMode from '@/plugin/darkmode'
 
 export default {
   name: 'MoAccountPage',
-  components: { MoLayout, MoBackHeader },
+  components: { MoLayout, MoBackHeader, MoDarkModeDialog },
   data() {
     return {
       antGold,
       antRed,
       antGreen,
+      isDarkModeDialogOpen: false,
+      darkModeValue: DarkMode.get(),
     }
   },
   computed: {
@@ -114,6 +122,12 @@ export default {
       let user = this.$API.user.loginUser
       return _.isNil(user) ? '' : user.username
     },
+    darkModeStatus() {
+      if (!DarkMode.isSupported()) {
+        return '不支持'
+      }
+      return { auto: '跟随系统', enable: '已开启', disable: '已关闭' }[this.darkModeValue]
+    },
   },
   mounted() {
     this.$API.user.syncProduct()
@@ -132,7 +146,7 @@ export default {
           this.$API.user
             .changePassword({ password: instance.value })
             .then(() => done())
-            .catch(error => {
+            .catch((error) => {
               instance.errorText = error.message
             })
         },
@@ -157,6 +171,12 @@ export default {
     },
     goAbout() {
       this.$router.push('/about')
+    },
+    onClickDarkMode() {
+      this.isDarkModeDialogOpen = true
+    },
+    onDarkModeChange() {
+      this.darkModeValue = DarkMode.get()
     },
     onLogout() {
       this.$API.user.logout().then(() => {

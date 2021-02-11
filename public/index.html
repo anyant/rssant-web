@@ -128,28 +128,41 @@
         transform: scale(1);
       }
     }
-
-    /*
-      https://github.com/darkreader/darkreader
-      const CSS = await DarkReader.exportGeneratedCSS();
-    */
-    @media (prefers-color-scheme: dark) {
-
-      html,
-      body,
-      .rssant-spinner-wrapper {
-        background-color: #1c1e1f;
-      }
-
-      .rssant-spinner .spinner-title {
-        color: rgb(184, 180, 172);
-      }
-
-      .sk-spinner-three-bounce div {
-        background-color: rgb(38, 41, 42);
-      }
-    }
   </style>
+  <script>
+    (function () {
+      function appendStyle(css) {
+        var style = document.createElement('style');
+        style.type = 'text/css';
+        style.id = 'rssant-dark-mode-style';
+        style.appendChild(document.createTextNode(css));
+        document.head.appendChild(style);
+      }
+      function normalizeMode(mode) {
+        return mode === 'enable' || mode === 'disable' ? mode : 'auto';
+      }
+      function getDarkMode() {
+        var storage = window.localStorage;
+        if (storage === null || storage === undefined) { return null; }
+        return storage.getItem('RSSANT_DARK_MODE');
+      }
+      /*
+        https://github.com/darkreader/darkreader
+        const CSS = await DarkReader.exportGeneratedCSS();
+      */
+      var DARK_CSS = (
+        "html, body, .rssant-spinner-wrapper { background-color: #1c1e1f; }\n" +
+        ".rssant-spinner .spinner-title { color: rgb(184, 180, 172); }\n" +
+        ".sk-spinner-three-bounce div { background-color: rgb(38, 41, 42); }\n"
+      );
+      var mode = normalizeMode(getDarkMode());
+      if (mode === 'enable') {
+        appendStyle(DARK_CSS);
+      } else if (mode === 'auto') {
+        appendStyle('@media (prefers-color-scheme: dark) {' + DARK_CSS + '}');
+      }
+    })();
+  </script>
 </head>
 
 <body>

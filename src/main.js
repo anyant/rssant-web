@@ -8,7 +8,7 @@ import 'material-design-icons/iconfont/material-icons.css'
 import 'typeface-roboto'
 // others
 import Mescroll from 'mescroll.js/mescroll.vue'
-import autoDarkMode from '@/plugin/darkmode'
+import DarkMode from '@/plugin/darkmode'
 
 // rssant
 import App from './App'
@@ -28,7 +28,7 @@ import { initPWA } from '@/plugin/pwa'
 
 initPWA()
 initREM(true, 32, 1)
-autoDarkMode()
+DarkMode.init()
 
 Vue.config.productionTip = false
 
@@ -52,5 +52,9 @@ document.addEventListener('DOMContentLoaded', function() {
   let spiner = document.getElementById('rssant-spinner')
   if (spiner !== undefined && spiner !== null) {
     spiner.remove()
+  }
+  let darkModeStyle = document.getElementById('rssant-dark-mode-style')
+  if (darkModeStyle !== undefined && darkModeStyle !== null) {
+    darkModeStyle.remove()
   }
 })
