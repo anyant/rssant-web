@@ -197,7 +197,7 @@ export default {
 .divider {
   margin-top: 8 * @pr;
   margin-bottom: 8 * @pr;
-  border-bottom: solid 1 * @pr @antLineGrey;
+  border-bottom: solid 1 * @pr lighten(@antLineGrey, 3%);
 }
 
 .action-group {
