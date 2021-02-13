@@ -24,13 +24,26 @@ export function isSameOriginUrl(url, origin) {
   }
 }
 
-const RE_IMAGE_URL = /(img|image|pic|picture|photo|png|jpg|jpeg|webp|bpg|ico|exif|tiff|gif|svg|bmp)/gi
+// Note: regex object contains states !!!
+const RE_IMAGE_URL = () => /(img|image|pic|picture|photo|png|jpg|jpeg|webp|bpg|ico|exif|tiff|gif|svg|bmp)/gi
 
 export function isImageUrl(value) {
   if (_.isEmpty(value) || isDataUrl(value)) {
     return false
   }
-  return RE_IMAGE_URL.test(value)
+  return RE_IMAGE_URL().test(value)
+}
+
+function _getDataOptionUrl(value) {
+  // fix image of https://www.uscreditcards101.com/feed/
+  // https://gist.github.com/guyskk/c35c8a29b14a48bd2fca8512cb2f89a8
+  if (!_.isEmpty(value) && value.startsWith('[[') && value.endsWith(']]')) {
+    try {
+      let dataOptions = JSON.parse(value)
+      return dataOptions[0][1]
+    } catch (ignore) {}
+  }
+  return null
 }
 
 export function getImageSrc(node) {
@@ -38,9 +51,12 @@ export function getImageSrc(node) {
   if (_.isEmpty(src)) {
     src = node.getAttribute('srcset')
   }
-  let dataSrcAttrs = ['data-src', 'data-original', 'data-origin']
+  let dataSrcAttrs = ['data-src', 'data-original', 'data-origin', 'data-options']
   for (let attr of dataSrcAttrs) {
     let value = node.getAttribute(attr)
+    if (attr === 'data-options') {
+      value = _getDataOptionUrl(value)
+    }
     if (isImageUrl(value)) {
       src = value
       break

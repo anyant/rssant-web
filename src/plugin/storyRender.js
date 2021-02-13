@@ -16,20 +16,21 @@ import _ from 'lodash'
 // see also: https://caniuse.com/#feat=js-regexp-lookbehind
 // see also: https://regexr.com/
 
-const RE_STRICT_MATHJAX = /(\$\$.+?\$\$)|(\\\[.+?\\\])|(\\\(.+?\\\))/ms
-const RE_INLINE_MATHJAX = /(\\\(.+?\\\))|(\$.+?\$(?![^\s<]))/ms
-const RE_DISPLAY_MATHJAX = /(\$\$.+?\$\$)|(\\\[.+?\\\])/ms
+// Note: regex object contains states !!!
+const RE_STRICT_MATHJAX = () => /(\$\$.+?\$\$)|(\\\[.+?\\\])|(\\\(.+?\\\))/ms
+const RE_INLINE_MATHJAX = () => /(\\\(.+?\\\))|(\$.+?\$(?![^\s<]))/ms
+const RE_DISPLAY_MATHJAX = () => /(\$\$.+?\$\$)|(\\\[.+?\\\])/ms
 
 function hasStrictMathJax(content) {
-  return RE_STRICT_MATHJAX.test(content)
+  return RE_STRICT_MATHJAX().test(content)
 }
 
 function hasInlineMathJax(content) {
-  return RE_INLINE_MATHJAX.test(content)
+  return RE_INLINE_MATHJAX().test(content)
 }
 
 function hasDisplayMathJax(content) {
-  return RE_DISPLAY_MATHJAX.test(content)
+  return RE_DISPLAY_MATHJAX().test(content)
 }
 
 function isMathjaxReady() {
