@@ -12,7 +12,7 @@ function isLikelySupportPWA() {
   }
   let ua = new UAParser(navigator.userAgent)
   let browser = ua.getBrowser().name
-  let isSupport = /(Chrome|Chromium|Firefox|Edge|Safari|MIUI Browser)/i.test(browser)
+  let isSupport = /(Chrome|Chromium|Firefox|Edge|Safari)/i.test(browser)
   return isSupport
 }
 
