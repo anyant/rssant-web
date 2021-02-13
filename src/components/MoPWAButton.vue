@@ -2,9 +2,9 @@
   <div class="pwa-button" @click.capture.stop.prevent="togglePWA">
     <mu-checkbox
       v-model="isPWAEnable"
-      :uncheck-icon="hasPWA?'favorite_border':'help_outline'"
+      :uncheck-icon="hasPWA ? 'favorite_border' : 'help_outline'"
       checked-icon="favorite"
-      :label="isPWAEnable?'已添加到主屏':'添加到主屏'"
+      :label="isPWAEnable ? '已添加到主屏' : '添加到主屏'"
       :label-left="true"
       :ripple="false"
     ></mu-checkbox>
@@ -25,7 +25,7 @@ export default {
   methods: {
     togglePWA() {
       if (!hasPWA) {
-        this.$alert('可以尝试用Chrome，Safari，火狐，微软Edge，或小米浏览器打开蚁阅。', '当前浏览器不支持添加到主屏', {
+        this.$alert('可以尝试用Chrome，Safari，火狐，或微软Edge 打开蚁阅。', '当前浏览器不支持添加到主屏', {
           okLabel: '好的',
         })
         return
@@ -40,7 +40,7 @@ export default {
       if (hasPWA) {
         localConfig.PWA_ENABLE.set(true)
         this.isPWAEnable = true
-        let content = h => {
+        let content = (h) => {
           return h('ol', null, [
             h('li', null, [h('span', null, '页面刷新后，浏览器可能会弹出 "将蚁阅添加到主屏" 提示，点击确认即可')]),
             h('li', null, [h('span', null, '如果没有弹出提示，可以从浏览器菜单将蚁阅添加到主屏')]),

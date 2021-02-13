@@ -8,9 +8,7 @@
         <h4 class="sub-title">将蚁阅添加到主屏</h4>
         <div class="center">
           <div>获得和App一样沉浸式的体验</div>
-          <div v-if="!isLikelySupportPWA" class="pwa-tip">
-            推荐用Chrome，Safari，火狐，微软Edge，或小米浏览器打开蚁阅
-          </div>
+          <div v-if="!isLikelySupportPWA" class="pwa-tip">推荐用Chrome，Safari，火狐，或微软Edge 打开蚁阅</div>
           <div class="button-wrapper">
             <MoPWAButton />
           </div>
