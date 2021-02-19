@@ -6,16 +6,16 @@
     :open="open"
     v-on:update:open="onUpdateOpen"
   >
-    <mu-text-field class="group-input" full-width v-model="groupName" placeholder="请输入或选择分组"></mu-text-field>
+    <mu-text-field
+      class="group-input"
+      full-width
+      v-model="groupName"
+      :max-length="50"
+      placeholder="请输入或选择分组"
+    ></mu-text-field>
     <MoGroupNameSelector class="group-name-selector" @select="onSelect"></MoGroupNameSelector>
     <mu-button slot="actions" flat @click="onCancel()">取消</mu-button>
-    <mu-button
-      slot="actions"
-      :disabled="!isConfirmEnable"
-      flat
-      color="primary"
-      @click="onConfirm()"
-    >确定</mu-button>
+    <mu-button slot="actions" :disabled="!isConfirmEnable" flat color="primary" @click="onConfirm()">确定</mu-button>
   </mu-dialog>
 </template>
 
@@ -42,7 +42,7 @@ export default {
     },
   },
   watch: {
-    open: function(value, oldValue) {
+    open: function (value, oldValue) {
       if (value) {
         this.groupName = this.value
       }
