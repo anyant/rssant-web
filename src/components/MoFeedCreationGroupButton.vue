@@ -26,6 +26,11 @@ export default {
   text-transform: none;
   // cover button border-radius
   margin-right: -4 * @pr;
+  // limit width when text too long
+  flex-shrink: 1;
+  flex-grow: 0;
+  white-space: pre;
+  overflow: hidden;
 
   &.hover::before {
     display: none;
@@ -37,6 +42,8 @@ export default {
 
   .group-name {
     margin-right: 4 * @pr;
+    text-overflow: clip;
+    overflow: hidden;
   }
 }
 
