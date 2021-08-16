@@ -1,5 +1,9 @@
 <template>
-  <MoLayout header border solo>
+  <MoLayout
+    header
+    border
+    solo
+  >
     <MoBackHeader>
       <template v-slot:title>蚁阅</template>
     </MoBackHeader>
@@ -20,20 +24,19 @@
             <li>开源，开箱即用，也支持自己部署</li>
           </ul>
         </div>
-
-        <h4 class="sub-title">反馈建议</h4>
-        <p class="center">
-          欢迎通过邮件联系我
-          <br />
-          邮箱地址: {{ contactEmail }}
-          <br />
-          <a class="changelog" :href="changelogUrl" target="_blank">更新日志</a>
-        </p>
-
-        <h4 class="sub-title">开放源码</h4>
-        <p class="center">
-          <a href="https://github.com/anyant/rssant" target="_blank">https://github.com/anyant/rssant</a>
-        </p>
+        <MoContact />
+        <div class="center footer-links">
+          <a
+            class="link"
+            href="https://github.com/anyant/rssant"
+            target="_blank"
+          >GitHub开源</a>
+          <a
+            class="link"
+            :href="changelogUrl"
+            target="_blank"
+          >更新日志</a>
+        </div>
       </div>
     </div>
   </MoLayout>
@@ -42,14 +45,14 @@
 <script>
 import MoLayout from '@/components/MoLayout'
 import MoBackHeader from '@/components/MoBackHeader'
+import MoContact from '@/components/MoContact'
 
 const changelogUrl = location.origin + '/changelog'
-const contactEmail = 'guyskk@anyant.com'
 
 export default {
-  components: { MoLayout, MoBackHeader },
+  components: { MoLayout, MoBackHeader, MoContact },
   data() {
-    return { changelogUrl, contactEmail }
+    return { changelogUrl }
   },
 }
 </script>
@@ -92,8 +95,15 @@ export default {
   }
 }
 
-.changelog {
-  display: inline-block;
-  margin-top: 8 * @pr;
+.footer-links {
+  display: flex;
+  flex-direction: row;
+  align-content: center;
+  justify-content: center;
+  padding-top: 32 * @pr;
+  .link {
+    margin-left: 16 * @pr;
+    margin-right: 16 * @pr;
+  }
 }
 </style>
