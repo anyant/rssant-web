@@ -1,23 +1,66 @@
 <template>
-  <MoLayout header class="vip">
+  <MoLayout
+    header
+    class="vip"
+  >
     <MoBackHeader>
       <template v-slot:title>蚁阅会员</template>
-      <mu-button flat class="action-redeem-code" to="/vip-redeem-code">兑换码</mu-button>
+      <mu-button
+        flat
+        class="action-redeem-code"
+        to="/vip-redeem-code"
+      >兑换码</mu-button>
     </MoBackHeader>
     <div class="main">
       <div class="balance">
         <div class="balance-info">
           <span>会员</span>
-          <transition-group name="balance-transition" tag="div" class="balance-date-wrapper">
-            <span class="balance-date" v-for="item in customerBalanceList" :key="item">{{ item }}</span>
+          <transition-group
+            name="balance-transition"
+            tag="div"
+            class="balance-date-wrapper"
+          >
+            <span
+              class="balance-date"
+              v-for="item in customerBalanceList"
+              :key="item"
+            >{{ item }}</span>
           </transition-group>
           <span>到期</span>
         </div>
-        <router-link class="button-balance-logs" to="/vip-balance-logs">充值兑换记录</router-link>
+        <router-link
+          class="button-balance-logs"
+          to="/vip-balance-logs"
+        >充值兑换记录</router-link>
       </div>
       <div class="description">
-        <div>会员可享受全部功能，订阅数量不限</div>
-        <div>到期后订阅将停止更新</div>
+        <table class="description-table">
+          <tr>
+            <th></th>
+            <th>会员版</th>
+            <th>免费版</th>
+          </tr>
+          <tr>
+            <td>订阅数量</td>
+            <td class="highlight"> 不限</td>
+            <td> 不限</td>
+          </tr>
+          <tr>
+            <td>基础功能</td>
+            <td class="highlight"> 支持</td>
+            <td> 试用30天</td>
+          </tr>
+          <tr>
+            <td>高级功能</td>
+            <td class="highlight"> 支持</td>
+            <td> 试用30天</td>
+          </tr>
+          <tr>
+            <td>技术支持</td>
+            <td class="highlight"> 优先</td>
+            <td> 常规</td>
+          </tr>
+        </table>
         <div class="description-highlight">{{ promotionMessage }}</div>
       </div>
       <div class="package-list">
@@ -36,7 +79,11 @@
         </div>
       </div>
       <div class="price-list">
-        <div class="price" v-for="item in prices" :key="item.payment_channel.id">
+        <div
+          class="price"
+          v-for="item in prices"
+          :key="item.payment_channel.id"
+        >
           <mu-radio
             :ripple="false"
             :label="item.payment_channel.name"
@@ -52,7 +99,7 @@
           @click="onPay"
           data-mu-loading-size="24"
           v-loading="isPaymentLoading"
-          >充值
+        >充值
         </mu-button>
       </div>
     </div>
@@ -348,6 +395,26 @@ export default {
 .description {
   margin-top: 16 * @pr;
   color: @antTextSemi;
+}
+
+.description-table {
+  border-collapse: collapse;
+  margin-bottom: 16 * @pr;
+  width: 100%;
+  max-width: 360 * @pr;
+  th,
+  td {
+    text-align: left;
+    border-bottom: 1 * @pr solid;
+    border-color: @antLineGrey;
+    padding: 8 * @pr 32 * @pr 8 * @pr 0;
+    &:last-child {
+      padding-right: 8 * @pr;
+    }
+  }
+  .highlight {
+    color: @antGreen;
+  }
 }
 
 .description-highlight {
