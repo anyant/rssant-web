@@ -33,6 +33,7 @@ import _ from 'lodash'
 import { antGreen, antTextGrey } from '@/plugin/common'
 import MoLayout from '@/components/MoLayout'
 import MoAntGreenButton from '@/components/MoAntGreenButton'
+import { userStore } from '@/store/user'
 
 export default {
   components: { MoAntGreenButton, MoLayout },
@@ -59,7 +60,7 @@ export default {
   methods: {
     save() {
       this.isLoading = true
-      this.$API.user
+      userStore
         .confirmResetPassword({ uid: this.uid, token: this.token, new_password: this.password })
         .then(() => {
           this.$toast.success({ message: '密码设置成功，请使用新密码登录！', time: 5000 })

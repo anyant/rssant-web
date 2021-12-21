@@ -5,7 +5,7 @@ import _ from 'lodash'
 
 import localConfig from '@/plugin/localConfig'
 import routes from './routes'
-import { API } from '@/store'
+import { userStore } from '@/store/user'
 
 Vue.use(Router)
 
@@ -52,12 +52,12 @@ router.beforeEach((to, from, next) => {
   }
   const goNext = () => next()
   if (loginRequired) {
-    API.user
+    userStore
       .login()
       .then(goNext)
       .catch(goLogin)
   } else {
-    API.user
+    userStore
       .login()
       .then(() => {
         const isAuthPage = to.name === 'Login' || to.name === 'Register' || to.name === 'Hello'

@@ -111,6 +111,7 @@ import MoLayout from '@/components/MoLayout.vue'
 import MoBackHeader from '@/components/MoBackHeader'
 import shopantClient from '@/plugin/shopant'
 import { formatDate } from '@/plugin/datefmt'
+import { userStore } from '@/store/user'
 
 // https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
 const isMobile = window.innerWidth < 600 || /Mobi/i.test(window.navigator.userAgent)
@@ -164,7 +165,7 @@ export default {
   },
   computed: {
     product() {
-      return this.$API.user.shopantProduct
+      return userStore.shopantProduct
     },
     packages() {
       if (_.isNil(this.product)) {
@@ -192,7 +193,7 @@ export default {
       return _.isEmpty(this.prices) ? null : this.prices[0].payment_channel.id
     },
     customerBalance() {
-      let dt = this.$API.user.balance
+      let dt = userStore.balance
       if (_.isNil(dt)) {
         return ''
       }
@@ -232,11 +233,11 @@ export default {
     },
   },
   async mounted() {
-    if (this.$API.user.shouldNoticeVip) {
-      this.$API.user.UPDATE_VIP_NOTICED_TIMESTAMP()
+    if (userStore.shouldNoticeVip) {
+      userStore.UPDATE_VIP_NOTICED_TIMESTAMP()
     }
     try {
-      await this.$API.user.syncProduct()
+      await userStore.syncProduct()
     } catch (ex) {
       this.$toast.error(ex.message)
       return
@@ -301,7 +302,7 @@ export default {
       let data = null
       try {
         data = await shopantClient.call('payment.start', {
-          customer: this.$API.user.shopantCustomerParameter,
+          customer: userStore.shopantCustomerParameter,
           package_amount: this.package_amount,
           payment_channel_id: this.payment_channel_id,
         })
@@ -314,7 +315,7 @@ export default {
       }, 6000)
       await shopantClient.show(data)
       this.isPaymentLoading = false
-      await this.$API.user.syncCustomerBalance()
+      await userStore.syncCustomerBalance()
     },
   },
 }

@@ -43,6 +43,7 @@ import MoLayout from '@/components/MoLayout'
 import MoAntGreenButton from '@/components/MoAntGreenButton'
 import MoThirdpartLogin from '@/components/MoThirdpartLogin'
 import MoFooter from '@/components/MoFooter'
+import { userStore } from '@/store/user'
 
 export default {
   components: { MoAntGreenButton, MoThirdpartLogin, MoLayout, MoFooter },
@@ -60,10 +61,10 @@ export default {
   computed: {
     account: {
       get() {
-        return this.$API.user.inputAccount
+        return userStore.inputAccount
       },
       set(value) {
-        this.$API.user.SET_INPUT_ACCOUNT(value)
+        userStore.SET_INPUT_ACCOUNT(value)
       },
     },
     isLoginDisabled() {
@@ -80,8 +81,8 @@ export default {
       this.$router.replace('/register')
     },
     async login() {
-      this.$API.user.safeLogout().finally(() => {
-        this.$API.user
+      userStore.safeLogout().finally(() => {
+        userStore
           .login({
             account: this.account,
             password: this.loginForm.password,

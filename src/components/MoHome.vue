@@ -107,6 +107,7 @@ import MoHeaderTip from '@/components/MoHeaderTip.vue'
 import initMathjax from '@/plugin/mathjax'
 import localConfig from '@/plugin/localConfig'
 import { antRippleGrey } from '@/plugin/common'
+import { userStore } from '@/store/user'
 
 const ITEM_HEIGHT = 48
 const PAGE_SIZE = Math.ceil(window.innerHeight / ITEM_HEIGHT)
@@ -181,7 +182,7 @@ export default {
       return this.isReady || !this.$LAYOUT.hasBoard
     },
     showMenuAccountDot() {
-      return this.isReady && !this.isEmpty && this.$API.user.shouldNoticeVip
+      return this.isReady && !this.isEmpty && userStore.shouldNoticeVip
     },
     showMenuHelpDot() {
       return this.isReady && !this.isEmpty && !this.isHelpReaded

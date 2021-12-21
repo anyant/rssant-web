@@ -11,6 +11,7 @@
 
 <script>
 import MoLayout from '@/components/MoLayout'
+import { userStore } from '@/store/user'
 
 export default {
   components: { MoLayout },
@@ -25,11 +26,11 @@ export default {
     },
   },
   mounted() {
-    this.$API.user
+    userStore
       .confirmEmail({ key: this.key })
       .then(() => {
         this.$toast.success({ message: '邮箱验证成功！', time: 5000 })
-        if (this.$API.user.isLogined) {
+        if (userStore.isLogined) {
           this.$router.replace('/')
         } else {
           this.$router.replace('/login')

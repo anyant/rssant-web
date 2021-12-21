@@ -31,6 +31,7 @@ import MoLayout from '@/components/MoLayout.vue'
 import MoBackHeader from '@/components/MoBackHeader'
 import MoAntBlueButton from '@/components/MoAntBlueButton'
 import shopantClient from '@/plugin/shopant'
+import { userStore } from '@/store/user'
 
 export default {
   components: {
@@ -57,11 +58,11 @@ export default {
     onExchange() {
       return shopantClient
         .call('redeem_code.exchange', {
-          customer: this.$API.user.shopantCustomerParameter,
+          customer: userStore.shopantCustomerParameter,
           value: this.inputText,
         })
         .then(data => {
-          this.$API.user.syncCustomerBalance()
+          userStore.syncCustomerBalance()
           let message = `兑换成功，时长：${this.formatAmount(data.amount)}`
           this.$alert(message, '兑换成功', {
             okLabel: '知道了',
