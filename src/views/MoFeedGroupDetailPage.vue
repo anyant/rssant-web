@@ -30,6 +30,7 @@ import MoFeedDetailInfoItem from '@/components/MoFeedDetailInfoItem.vue'
 import MoGroupNameSelector from '@/components/MoGroupNameSelector.vue'
 import { getGroupId, isSystemGroup } from '@/plugin/feedGroupHelper'
 import { formatFullDateFriendly } from '@/plugin/datefmt'
+import { rootStore } from '@/store/root'
 
 function isReadedFeed(feed) {
   return feed.num_unread_storys <= 0
@@ -41,7 +42,7 @@ export default {
     return {}
   },
   async mounted() {
-    await this.$API.syncFeedLoadMushrooms()
+    await rootStore.syncFeedLoadMushrooms()
   },
   computed: {
     name() {

@@ -22,6 +22,7 @@ import MoLayout from '@/components/MoLayout'
 import MoHome from '@/components/MoHome'
 import MoHeader from '@/components/MoHeader'
 import { keepAlivePages } from '@/router'
+import { rootStore } from '@/store/root'
 
 export default {
   name: 'MoHomePage',
@@ -33,7 +34,7 @@ export default {
     }
   },
   mounted() {
-    this.$API.syncFeedLoadMushrooms().then(() => {
+    rootStore.syncFeedLoadMushrooms().then(() => {
       this.isReady = true
     })
   },

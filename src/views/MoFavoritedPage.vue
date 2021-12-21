@@ -25,6 +25,8 @@ import _ from 'lodash'
 import MoBackHeader from '@/components/MoBackHeader'
 import MoLayout from '@/components/MoLayout'
 import MoFeedStoryItem from '@/components/MoFeedStoryItem.vue'
+import { storyStore } from '@/store/story'
+import { rootStore } from '@/store/root'
 
 export default {
   components: { MoBackHeader, MoLayout, MoFeedStoryItem },
@@ -35,17 +37,17 @@ export default {
     },
   },
   mounted() {
-    this.$API.story
+    storyStore
       .loadFavorited()
-      .then(this.$API.syncFeedLoadMushrooms())
+      .then(rootStore.syncFeedLoadMushrooms())
       .then(() => {
         this.$pageState.restoreScrollTop({ el: this.$refs.mainRef })
       })
-    this.$API.story.setNextStoryGetter(null)
+    storyStore.setNextStoryGetter(null)
   },
   computed: {
     favorited() {
-      return this.$API.story.favorited
+      return storyStore.favorited
     },
   },
   methods: {

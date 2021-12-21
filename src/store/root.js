@@ -1,7 +1,11 @@
-export default {
+import { hamiVuex, API as StoreAPI } from '.'
+import { storyStore } from './story'
+
+export const rootStore = hamiVuex.store({
+  $name: 'root',
   async syncFeedLoadMushrooms(API) {
-    await API.feed.sync()
+    await StoreAPI.feed.sync()
     let mushroomKeys = API.feed.mushroomKeys
-    await API.story.loadMushrooms({ mushroomKeys })
+    await storyStore.loadMushrooms({ mushroomKeys })
   },
-}
+})

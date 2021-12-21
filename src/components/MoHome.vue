@@ -108,6 +108,8 @@ import initMathjax from '@/plugin/mathjax'
 import localConfig from '@/plugin/localConfig'
 import { antRippleGrey } from '@/plugin/common'
 import { userStore } from '@/store/user'
+import { storyStore } from '@/store/story'
+import { rootStore } from '@/store/root'
 
 const ITEM_HEIGHT = 48
 const PAGE_SIZE = Math.ceil(window.innerHeight / ITEM_HEIGHT)
@@ -151,12 +153,12 @@ export default {
           getDate: () => this.$API.feed.latestDateOfGroup(group),
         })
       })
-      let mushroomsOfHome = this.$API.story.mushroomsOfHome
+      let mushroomsOfHome = storyStore.mushroomsOfHome
       let mushroomGroup = {
         title: '品读',
         link: '/mushroom',
-        getNumber: () => this.$API.story.numUnreadOf(mushroomsOfHome),
-        getDate: () => this.$API.story.latestDateOf(mushroomsOfHome),
+        getNumber: () => storyStore.numUnreadOf(mushroomsOfHome),
+        getDate: () => storyStore.latestDateOf(mushroomsOfHome),
       }
       if (mushroomGroup.getNumber() <= 0) {
         ret.splice(0, 0, mushroomGroup)
@@ -193,7 +195,7 @@ export default {
   },
   mounted() {
     this.wizardTrigger = this.$refs.wizardTrigger.$el
-    this.$API.syncFeedLoadMushrooms().then(() => {
+    rootStore.syncFeedLoadMushrooms().then(() => {
       this.openWizard = this.isEmpty
       this.isReady = true
       this.renderVirtualList()
@@ -279,7 +281,7 @@ export default {
       this.$API.feed.setAllReaded({ feedIds })
     },
     isReaded(story) {
-      return this.$API.story.isReaded(story)
+      return storyStore.isReaded(story)
     },
     isActiveItem(key) {
       if (_.isNil(this.activeItemKey) || !this.$LAYOUT.hasBoard) {

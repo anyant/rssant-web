@@ -43,6 +43,7 @@ import MoFeedDetailInfoItem from '@/components/MoFeedDetailInfoItem.vue'
 import MoGroupNameSelector from '@/components/MoGroupNameSelector.vue'
 import { formatFullDateFriendly } from '@/plugin/datefmt'
 import { getGroupName, getGroupId } from '@/plugin/feedGroupHelper'
+import { rootStore } from '@/store/root'
 
 const FEED_FIELDS = [
   {
@@ -173,7 +174,7 @@ export default {
   },
   async mounted() {
     await this.$API.feed.load({ feedId: this.feedId, detail: true })
-    await this.$API.syncFeedLoadMushrooms()
+    await rootStore.syncFeedLoadMushrooms()
   },
   computed: {
     feedId() {

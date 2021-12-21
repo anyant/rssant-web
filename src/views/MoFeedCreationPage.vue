@@ -83,6 +83,7 @@ import MoFeedCreationGroupButton from '@/components/MoFeedCreationGroupButton.vu
 
 import { antBlue } from '@/plugin/common'
 import { getGroupId } from '../plugin/feedGroupHelper'
+import { rootStore } from '@/store/root'
 
 export default {
   name: 'MoFeedCreationPage',
@@ -115,7 +116,7 @@ export default {
     },
   },
   mounted() {
-    this.$API.syncFeedLoadMushrooms().then(() => {
+    rootStore.syncFeedLoadMushrooms().then(() => {
       if (this.$API.feed.isEmpty) {
         let changelogUrl = location.origin + '/changelog'
         this.$alert('🎉🎉欢迎！我们先订阅一下蚁阅更新日志吧，我帮你填上链接。', {

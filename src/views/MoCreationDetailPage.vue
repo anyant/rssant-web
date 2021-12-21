@@ -31,6 +31,7 @@ import MoLayout from '@/components/MoLayout'
 import MoFeedDetailInfoItem from '@/components/MoFeedDetailInfoItem.vue'
 import { formatFullDateFriendly } from '@/plugin/datefmt'
 import { getGroupName } from '@/plugin/feedGroupHelper'
+import { rootStore } from '@/store/root'
 
 export default {
   components: { MoBackHeader, MoLayout, MoFeedDetailInfoItem },
@@ -93,7 +94,7 @@ export default {
   },
   mounted() {
     this.$API.feed.loadCreation({ creationId: this.creationId, detail: true })
-    this.$API.syncFeedLoadMushrooms()
+    rootStore.syncFeedLoadMushrooms()
     window.scrollTo(0, 0)
   },
   methods: {},

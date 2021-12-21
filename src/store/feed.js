@@ -249,6 +249,14 @@ function handleImportedFeedResult(DAO, data) {
   }
 }
 
+const _storyStore = { value: null }
+export function setStoryStore(value) {
+  _storyStore.value = value
+}
+function getStoryStore() {
+  return _storyStore.value
+}
+
 export default {
   state: {
     loading: new Loading(),
@@ -448,14 +456,14 @@ export default {
       await API.feed.delete({
         id: feedId,
       })
-      DAO.API.story.DELETE_STORYS_OF_FEED(feedId)
+      getStoryStore().DELETE_STORYS_OF_FEED(feedId)
       DAO.REMOVE({ id: feedId })
     },
     async deleteAll(DAO, { feedIds = null } = {}) {
       if (_.isNil(feedIds) || feedIds.length > 0) {
         await API.feed.deleteAll({ ids: feedIds })
         DAO.REMOVE_ALL({ feedIds })
-        DAO.API.story.DELETE_STORYS_OF_ALL_FEED({ feedIds })
+        getStoryStore().DELETE_STORYS_OF_ALL_FEED({ feedIds })
         localFeeds.clear()
       }
     },

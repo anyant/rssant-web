@@ -26,6 +26,8 @@ import MoLayout from '@/components/MoLayout'
 import MoFeedVirtualItem from '@/components/MoFeedVirtualItem'
 import MoReadedButton from '@/components/MoReadedButton'
 import Keyboard from '@/plugin/keyboard'
+import { storyStore } from '@/store/story'
+import { rootStore } from '@/store/root'
 
 export default {
   name: 'MoFeedGroupPage',
@@ -58,7 +60,7 @@ export default {
       return this.$API.feed.feedListOfGroup(this.group)
     },
     mushrooms() {
-      return this.$API.story.mushroomsOfGroup(this.name)
+      return storyStore.mushroomsOfGroup(this.name)
     },
     virtualList() {
       let mushroomFeedIds = {}
@@ -81,7 +83,7 @@ export default {
     },
   },
   async mounted() {
-    await this.$API.syncFeedLoadMushrooms()
+    await rootStore.syncFeedLoadMushrooms()
     // when group rename, exit this page
     if (_.isEmpty(this.feeds)) {
       this.$router.back()
@@ -90,7 +92,7 @@ export default {
     this.restoreScroll()
     this.keyboard.setup()
     const groupName = this.name // keep groupName after this page destroyed
-    this.$API.story.setNextStoryGetter(({ feedId, offset }) => {
+    storyStore.setNextStoryGetter(({ feedId, offset }) => {
       return this.getNextStoryInfo({ groupName, feedId, offset })
     })
   },
@@ -107,8 +109,8 @@ export default {
   },
   methods: {
     getNextStoryInfo({ groupName, feedId, offset }) {
-      let mushrooms = this.$API.story.mushroomsOfGroup(groupName)
-      let story = this.$API.story.nextMushroomOf({
+      let mushrooms = storyStore.mushroomsOfGroup(groupName)
+      let story = storyStore.nextMushroomOf({
         mushrooms: mushrooms,
         feedId: feedId,
         offset: offset,

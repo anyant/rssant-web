@@ -20,6 +20,7 @@
 <script>
 import _ from 'lodash'
 import MoCreationItem from '@/components/MoCreationItem'
+import { rootStore } from '@/store/root'
 
 export default {
   components: { MoCreationItem },
@@ -41,7 +42,7 @@ export default {
     this.$API.feed.loadCreationList().then(() => {
       this.isReady = true
     })
-    this.$API.syncFeedLoadMushrooms()
+    rootStore.syncFeedLoadMushrooms()
   },
 }
 </script>
