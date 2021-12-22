@@ -27,6 +27,7 @@ import MoReadedButton from '@/components/MoReadedButton'
 import Keyboard from '@/plugin/keyboard'
 import { storyStore } from '@/store/story'
 import { rootStore } from '@/store/root'
+import { feedStore } from '@/store/feed'
 
 export default {
   name: 'MoMushroomPage',
@@ -101,14 +102,14 @@ export default {
       return storyStore.isReaded(story)
     },
     getFeedTitle(feedId) {
-      return this.$API.feed.get(feedId).title
+      return feedStore.get(feedId).title
     },
     setAllReaded() {
       let feedIds = {}
       this.mushrooms.forEach(story => {
         feedIds[story.feed.id] = true
       })
-      this.$API.feed.setAllReaded({ feedIds: _.keys(feedIds) })
+      feedStore.setAllReaded({ feedIds: _.keys(feedIds) })
     },
     goMushroomDetail() {
       this.$router.push('/mushroom-detail')

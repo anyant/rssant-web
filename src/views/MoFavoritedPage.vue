@@ -27,6 +27,7 @@ import MoLayout from '@/components/MoLayout'
 import MoFeedStoryItem from '@/components/MoFeedStoryItem.vue'
 import { storyStore } from '@/store/story'
 import { rootStore } from '@/store/root'
+import { feedStore } from '@/store/feed'
 
 export default {
   components: { MoBackHeader, MoLayout, MoFeedStoryItem },
@@ -52,7 +53,7 @@ export default {
   },
   methods: {
     getFeedTitle(feedId) {
-      let feed = this.$API.feed.get(feedId)
+      let feed = feedStore.get(feedId)
       return _.isNil(feed) ? feedId : feed.title
     },
   },

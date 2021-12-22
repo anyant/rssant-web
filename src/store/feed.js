@@ -5,6 +5,7 @@ import Loading from '@/plugin/loading'
 import { API } from '@/plugin/api'
 import localFeeds from '@/plugin/localFeeds'
 import { GROUP_MUSHROOM, GROUP_SOLO, getGroupName, isSystemGroup } from '@/plugin/feedGroupHelper'
+import { hamiVuex } from '.'
 
 function isEmptyFeed(feed) {
   return feed.total_storys <= 0 || _.isEmpty(feed.dt_latest_story_published)
@@ -24,13 +25,6 @@ function getFeedGroup(feed) {
 
 function isMushroomFeed(feed) {
   return getFeedGroup(feed) === GROUP_MUSHROOM
-}
-
-function getAvaliableGroups(state) {
-  let sysNames = [GROUP_SOLO, GROUP_MUSHROOM]
-  let customNames = state.feedGroups.map(x => x.name)
-  customNames = _.sortBy(customNames)
-  return _.concat(sysNames, customNames)
 }
 
 function _sortGroupFeedList(feedList) {
@@ -214,41 +208,6 @@ function addOrUpdateCreation(state, creation) {
   Vue.set(state.creations, creation.id, creation)
 }
 
-function watchFeedCreation(DAO, { creationId, numTry = 10 }) {
-  const token = setInterval(() => {
-    API.feed
-      .getCreation({ id: creationId })
-      .then(creation => {
-        DAO.ADD_OR_UPDATE_CREATION(creation)
-        if (creation.status === 'ready') {
-          setTimeout(() => {
-            clearInterval(token)
-          }, 3500)
-          DAO.API.feed.load({ feedId: creation.feed_id, detail: true })
-        } else if (creation.status === 'error' || numTry <= 0) {
-          clearInterval(token)
-        }
-      })
-      .finally(() => {
-        numTry -= 1
-      })
-  }, 3000)
-}
-
-function handleImportedFeedResult(DAO, data) {
-  DAO.ADD_OR_UPDATE_LIST(data.created_feeds)
-  DAO.ADD_OR_UPDATE_CREATION_LIST(data.feed_creations)
-  if (data.feed_creations.length === 1) {
-    watchFeedCreation(DAO, { creationId: data.feed_creations[0].id })
-  }
-  return {
-    numFeedCreations: data.feed_creations.length,
-    numCreatedFeeds: data.created_feeds.length,
-    numExistedFeeds: data.num_existed_feeds,
-    firstExistedFeed: data.first_existed_feed,
-  }
-}
-
 const _storyStore = { value: null }
 export function setStoryStore(value) {
   _storyStore.value = value
@@ -257,18 +216,20 @@ function getStoryStore() {
   return _storyStore.value
 }
 
-export default {
-  state: {
-    loading: new Loading(),
-    loadingCreations: new Loading(),
-    creations: {},
-    feeds: {},
-    feedGroups: [],
-    homeFeedIds: [],
-    mushroomKeys: [],
+export const feedStore = hamiVuex.store({
+  $state() {
+    return {
+      loading: new Loading(),
+      loadingCreations: new Loading(),
+      creations: {},
+      feeds: {},
+      feedGroups: [],
+      homeFeedIds: [],
+      mushroomKeys: [],
+    }
   },
-  mutations: {
-    SYNC(state, { updatedFeeds, deletedFeedIds }) {
+  SYNC({ updatedFeeds, deletedFeedIds }) {
+    this.$patch(state => {
       _.defaultTo(deletedFeedIds, []).forEach(feedId => {
         Vue.delete(state.feeds, feedId)
       })
@@ -276,36 +237,50 @@ export default {
         updateStateFeed(state, feed)
       })
       updateFeedList(state)
-    },
-    ADD_OR_UPDATE_CREATION(state, creation) {
+    })
+  },
+  ADD_OR_UPDATE_CREATION(creation) {
+    this.$patch(state => {
       addOrUpdateCreation(state, creation)
-    },
-    ADD_OR_UPDATE_CREATION_LIST(state, creationList) {
+    })
+  },
+  ADD_OR_UPDATE_CREATION_LIST(creationList) {
+    this.$patch(state => {
       creationList.forEach(creation => {
         addOrUpdateCreation(state, creation)
       })
-    },
-    ADD_OR_UPDATE(state, feed) {
+    })
+  },
+  ADD_OR_UPDATE(feed) {
+    this.$patch(state => {
       updateStateFeed(state, feed)
       updateFeedList(state)
-    },
-    ADD_OR_UPDATE_LIST(state, feedList) {
+    })
+  },
+  ADD_OR_UPDATE_LIST(feedList) {
+    this.$patch(state => {
       feedList.forEach(feed => {
         updateStateFeed(state, feed)
       })
       updateFeedList(state)
-    },
-    UPDATE_ALL_GROUP(state, { feedIds, group }) {
+    })
+  },
+  UPDATE_ALL_GROUP({ feedIds, group }) {
+    this.$patch(state => {
       _.forEach(_getFeedsByIds(state, feedIds), feed => {
         Vue.set(feed, 'group', group)
       })
       updateFeedList(state)
-    },
-    REMOVE(state, { id }) {
+    })
+  },
+  REMOVE({ id }) {
+    this.$patch(state => {
       Vue.delete(state.feeds, id)
       updateFeedList(state)
-    },
-    REMOVE_ALL(state, { feedIds = null } = {}) {
+    })
+  },
+  REMOVE_ALL({ feedIds = null } = {}) {
+    this.$patch(state => {
       if (_.isNil(feedIds)) {
         state.feeds = {}
       } else {
@@ -314,186 +289,210 @@ export default {
         })
       }
       updateFeedList(state)
-    },
-    SET_STORY_OFFSET(state, { id, offset }) {
+    })
+  },
+  SET_STORY_OFFSET({ id, offset }) {
+    this.$patch(state => {
       let feed = state.feeds[id]
       feed.story_offset = offset
       feed.num_unread_storys = feed.total_storys - offset
-    },
-    SET_TOTAL_STORYS_IF_UPDATED(state, { id, total }) {
+    })
+  },
+  SET_TOTAL_STORYS_IF_UPDATED({ id, total }) {
+    this.$patch(state => {
       let feed = state.feeds[id]
       if (total > feed.total_storys) {
         feed.total_storys = total
         feed.num_unread_storys = feed.total_storys - feed.story_offset
       }
-    },
-    SET_ALL_READED(state, { feedIds }) {
+    })
+  },
+  SET_ALL_READED({ feedIds }) {
+    this.$patch(state => {
       feedIds.forEach(feedId => {
         let feed = state.feeds[feedId]
         feed.story_offset = feed.total_storys
         feed.num_unread_storys = 0
       })
-    },
+    })
   },
-  getters: {
-    isLoading(state) {
-      return state.loading.isLoading
-    },
-    isEmpty(state) {
-      let numFeeds = _.size(state.feeds)
-      let numFeedCreations = _.size(state.creations)
-      return numFeeds <= 0 && numFeedCreations <= 0
-    },
-    numFeeds(state) {
-      return _.size(state.feeds)
-    },
-    feedIds(state) {
-      return _.keys(state.feeds)
-    },
-    creations(state) {
-      return _.reverse(_.sortBy(_.values(state.creations), ['dt_created', 'status']))
-    },
-    getCreation(state) {
-      return creationId => {
-        return state.creations[creationId]
+  get isLoading() {
+    return this.loading.isLoading
+  },
+  get isEmpty() {
+    let numFeeds = _.size(this.feeds)
+    let numFeedCreations = _.size(this.creations)
+    return numFeeds <= 0 && numFeedCreations <= 0
+  },
+  get numFeeds() {
+    return _.size(this.feeds)
+  },
+  get feedIds() {
+    return _.keys(this.feeds)
+  },
+  get creationList() {
+    return _.reverse(_.sortBy(_.values(this.creations), ['dt_created', 'status']))
+  },
+  getCreation(creationId) {
+    return this.creations[creationId]
+  },
+  get homeFeedList() {
+    return _getFeedsByIds(this, this.homeFeedIds)
+  },
+  feedListOfGroup(group) {
+    let feedIds = _.isNil(group) ? [] : group.feedIds
+    return _getFeedsByIds(this, feedIds)
+  },
+  numUnreadOfGroup(group) {
+    return _.isNil(group) ? null : getNumUnreadOfGroup(this, group)
+  },
+  latestDateOfGroup(group) {
+    return _.isNil(group) ? null : getLatestDateOfGroup(this, group)
+  },
+  groupOf(feed) {
+    return _.isNil(feed) ? null : getFeedGroup(feed)
+  },
+  get avaliableGroups() {
+    let sysNames = [GROUP_SOLO, GROUP_MUSHROOM]
+    let customNames = this.feedGroups.map(x => x.name)
+    customNames = _.sortBy(customNames)
+    return _.concat(sysNames, customNames)
+  },
+  get avaliableGroupNames() {
+    return this.avaliableGroups.map(getGroupName)
+  },
+  getGroupByName(name) {
+    for (let g of this.feedGroups) {
+      if (g.name === name) {
+        return g
       }
-    },
-    feedGroups(state) {
-      return state.feedGroups
-    },
-    homeFeedList(state) {
-      return _getFeedsByIds(state, state.homeFeedIds)
-    },
-    feedListOfGroup(state) {
-      return group => {
-        let feedIds = _.isNil(group) ? [] : group.feedIds
-        return _getFeedsByIds(state, feedIds)
+    }
+    return null
+  },
+  get(feedId) {
+    return this.feeds[feedId]
+  },
+  async sync() {
+    await this.loading.begin(async () => {
+      let feeds = localFeeds.get()
+      if (!_.isNil(feeds)) {
+        this.ADD_OR_UPDATE_LIST(feeds)
       }
-    },
-    mushroomKeys(state) {
-      return state.mushroomKeys
-    },
-    numUnreadOfGroup(state) {
-      return group => (_.isNil(group) ? null : getNumUnreadOfGroup(state, group))
-    },
-    latestDateOfGroup(state) {
-      return group => (_.isNil(group) ? null : getLatestDateOfGroup(state, group))
-    },
-    groupOf(state) {
-      return feed => (_.isNil(feed) ? null : getFeedGroup(feed))
-    },
-    avaliableGroups(state) {
-      return getAvaliableGroups(state)
-    },
-    avaliableGroupNames(state) {
-      return getAvaliableGroups(state).map(getGroupName)
-    },
-    getGroupByName(state) {
-      return name => {
-        for (let g of state.feedGroups) {
-          if (g.name === name) {
-            return g
-          }
+      let hints = []
+      _.forEach(_.values(this.feeds), x => {
+        if (!_.isEmpty(x.dt_updated)) {
+          hints.push({ id: x.id, dt_updated: x.dt_updated })
         }
-        return null
-      }
-    },
-    get(state) {
-      return feedId => {
-        return state.feeds[feedId]
-      }
-    },
+      })
+      await API.feed.query({ hints }).then(result => {
+        this.SYNC({
+          updatedFeeds: result.feeds,
+          deletedFeedIds: result.deleted_ids,
+        })
+        localFeeds.set(_.values(this.feeds))
+      })
+    })
   },
-  actions: {
-    async sync(DAO) {
-      await DAO.state.loading.begin(async () => {
-        let feeds = localFeeds.get()
-        if (!_.isNil(feeds)) {
-          DAO.ADD_OR_UPDATE_LIST(feeds)
-        }
-        let hints = []
-        _.forEach(_.values(DAO.state.feeds), x => {
-          if (!_.isEmpty(x.dt_updated)) {
-            hints.push({ id: x.id, dt_updated: x.dt_updated })
+  async loadCreationList() {
+    await this.loadingCreations.begin(async () => {
+      await API.feed.queryCreationList().then(result => {
+        this.ADD_OR_UPDATE_CREATION_LIST(result.feed_creations)
+      })
+    })
+  },
+  async load({ feedId, detail }) {
+    let feed = await API.feed.get({ id: feedId, detail })
+    this.ADD_OR_UPDATE(feed)
+  },
+  async loadCreation({ creationId, detail }) {
+    let creation = await API.feed.getCreation({ id: creationId, detail })
+    this.ADD_OR_UPDATE_CREATION(creation)
+  },
+  async setTitle({ feedId, title }) {
+    let newFeed = await API.feed.setTitle({ id: feedId, title: title })
+    this.ADD_OR_UPDATE(newFeed)
+  },
+  async setAllGroup({ feedIds, group }) {
+    if (_.isEmpty(feedIds)) {
+      return
+    }
+    await API.feed.setAllGroup({ ids: feedIds, group: group })
+    this.UPDATE_ALL_GROUP({ feedIds, group })
+  },
+  async delete({ feedId }) {
+    await API.feed.delete({
+      id: feedId,
+    })
+    getStoryStore().DELETE_STORYS_OF_FEED(feedId)
+    this.REMOVE({ id: feedId })
+  },
+  async deleteAll({ feedIds = null } = {}) {
+    if (_.isNil(feedIds) || feedIds.length > 0) {
+      await API.feed.deleteAll({ ids: feedIds })
+      this.REMOVE_ALL({ feedIds })
+      getStoryStore().DELETE_STORYS_OF_ALL_FEED({ feedIds })
+      localFeeds.clear()
+    }
+  },
+  _watchFeedCreation({ creationId, numTry = 10 }) {
+    const token = setInterval(() => {
+      API.feed
+        .getCreation({ id: creationId })
+        .then(creation => {
+          this.ADD_OR_UPDATE_CREATION(creation)
+          if (creation.status === 'ready') {
+            setTimeout(() => {
+              clearInterval(token)
+            }, 3500)
+            feedStore.load({ feedId: creation.feed_id, detail: true })
+          } else if (creation.status === 'error' || numTry <= 0) {
+            clearInterval(token)
           }
         })
-        await API.feed.query({ hints }).then(result => {
-          DAO.SYNC({
-            updatedFeeds: result.feeds,
-            deletedFeedIds: result.deleted_ids,
-          })
-          localFeeds.set(_.values(DAO.state.feeds))
+        .finally(() => {
+          numTry -= 1
         })
-      })
-    },
-    async loadCreationList(DAO) {
-      await DAO.state.loadingCreations.begin(async () => {
-        await API.feed.queryCreationList().then(result => {
-          DAO.ADD_OR_UPDATE_CREATION_LIST(result.feed_creations)
-        })
-      })
-    },
-    async load(DAO, { feedId, detail }) {
-      let feed = await API.feed.get({ id: feedId, detail })
-      DAO.ADD_OR_UPDATE(feed)
-    },
-    async loadCreation(DAO, { creationId, detail }) {
-      let creation = await API.feed.getCreation({ id: creationId, detail })
-      DAO.ADD_OR_UPDATE_CREATION(creation)
-    },
-    async setTitle(DAO, { feedId, title }) {
-      let newFeed = await API.feed.setTitle({ id: feedId, title: title })
-      DAO.ADD_OR_UPDATE(newFeed)
-    },
-    async setAllGroup(DAO, { feedIds, group }) {
-      if (_.isEmpty(feedIds)) {
-        return
-      }
-      await API.feed.setAllGroup({ ids: feedIds, group: group })
-      DAO.UPDATE_ALL_GROUP({ feedIds, group })
-    },
-    async delete(DAO, { feedId }) {
-      await API.feed.delete({
-        id: feedId,
-      })
-      getStoryStore().DELETE_STORYS_OF_FEED(feedId)
-      DAO.REMOVE({ id: feedId })
-    },
-    async deleteAll(DAO, { feedIds = null } = {}) {
-      if (_.isNil(feedIds) || feedIds.length > 0) {
-        await API.feed.deleteAll({ ids: feedIds })
-        DAO.REMOVE_ALL({ feedIds })
-        getStoryStore().DELETE_STORYS_OF_ALL_FEED({ feedIds })
-        localFeeds.clear()
-      }
-    },
-    async import(DAO, { text, group }) {
-      group = group === GROUP_SOLO ? null : group
-      let data = await API.feed.import({ text, group })
-      return handleImportedFeedResult(DAO, data)
-    },
-    async importFile(DAO, { file, group }) {
-      group = group === GROUP_SOLO ? null : group
-      let data = await API.feed.importFile({ file, group })
-      return handleImportedFeedResult(DAO, data)
-    },
-    exportOPML(DAO, { download } = {}) {
-      API.feed.exportOPML({ download })
-    },
-    async setStoryOffset(DAO, { feedId, offset }) {
-      if (DAO.get(feedId).story_offset !== offset) {
-        await API.feed.setStoryOffset({ id: feedId, offset })
-        DAO.SET_STORY_OFFSET({ id: feedId, offset })
-      }
-    },
-    async setAllReaded(DAO, { feedIds }) {
-      feedIds = feedIds.filter(feedId => {
-        return DAO.get(feedId).num_unread_storys > 0
-      })
-      if (feedIds.length > 0) {
-        await API.feed.setAllReaded({ ids: feedIds })
-        DAO.SET_ALL_READED({ feedIds })
-      }
-    },
+    }, 3000)
   },
-}
+  _handleImportedFeedResult(data) {
+    this.ADD_OR_UPDATE_LIST(data.created_feeds)
+    this.ADD_OR_UPDATE_CREATION_LIST(data.feed_creations)
+    if (data.feed_creations.length === 1) {
+      this._watchFeedCreation({ creationId: data.feed_creations[0].id })
+    }
+    return {
+      numFeedCreations: data.feed_creations.length,
+      numCreatedFeeds: data.created_feeds.length,
+      numExistedFeeds: data.num_existed_feeds,
+      firstExistedFeed: data.first_existed_feed,
+    }
+  },
+  async import({ text, group }) {
+    group = group === GROUP_SOLO ? null : group
+    let data = await API.feed.import({ text, group })
+    return this._handleImportedFeedResult(data)
+  },
+  async importFile({ file, group }) {
+    group = group === GROUP_SOLO ? null : group
+    let data = await API.feed.importFile({ file, group })
+    return this._handleImportedFeedResult(data)
+  },
+  exportOPML({ download } = {}) {
+    API.feed.exportOPML({ download })
+  },
+  async setStoryOffset({ feedId, offset }) {
+    if (this.get(feedId).story_offset !== offset) {
+      await API.feed.setStoryOffset({ id: feedId, offset })
+      this.SET_STORY_OFFSET({ id: feedId, offset })
+    }
+  },
+  async setAllReaded({ feedIds }) {
+    feedIds = feedIds.filter(feedId => {
+      return this.get(feedId).num_unread_storys > 0
+    })
+    if (feedIds.length > 0) {
+      await API.feed.setAllReaded({ ids: feedIds })
+      this.SET_ALL_READED({ feedIds })
+    }
+  },
+})

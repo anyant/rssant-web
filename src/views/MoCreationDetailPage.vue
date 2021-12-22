@@ -32,6 +32,7 @@ import MoFeedDetailInfoItem from '@/components/MoFeedDetailInfoItem.vue'
 import { formatFullDateFriendly } from '@/plugin/datefmt'
 import { getGroupName } from '@/plugin/feedGroupHelper'
 import { rootStore } from '@/store/root'
+import { feedStore } from '@/store/feed'
 
 export default {
   components: { MoBackHeader, MoLayout, MoFeedDetailInfoItem },
@@ -43,7 +44,7 @@ export default {
       return this.$route.query.id
     },
     creation() {
-      return this.$API.feed.getCreation(this.creationId)
+      return feedStore.getCreation(this.creationId)
     },
     title() {
       if (_.isNil(this.creation)) {
@@ -77,7 +78,7 @@ export default {
       if (_.isNil(this.feedId)) {
         return null
       }
-      let feed = this.$API.feed.get(this.feedId)
+      let feed = feedStore.get(this.feedId)
       if (_.isNil(feed) || _.isEmpty(feed.title)) {
         return this.feedLink
       } else {
@@ -93,7 +94,7 @@ export default {
     },
   },
   mounted() {
-    this.$API.feed.loadCreation({ creationId: this.creationId, detail: true })
+    feedStore.loadCreation({ creationId: this.creationId, detail: true })
     rootStore.syncFeedLoadMushrooms()
     window.scrollTo(0, 0)
   },

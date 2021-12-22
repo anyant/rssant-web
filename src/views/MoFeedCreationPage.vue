@@ -84,6 +84,7 @@ import MoFeedCreationGroupButton from '@/components/MoFeedCreationGroupButton.vu
 import { antBlue } from '@/plugin/common'
 import { getGroupId } from '../plugin/feedGroupHelper'
 import { rootStore } from '@/store/root'
+import { feedStore } from '@/store/feed'
 
 export default {
   name: 'MoFeedCreationPage',
@@ -117,7 +118,7 @@ export default {
   },
   mounted() {
     rootStore.syncFeedLoadMushrooms().then(() => {
-      if (this.$API.feed.isEmpty) {
+      if (feedStore.isEmpty) {
         let changelogUrl = location.origin + '/changelog'
         this.$alert('🎉🎉欢迎！我们先订阅一下蚁阅更新日志吧，我帮你填上链接。', {
           okLabel: '好的',
@@ -200,7 +201,7 @@ export default {
         return
       }
       this.isImportLoading = true
-      this.$API.feed
+      feedStore
         .import({ text: this.inputText, group: this.groupId })
         .then(this.onFeedSavedResult.bind(this))
         .catch(error => {
@@ -237,7 +238,7 @@ export default {
         return
       }
       this.isImportLoading = true
-      this.$API.feed
+      feedStore
         .importFile({ file, group: this.groupId })
         .then(this.onFeedImportedResult.bind(this))
         .catch(error => {

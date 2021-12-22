@@ -110,6 +110,7 @@ import { antRippleGrey } from '@/plugin/common'
 import { userStore } from '@/store/user'
 import { storyStore } from '@/store/story'
 import { rootStore } from '@/store/root'
+import { feedStore } from '@/store/feed'
 
 const ITEM_HEIGHT = 48
 const PAGE_SIZE = Math.ceil(window.innerHeight / ITEM_HEIGHT)
@@ -144,13 +145,13 @@ export default {
         return []
       }
       let ret = []
-      _.forEach(this.$API.feed.feedGroups, group => {
+      _.forEach(feedStore.feedGroups, group => {
         let groupName = encodeURIComponent(group.name)
         ret.push({
           title: group.name,
           link: `/group?name=${groupName}`,
-          getNumber: () => this.$API.feed.numUnreadOfGroup(group),
-          getDate: () => this.$API.feed.latestDateOfGroup(group),
+          getNumber: () => feedStore.numUnreadOfGroup(group),
+          getDate: () => feedStore.latestDateOfGroup(group),
         })
       })
       let mushroomsOfHome = storyStore.mushroomsOfHome
@@ -175,10 +176,10 @@ export default {
       return ret
     },
     feedList() {
-      return this.$API.feed.homeFeedList
+      return feedStore.homeFeedList
     },
     isEmpty() {
-      return this.$API.feed.numFeeds <= 0
+      return feedStore.numFeeds <= 0
     },
     showHeader() {
       return this.isReady || !this.$LAYOUT.hasBoard
@@ -277,8 +278,8 @@ export default {
       }
     },
     setAllReaded() {
-      let feedIds = this.$API.feed.feedIds
-      this.$API.feed.setAllReaded({ feedIds })
+      let feedIds = feedStore.feedIds
+      feedStore.setAllReaded({ feedIds })
     },
     isReaded(story) {
       return storyStore.isReaded(story)

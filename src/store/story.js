@@ -4,10 +4,8 @@ import { isAfter } from 'date-fns'
 import Loading from '@/plugin/loading'
 import { API } from '@/plugin/api'
 import * as feedGroupHelper from '@/plugin/feedGroupHelper'
-import { hamiVuex, API as StoreAPI } from '.'
-import { setStoryStore } from './feed'
-
-const feedStore = StoreAPI.feed
+import { hamiVuex } from '.'
+import { feedStore, setStoryStore } from './feed'
 
 function sortMushrooms(mushrooms) {
   return _.sortBy(mushrooms, [

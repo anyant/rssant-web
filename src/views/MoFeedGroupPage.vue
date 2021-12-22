@@ -28,6 +28,7 @@ import MoReadedButton from '@/components/MoReadedButton'
 import Keyboard from '@/plugin/keyboard'
 import { storyStore } from '@/store/story'
 import { rootStore } from '@/store/root'
+import { feedStore } from '@/store/feed'
 
 export default {
   name: 'MoFeedGroupPage',
@@ -50,14 +51,14 @@ export default {
       return decodeURIComponent(this.$route.query.name)
     },
     group() {
-      return this.$API.feed.getGroupByName(this.name)
+      return feedStore.getGroupByName(this.name)
     },
     numUnreadText() {
-      let num = this.$API.feed.numUnreadOfGroup(this.group)
+      let num = feedStore.numUnreadOfGroup(this.group)
       return num > 0 ? `#${num}# ` : ''
     },
     feeds() {
-      return this.$API.feed.feedListOfGroup(this.group)
+      return feedStore.feedListOfGroup(this.group)
     },
     mushrooms() {
       return storyStore.mushroomsOfGroup(this.name)
@@ -127,7 +128,7 @@ export default {
     },
     setAllReaded() {
       let feedIds = this.feeds.map(x => x.id)
-      this.$API.feed.setAllReaded({ feedIds })
+      feedStore.setAllReaded({ feedIds })
     },
     goFeedGroupDetail() {
       this.$router.push({

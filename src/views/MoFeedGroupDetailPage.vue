@@ -31,6 +31,7 @@ import MoGroupNameSelector from '@/components/MoGroupNameSelector.vue'
 import { getGroupId, isSystemGroup } from '@/plugin/feedGroupHelper'
 import { formatFullDateFriendly } from '@/plugin/datefmt'
 import { rootStore } from '@/store/root'
+import { feedStore } from '@/store/feed'
 
 function isReadedFeed(feed) {
   return feed.num_unread_storys <= 0
@@ -49,10 +50,10 @@ export default {
       return decodeURIComponent(this.$route.query.name)
     },
     group() {
-      return this.$API.feed.getGroupByName(this.name)
+      return feedStore.getGroupByName(this.name)
     },
     feeds() {
-      return this.$API.feed.feedListOfGroup(this.group)
+      return feedStore.feedListOfGroup(this.group)
     },
     totalFeedCount() {
       return this.feeds.length
@@ -61,10 +62,10 @@ export default {
       return this.feeds.filter(x => !isReadedFeed(x)).length
     },
     numUnreadStorys() {
-      return this.$API.feed.numUnreadOfGroup(this.group)
+      return feedStore.numUnreadOfGroup(this.group)
     },
     latestStoryDate() {
-      let dt = this.$API.feed.latestDateOfGroup(this.group)
+      let dt = feedStore.latestDateOfGroup(this.group)
       return formatFullDateFriendly(dt)
     },
   },
@@ -86,7 +87,7 @@ export default {
         goNext = () => this.$router.replace(newRoute)
       }
       try {
-        await this.$API.feed.setAllGroup({ feedIds: feedIds, group: group })
+        await feedStore.setAllGroup({ feedIds: feedIds, group: group })
         goNext()
       } catch (ex) {
         this.$toast.error(`更新失败: ${ex.message}`)

@@ -5,6 +5,7 @@ import MoFeedItem from '@/components/MoFeedItem.vue'
 import MoFeedGroupItem from '@/components/MoFeedGroupItem.vue'
 import MoFeedStoryItem from '@/components/MoFeedStoryItem.vue'
 import { storyStore } from '@/store/story'
+import { feedStore } from '@/store/feed'
 
 export default Vue.component('MoFeedVirtualItem', {
   props: {
@@ -25,7 +26,7 @@ export default Vue.component('MoFeedVirtualItem', {
       return storyStore.isReaded(story)
     },
     getFeedTitle(feedId) {
-      let feed = this.$API.feed.get(feedId)
+      let feed = feedStore.get(feedId)
       return _.isNil(feed) ? null : feed.title
     },
   },

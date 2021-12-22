@@ -69,6 +69,7 @@ import { antGold, antRed, antGreen } from '@/plugin/common'
 import { formatDate } from '@/plugin/datefmt'
 import DarkMode from '@/plugin/darkmode'
 import { userStore } from '@/store/user'
+import { feedStore } from '@/store/feed'
 
 export default {
   name: 'MoAccountPage',
@@ -165,7 +166,7 @@ export default {
       userStore.connectGithub({ next: '/' })
     },
     exportOPML() {
-      this.$API.feed.exportOPML({ download: true })
+      feedStore.exportOPML({ download: true })
     },
     goVip() {
       this.$router.push('/vip')

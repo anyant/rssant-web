@@ -3,16 +3,10 @@
 STORE: 维护状态稳定性和一致性
 API: 提供对外接口
 */
+import Vue from 'vue'
+import Vuex from 'vuex'
 import { createHamiVuex } from 'hami-vuex'
-import StoreBuilder from './builder'
-import feed from './feed'
 
-const builder = new StoreBuilder()
-builder.mount('feed', feed)
+Vue.use(Vuex)
 
-const [Store, API] = builder.build()
-export const hamiVuex = createHamiVuex({
-  vuexStore: Store,
-})
-window.StoreAPI = API
-export { Store, API }
+export const hamiVuex = createHamiVuex()

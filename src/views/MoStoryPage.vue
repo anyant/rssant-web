@@ -36,6 +36,7 @@ import MoBackHeader from '@/components/MoBackHeader'
 import MoStoryContent from '@/components/MoStoryContent'
 import { storyStore } from '@/store/story'
 import { rootStore } from '@/store/root'
+import { feedStore } from '@/store/feed'
 
 export default {
   components: { MoBackHeader, MoLayout, MoStoryContent },
@@ -68,7 +69,7 @@ export default {
       }
     },
     feed() {
-      return this.$API.feed.get(this.feedId)
+      return feedStore.get(this.feedId)
     },
     story() {
       return storyStore.get({ feedId: this.feedId, offset: this.offset })
@@ -89,7 +90,7 @@ export default {
       if (_.isNil(this.nextStory)) {
         return null
       }
-      return this.$API.feed.get(this.nextStory.feed.id)
+      return feedStore.get(this.nextStory.feed.id)
     },
     headerTitle() {
       if (!_.isNil(this.story) && !_.isNil(this.feed)) {
@@ -146,7 +147,7 @@ export default {
     },
     async loadFeed({ feed, feedId }) {
       if (_.isNil(feed)) {
-        await this.$API.feed.load({ feedId: feedId })
+        await feedStore.load({ feedId: feedId })
       }
     },
     async loadStory({ story, feedId, offset, setReaded }) {
@@ -169,7 +170,7 @@ export default {
       await storyLoaded
       // 当 story 已加载但仍未读时，loadStory 不会更新已读状态，需要单独更新
       if (!_.isNil(this.feed) && !_.isNil(this.story) && !this.isReaded) {
-        this.$API.feed.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
+        feedStore.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
       }
       this.scrollToTop()
       if (this.nextStoryInfo.shouldLoadNext) {
