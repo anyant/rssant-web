@@ -3,9 +3,9 @@ import { storyStore } from './story'
 
 export const rootStore = hamiVuex.store({
   $name: 'root',
-  async syncFeedLoadMushrooms(API) {
+  async syncFeedLoadMushrooms() {
     await StoreAPI.feed.sync()
-    let mushroomKeys = API.feed.mushroomKeys
+    let mushroomKeys = StoreAPI.feed.mushroomKeys
     await storyStore.loadMushrooms({ mushroomKeys })
   },
 })

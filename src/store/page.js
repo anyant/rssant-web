@@ -1,19 +1,20 @@
 import Vue from 'vue'
 import _ from 'lodash'
+import { hamiVuex } from '.'
 
-export const pageDriver = {
-  state: {},
-  mutations: {
-    STATE_COMMIT(state, { vid, data }) {
-      Vue.set(state, vid, data)
-    },
+export const pageStore = hamiVuex.store({
+  $state: {
+    pages: {},
   },
-  actions: {
-    of(DAO, vid) {
-      return new PageComponentState(DAO, vid)
-    },
+  setPage(vid, data) {
+    this.$patch(state => {
+      Vue.set(state.pages, vid, data)
+    })
   },
-}
+  getPage(vid) {
+    return this.pages[vid]
+  },
+})
 
 function _nativeElement(el) {
   if (!_.isNil(el) && !_.isNil(el.$el)) {
@@ -47,8 +48,7 @@ function restoreScrollTop({ pageState, el, key }) {
 }
 
 class PageComponentState {
-  constructor(DAO, vid) {
-    this._DAO = DAO
+  constructor(vid) {
     this._vid = vid
     this._data = {}
   }
@@ -57,7 +57,7 @@ class PageComponentState {
     if (_.has(this._data, key)) {
       return this._data[key]
     }
-    let state = this._DAO.state[this._vid]
+    let state = pageStore.getPage(this._vid)
     if (_.isNil(state)) {
       return null
     }
@@ -69,7 +69,7 @@ class PageComponentState {
   }
 
   commit() {
-    this._DAO.STATE_COMMIT({ vid: this._vid, data: this._data })
+    pageStore.setPage(this._vid, this._data)
   }
 
   saveScrollTop({ el, key }) {
@@ -131,7 +131,7 @@ export const pageMixin = {
       if (_.isEmpty(vid)) {
         return new FakePageComponentState()
       }
-      return this.$API.page.of(vid)
+      return new PageComponentState(vid)
     },
   },
   beforeRouteLeave(to, from, next) {

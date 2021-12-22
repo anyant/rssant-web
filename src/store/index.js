@@ -5,16 +5,14 @@ API: 提供对外接口
 */
 import { createHamiVuex } from 'hami-vuex'
 import StoreBuilder from './builder'
-import { pageDriver as page } from '@/plugin/page'
 import feed from './feed'
 
 const builder = new StoreBuilder()
 builder.mount('feed', feed)
-builder.mount('page', page)
 
 const [Store, API] = builder.build()
-const hamiVuex = createHamiVuex({
-    vuexStore: Store,
+export const hamiVuex = createHamiVuex({
+  vuexStore: Store,
 })
 window.StoreAPI = API
-export { Store, API, hamiVuex }
+export { Store, API }
