@@ -5,7 +5,7 @@ import Loading from '@/plugin/loading'
 import { API } from '@/plugin/api'
 import * as feedGroupHelper from '@/plugin/feedGroupHelper'
 import { hamiVuex } from '.'
-import { feedStore, setStoryStore } from './feed'
+import { feedStore } from './feed'
 
 function sortMushrooms(mushrooms) {
   return _.sortBy(mushrooms, [
@@ -368,5 +368,3 @@ export const storyStore = hamiVuex.store({
     return result
   },
 })
-
-setStoryStore(storyStore)

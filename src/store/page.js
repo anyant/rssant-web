@@ -3,6 +3,7 @@ import _ from 'lodash'
 import { hamiVuex } from '.'
 
 export const pageStore = hamiVuex.store({
+  $name: 'page',
   $state: {
     pages: {},
   },

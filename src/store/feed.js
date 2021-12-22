@@ -208,15 +208,8 @@ function addOrUpdateCreation(state, creation) {
   Vue.set(state.creations, creation.id, creation)
 }
 
-const _storyStore = { value: null }
-export function setStoryStore(value) {
-  _storyStore.value = value
-}
-function getStoryStore() {
-  return _storyStore.value
-}
-
 export const feedStore = hamiVuex.store({
+  $name: 'feed',
   $state() {
     return {
       loading: new Loading(),
@@ -419,18 +412,18 @@ export const feedStore = hamiVuex.store({
     await API.feed.setAllGroup({ ids: feedIds, group: group })
     this.UPDATE_ALL_GROUP({ feedIds, group })
   },
-  async delete({ feedId }) {
+  async delete({ feedId, storyStore }) {
     await API.feed.delete({
       id: feedId,
     })
-    getStoryStore().DELETE_STORYS_OF_FEED(feedId)
+    storyStore.DELETE_STORYS_OF_FEED(feedId)
     this.REMOVE({ id: feedId })
   },
-  async deleteAll({ feedIds = null } = {}) {
+  async deleteAll({ feedIds = null, storyStore } = {}) {
     if (_.isNil(feedIds) || feedIds.length > 0) {
       await API.feed.deleteAll({ ids: feedIds })
       this.REMOVE_ALL({ feedIds })
-      getStoryStore().DELETE_STORYS_OF_ALL_FEED({ feedIds })
+      storyStore.DELETE_STORYS_OF_ALL_FEED({ feedIds })
       localFeeds.clear()
     }
   },

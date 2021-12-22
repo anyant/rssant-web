@@ -84,6 +84,7 @@ import MoGroupNameSelectorDialog from '@/components/MoGroupNameSelectorDialog.vu
 
 import { GROUP_MUSHROOM, getGroupId, getGroupName } from '../plugin/feedGroupHelper'
 import { feedStore } from '@/store/feed'
+import { rootStore } from '@/store/root'
 
 function isBlank(value) {
   return _.isNil(value) || value === ''
@@ -346,8 +347,8 @@ export default {
       }).then(({ result }) => {
         if (result) {
           let message = `成功删除 ${count} 个订阅!`
-          feedStore
-            .deleteAll({ feedIds: this.selectedFeedIds })
+          rootStore
+            .deleteAllFeed({ feedIds: this.selectedFeedIds })
             .then(() => {
               this.selectedFeedIds = []
               this.$toast.success({ message })

@@ -251,8 +251,8 @@ export default {
         type: 'warning',
       }).then(({ result }) => {
         if (result) {
-          feedStore
-            .delete({ feedId: this.feedId })
+          rootStore
+            .deleteFeed({ feedId: this.feedId })
             .then(() => {
               this.$toast.success('删除成功')
               this.$router.go(-2)
