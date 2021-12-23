@@ -45,6 +45,9 @@ import MoStoryItem from '@/components/MoStoryItem'
 import MoScrollList from '@/components/MoScrollList'
 import MoReadedButton from '@/components/MoReadedButton'
 import Keyboard from '@/plugin/keyboard'
+import { storyStore } from '@/store/story'
+import { rootStore } from '@/store/root'
+import { feedStore } from '@/store/feed'
 
 export default {
   components: { MoBackHeader, MoLayout, MoStoryItem, MoScrollList, MoReadedButton },
@@ -60,7 +63,7 @@ export default {
       return this.$route.query.id
     },
     feed() {
-      return this.$API.feed.get(this.feedId)
+      return feedStore.get(this.feedId)
     },
     feedTitle() {
       return _.isNil(this.feed) ? '' : this.feed.title
@@ -73,19 +76,19 @@ export default {
       return num > 0 ? `#${num}# ` : ''
     },
     beginOffset() {
-      let offset = this.$API.story.loadedOffset(this.feedId)
+      let offset = storyStore.loadedOffset(this.feedId)
       return _.isNil(offset) ? null : offset.begin
     },
     endOffset() {
-      let offset = this.$API.story.loadedOffset(this.feedId)
+      let offset = storyStore.loadedOffset(this.feedId)
       return _.isNil(offset) ? null : offset.end
     },
     storyList() {
-      let offset = this.$API.story.loadedOffset(this.feedId)
+      let offset = storyStore.loadedOffset(this.feedId)
       if (_.isNil(offset) || _.isNil(offset.begin) || _.isNil(offset.end)) {
         return []
       }
-      let storys = this.$API.story.getListByFeed(this.feedId)
+      let storys = storyStore.getListByFeed(this.feedId)
       return _.filter(storys, (s) => {
         return s.offset >= offset.begin && s.offset <= offset.end
       })
@@ -107,22 +110,22 @@ export default {
   },
   async mounted() {
     if (_.isNil(this.feed)) {
-      await this.$API.feed.load({ feedId: this.feedId })
+      await feedStore.load({ feedId: this.feedId })
     }
-    await this.$API.syncFeedLoadMushrooms()
+    await rootStore.syncFeedLoadMushrooms()
     this.keyboard.setup()
-    this.$API.story.setNextStoryGetter(this.getNextStoryInfo.bind(this))
+    storyStore.setNextStoryGetter(this.getNextStoryInfo.bind(this))
   },
   destroyed() {
     this.keyboard.destroy()
   },
   methods: {
     getNextStoryInfo({ feedId, offset }) {
-      let story = this.$API.story.get({ feedId, offset: offset + 1 })
+      let story = storyStore.get({ feedId, offset: offset + 1 })
       return { story, shouldLoadNext: true }
     },
     loadStorys({ offset, size, resetLoadedOffset, isInit }) {
-      return this.$API.story.loadList({
+      return storyStore.loadList({
         feedId: this.feedId,
         offset: offset,
         detail: true,
@@ -135,18 +138,18 @@ export default {
       this.readingStoryOffset = story.offset
     },
     setAllReaded() {
-      this.$API.feed.setStoryOffset({ feedId: this.feed.id, offset: this.feed.total_storys })
+      feedStore.setStoryOffset({ feedId: this.feed.id, offset: this.feed.total_storys })
     },
     goFeedDetail() {
       this.$router.push(`/feed-detail?id=${this.feedId}`)
     },
     toggleFavorited(story) {
       let is_favorited = !story.is_favorited
-      this.$API.story.setFavorited({ feedId: story.feed.id, offset: story.offset, is_favorited })
+      storyStore.setFavorited({ feedId: story.feed.id, offset: story.offset, is_favorited })
     },
     async onJump(offset) {
-      await this.$API.syncFeedLoadMushrooms()
-      this.$API.feed.setStoryOffset({ feedId: this.feed.id, offset: offset })
+      await rootStore.syncFeedLoadMushrooms()
+      feedStore.setStoryOffset({ feedId: this.feed.id, offset: offset })
       // close all story cards so that scroll position can be computed correctly
       _.forEach(_.keys(this.storyOpened), (key) => {
         this.storyOpened[key] = false

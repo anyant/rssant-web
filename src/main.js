@@ -13,8 +13,7 @@ import DarkMode from '@/plugin/darkmode'
 // rssant
 import App from './App'
 import router from '@/router'
-import { API } from '@/store'
-import { pageMixin } from '@/plugin/page'
+import { pageMixin } from '@/store/page'
 import StoryRender from '@/plugin/storyRender'
 import { LAYOUT } from '@/plugin/common'
 import '@/styles/theme-rssant.less'
@@ -32,7 +31,6 @@ DarkMode.init()
 
 Vue.config.productionTip = false
 
-Vue.prototype.$API = API
 Vue.prototype.$LAYOUT = LAYOUT
 Vue.mixin(pageMixin)
 

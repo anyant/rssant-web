@@ -51,6 +51,7 @@ import MoLayout from '@/components/MoLayout'
 import MoAntGreenButton from '@/components/MoAntGreenButton'
 import MoThirdpartLogin from '@/components/MoThirdpartLogin'
 import MoFooter from '@/components/MoFooter'
+import { userStore } from '@/store/user'
 
 export default {
   components: { MoAntGreenButton, MoThirdpartLogin, MoLayout, MoFooter },
@@ -70,10 +71,10 @@ export default {
   computed: {
     email: {
       get() {
-        return this.$API.user.inputAccount
+        return userStore.inputAccount
       },
       set(value) {
-        this.$API.user.SET_INPUT_ACCOUNT(value)
+        userStore.SET_INPUT_ACCOUNT(value)
       },
     },
     isRegisterDisabled() {
@@ -91,14 +92,14 @@ export default {
     },
     register() {
       this.isRegisterLoading = true
-      this.$API.user
+      userStore
         .register({
           email: this.email,
           password: this.registerForm.password,
         })
         .then(() => {
           this.$toast.success({ message: '注册成功，请查收邮件验证邮箱！', time: 5000 })
-          this.$API.user
+          userStore
             .login({
               account: this.email,
               password: this.registerForm.password,

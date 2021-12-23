@@ -43,6 +43,8 @@ import MoFeedDetailInfoItem from '@/components/MoFeedDetailInfoItem.vue'
 import MoGroupNameSelector from '@/components/MoGroupNameSelector.vue'
 import { formatFullDateFriendly } from '@/plugin/datefmt'
 import { getGroupName, getGroupId } from '@/plugin/feedGroupHelper'
+import { rootStore } from '@/store/root'
+import { feedStore } from '@/store/feed'
 
 const FEED_FIELDS = [
   {
@@ -172,21 +174,21 @@ export default {
     return {}
   },
   async mounted() {
-    await this.$API.feed.load({ feedId: this.feedId, detail: true })
-    await this.$API.syncFeedLoadMushrooms()
+    await feedStore.load({ feedId: this.feedId, detail: true })
+    await rootStore.syncFeedLoadMushrooms()
   },
   computed: {
     feedId() {
       return this.$route.query.id
     },
     feed() {
-      return this.$API.feed.get(this.feedId)
+      return feedStore.get(this.feedId)
     },
     feedTitle() {
       return _.isNil(this.feed) ? '' : this.feed.title
     },
     feedGroup() {
-      return this.$API.feed.groupOf(this.feed)
+      return feedStore.groupOf(this.feed)
     },
     feedInfo() {
       let feed = this.feed
@@ -221,7 +223,7 @@ export default {
     getGroupName,
     async onSaveTitle({ value, done }) {
       try {
-        await this.$API.feed.setTitle({ feedId: this.feedId, title: value })
+        await feedStore.setTitle({ feedId: this.feedId, title: value })
       } catch (ex) {
         this.$toast.error(`更新失败: ${ex.message}`)
       }
@@ -237,7 +239,7 @@ export default {
       let group = getGroupId(value)
       if (!_.isEmpty(group) && group !== this.feedGroup) {
         try {
-          await this.$API.feed.setAllGroup({ feedIds: [this.feedId], group: group })
+          await feedStore.setAllGroup({ feedIds: [this.feedId], group: group })
         } catch (ex) {
           this.$toast.error(`更新失败: ${ex.message}`)
         }
@@ -249,8 +251,8 @@ export default {
         type: 'warning',
       }).then(({ result }) => {
         if (result) {
-          this.$API.feed
-            .delete({ feedId: this.feedId })
+          rootStore
+            .deleteFeed({ feedId: this.feedId })
             .then(() => {
               this.$toast.success('删除成功')
               this.$router.go(-2)

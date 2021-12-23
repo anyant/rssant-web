@@ -31,6 +31,7 @@ import MoLayout from '@/components/MoLayout.vue'
 import MoBackHeader from '@/components/MoBackHeader'
 import shopantClient from '@/plugin/shopant'
 import { formatDate, formatFullDate } from '@/plugin/datefmt'
+import { userStore } from '@/store/user'
 
 export default {
   components: {
@@ -45,7 +46,7 @@ export default {
   computed: {},
   async mounted() {
     let data = await shopantClient.call('customer.get', {
-      customer: this.$API.user.shopantCustomerParameter,
+      customer: userStore.shopantCustomerParameter,
       include_balance_logs: true,
     })
     if (!_.isEmpty(data.balance_logs)) {

@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import { userStore } from '@/store/user'
 export default {
   data() {
     return {
@@ -20,8 +21,8 @@ export default {
         return
       }
       this.githubLoading = true
-      await this.$API.user.safeLogout()
-      this.$API.user.loginGithub({ next: '/' })
+      await userStore.safeLogout()
+      userStore.loginGithub({ next: '/' })
     },
   },
 }

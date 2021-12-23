@@ -107,6 +107,10 @@ import MoHeaderTip from '@/components/MoHeaderTip.vue'
 import initMathjax from '@/plugin/mathjax'
 import localConfig from '@/plugin/localConfig'
 import { antRippleGrey } from '@/plugin/common'
+import { userStore } from '@/store/user'
+import { storyStore } from '@/store/story'
+import { rootStore } from '@/store/root'
+import { feedStore } from '@/store/feed'
 
 const ITEM_HEIGHT = 48
 const PAGE_SIZE = Math.ceil(window.innerHeight / ITEM_HEIGHT)
@@ -141,21 +145,21 @@ export default {
         return []
       }
       let ret = []
-      _.forEach(this.$API.feed.feedGroups, group => {
+      _.forEach(feedStore.feedGroups, group => {
         let groupName = encodeURIComponent(group.name)
         ret.push({
           title: group.name,
           link: `/group?name=${groupName}`,
-          getNumber: () => this.$API.feed.numUnreadOfGroup(group),
-          getDate: () => this.$API.feed.latestDateOfGroup(group),
+          getNumber: () => feedStore.numUnreadOfGroup(group),
+          getDate: () => feedStore.latestDateOfGroup(group),
         })
       })
-      let mushroomsOfHome = this.$API.story.mushroomsOfHome
+      let mushroomsOfHome = storyStore.mushroomsOfHome
       let mushroomGroup = {
         title: '品读',
         link: '/mushroom',
-        getNumber: () => this.$API.story.numUnreadOf(mushroomsOfHome),
-        getDate: () => this.$API.story.latestDateOf(mushroomsOfHome),
+        getNumber: () => storyStore.numUnreadOf(mushroomsOfHome),
+        getDate: () => storyStore.latestDateOf(mushroomsOfHome),
       }
       if (mushroomGroup.getNumber() <= 0) {
         ret.splice(0, 0, mushroomGroup)
@@ -172,16 +176,16 @@ export default {
       return ret
     },
     feedList() {
-      return this.$API.feed.homeFeedList
+      return feedStore.homeFeedList
     },
     isEmpty() {
-      return this.$API.feed.numFeeds <= 0
+      return feedStore.numFeeds <= 0
     },
     showHeader() {
       return this.isReady || !this.$LAYOUT.hasBoard
     },
     showMenuAccountDot() {
-      return this.isReady && !this.isEmpty && this.$API.user.shouldNoticeVip
+      return this.isReady && !this.isEmpty && userStore.shouldNoticeVip
     },
     showMenuHelpDot() {
       return this.isReady && !this.isEmpty && !this.isHelpReaded
@@ -192,7 +196,7 @@ export default {
   },
   mounted() {
     this.wizardTrigger = this.$refs.wizardTrigger.$el
-    this.$API.syncFeedLoadMushrooms().then(() => {
+    rootStore.syncFeedLoadMushrooms().then(() => {
       this.openWizard = this.isEmpty
       this.isReady = true
       this.renderVirtualList()
@@ -274,11 +278,11 @@ export default {
       }
     },
     setAllReaded() {
-      let feedIds = this.$API.feed.feedIds
-      this.$API.feed.setAllReaded({ feedIds })
+      let feedIds = feedStore.feedIds
+      feedStore.setAllReaded({ feedIds })
     },
     isReaded(story) {
-      return this.$API.story.isReaded(story)
+      return storyStore.isReaded(story)
     },
     isActiveItem(key) {
       if (_.isNil(this.activeItemKey) || !this.$LAYOUT.hasBoard) {

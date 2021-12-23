@@ -10,10 +10,11 @@
 </template>
 
 <script>
+import { feedStore } from '@/store/feed'
 export default {
   computed: {
     avaliableGroupNames() {
-      return this.$API.feed.avaliableGroupNames
+      return feedStore.avaliableGroupNames
     },
   },
   methods: {

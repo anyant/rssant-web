@@ -34,6 +34,9 @@ import { antGold } from '@/plugin/common'
 import MoLayout from '@/components/MoLayout.vue'
 import MoBackHeader from '@/components/MoBackHeader'
 import MoStoryContent from '@/components/MoStoryContent'
+import { storyStore } from '@/store/story'
+import { rootStore } from '@/store/root'
+import { feedStore } from '@/store/feed'
 
 export default {
   components: { MoBackHeader, MoLayout, MoStoryContent },
@@ -66,13 +69,13 @@ export default {
       }
     },
     feed() {
-      return this.$API.feed.get(this.feedId)
+      return feedStore.get(this.feedId)
     },
     story() {
-      return this.$API.story.get({ feedId: this.feedId, offset: this.offset })
+      return storyStore.get({ feedId: this.feedId, offset: this.offset })
     },
     nextStoryInfo() {
-      return this.$API.story.nextStoryInfo({
+      return storyStore.nextStoryInfo({
         feedId: this.feedId,
         offset: this.offset,
       })
@@ -87,7 +90,7 @@ export default {
       if (_.isNil(this.nextStory)) {
         return null
       }
-      return this.$API.feed.get(this.nextStory.feed.id)
+      return feedStore.get(this.nextStory.feed.id)
     },
     headerTitle() {
       if (!_.isNil(this.story) && !_.isNil(this.feed)) {
@@ -103,7 +106,7 @@ export default {
   },
   async mounted() {
     await this.loadFeedAndStory()
-    await this.$API.syncFeedLoadMushrooms()
+    await rootStore.syncFeedLoadMushrooms()
     // chrome: $route will change and mounted will not re-executed
     // firefox and safari: mounted will re-executed
     this.$watch('$route', () => {
@@ -116,7 +119,7 @@ export default {
     },
     toggleFavorited() {
       let is_favorited = !this.isFavorited
-      this.$API.story.setFavorited({ feedId: this.feedId, offset: this.offset, is_favorited })
+      storyStore.setFavorited({ feedId: this.feedId, offset: this.offset, is_favorited })
     },
     async onFetchFulltext() {
       if (this.isFetchLoading) {
@@ -125,7 +128,7 @@ export default {
       this.isFetchLoading = true
       let result = null
       try {
-        result = await this.$API.story.fetchFulltext({ feedId: this.feedId, offset: this.offset })
+        result = await storyStore.fetchFulltext({ feedId: this.feedId, offset: this.offset })
       } catch (ex) {
         this.$toast.error({ message: `抓取全文失败: ${ex.message}`, time: 10000 })
       } finally {
@@ -144,12 +147,12 @@ export default {
     },
     async loadFeed({ feed, feedId }) {
       if (_.isNil(feed)) {
-        await this.$API.feed.load({ feedId: feedId })
+        await feedStore.load({ feedId: feedId })
       }
     },
     async loadStory({ story, feedId, offset, setReaded }) {
       if (_.isNil(story) || _.isEmpty(story.content)) {
-        await this.$API.story.load({ feedId, offset, setReaded, detail: true })
+        await storyStore.load({ feedId, offset, setReaded, detail: true })
       }
     },
     async loadFeedAndStory() {
@@ -167,13 +170,13 @@ export default {
       await storyLoaded
       // 当 story 已加载但仍未读时，loadStory 不会更新已读状态，需要单独更新
       if (!_.isNil(this.feed) && !_.isNil(this.story) && !this.isReaded) {
-        this.$API.feed.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
+        feedStore.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
       }
       this.scrollToTop()
       if (this.nextStoryInfo.shouldLoadNext) {
         let hasNext = this.offset + 1 < this.feed.total_storys
         if (hasNext) {
-          let next = this.$API.story.get({
+          let next = storyStore.get({
             feedId: this.feedId,
             offset: this.offset + 1,
           })

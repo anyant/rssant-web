@@ -61,6 +61,7 @@ import MoAntGreenButton from '@/components/MoAntGreenButton'
 import MoContact from '@/components/MoContact'
 import { isLikelySupportPWA } from '@/plugin/pwa'
 import { formatDate } from '@/plugin/datefmt'
+import { userStore } from '@/store/user'
 
 export default {
   components: { MoLayout, MoBackHeader, MoPWAButton, MoAntGreenButton, MoContact },
@@ -69,21 +70,21 @@ export default {
   },
   computed: {
     isShopantEnable() {
-      return this.$API.user.isShopantEnable
+      return userStore.isShopantEnable
     },
     customerBalance() {
-      let dt = this.$API.user.balance
+      let dt = userStore.balance
       if (_.isNil(dt)) {
         return '####-##-##'
       }
       return formatDate(dt)
     },
     isBalanceEnough() {
-      return this.$API.user.isBalanceEnough
+      return userStore.isBalanceEnough
     },
   },
   mounted() {
-    this.$API.user.syncProduct()
+    userStore.syncProduct()
   },
   methods: {
     goVip() {

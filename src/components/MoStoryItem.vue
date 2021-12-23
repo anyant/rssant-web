@@ -46,6 +46,8 @@ import { antGold } from '@/plugin/common'
 import { formatDateFriendly } from '@/plugin/datefmt'
 import MoIconAngleRight3 from '@/components/MoIconAngleRight3'
 import * as ImageHelper from '@/plugin/image'
+import { storyStore } from '@/store/story'
+import { feedStore } from '@/store/feed'
 
 export default {
   components: { MoIconAngleRight3 },
@@ -164,7 +166,7 @@ export default {
     },
     async onOpen() {
       if (_.isEmpty(this.story.summary) || _.isEmpty(this.story.content)) {
-        let promise = this.$API.story.load({
+        let promise = storyStore.load({
           feedId: this.feedId,
           offset: this.offset,
           detail: true,
@@ -174,7 +176,7 @@ export default {
           await promise
         }
       } else if (!this.isReaded) {
-        this.$API.feed.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
+        feedStore.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
       }
       this.$emit('read')
       if (!this.isOpened && this.isCtrlKeyHold) {

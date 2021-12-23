@@ -25,6 +25,9 @@ import MoLayout from '@/components/MoLayout'
 import MoFeedVirtualItem from '@/components/MoFeedVirtualItem'
 import MoReadedButton from '@/components/MoReadedButton'
 import Keyboard from '@/plugin/keyboard'
+import { storyStore } from '@/store/story'
+import { rootStore } from '@/store/root'
+import { feedStore } from '@/store/feed'
 
 export default {
   name: 'MoMushroomPage',
@@ -47,10 +50,10 @@ export default {
   },
   computed: {
     mushrooms() {
-      return this.$API.story.mushroomsOfHome
+      return storyStore.mushroomsOfHome
     },
     numUnreadMushrooms() {
-      return this.$API.story.numUnreadOf(this.mushrooms)
+      return storyStore.numUnreadOf(this.mushrooms)
     },
     numUnreadText() {
       let num = this.numUnreadMushrooms
@@ -63,7 +66,7 @@ export default {
     },
   },
   async mounted() {
-    await this.$API.syncFeedLoadMushrooms()
+    await rootStore.syncFeedLoadMushrooms()
     this.restoreScroll()
     this.keyboard.setup()
   },
@@ -73,7 +76,7 @@ export default {
   activated() {
     this.restoreScroll()
     this.keyboard.setup()
-    this.$API.story.setNextStoryGetter(this.getNextStoryInfo.bind(this))
+    storyStore.setNextStoryGetter(this.getNextStoryInfo.bind(this))
   },
   deactivated() {
     this.keyboard.destroy()
@@ -85,7 +88,7 @@ export default {
   },
   methods: {
     getNextStoryInfo({ feedId, offset }) {
-      let story = this.$API.story.nextMushroomOf({
+      let story = storyStore.nextMushroomOf({
         mushrooms: this.mushrooms,
         feedId: feedId,
         offset: offset,
@@ -96,17 +99,17 @@ export default {
       this.$pageState.restoreScrollTop({ el: this.$refs.mainRef })
     },
     isReaded(story) {
-      return this.$API.story.isReaded(story)
+      return storyStore.isReaded(story)
     },
     getFeedTitle(feedId) {
-      return this.$API.feed.get(feedId).title
+      return feedStore.get(feedId).title
     },
     setAllReaded() {
       let feedIds = {}
       this.mushrooms.forEach(story => {
         feedIds[story.feed.id] = true
       })
-      this.$API.feed.setAllReaded({ feedIds: _.keys(feedIds) })
+      feedStore.setAllReaded({ feedIds: _.keys(feedIds) })
     },
     goMushroomDetail() {
       this.$router.push('/mushroom-detail')

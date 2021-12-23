@@ -33,6 +33,7 @@ import _ from 'lodash'
 import { antGreen, antTextGrey } from '@/plugin/common'
 import MoLayout from '@/components/MoLayout'
 import MoAntGreenButton from '@/components/MoAntGreenButton'
+import { userStore } from '@/store/user'
 
 export default {
   components: { MoAntGreenButton, MoLayout },
@@ -53,7 +54,7 @@ export default {
   methods: {
     reset() {
       this.isLoading = true
-      this.$API.user
+      userStore
         .resetPassword({ email: this.email })
         .then(() => {
           this.$toast.success({ message: '重置密码链接已发送到邮箱，请查收！', time: 5000 })

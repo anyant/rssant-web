@@ -68,6 +68,8 @@ import MoDarkModeDialog from '@/components/MoDarkModeDialog'
 import { antGold, antRed, antGreen } from '@/plugin/common'
 import { formatDate } from '@/plugin/datefmt'
 import DarkMode from '@/plugin/darkmode'
+import { userStore } from '@/store/user'
+import { feedStore } from '@/store/feed'
 
 export default {
   name: 'MoAccountPage',
@@ -83,21 +85,21 @@ export default {
   },
   computed: {
     isShopantEnable() {
-      return this.$API.user.isShopantEnable
+      return userStore.isShopantEnable
     },
     customerBalance() {
-      let dt = this.$API.user.balance
+      let dt = userStore.balance
       if (_.isNil(dt)) {
         return '####-##-##'
       }
       return formatDate(dt)
     },
     isBalanceEnough() {
-      return this.$API.user.isBalanceEnough
+      return userStore.isBalanceEnough
     },
     isGithubConnected() {
-      let user = this.$API.user.loginUser
-      if (!this.$API.user.isLogined || _.isNil(user)) {
+      let user = userStore.loginUser
+      if (!userStore.isLogined || _.isNil(user)) {
         return false
       }
       if (_.isNil(user.social_accounts)) {
@@ -112,14 +114,14 @@ export default {
       return false
     },
     isPasswordConfigured() {
-      let user = this.$API.user.loginUser
-      if (!this.$API.user.isLogined || _.isNil(user)) {
+      let user = userStore.loginUser
+      if (!userStore.isLogined || _.isNil(user)) {
         return false
       }
       return _.isNil(user.has_usable_password) || user.has_usable_password
     },
     username() {
-      let user = this.$API.user.loginUser
+      let user = userStore.loginUser
       return _.isNil(user) ? '' : user.username
     },
     darkModeStatus() {
@@ -130,7 +132,7 @@ export default {
     },
   },
   mounted() {
-    this.$API.user.syncProduct()
+    userStore.syncProduct()
   },
   methods: {
     configurePassword() {
@@ -143,7 +145,7 @@ export default {
           if (!result) {
             return done()
           }
-          this.$API.user
+          userStore
             .changePassword({ password: instance.value })
             .then(() => done())
             .catch((error) => {
@@ -161,10 +163,10 @@ export default {
         return
       }
       this.$loading({ size: 24 })
-      this.$API.user.connectGithub({ next: '/' })
+      userStore.connectGithub({ next: '/' })
     },
     exportOPML() {
-      this.$API.feed.exportOPML({ download: true })
+      feedStore.exportOPML({ download: true })
     },
     goVip() {
       this.$router.push('/vip')
@@ -179,7 +181,7 @@ export default {
       this.darkModeValue = DarkMode.get()
     },
     onLogout() {
-      this.$API.user.logout().then(() => {
+      userStore.logout().then(() => {
         window.location.assign('/')
       })
     },

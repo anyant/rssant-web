@@ -9,6 +9,7 @@
 <script>
 import _ from 'lodash'
 import { formatDateFriendly } from '@/plugin/datefmt'
+import { feedStore } from '@/store/feed'
 
 export default {
   props: {
@@ -47,7 +48,7 @@ export default {
     goStory() {
       if (this.isCtrlKeyHold && !_.isEmpty(this.storyLink)) {
         if (!_.isNil(this.isReaded) && !this.isReaded) {
-          this.$API.feed.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
+          feedStore.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
         }
         window.open(this.storyLink, '_blank')
       } else {

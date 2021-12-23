@@ -83,6 +83,8 @@ import MoLayout from '@/components/MoLayout.vue'
 import MoGroupNameSelectorDialog from '@/components/MoGroupNameSelectorDialog.vue'
 
 import { GROUP_MUSHROOM, getGroupId, getGroupName } from '../plugin/feedGroupHelper'
+import { feedStore } from '@/store/feed'
+import { rootStore } from '@/store/root'
 
 function isBlank(value) {
   return _.isNil(value) || value === ''
@@ -133,7 +135,7 @@ export default {
   },
   computed: {
     numFeeds() {
-      return this.$API.feed.numFeeds
+      return feedStore.numFeeds
     },
     getFeedIssue() {
       function isTrashFeed(feed) {
@@ -180,7 +182,7 @@ export default {
     },
     feedGroups() {
       const self = this
-      const feedAPI = this.$API.feed
+      const feedAPI = feedStore
 
       let soloItems = []
       let mushroomItems = []
@@ -279,7 +281,7 @@ export default {
     },
   },
   mounted() {
-    this.$API.feed.sync().then(() => {
+    feedStore.sync().then(() => {
       let selectedFeedIds = this.$pageState.get('selectedFeedIds')
       if (!_.isNil(selectedFeedIds)) {
         selectedFeedIds.forEach(x => this.selectedFeedIds.push(x))
@@ -325,7 +327,7 @@ export default {
     async onSaveGroup({ value, done }) {
       let group = getGroupId(value)
       try {
-        await this.$API.feed.setAllGroup({ feedIds: this.selectedFeedIds, group: group })
+        await feedStore.setAllGroup({ feedIds: this.selectedFeedIds, group: group })
         this.selectedFeedIds = []
         this.$toast.success({ message: '设置订阅分组成功!' })
       } catch (ex) {
@@ -345,8 +347,8 @@ export default {
       }).then(({ result }) => {
         if (result) {
           let message = `成功删除 ${count} 个订阅!`
-          this.$API.feed
-            .deleteAll({ feedIds: this.selectedFeedIds })
+          rootStore
+            .deleteAllFeed({ feedIds: this.selectedFeedIds })
             .then(() => {
               this.selectedFeedIds = []
               this.$toast.success({ message })
@@ -367,7 +369,7 @@ export default {
       Vue.set(this.closedGroups, name, !this.closedGroups[name])
     },
     getFeedGroupName(feed) {
-      return getGroupName(this.$API.feed.groupOf(feed))
+      return getGroupName(feedStore.groupOf(feed))
     },
     totalStorys(feed) {
       if (feed.total_storys > 999) {

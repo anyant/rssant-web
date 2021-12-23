@@ -8,7 +8,7 @@
       </div>
     </div>
     <MoCreationItem
-      v-for="creation in creations"
+      v-for="creation in creationList"
       :key="creation.id"
       :status="creation.status"
       :title="creation.url"
@@ -20,6 +20,8 @@
 <script>
 import _ from 'lodash'
 import MoCreationItem from '@/components/MoCreationItem'
+import { rootStore } from '@/store/root'
+import { feedStore } from '@/store/feed'
 
 export default {
   components: { MoCreationItem },
@@ -29,19 +31,19 @@ export default {
     }
   },
   computed: {
-    creations() {
-      return this.$API.feed.creations
+    creationList() {
+      return feedStore.creationList
     },
     isEmpty() {
-      let items = this.$API.feed.creations
+      let items = feedStore.creationList
       return _.isNil(items) || items.length <= 0
     },
   },
   mounted() {
-    this.$API.feed.loadCreationList().then(() => {
+    feedStore.loadCreationList().then(() => {
       this.isReady = true
     })
-    this.$API.syncFeedLoadMushrooms()
+    rootStore.syncFeedLoadMushrooms()
   },
 }
 </script>
