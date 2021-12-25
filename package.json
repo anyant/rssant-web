@@ -21,7 +21,7 @@
     "darkreader": "^4.9.27",
     "date-fns": "^2.16.1",
     "github-markdown-css": "^2.10.0",
-    "hami-vuex": "^0.1.1",
+    "hami-vuex": "^0.1.2",
     "js-cookie": "^2.2.0",
     "lodash": "^4.17.21",
     "material-design-icons": "^3.0.1",
