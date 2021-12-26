@@ -254,7 +254,7 @@ export const storyStore = hamiVuex.store({
     return this.getStoryListByKeys(keys)
   },
   numUnreadOf(storys) {
-    return storys.filter(story => !isReaded(API, story)).length
+    return storys.filter(story => !isReaded(story)).length
   },
   latestDateOf(storys) {
     let latest = null
