@@ -1,8 +1,10 @@
+.git
 .DS_Store
 node_modules
 /dist
 /tmp
 public/libs/
+/design
 
 # local env files
 .env.local

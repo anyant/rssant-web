@@ -3,6 +3,7 @@ node_modules
 /dist
 /tmp
 public/libs/
+/deploy/history
 
 # local env files
 .env.local

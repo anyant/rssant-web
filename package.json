@@ -4,11 +4,12 @@
   "private": true,
   "scripts": {
     "serve": "npm run copy_libs && vue-cli-service serve",
-    "build": "sh scripts/pre_build.sh && vue-cli-service build --report && npm run copy_libs dist",
+    "build": "sh scripts/pre_build.sh && vue-cli-service build --report && npm run copy_libs dist && node scripts/write_build_id.js",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "copy_libs": "sh scripts/copy_libs.sh",
-    "serve_dist": "node scripts/serve_dist.js"
+    "serve_dist": "node scripts/serve_dist.js",
+    "build_history": "node scripts/build_history.js"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.28",

@@ -1,4 +1,9 @@
 {
+  "include": [
+    "src",
+    "tests",
+    "scripts"
+  ],
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
