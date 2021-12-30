@@ -6,6 +6,8 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm clean-install --loglevel info ${NPM_REGISTERY}
 
+# Ignore Browserslist: caniuse-lite is outdated
+ENV BROWSERSLIST_IGNORE_OLD_DATA=1
 COPY . .
 RUN npm run build
 
