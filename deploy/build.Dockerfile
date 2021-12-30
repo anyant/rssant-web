@@ -4,7 +4,7 @@ ARG NPM_REGISTERY="--registry=https://registry.npmmirror.com"
 
 WORKDIR /app
 COPY package*.json ./
-RUN npm clean-install --no-audit --loglevel info ${NPM_REGISTERY}
+RUN npm clean-install --no-audit --verbose ${NPM_REGISTERY}
 
 # Ignore Browserslist: caniuse-lite is outdated
 ENV BROWSERSLIST_IGNORE_OLD_DATA=1

@@ -1,10 +1,11 @@
 ## 打包部署
 
 Nginx环境变量支持：  
-https://github.com/kreuzwerker/envplate/releases/
+https://github.com/guyskk/envsub-njs  
+https://github.com/kreuzwerker/envplate/releases/  
 
 MathJax库打包：  
-https://github.com/mathjax/MathJax/releases/
+https://github.com/mathjax/MathJax/releases/  
 
 
 ## History Build
