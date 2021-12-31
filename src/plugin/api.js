@@ -12,8 +12,11 @@ function isDebug() {
 
 const BASE_URL = '/api/v1'
 
-function urlFor(path, query) {
-  let url = new URL(path, window.location.origin)
+function urlFor(path, query, origin) {
+  if (_.isNil(origin)) {
+    origin = window.location.origin
+  }
+  let url = new URL(path, origin)
   let search = new URLSearchParams()
   _.forEach(_.entries(query), ([key, value]) => {
     if (!_.isNil(value)) {
@@ -279,6 +282,17 @@ const API = {
     },
     fetchFulltext({ feed_id, offset }) {
       return client.post('/story/fetch-fulltext', { feed_id, offset })
+    },
+  },
+  imageProxy: {
+    active({ proxyUrl, userId }) {
+      let path = '/api/v1/image/active-proxy'
+      let activeUrl = urlFor(path, { user_id: userId }, proxyUrl)
+      return client.get(activeUrl)
+    },
+    urlForImage({ proxyUrl, src, token }) {
+      let path = '/api/v1/image/proxy'
+      return urlFor(path, { url: src, token: token }, proxyUrl)
     },
   },
 }

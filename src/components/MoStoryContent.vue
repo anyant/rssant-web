@@ -1,8 +1,18 @@
 <template>
   <div class="story-content">
-    <div class="story-wrapper" :style="wrapperStyle">
-      <div class="story-info" v-if="story">
-        <div id="story-info-title" class="info-title" v-story="titleForRender"></div>
+    <div
+      class="story-wrapper"
+      :style="wrapperStyle"
+    >
+      <div
+        class="story-info"
+        v-if="story"
+      >
+        <div
+          id="story-info-title"
+          class="info-title"
+          v-story="titleForRender"
+        ></div>
         <div class="info-item">
           <span class="info-item-name">原文：</span>
           <a
@@ -16,11 +26,20 @@
           <span class="info-item-content">{{ dateText }}</span>
         </div>
       </div>
-      <div class="content" v-if="story">
-        <div class="story-audio-wrapper" v-if="story.audio_url">
+      <div
+        class="content"
+        v-if="story"
+      >
+        <div
+          class="story-audio-wrapper"
+          v-if="story.audio_url"
+        >
           <MoAudioPlayer :src="story.audio_url"></MoAudioPlayer>
         </div>
-        <div class="story-iframe-wrapper" v-if="story.iframe_url">
+        <div
+          class="story-iframe-wrapper"
+          v-if="story.iframe_url"
+        >
           <div class="story-iframe-loading-wrapper">
             <div class="story-iframe-loading">Loading</div>
           </div>
@@ -34,17 +53,27 @@
             referrerpolicy="no-referrer"
           ></iframe>
         </div>
-        <div id="story-markdown-body" class="markdown-body" v-story="storyForRender"></div>
+        <div
+          id="story-markdown-body"
+          class="markdown-body"
+          v-story="storyForRender"
+        ></div>
       </div>
     </div>
     <transition name="fade">
-      <div v-if="nextStory" class="next-story">
+      <div
+        v-if="nextStory"
+        class="next-story"
+      >
         <div class="next-story-label">
           <div class="next-story-label-line"></div>
           <div class="next-story-label-value">下一篇</div>
           <div class="next-story-label-line"></div>
         </div>
-        <a class="next-story-link" @click.prevent="openNextStory">{{ nextTitle }}</a>
+        <a
+          class="next-story-link"
+          @click.prevent="openNextStory"
+        >{{ nextTitle }}</a>
       </div>
     </transition>
   </div>
@@ -58,6 +87,7 @@ import * as ImageHelper from '@/plugin/image'
 import MoAudioPlayer from '@/components/MoAudioPlayer'
 import 'viewerjs/dist/viewer.css'
 import Viewer from 'viewerjs'
+import { imageProxyStore } from '@/store/imageProxy'
 
 export default {
   components: { MoAudioPlayer },
@@ -121,6 +151,7 @@ export default {
   },
   mounted() {
     initMathjax()
+    imageProxyStore.doActive()
   },
   methods: {
     onStoryRendered(dom) {
@@ -130,7 +161,7 @@ export default {
     },
     setupVideoFallback(dom) {
       let videoNodes = dom.querySelectorAll('video')
-      videoNodes.forEach(node => {
+      videoNodes.forEach((node) => {
         let src = node.getAttribute('src')
         if (_.isEmpty(src)) {
           node.removeAttribute('src')
@@ -154,7 +185,7 @@ export default {
     },
     setupImageProxy(dom) {
       let imageNodes = dom.querySelectorAll('img,source')
-      imageNodes.forEach(node => {
+      imageNodes.forEach((node) => {
         let src = ImageHelper.fixImageSrc(node, this.link)
         if (_.isEmpty(src) || ImageHelper.isDataUrl(src) || ImageHelper.isSameOriginUrl(src)) {
           return
@@ -166,7 +197,7 @@ export default {
         }
       })
     },
-    onImageError(node) {
+    async onImageError(node) {
       if (_.isEmpty(this.imageToken)) {
         return
       }
@@ -174,16 +205,19 @@ export default {
       if (ImageHelper.isSameOriginUrl(src)) {
         return
       }
+      if (!imageProxyStore.isEnable) {
+        return
+      }
       node.style.visibility = 'hidden'
-      let proxyUrl = new URL('/api/v1/image/proxy', location.origin)
-      proxyUrl.searchParams.set('url', src)
-      proxyUrl.searchParams.set('token', this.imageToken)
-      node.setAttribute('src', proxyUrl)
+      let url = await imageProxyStore.urlForImage({ src, token: this.imageToken })
+      if (!_.isNil(url)) {
+        node.setAttribute('src', url)
+      }
       node.style.visibility = 'visible'
     },
     setupImageViewer(dom) {
       let imageNodes = dom.querySelectorAll('img,source')
-      imageNodes.forEach(node => {
+      imageNodes.forEach((node) => {
         if (_.isEmpty(node.src)) {
           return
         }
@@ -191,7 +225,7 @@ export default {
           return
         }
         node.style.cursor = 'zoom-in'
-        node.addEventListener('click', event => {
+        node.addEventListener('click', (event) => {
           event.preventDefault()
           this.onViewImage(node)
         })
