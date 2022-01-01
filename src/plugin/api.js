@@ -30,6 +30,9 @@ function urlFor(path, query, origin) {
 const client = axios.create({
   baseURL: BASE_URL,
 })
+const imageProxyClient = axios.create({
+  baseURL: BASE_URL,
+})
 
 const REQUEST_ITERCEPTORS = [
   function(config) {
@@ -43,43 +46,51 @@ const REQUEST_ITERCEPTORS = [
     return config
   },
 ]
-REQUEST_ITERCEPTORS.forEach(x => client.interceptors.request.use(x))
+REQUEST_ITERCEPTORS.forEach(x => {
+  client.interceptors.request.use(x)
+})
 
-client.interceptors.response.use(
-  function(response) {
-    if (isDebug()) {
-      let time = response.headers['x-time']
-      if (!_.isNil(time)) {
-        Timeit.show(time, response.config.method, response.config.url)
-      }
-    }
-    return Promise.resolve(response.data)
-  },
-  function(error) {
-    let title = null
-    if (_.isNil(error.response)) {
-      title = `Failed: ${error.config.method} ${error.config.url}`
-    } else {
-      title = `${error.response.status} ${error.response.statusText}`
-    }
-    let message = error.message
-    if (!_.isNil(error.response)) {
-      if (!_.isNil(error.response.data)) {
-        if (!_.isEmpty(error.response.data.message)) {
-          message = error.response.data.message
-        } else if (!_.isEmpty(error.response.data.detail)) {
-          message = error.response.data.detail
+const RESPONSE_INTERCEPTORS = [
+  [
+    function(response) {
+      if (isDebug()) {
+        let time = response.headers['x-time']
+        if (!_.isNil(time)) {
+          Timeit.show(time, response.config.method, response.config.url)
         }
       }
-    }
-    message = _.truncate(message, { length: 50, separator: /,? +/ })
-    Object.assign(error, { title, message })
-    if (isDebug()) {
-      Toast.error(title + ': ' + message)
-    }
-    return Promise.reject(error)
-  }
-)
+      return Promise.resolve(response.data)
+    },
+    function(error) {
+      let title = null
+      if (_.isNil(error.response)) {
+        title = `Failed: ${error.config.method} ${error.config.url}`
+      } else {
+        title = `${error.response.status} ${error.response.statusText}`
+      }
+      let message = error.message
+      if (!_.isNil(error.response)) {
+        if (!_.isNil(error.response.data)) {
+          if (!_.isEmpty(error.response.data.message)) {
+            message = error.response.data.message
+          } else if (!_.isEmpty(error.response.data.detail)) {
+            message = error.response.data.detail
+          }
+        }
+      }
+      message = _.truncate(message, { length: 50, separator: /,? +/ })
+      Object.assign(error, { title, message })
+      if (isDebug()) {
+        Toast.error(title + ': ' + message)
+      }
+      return Promise.reject(error)
+    },
+  ],
+]
+RESPONSE_INTERCEPTORS.forEach(pair => {
+  client.interceptors.response.use(...pair)
+  imageProxyClient.interceptors.response.use(...pair)
+})
 
 function convertDjangoErrorMessage(error, fields) {
   if (!error.response || error.response.status !== 400) {
@@ -288,7 +299,7 @@ const API = {
     active({ proxyUrl, userId }) {
       let path = '/api/v1/image/active-proxy'
       let activeUrl = urlFor(path, { user_id: userId }, proxyUrl)
-      return client.get(activeUrl)
+      return imageProxyClient.get(activeUrl)
     },
     urlForImage({ proxyUrl, src, token }) {
       let path = '/api/v1/image/proxy'
