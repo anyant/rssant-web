@@ -9,7 +9,8 @@
     "lint": "vue-cli-service lint",
     "copy_libs": "sh scripts/copy_libs.sh",
     "serve_dist": "node scripts/serve_dist.js",
-    "build_history": "node scripts/build_history.js"
+    "build_history": "node scripts/build_history.js",
+    "caddy": "caddy run -config scripts/Caddyfile"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.28",

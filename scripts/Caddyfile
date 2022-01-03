@@ -1,0 +1,15 @@
+# Caddy server for local development https support
+{
+	ocsp_stapling off
+}
+
+rss.anyant.localhost {
+	reverse_proxy /api* http://127.0.0.1:6788
+	reverse_proxy /static* http://127.0.0.1:6788
+	reverse_proxy /changelog* http://127.0.0.1:6788
+	reverse_proxy http://127.0.0.1:6789
+}
+
+rss-img1.anyant.localhost {
+	reverse_proxy 127.0.0.1:6786
+}
