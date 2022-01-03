@@ -30,9 +30,6 @@ function urlFor(path, query, origin) {
 const client = axios.create({
   baseURL: BASE_URL,
 })
-const imageProxyClient = axios.create({
-  baseURL: BASE_URL,
-})
 
 const REQUEST_ITERCEPTORS = [
   function(config) {
@@ -89,7 +86,6 @@ const RESPONSE_INTERCEPTORS = [
 ]
 RESPONSE_INTERCEPTORS.forEach(pair => {
   client.interceptors.response.use(...pair)
-  imageProxyClient.interceptors.response.use(...pair)
 })
 
 function convertDjangoErrorMessage(error, fields) {
@@ -296,11 +292,6 @@ const API = {
     },
   },
   imageProxy: {
-    active({ proxyUrl, userId }) {
-      let path = '/api/v1/image/active-proxy'
-      let activeUrl = urlFor(path, { user_id: userId }, proxyUrl)
-      return imageProxyClient.get(activeUrl)
-    },
     urlForImage({ proxyUrl, src, token }) {
       let path = '/api/v1/image/proxy'
       return urlFor(path, { url: src, token: token }, proxyUrl)

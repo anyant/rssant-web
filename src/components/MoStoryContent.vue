@@ -151,7 +151,6 @@ export default {
   },
   mounted() {
     initMathjax()
-    imageProxyStore.doActive()
   },
   methods: {
     onStoryRendered(dom) {
@@ -197,7 +196,7 @@ export default {
         }
       })
     },
-    async onImageError(node) {
+    onImageError(node) {
       if (_.isEmpty(this.imageToken)) {
         return
       }
@@ -216,7 +215,7 @@ export default {
         return
       }
       node.style.visibility = 'hidden'
-      let url = await imageProxyStore.urlForImage({ src, token: this.imageToken })
+      let url = imageProxyStore.urlForImage({ src, token: this.imageToken })
       if (!_.isNil(url)) {
         node.setAttribute(PROXY_MARK_KEY, PROXY_MARK_VALUE)
         node.setAttribute('src', url)
