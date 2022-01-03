@@ -208,9 +208,17 @@ export default {
       if (!imageProxyStore.isEnable) {
         return
       }
+      // 给已替换的元素添加标记，使得再次onerror时可以忽略掉
+      const PROXY_MARK_KEY = 'data-image-proxy'
+      const PROXY_MARK_VALUE = 'true'
+      let proxyMark = node.getAttribute(PROXY_MARK_KEY)
+      if (proxyMark === PROXY_MARK_VALUE) {
+        return
+      }
       node.style.visibility = 'hidden'
       let url = await imageProxyStore.urlForImage({ src, token: this.imageToken })
       if (!_.isNil(url)) {
+        node.setAttribute(PROXY_MARK_KEY, PROXY_MARK_VALUE)
         node.setAttribute('src', url)
       }
       node.style.visibility = 'visible'
