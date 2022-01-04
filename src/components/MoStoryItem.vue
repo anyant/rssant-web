@@ -1,15 +1,44 @@
 <template>
-  <div class="story-item" :class="{ 'story-item-ctrl': isCtrlKeyHold }">
-    <div class="story-header" :class="{ 'story-header-readed': isReaded }" v-if="!isOpened" @click="onOpen">
+  <div
+    class="story-item"
+    :class="{ 'story-item-ctrl': isCtrlKeyHold }"
+  >
+    <div
+      class="story-header"
+      :class="{ 'story-header-readed': isReaded }"
+      v-if="!isOpened"
+      @click="onOpen"
+    >
       <div class="story-title">{{ title }}</div>
       <div class="story-date">{{ dateText }}</div>
     </div>
-    <div class="story-preview" :class="{ 'story-preview-readed': isReaded && !isReading }" v-if="isOpened">
-      <div class="story-preview-header" @click="onOpen">
+    <div
+      class="story-preview"
+      :class="{ 'story-preview-readed': isReaded && !isReading }"
+      v-if="isOpened"
+    >
+      <div
+        class="story-preview-header"
+        @click="onOpen"
+      >
         <div class="story-preview-title">{{ title }}</div>
-        <mu-button icon class="story-favorited" @click.stop="toggleFavorited">
-          <fa-icon size="18" v-if="isFavorited" icon="star" :color="starColor" />
-          <fa-icon size="18" v-else icon="far/star" :color="starColor" />
+        <mu-button
+          icon
+          class="story-favorited"
+          @click.stop="toggleFavorited"
+        >
+          <fa-icon
+            size="18"
+            v-if="isFavorited"
+            icon="star"
+            :color="starColor"
+          />
+          <fa-icon
+            size="18"
+            v-else
+            icon="far/star"
+            :color="starColor"
+          />
         </mu-button>
       </div>
       <div
@@ -31,7 +60,10 @@
         />
         {{ story.summary }}
       </div>
-      <div class="story-preview-link" @click="goLink">
+      <div
+        class="story-preview-link"
+        @click="goLink"
+      >
         <MoIconAngleRight3 class="story-preview-link-fade" />
         <MoIconAngleRight3 class="story-preview-link-main" />
         <MoIconAngleRight3 class="story-preview-link-fade" />
@@ -48,6 +80,7 @@ import MoIconAngleRight3 from '@/components/MoIconAngleRight3'
 import * as ImageHelper from '@/plugin/image'
 import { storyStore } from '@/store/story'
 import { feedStore } from '@/store/feed'
+import { imageProxyStore } from '@/store/imageProxy'
 
 export default {
   components: { MoIconAngleRight3 },
@@ -114,10 +147,14 @@ export default {
       if (!this.isImageNeedProxy || ImageHelper.isSameOriginUrl(src)) {
         return src
       }
-      let proxyUrl = new URL('/api/v1/image/proxy', location.origin)
-      proxyUrl.searchParams.set('url', src)
-      proxyUrl.searchParams.set('token', this.story.image_token)
-      return proxyUrl.toString()
+      let proxyUrl = imageProxyStore.urlForImage({
+        src: src,
+        token: this.story.image_token,
+      })
+      if (_.isNil(proxyUrl)) {
+        return src
+      }
+      return proxyUrl
     },
     isShowImage() {
       return !_.isEmpty(this.imageUrl) && !this.story.is_image_duplicated
