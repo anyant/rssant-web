@@ -160,7 +160,9 @@ export default {
       return !_.isEmpty(this.imageUrl) && !this.story.is_image_duplicated
     },
     isIgnoreImage() {
-      let isImageFailed = _.isEmpty(this.story.image_token) && this.isImageNeedProxy
+      let hasToken = !_.isEmpty(this.story.image_token)
+      let isProxyEnable = hasToken && imageProxyStore.isEnable
+      let isImageFailed = !isProxyEnable && this.isImageNeedProxy
       return isImageFailed || this.isImageProxyFailed
     },
     routerLink() {

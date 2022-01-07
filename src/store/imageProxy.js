@@ -36,7 +36,7 @@ export const imageProxyStore = hamiVuex.store({
   },
   urlForImage({ src, token }) {
     let proxyUrl = this.pickProxyUrl()
-    if (_.isNil(proxyUrl)) {
+    if (_.isNil(proxyUrl) || _.isEmpty(token)) {
       return null
     }
     return API.imageProxy.urlForImage({ proxyUrl, src, token })
