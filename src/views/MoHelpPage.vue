@@ -10,7 +10,13 @@
       <div class="markdown-body">
         <h4 class="sub-title">将蚁阅添加到主屏</h4>
         <div class="center">
-          <div>获得和App一样沉浸式的体验</div>
+          <div>
+            获得和App一样沉浸式的体验
+            <a
+              href="https://www.yuque.com/guyskk/rssant/efvcls"
+              target="_blank"
+            >查看教程</a>
+          </div>
           <div
             v-if="!isLikelySupportPWA"
             class="pwa-tip"
