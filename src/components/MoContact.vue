@@ -6,7 +6,7 @@
     </div>
     <div class="center">
       <img
-        src="https://gitee.com/guyskk/guyskk.github.io/raw/master/static/about/guyskk-qrcode.jpg"
+        src="@/assets/guyskk-qrcode.jpg"
         alt="微信号:guyskk"
         width="160"
         height="160"
