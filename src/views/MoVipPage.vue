@@ -46,12 +46,7 @@
             <td> 不限</td>
           </tr>
           <tr>
-            <td>基础功能</td>
-            <td class="highlight"> 支持</td>
-            <td> 试用30天</td>
-          </tr>
-          <tr>
-            <td>高级功能</td>
+            <td>全部功能</td>
             <td class="highlight"> 支持</td>
             <td> 试用30天</td>
           </tr>
