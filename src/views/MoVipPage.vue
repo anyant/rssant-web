@@ -6,7 +6,7 @@
       </template>
     </MoBackHeader>
     <div class="main">
-      <iframe class="iframe" :src="vipHomeLink"></iframe>
+      <iframe class="iframe" v-if="vipHomeLink" :src="vipHomeLink"></iframe>
     </div>
   </MoLayout>
 </template>
@@ -31,11 +31,7 @@ export default {
       return userStore.vipHomeLink
     },
   },
-  async mounted() {
-    if (userStore.shouldNoticeVip) {
-      userStore.UPDATE_VIP_NOTICED_TIMESTAMP()
-    }
-  },
+  async mounted() {},
   methods: {
     async onBack() {
       await userStore.syncVipCustomer()

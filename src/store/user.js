@@ -85,8 +85,11 @@ export const userStore = hamiVuex.store({
     if (!this.isBalanceUsable) {
       return true
     }
-    const deadline = this.balance?.balance
-    return deadline * 1000 - NOW < 48 * HOURS
+    if (_.isNil(this.balance)) {
+      return false
+    }
+    const deadline = this.balance.balance * 1000
+    return deadline - NOW < 48 * HOURS
   },
   async login({ account, password } = {}) {
     if (!_.isNil(account)) {
