@@ -1,9 +1,9 @@
 <template>
   <MoHeader :border="border">
-    <div class="left" :class="{'center-title': centerTitle}">
+    <div class="left" :class="{ 'center-title': centerTitle }">
       <div class="back" @click="goBack">
         <mu-button icon class="back-button">
-          <fa-icon size="18" icon="chevron-left" />
+          <slot name="icon"><fa-icon size="18" icon="chevron-left"/></slot>
         </mu-button>
       </div>
       <div class="title">
@@ -32,6 +32,7 @@ export default {
   },
   methods: {
     goBack() {
+      this.$emit('back')
       this.$router.safeBack()
     },
   },

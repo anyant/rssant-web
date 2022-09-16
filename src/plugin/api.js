@@ -157,6 +157,9 @@ const API = {
           throw error
         })
     },
+    vipCustomerInfo() {
+      return client.post('/ezrevenue/customer.info')
+    },
     confirmEmail({ key }) {
       return client.post('/auth/registration/verify-email/', { key })
     },
