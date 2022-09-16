@@ -20,7 +20,6 @@ import MoAccountPage from '@/views/MoAccountPage'
 import MoAboutPage from '@/views/MoAboutPage'
 import MoHelloPage from '@/views/MoHelloPage'
 import MoHelpPage from '@/views/MoHelpPage'
-import MoVipPage from '@/views/MoVipPage'
 import MoNotFoundPage from '@/views/MoNotFoundPage'
 
 const boardRoutes = [
@@ -34,12 +33,6 @@ const boardRoutes = [
     path: 'help',
     name: 'Help',
     component: MoHelpPage,
-    meta: { loginRequired: true },
-  },
-  {
-    path: 'vip',
-    name: 'Vip',
-    component: MoVipPage,
     meta: { loginRequired: true },
   },
   {

@@ -157,8 +157,8 @@ export default {
     exportOPML() {
       feedStore.exportOPML({ download: true })
     },
-    goVip() {
-      this.$router.push('/vip')
+    async goVip() {
+      await userStore.openVipHomeLink()
     },
     goAbout() {
       this.$router.push('/about')

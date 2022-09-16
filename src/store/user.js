@@ -121,6 +121,28 @@ export const userStore = hamiVuex.store({
         console.log(ex)
       })
   },
+  async openVipHomeLink() {
+    const url = this.vipHomeLink
+    if (!url) {
+      return
+    }
+    const padTop = window.outerHeight - window.innerHeight
+    const width = window.innerWidth - 16
+    const height = window.innerHeight - padTop
+    const left = window.screenLeft + 8
+    const top = window.screenTop + padTop + 8
+    const popupConfig = `popup,width=${width},height=${height},left=${left},top=${top}`
+    const popup = window.open(url, '', popupConfig)
+    await new Promise(resolve => {
+      const popupTick = setInterval(() => {
+        if (popup.closed) {
+          clearInterval(popupTick)
+          resolve(true)
+        }
+      }, 1000)
+    })
+    await this.syncVipCustomer()
+  },
   async register({ username, email, password }) {
     await API.user.register({ username, email, password })
     reportEvent('REGISTER')
