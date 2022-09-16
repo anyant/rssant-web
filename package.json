@@ -34,7 +34,6 @@
     "muse-ui-message": "^0.2.1",
     "muse-ui-toast": "^0.3.0",
     "register-service-worker": "^1.7.1",
-    "shopant-sdk": "0.0.3",
     "typeface-roboto": "0.0.54",
     "ua-parser-js": "^0.7.21",
     "viewerjs": "^1.9.0",

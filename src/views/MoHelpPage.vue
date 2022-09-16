@@ -1,8 +1,5 @@
 <template>
-  <MoLayout
-    header
-    border
-  >
+  <MoLayout header border>
     <MoBackHeader>
       <template v-slot:title>蚁阅锦囊</template>
     </MoBackHeader>
@@ -12,15 +9,9 @@
         <div class="center">
           <div>
             获得和App一样沉浸式的体验
-            <a
-              href="https://www.yuque.com/guyskk/rssant/efvcls"
-              target="_blank"
-            >查看教程</a>
+            <a href="https://www.yuque.com/guyskk/rssant/efvcls" target="_blank">查看教程</a>
           </div>
-          <div
-            v-if="!isLikelySupportPWA"
-            class="pwa-tip"
-          >推荐用Chrome，Safari，火狐，或微软Edge 打开蚁阅</div>
+          <div v-if="!isLikelySupportPWA" class="pwa-tip">推荐用Chrome，Safari，火狐，或微软Edge 打开蚁阅</div>
           <div class="button-wrapper">
             <MoPWAButton />
           </div>
@@ -29,21 +20,15 @@
         <div class="center">
           <div>
             一份帮你快速上手的
-            <a
-              href="https://www.yuque.com/guyskk/rssant/lmq3kk"
-              target="_blank"
-            >RSS阅读指南</a>
+            <a href="https://www.yuque.com/guyskk/rssant/lmq3kk" target="_blank">RSS阅读指南</a>
           </div>
         </div>
-        <template v-if="isShopantEnable">
+        <template v-if="isVipEnable">
           <h4 class="sub-title">蚁阅会员</h4>
           <div class="center">
             <div>会员可享受全部功能，订阅数量不限</div>
             <div>首月免费试用，到期后订阅将停止更新</div>
-            <div
-              class="dt-avaliable"
-              :class="{ 'balance-not-enough': !isBalanceEnough }"
-            >
+            <div class="dt-avaliable" :class="{ 'balance-notice': shouldNoticeVip }">
               <span class="label">会员到期时间:</span>
               <span class="value">{{ customerBalance }}</span>
             </div>
@@ -59,14 +44,12 @@
 </template>
 
 <script>
-import _ from 'lodash'
 import MoLayout from '@/components/MoLayout'
 import MoBackHeader from '@/components/MoBackHeader'
 import MoPWAButton from '@/components/MoPWAButton'
 import MoAntGreenButton from '@/components/MoAntGreenButton'
 import MoContact from '@/components/MoContact'
 import { isLikelySupportPWA } from '@/plugin/pwa'
-import { formatDate } from '@/plugin/datefmt'
 import { userStore } from '@/store/user'
 
 export default {
@@ -75,23 +58,17 @@ export default {
     return { isLikelySupportPWA: isLikelySupportPWA() }
   },
   computed: {
-    isShopantEnable() {
-      return userStore.isShopantEnable
+    isVipEnable() {
+      return userStore.isVipEnable
     },
     customerBalance() {
-      let dt = userStore.balance
-      if (_.isNil(dt)) {
-        return '####-##-##'
-      }
-      return formatDate(dt)
+      return userStore.balanceText
     },
-    isBalanceEnough() {
-      return userStore.isBalanceEnough
+    shouldNoticeVip() {
+      return userStore.shouldNoticeVip
     },
   },
-  mounted() {
-    userStore.syncProduct()
-  },
+  mounted() {},
   methods: {
     goVip() {
       this.$router.push('/vip')
@@ -156,7 +133,7 @@ export default {
   }
 }
 
-.balance-not-enough .value {
+.balance-notice .value {
   color: @antGold;
 }
 

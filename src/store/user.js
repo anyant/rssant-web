@@ -5,8 +5,8 @@ import { isLaunchFromPWA } from '@/plugin/pwa'
 import { reportEvent } from '@/plugin/metric'
 import localFeeds from '@/plugin/localFeeds'
 import localConfig from '@/plugin/localConfig'
-import shopantClient from '@/plugin/shopant'
 import { hamiVuex } from '.'
+import { formatDate } from '@/plugin/datefmt'
 
 const NOW = Date.now()
 const HOURS = 60 * 60 * 1000
@@ -20,10 +20,7 @@ export const userStore = hamiVuex.store({
       loginUser: null,
       loginToken: null,
       loginDate: null,
-      vipNoticedTimestamp: localConfig.VIP_NOTICED_TIMESTAMP.get(),
-      shopantCustomer: null,
-      shopantProductLoading: new Loading(),
-      shopantProduct: null,
+      vipCustomer: null,
     }
   },
   SET_INPUT_ACCOUNT(value) {
@@ -39,16 +36,8 @@ export const userStore = hamiVuex.store({
       })
     }
   },
-  UPDATE_VIP_NOTICED_TIMESTAMP() {
-    let value = Math.floor(Date.now() / 1000)
-    this.$patch({ vipNoticedTimestamp: value })
-    localConfig.VIP_NOTICED_TIMESTAMP.set(value)
-  },
-  SET_SHOPANT_CUSTOMER(customer) {
-    this.$patch({ shopantCustomer: customer })
-  },
-  SET_SHOPANT_PRODUCT(product) {
-    this.$patch({ shopantProduct: product })
+  SET_VIP_CUSTOMER(customer) {
+    this.$patch({ vipCustomer: customer })
   },
   get isLoading() {
     return this.loading.isLoading
@@ -56,45 +45,51 @@ export const userStore = hamiVuex.store({
   get isLogined() {
     return !_.isNil(this.loginUser)
   },
-  get shouldNoticeVip() {
-    if (this.isBalanceEnough) {
-      return false
-    }
-    let noticed = this.vipNoticedTimestamp
-    return _.isNil(noticed) || NOW - noticed * 1000 > 16 * HOURS
-  },
-  get isShopantEnable() {
+  get isVipEnable() {
     if (_.isNil(this.loginUser)) {
       return false
     }
-    return _.defaultTo(this.loginUser.shopant_enable, false)
-  },
-  get shopantCustomerParameter() {
-    if (_.isNil(this.loginUser)) {
-      return null
-    }
-    let user = this.loginUser
-    return {
-      external_id: user.id,
-      nickname: user.username,
-    }
+    return _.defaultTo(this.loginUser.ezrevenue_enable, false)
   },
   get balance() {
-    if (_.isNil(this.shopantCustomer)) {
+    if (_.isNil(this.vipCustomer)) {
       return null
     }
-    let balance = this.shopantCustomer.balance
-    return new Date(balance * 1000)
+    const equityId = this.loginUser.ezrevenue_vip_equity_id
+    const balance_s = this.vipCustomer.balance_s
+    return balance_s.find(x => x.equity_id === equityId)
   },
-  get isBalanceEnough() {
-    if (!this.isShopantEnable) {
+  get isBalanceUsable() {
+    if (!this.isVipEnable || _.isNil(this.balance)) {
       return true
     }
-    let balance = this.balance
-    if (_.isNil(balance)) {
+    return this.balance.is_balance_usable
+  },
+  get balanceText() {
+    const item = this.balance
+    if (_.isNil(item)) {
+      return '####-##-##'
+    }
+    if (item.is_balance_infinite) {
+      return '9999-12-31'
+    }
+    return formatDate(item.balance * 1000)
+  },
+  get vipHomeLink() {
+    if (_.isNil(this.vipCustomer)) {
+      return null
+    }
+    return this.vipCustomer.home_link.url
+  },
+  get shouldNoticeVip() {
+    if (!this.isBalanceUsable) {
       return true
     }
-    return balance.getTime() - NOW > 24 * HOURS
+    if (_.isNil(this.balance)) {
+      return false
+    }
+    const deadline = this.balance.balance * 1000
+    return deadline - NOW < 48 * HOURS
   },
   async login({ account, password } = {}) {
     if (!_.isNil(account)) {
@@ -106,39 +101,25 @@ export const userStore = hamiVuex.store({
       let user = await API.user.login({ account, password })
       this.LOGIN(user)
       localConfig.HAS_LOGIN_HISTORY.set(true)
-      this.syncCustomerBalance()
+      this.syncVipCustomer()
       if (isLaunchFromPWA()) {
         reportEvent('LOGIN_PWA')
       }
     })
   },
-  async syncCustomerBalance() {
-    if (!this.isShopantEnable) {
+  async syncVipCustomer() {
+    if (!this.isVipEnable) {
       return
     }
-    await shopantClient
-      .call('customer.get', {
-        customer: this.shopantCustomerParameter,
-      })
+    await API.user
+      .vipCustomerInfo()
       .then(customer => {
-        this.SET_SHOPANT_CUSTOMER(customer)
+        this.SET_VIP_CUSTOMER(customer)
       })
       .catch(ex => {
         // eslint-disable-next-line
         console.log(ex)
       })
-  },
-  async syncProduct() {
-    if (!_.isNil(this.shopantProduct)) {
-      return
-    }
-    if (!this.isShopantEnable) {
-      return
-    }
-    await this.shopantProductLoading.begin(async () => {
-      let product = await shopantClient.call('product.get')
-      this.SET_SHOPANT_PRODUCT(product)
-    })
   },
   async register({ username, email, password }) {
     await API.user.register({ username, email, password })

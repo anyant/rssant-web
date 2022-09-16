@@ -5,11 +5,7 @@
       <MoDarkModeDialog :open.sync="isDarkModeDialogOpen" @change="onDarkModeChange" />
     </MoBackHeader>
     <div class="main">
-      <div
-        class="action-group action-group-vip"
-        :class="{ 'balance-not-enough': !isBalanceEnough }"
-        v-if="isShopantEnable"
-      >
+      <div class="action-group action-group-vip" :class="{ 'balance-notice': shouldNoticeVip }" v-if="isVipEnable">
         <div class="action-row" @click="goVip">
           <span class="action-label">蚁阅会员</span>
           <span>
@@ -66,7 +62,6 @@ import MoLayout from '@/components/MoLayout'
 import MoBackHeader from '@/components/MoBackHeader'
 import MoDarkModeDialog from '@/components/MoDarkModeDialog'
 import { antGold, antRed, antGreen } from '@/plugin/common'
-import { formatDate } from '@/plugin/datefmt'
 import DarkMode from '@/plugin/darkmode'
 import { userStore } from '@/store/user'
 import { feedStore } from '@/store/feed'
@@ -84,18 +79,14 @@ export default {
     }
   },
   computed: {
-    isShopantEnable() {
-      return userStore.isShopantEnable
+    isVipEnable() {
+      return userStore.isVipEnable
+    },
+    shouldNoticeVip() {
+      return userStore.shouldNoticeVip
     },
     customerBalance() {
-      let dt = userStore.balance
-      if (_.isNil(dt)) {
-        return '####-##-##'
-      }
-      return formatDate(dt)
-    },
-    isBalanceEnough() {
-      return userStore.isBalanceEnough
+      return userStore.balanceText
     },
     isGithubConnected() {
       let user = userStore.loginUser
@@ -131,9 +122,7 @@ export default {
       return { auto: '跟随系统', enable: '已开启', disable: '已关闭' }[this.darkModeValue]
     },
   },
-  mounted() {
-    userStore.syncProduct()
-  },
+  mounted() {},
   methods: {
     configurePassword() {
       if (this.isPasswordConfigured) {
@@ -148,7 +137,7 @@ export default {
           userStore
             .changePassword({ password: instance.value })
             .then(() => done())
-            .catch((error) => {
+            .catch(error => {
               instance.errorText = error.message
             })
         },
@@ -212,7 +201,7 @@ export default {
   color: @antTextBlack;
 }
 
-.balance-not-enough .vip-balance {
+.balance-notice .vip-balance {
   color: @antGold;
   font-weight: bold;
 }
