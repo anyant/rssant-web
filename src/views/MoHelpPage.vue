@@ -70,8 +70,8 @@ export default {
   },
   mounted() {},
   methods: {
-    goVip() {
-      this.$router.push('/vip')
+    async goVip() {
+      await userStore.openVipHomeLink()
     },
   },
 }
