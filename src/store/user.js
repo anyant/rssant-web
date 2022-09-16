@@ -122,13 +122,16 @@ export const userStore = hamiVuex.store({
       })
   },
   async openVipHomeLink() {
+    // 当前页面打开对话框窗口，显示会员界面
     const url = this.vipHomeLink
     if (!url) {
       return
     }
+    // 高度设置为当前页面内容区域
     const padTop = window.outerHeight - window.innerHeight
     const height = window.innerHeight - padTop
     const top = window.screenTop + padTop + 8
+    // 宽度设置为当前页面内容区域居中
     let width = window.innerWidth - 16
     if (width > 800) {
       width = 800
@@ -136,7 +139,9 @@ export const userStore = hamiVuex.store({
     const padLeft = Math.round((window.innerWidth - width) / 2)
     const left = window.screenLeft + padLeft
     const popupConfig = `popup,width=${width},height=${height},left=${left},top=${top}`
+    // 打开对话框窗口，轮训等待窗口关闭
     const popup = window.open(url, '', popupConfig)
+    reportEvent('VISIT_VIP_HOME')
     await new Promise(resolve => {
       const popupTick = setInterval(() => {
         if (popup.closed) {
@@ -145,6 +150,7 @@ export const userStore = hamiVuex.store({
         }
       }, 1000)
     })
+    // 窗口关闭后，获取最新会员信息
     await this.syncVipCustomer()
   },
   async register({ username, email, password }) {
