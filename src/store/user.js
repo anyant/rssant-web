@@ -127,10 +127,14 @@ export const userStore = hamiVuex.store({
       return
     }
     const padTop = window.outerHeight - window.innerHeight
-    const width = window.innerWidth - 16
     const height = window.innerHeight - padTop
-    const left = window.screenLeft + 8
     const top = window.screenTop + padTop + 8
+    let width = window.innerWidth - 16
+    if (width > 800) {
+      width = 800
+    }
+    const padLeft = Math.round((window.innerWidth - width) / 2)
+    const left = window.screenLeft + padLeft
     const popupConfig = `popup,width=${width},height=${height},left=${left},top=${top}`
     const popup = window.open(url, '', popupConfig)
     await new Promise(resolve => {
