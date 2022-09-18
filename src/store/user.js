@@ -55,9 +55,9 @@ export const userStore = hamiVuex.store({
     if (_.isNil(this.vipCustomer)) {
       return null
     }
-    const equityId = this.loginUser.ezrevenue_vip_equity_id
+    const equityAlias = 'equity_vip'
     const balance_s = this.vipCustomer.balance_s
-    return balance_s.find(x => x.equity_id === equityId)
+    return balance_s.find(x => x.equity.alias === equityAlias)
   },
   get isBalanceUsable() {
     if (!this.isVipEnable || _.isNil(this.balance)) {
