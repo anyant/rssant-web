@@ -49,15 +49,18 @@
           'story-preview-summary-ignore-image': isIgnoreImage,
         }"
       >
-        <img
+        <div 
           v-if="isShowImage"
-          @load="onPreviewImageLoad"
-          @error="onPreviewImageError"
-          referrerpolicy="no-referrer"
           class="story-preview-image"
           :class="{ 'story-preview-image-loading': !isImageReady }"
-          :src="imageUrl"
-        />
+        >
+          <img
+            @load="onPreviewImageLoad"
+            @error="onPreviewImageError"
+            referrerpolicy="no-referrer"
+            :src="imageUrl"
+          />
+        </div>
         {{ story.summary }}
       </div>
       <div
@@ -319,6 +322,10 @@ export default {
   margin-right: 16 * @pr;
   margin-top: 4 * @pr;
   margin-bottom: 4 * @pr;
+  > img {
+    display: block;
+    width: 100%;
+  }
 }
 
 .story-preview-image-loading {
@@ -327,10 +334,11 @@ export default {
 }
 
 .story-preview-summary-ignore-image .story-preview-image {
-  width: 1px;
-  height: 1px;
+  width: 0;
+  height: 0;
   padding: 0;
-  margin: 0;
+  margin-right: 0;
+  margin-bottom: 0;
 }
 
 .story-item-ctrl .story-preview-summary:hover {
