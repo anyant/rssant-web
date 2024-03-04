@@ -232,6 +232,9 @@ const API = {
     setTitle({ id, title }) {
       return client.put(`/feed/set-title`, { id, title })
     },
+    setPublish({ id, is_publish }) {
+      return client.put(`/feed/set-publish`, { id, is_publish })
+    },
     setAllGroup({ ids, group }) {
       return client.put(`/feed/set-all-group`, { ids, group })
     },
@@ -292,6 +295,14 @@ const API = {
     },
     fetchFulltext({ feed_id, offset }) {
       return client.post('/story/fetch-fulltext', { feed_id, offset })
+    },
+  },
+  userPublish: {
+    get() {
+      return client.post('/user_publish.get', {})
+    },
+    set({ unionid, is_enable, root_url, is_all_public }) {
+      return client.post('/user_publish.set', { unionid, is_enable, root_url, is_all_public })
     },
   },
   imageProxy: {

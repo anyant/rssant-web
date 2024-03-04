@@ -405,6 +405,10 @@ export const feedStore = hamiVuex.store({
     let newFeed = await API.feed.setTitle({ id: feedId, title: title })
     this.ADD_OR_UPDATE(newFeed)
   },
+  async setPublish({ feedId, is_publish }) {
+    let newFeed = await API.feed.setPublish({ id: feedId, is_publish: is_publish })
+    this.ADD_OR_UPDATE(newFeed)
+  },
   async setAllGroup({ feedIds, group }) {
     if (_.isEmpty(feedIds)) {
       return
