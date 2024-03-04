@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import Router from 'vue-router'
 // muse-ui
 import '@/plugin/muse-ui'
 // fontawesome
@@ -12,7 +13,9 @@ import DarkMode from '@/plugin/darkmode'
 
 // rssant
 import App from './App'
-import router from '@/router'
+import PublishApp from './publish/App'
+import { createRouter } from '@/router'
+import { createPublishRouter } from '@/publish/router'
 import { pageMixin } from '@/store/page'
 import StoryRender from '@/plugin/storyRender'
 import { LAYOUT } from '@/plugin/common'
@@ -31,6 +34,7 @@ DarkMode.init()
 
 Vue.config.productionTip = false
 
+Vue.use(Router)
 Vue.prototype.$LAYOUT = LAYOUT
 Vue.mixin(pageMixin)
 
@@ -39,11 +43,30 @@ Vue.use(StoryRender)
 // 上拉刷新下拉加载滚动列表
 Vue.component('mescroll', Mescroll)
 
-window.app = new Vue({
-  el: '#app',
-  router,
-  render: h => h(App),
-})
+function isPublishPage() {
+  let path = window.location.pathname
+  return path.startsWith('/rssant/')
+}
+
+function createApp() {
+  if (isPublishPage()) {
+    const router = createPublishRouter()
+    return new Vue({
+      el: '#app',
+      router,
+      render: h => h(PublishApp),
+    })
+  } else {
+    const router = createRouter()
+    return new Vue({
+      el: '#app',
+      router,
+      render: h => h(App),
+    })
+  }
+}
+
+window.app = createApp()
 
 // remove spinner: https://pathgather.github.io/please-wait/
 document.addEventListener('DOMContentLoaded', function() {

@@ -305,6 +305,23 @@ const API = {
       return client.post('/user_publish.set', { unionid, is_enable, root_url, is_all_public })
     },
   },
+  publish: {
+    info() {
+      return client.post('/publish.info', {})
+    },
+    feedQuery({ detail, hints } = {}) {
+      return client.post('/publish.feed_query', { detail, hints })
+    },
+    feedGet({ id, detail }) {
+      return client.post(`/publish.feed_get`, { params: { id, detail } })
+    },
+    storyQuery({ feed_id, detail, offset, size } = {}) {
+      return client.post('/publish.story_query', { params: { feed_id, detail, offset, size } })
+    },
+    storyGet({ feed_id, offset, detail, set_readed }) {
+      return client.post(`/publish.story_get`, { params: { feed_id, offset, detail, set_readed } })
+    },
+  },
   imageProxy: {
     urlForImage({ proxyUrl, src, token }) {
       let path = '/api/v1/image/proxy'
