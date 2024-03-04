@@ -1,7 +1,11 @@
 <template>
     <MoLayout header>
-        <MoBackHeader center-title>
+        <MoBackHeader>
             <template v-slot:title>发布订阅</template>
+            <mu-button flat class="action-guide" @click="openGuideDialog">
+                <fa-icon icon="info-circle" :size="16" :color="antGold" />
+                <span class="guide-button-text">配置说明</span>
+            </mu-button>
         </MoBackHeader>
         <div class="main">
             <div class="section-publish-config">
@@ -35,6 +39,41 @@
             <MoPublishConfigFeedList class="section-feed-list" v-if="isShowFeedList">
             </MoPublishConfigFeedList>
         </div>
+        <mu-dialog fullscreen scrollable padding="0" :open.sync="isGuideDialogOpen">
+            <mu-appbar z-depth="0" color="#ffffff" text-color="#000000" title="配置说明">
+                <mu-button class="button-close" slot="right" :color="antBlue" flat @click="closeGuideDialog">
+                    <fa-icon icon="times" :size="20" :color="antBlue"></fa-icon>
+                    <span class="button-text">关闭</span>
+                </mu-button>
+            </mu-appbar>
+            <div class="guide-main markdown-body">
+                <p>发布订阅功能用于公开你的订阅，让网友可以在指定的网址上看到你的订阅内容。</p>
+                <p>开启此功能后，你还需要在你的服务器上配置请求转发才能生效。</p>
+                <p>
+                    <span>当请求访问你指定的网址时，将请求转发到蚁阅地址</span>
+                    <code>{{ publishTarget }}</code>
+                    <span>同时带上请求头</span>
+                    <code>{{ publishHeader }}</code>
+                    <span>，蚁阅服务器会根据此请求头展示你发布的订阅。</span>
+                </p>
+                <h4>Nginx配置</h4>
+                <pre>
+location /publish/ {
+    proxy_pass {{ publishTarget }};
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header {{ publishHeader }};
+}</pre>
+                <h4>Caddy配置</h4>
+                <pre>
+{{ publishUrl }} {
+    reverse_proxy {{ publishTarget }}
+    header_up {{ publishHeader }}
+}</pre>
+            </div>
+        </mu-dialog>
     </MoLayout>
 </template>
 <script>
@@ -43,7 +82,7 @@ import MoLayout from '@/components/MoLayout'
 import MoPublishConfigFeedList from '@/components/MoPublishConfigFeedList'
 import { userPublishStore } from '@/store/userPublish'
 import { feedStore } from '@/store/feed'
-import { antBlue, antTextWhite } from '@/plugin/common'
+import { antBlue, antGold, antTextWhite } from '@/plugin/common'
 
 export default {
     name: 'MoPublishConfigPage',
@@ -56,6 +95,8 @@ export default {
         return {
             antTextWhite,
             antBlue,
+            antGold,
+            isGuideDialogOpen: false,
             form: {
                 root_url: null,
                 root_url_error: null,
@@ -68,7 +109,19 @@ export default {
         },
         isShowFeedList() {
             return this.publishConfig.is_enable && !this.publishConfig.is_all_public
-        }
+        },
+        publishUrl() {
+            return this.publishConfig.root_url || 'https://rss.example.com'
+        },
+        publishTarget() {
+            return 'https://rss.anyant.com/publish/'
+        },
+        publishHeaderValue() {
+            return userPublishStore.config.unionid || 'your-publish-id'
+        },
+        publishHeader() {
+            return `x-rssant-publish: ${this.publishHeaderValue}`
+        },
     },
     async mounted() {
         await userPublishStore.doLoad()
@@ -76,6 +129,12 @@ export default {
         await feedStore.sync()
     },
     methods: {
+        openGuideDialog() {
+            this.isGuideDialogOpen = true
+        },
+        closeGuideDialog() {
+            this.isGuideDialogOpen = false
+        },
         async onSetIsEnable(value) {
             await userPublishStore.doSave({ is_enable: value })
             this.$toast.success({ message: '设置保存成功' })
@@ -100,6 +159,34 @@ export default {
 
 <style lang="less" scoped>
 @import '~@/styles/common';
+
+.action-guide {
+    position: relative;
+    right: -12*@pr;
+
+    .guide-button-text {
+        margin-left: 3*@pr;
+        color: @antGold;
+    }
+}
+
+.button-close {
+    position: relative;
+    right: -4*@pr;
+
+    .button-text {
+        font-size: 18*@pr;
+        margin-left: 2*@pr;
+    }
+}
+
+.guide-main {
+    padding: 16*@pr;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: auto;
+}
+
 
 .main {
     padding-top: 8*@pr;

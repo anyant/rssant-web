@@ -6,6 +6,7 @@ import Loading from 'muse-ui-loading'
 import Toast from 'muse-ui-toast'
 import MuseMessage from 'muse-ui-message'
 import {
+  AppBar,
   Button,
   Checkbox,
   Dialog,
@@ -24,6 +25,7 @@ import {
   Progress,
 } from 'muse-ui'
 
+Vue.use(AppBar)
 Vue.use(Button)
 Vue.use(Checkbox)
 Vue.use(Dialog)
