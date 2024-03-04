@@ -17,7 +17,7 @@
                     </div>
                     <div class="form-root-url">
                         <mu-text-field class="input-root-url" placeholder="例如：https://www.example.com" full-width
-                            v-model="form.root_url">
+                            v-model="form.root_url" :error-text="form.root_url_error">
                         </mu-text-field>
                         <span class="item-button item-button-save" @click="onSetRootUrl">
                             <fa-icon class="item-button-icon" :color="antTextWhite" icon="save" />保存
@@ -58,6 +58,7 @@ export default {
             antBlue,
             form: {
                 root_url: null,
+                root_url_error: null,
             },
         }
     },
@@ -80,7 +81,13 @@ export default {
             this.$toast.success({ message: '设置保存成功' })
         },
         async onSetRootUrl() {
-            await userPublishStore.doSave({ root_url: this.form.root_url })
+            try {
+                await userPublishStore.doSave({ root_url: this.form.root_url })
+            } catch (ex) {
+                this.form.root_url_error = ex.message
+                return
+            }
+            this.form.root_url_error = null
             this.$toast.success({ message: '设置保存成功' })
         },
         async onSetAllPublic(value) {
