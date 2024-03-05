@@ -16,6 +16,7 @@ import App from './App'
 import PublishApp from './publish/App'
 import { createRouter } from '@/router'
 import { createPublishRouter } from '@/publish/router'
+import { hamiVuex } from '@/store'
 import { pageMixin } from '@/store/page'
 import StoryRender from '@/plugin/storyRender'
 import { LAYOUT } from '@/plugin/common'
@@ -54,6 +55,7 @@ function createApp() {
     return new Vue({
       el: '#app',
       router,
+      store: hamiVuex.vuexStore,
       render: h => h(PublishApp),
     })
   } else {
@@ -61,6 +63,7 @@ function createApp() {
     return new Vue({
       el: '#app',
       router,
+      store: hamiVuex.vuexStore,
       render: h => h(App),
     })
   }

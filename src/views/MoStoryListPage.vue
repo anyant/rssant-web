@@ -19,6 +19,7 @@
       :total="feed.total_storys"
       :load="loadStorys"
       :jump="onJump"
+      :enableUnreadPad="true"
     >
       <MoStoryItem
         v-for="story in storyList"

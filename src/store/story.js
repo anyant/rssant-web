@@ -22,7 +22,7 @@ function sortMushrooms(mushrooms) {
   ])
 }
 
-const MIN_STORYS_FOR_IMAGE_DEDUP = 10
+export const MIN_STORYS_FOR_IMAGE_DEDUP = 10
 
 function getLoadedStorysForImageDedup(storys, feedStorys) {
   let loadedStorys = []
@@ -43,7 +43,7 @@ function getLoadedStorysForImageDedup(storys, feedStorys) {
   return loadedStorys
 }
 
-function detectDuplicatedStoryImages(storys, feedStorys) {
+export function detectDuplicatedStoryImages(storys, feedStorys) {
   let total = 0
   let counts = {}
   let loadedStorys = getLoadedStorysForImageDedup(storys, feedStorys)
@@ -78,7 +78,7 @@ function addOrUpdateList(state, storys) {
   })
 }
 
-function addOrUpdateStory(feedStorys, story) {
+export function addOrUpdateStory(feedStorys, story) {
   let updated = {}
   let old = feedStorys[story.offset]
   if (!_.isNil(old)) {

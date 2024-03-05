@@ -313,13 +313,13 @@ const API = {
       return client.post('/publish.feed_query', { detail, hints })
     },
     feedGet({ id, detail }) {
-      return client.post(`/publish.feed_get`, { params: { id, detail } })
+      return client.post(`/publish.feed_get`, { id, detail })
     },
     storyQuery({ feed_id, detail, offset, size } = {}) {
-      return client.post('/publish.story_query', { params: { feed_id, detail, offset, size } })
+      return client.post('/publish.story_query', { feed_id, detail, offset, size })
     },
     storyGet({ feed_id, offset, detail, set_readed }) {
-      return client.post(`/publish.story_get`, { params: { feed_id, offset, detail, set_readed } })
+      return client.post(`/publish.story_get`, { feed_id, offset, detail, set_readed })
     },
   },
   imageProxy: {

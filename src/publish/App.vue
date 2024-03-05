@@ -1,7 +1,6 @@
 <template>
     <div id="app">
         <div id="timeit"></div>
-        <h3>你好</h3>
         <keep-alive>
             <router-view />
         </keep-alive>

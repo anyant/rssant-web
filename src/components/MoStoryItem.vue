@@ -1,72 +1,27 @@
 <template>
-  <div
-    class="story-item"
-    :class="{ 'story-item-ctrl': isCtrlKeyHold }"
-  >
-    <div
-      class="story-header"
-      :class="{ 'story-header-readed': isReaded }"
-      v-if="!isOpened"
-      @click="onOpen"
-    >
+  <div class="story-item" :class="{ 'story-item-ctrl': isCtrlKeyHold }">
+    <div class="story-header" :class="{ 'story-header-readed': isReaded }" v-if="!isOpened" @click="onOpen">
       <div class="story-title">{{ title }}</div>
       <div class="story-date">{{ dateText }}</div>
     </div>
-    <div
-      class="story-preview"
-      :class="{ 'story-preview-readed': isReaded && !isReading }"
-      v-if="isOpened"
-    >
-      <div
-        class="story-preview-header"
-        @click="onOpen"
-      >
+    <div class="story-preview" :class="{ 'story-preview-readed': isReaded && !isReading }" v-if="isOpened">
+      <div class="story-preview-header" @click="onOpen">
         <div class="story-preview-title">{{ title }}</div>
-        <mu-button
-          icon
-          class="story-favorited"
-          @click.stop="toggleFavorited"
-        >
-          <fa-icon
-            size="18"
-            v-if="isFavorited"
-            icon="star"
-            :color="starColor"
-          />
-          <fa-icon
-            size="18"
-            v-else
-            icon="far/star"
-            :color="starColor"
-          />
+        <mu-button icon class="story-favorited" @click.stop="toggleFavorited">
+          <fa-icon size="18" v-if="isFavorited" icon="star" :color="starColor" />
+          <fa-icon size="18" v-else icon="far/star" :color="starColor" />
         </mu-button>
       </div>
-      <div
-        class="story-preview-summary"
-        @click="handleSummaryClick"
-        :class="{
-          'story-preview-summary-show-image': isShowImage,
-          'story-preview-summary-ignore-image': isIgnoreImage,
-        }"
-      >
-        <div 
-          v-if="isShowImage"
-          class="story-preview-image"
-          :class="{ 'story-preview-image-loading': !isImageReady }"
-        >
-          <img
-            @load="onPreviewImageLoad"
-            @error="onPreviewImageError"
-            referrerpolicy="no-referrer"
-            :src="imageUrl"
-          />
+      <div class="story-preview-summary" @click="handleSummaryClick" :class="{
+    'story-preview-summary-show-image': isShowImage,
+    'story-preview-summary-ignore-image': isIgnoreImage,
+  }">
+        <div v-if="isShowImage" class="story-preview-image" :class="{ 'story-preview-image-loading': !isImageReady }">
+          <img @load="onPreviewImageLoad" @error="onPreviewImageError" referrerpolicy="no-referrer" :src="imageUrl" />
         </div>
         {{ story.summary }}
       </div>
-      <div
-        class="story-preview-link"
-        @click="goLink"
-      >
+      <div class="story-preview-link" @click="goLink">
         <MoIconAngleRight3 class="story-preview-link-fade" />
         <MoIconAngleRight3 class="story-preview-link-main" />
         <MoIconAngleRight3 class="story-preview-link-fade" />
@@ -105,6 +60,10 @@ export default {
       default: false,
     },
     isCtrlKeyHold: {
+      type: Boolean,
+      default: false,
+    },
+    solo: {
       type: Boolean,
       default: false,
     },
@@ -207,6 +166,10 @@ export default {
       }
     },
     async onOpen() {
+      if (this.solo) {
+        this.$emit('click')
+        return
+      }
       if (_.isEmpty(this.story.summary) || _.isEmpty(this.story.content)) {
         let promise = storyStore.load({
           feedId: this.feedId,
@@ -253,6 +216,7 @@ export default {
 }
 
 .story-header-readed {
+
   .story-title,
   .story-date {
     color: @antTextGrey;
@@ -322,7 +286,8 @@ export default {
   margin-right: 16 * @pr;
   margin-top: 4 * @pr;
   margin-bottom: 4 * @pr;
-  > img {
+
+  >img {
     display: block;
     width: 100%;
   }
@@ -366,6 +331,7 @@ export default {
   .story-preview-link-main {
     color: @antBlue;
   }
+
   .story-preview-link-fade {
     color: @antLineGrey;
   }

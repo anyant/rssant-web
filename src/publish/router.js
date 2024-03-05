@@ -1,12 +1,14 @@
 import Router from 'vue-router'
 import PubHomePage from '@/publish/views/HomePage'
+import PubNotFoundPage from '@/publish/views/NotFoundPage'
 
 const routes = [
   {
     path: '/rssant/',
-    name: 'Home',
+    name: 'PubHome',
     component: PubHomePage,
   },
+  { path: '*', component: PubNotFoundPage },
 ]
 
 export function createPublishRouter() {

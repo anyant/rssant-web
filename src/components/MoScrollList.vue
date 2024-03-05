@@ -8,13 +8,7 @@
         </mu-button>
       </div>
     </transition>
-    <mescroll
-      ref="mescroll"
-      class="mescroll"
-      :down="mescrollDown"
-      :up="mescrollUp"
-      @init="mescrollInit"
-    >
+    <mescroll ref="mescroll" class="mescroll" :down="mescrollDown" :up="mescrollUp" @init="mescrollInit">
       <div class="item-list">
         <slot></slot>
       </div>
@@ -60,6 +54,10 @@ export default {
     jump: {
       type: Function,
       required: false,
+    },
+    enableUnreadPad: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -146,6 +144,7 @@ export default {
       }
     },
     setInitUnreadPad() {
+      if (!this.enableUnreadPad) { return }
       // 让未读故事恰好能撑满一页
       let pad = this.mescroll.upwarp
       if (this.hasNext || _.isNil(pad)) {
