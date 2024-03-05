@@ -10,9 +10,9 @@
                     :date="feed.dt_latest_story_published || feed.dt_created" :link="feed.id" :routeTo="onClickFeed">
                 </MoFeedItem>
             </div>
-            <div class="story-list">
-                <MoScrollList class="scroll-list" v-if="feed" :itemSize="40" :items="storyList"
-                    :init-offset="feed.story_offset" :begin-offset="beginOffset" :end-offset="endOffset"
+            <div class="story-list" v-if="feed">
+                <MoScrollList v-for="feed in [feed]" class="scroll-list" :key="feed.id" :itemSize="40" reversed
+                    :items="storyList" :init-offset="currentOffset" :begin-offset="beginOffset" :end-offset="endOffset"
                     :total="feed.total_storys" :load="loadStorys">
                     <MoStoryItem class="story-item" :class="{ 'active': isActiveStory(story.feed.id, story.offset) }"
                         v-for="story in storyList" :key="`${story.feed.id}-${story.offset}`" :feedId="story.feed.id"
@@ -20,9 +20,10 @@
                     </MoStoryItem>
                 </MoScrollList>
             </div>
-            <div class="story-detail">
-                <MoStoryContent class="story-content" v-if="story" ref="contentRef" :story="story" :next-feed="null"
-                    :next-story="null" :show-next-feed-title="false" :image-viewer-container-getter="null">
+            <div class="story-detail" v-if="story">
+                <MoStoryContent v-for="story in [story]" :key="`${story.feed.id}-${story.offset}`" class="story-content"
+                    ref="contentRef" :story="story" :next-feed="null" :next-story="null" :show-next-feed-title="false"
+                    :image-viewer-container-getter="null">
                 </MoStoryContent>
             </div>
         </MoLayout>
@@ -73,6 +74,9 @@ export default {
             return feedId
         },
         currentOffset() {
+            if (_.isNil(this.currentFeedId)) {
+                return null
+            }
             let offset = this.$route.query.offset
             if (!offset) {
                 return null
@@ -89,7 +93,8 @@ export default {
             if (_.isNil(this.currentFeedId)) {
                 return []
             }
-            return publishStoryStore.getListByFeed(this.currentFeedId)
+            let itemList = publishStoryStore.getListByFeed(this.currentFeedId)
+            return _.reverse(itemList)
         },
         beginOffset() {
             if (_.isNil(this.currentFeedId)) {
@@ -115,10 +120,6 @@ export default {
     },
     async mounted() {
         await publishFeedStore.doLoad()
-        if (!_.isNil(this.currentFeedId)) {
-            let isInit = _.isNil(this.currentOffset)
-            await publishStoryStore.doLoadList({ feedId: this.currentFeedId, isInit, offset: this.currentOffset })
-        }
         if (!_.isNil(this.currentFeedId) && !_.isNil(this.currentOffset)) {
             await publishStoryStore.doLoad({ feedId: this.currentFeedId, offset: this.currentOffset, detail: true })
         }
@@ -132,7 +133,7 @@ export default {
             return feedId === this.currentFeedId && offset === this.currentOffset
         },
         async loadStorys({ offset, size, resetLoadedOffset, isInit }) {
-            return publishStoryStore.doLoadList({
+            return await publishStoryStore.doLoadList({
                 feedId: this.currentFeedId,
                 offset: offset,
                 detail: true,
@@ -142,12 +143,19 @@ export default {
             })
         },
         async onClickFeed(feedId) {
-            await publishStoryStore.doLoadList({ feedId: feedId, isInit: true })
+            if (feedId === this.currentFeedId) { return }
             this.$router.push({ query: { feed: feedId } })
         },
         async onClickStory(feedId, offset) {
+            if (feedId === this.currentFeedId && offset === this.currentOffset) {
+                return
+            }
             await publishStoryStore.doLoad({ feedId: feedId, offset: offset, detail: true })
-            this.$router.push({ query: { feed: feedId, offset: offset } })
+            if (_.isNil(this.currentOffset)) {
+                this.$router.push({ query: { feed: feedId, offset: offset } })
+            } else {
+                this.$router.replace({ query: { feed: feedId, offset: offset } })
+            }
         }
     }
 }
