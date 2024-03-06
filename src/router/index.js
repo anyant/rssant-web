@@ -8,28 +8,33 @@ import { userStore } from '@/store/user'
 
 export const keepAlivePages = ['MoHomePage', 'MoMushroomPage', 'MoAccountPage', 'MoFeedCreationPage']
 
+export function enableSafeBack(router, { fallback } = {}) {
+  // when landing page not '/', router.back() may be a trouble
+  router._numRouteVistied = -1
+  router.safeBack = function() {
+    if (router._numRouteVistied < 1) {
+      router.replace(fallback || '/')
+    } else {
+      router.back()
+    }
+  }
+  router.beforeEach((to, from, next) => {
+    // after some path visited, browser history can go back safely
+    if (router._numRouteVistied < 1) {
+      router._numRouteVistied += 1
+    }
+    next()
+  })
+}
+
 export function createRouter() {
   const router = new Router({
     mode: 'history',
     base: process.env.BASE_URL,
     routes: routes,
   })
-
-  // when landing page not '/', router.back() may be a trouble
-  router._numRouteVistied = -1
-  router.safeBack = function() {
-    if (router._numRouteVistied < 1) {
-      router.replace('/')
-    } else {
-      router.back()
-    }
-  }
-
+  enableSafeBack(router)
   router.beforeEach((to, from, next) => {
-    // after some path visited, browser history can go back safely
-    if (router._numRouteVistied < 1) {
-      router._numRouteVistied += 1
-    }
     const loginRequired = to.matched.some(record => record.meta.loginRequired)
     const goLogin = error => {
       let response = error.response

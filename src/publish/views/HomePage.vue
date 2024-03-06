@@ -1,19 +1,23 @@
 <template>
-    <div class="home-page">
-        <MoHeader border>
-            <MoDebugTool class="title">蚁阅</MoDebugTool>
-        </MoHeader>
+    <div class="publish-home-page" :class="pageClasses">
+        <MoBackHeader :isHome="isHome" border>
+            <template v-slot:title>
+                <MoDebugTool class="title">{{ title }}</MoDebugTool>
+            </template>
+        </MoBackHeader>
         <MoLayout grey header class="main" :style="mainStyle">
-            <PubFeedList :currentFeedId="currentFeedId" />
-            <PubStoryList v-if="feed" :currentFeedId="currentFeedId" :currentOffset="currentOffset" />
-            <PubStoryDetail v-if="story" :currentFeedId="currentFeedId" :currentOffset="currentOffset" />
+            <PubFeedList class="feed-list" :currentFeedId="currentFeedId" />
+            <PubStoryList class="story-list" v-if="feed" :currentFeedId="currentFeedId"
+                :currentOffset="currentOffset" />
+            <PubStoryDetail class="story-detail" v-if="story" :currentFeedId="currentFeedId"
+                :currentOffset="currentOffset" />
         </MoLayout>
     </div>
 </template>
 
 
 <script>
-import MoHeader from '@/components/MoHeader';
+import MoBackHeader from '@/components/MoBackHeader';
 import MoDebugTool from '@/components/MoDebugTool';
 import MoLayout from '@/components/MoLayout'
 import { publishFeedStore } from '@/publish/store/feed'
@@ -22,18 +26,39 @@ import _ from 'lodash';
 import PubStoryList from '@/publish/views/StoryList.vue';
 import PubFeedList from '@/publish/views/FeedList.vue';
 import PubStoryDetail from '@/publish/views/StoryDetail.vue';
+import { LAYOUT } from '@/plugin/common';
 
 export default {
     components: {
-        MoHeader, MoDebugTool, MoLayout, PubStoryList, PubFeedList, PubStoryDetail
+        MoBackHeader, MoDebugTool, MoLayout, PubStoryList, PubFeedList, PubStoryDetail
     },
     data() {
         return {
             isReady: false,
-            showHeader: false
         }
     },
     computed: {
+        isWide() {
+            return LAYOUT.isWide
+        },
+        isPageHome() {
+            return _.isNil(this.currentFeedId) && _.isNil(this.currentOffset)
+        },
+        isPageFeed() {
+            return !_.isNil(this.currentFeedId) && _.isNil(this.currentOffset)
+        },
+        isPageStory() {
+            return !_.isNil(this.currentFeedId) && !_.isNil(this.currentOffset)
+        },
+        pageClasses() {
+            return {
+                'is-wide': this.isWide,
+                'not-wide': !this.isWide,
+                'is-page-home': this.isPageHome,
+                'is-page-feed': this.isPageFeed,
+                'is-page-story': this.isPageStory,
+            }
+        },
         mainStyle() {
             return {
                 width: '100%',
@@ -62,6 +87,10 @@ export default {
             }
             return _.parseInt(offset)
         },
+        isHome() {
+            if (this.isWide) { return true }
+            return _.isNil(this.currentFeedId) && _.isNil(this.currentOffset)
+        },
         feed() {
             if (_.isNil(this.currentFeedId)) {
                 return null
@@ -77,6 +106,29 @@ export default {
                 offset: this.currentOffset,
             })
         },
+        feedTitle() {
+            return this.feed?.title || this.currentFeedId
+        },
+        storyTitle() {
+            let feedTitle = this.feedTitle
+            let title = this.story?.title
+            if (feedTitle && title) {
+                return `${feedTitle} - ${title}`
+            }
+            return title || feedTitle
+        },
+        title() {
+            if (this.isHome) {
+                return '蚁阅'
+            }
+            if (this.isPageFeed) {
+                return this.feedTitle
+            }
+            if (this.isPageStory) {
+                return this.storyTitle
+            }
+            return ''
+        },
     },
     async mounted() {
         await publishFeedStore.doLoad()
@@ -85,7 +137,8 @@ export default {
         }
         this.isReady = true
     },
-    methods: {}
+    methods: {
+    }
 }
 </script>
 
@@ -93,17 +146,7 @@ export default {
 <style lang="less" scoped>
 @import '~@/styles/common';
 
-.title {
-    color: @antTextBlack;
-    font-weight: bold;
-    font-size: 16*@pr;
-    cursor: default;
-}
-
 .main {
-    display: flex;
-    flex-direction: row;
-    height: 100%;
 
     .feed-list,
     .story-list,
@@ -112,6 +155,12 @@ export default {
         overflow-y: auto;
         position: relative;
     }
+}
+
+.is-wide .main {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
 
     .feed-list,
     .story-list {
@@ -129,5 +178,42 @@ export default {
     .story-detail {
         flex: 1;
     }
+}
+
+.not-wide.is-page-home .main {
+    .feed-list {
+        width: 100%;
+    }
+
+    .story-list,
+    .story-detail {
+        display: none;
+    }
+}
+
+.not-wide.is-page-feed .main {
+
+    .feed-list,
+    .story-detail {
+        display: none;
+    }
+
+    .story-list {
+        width: 100%;
+    }
+
+}
+
+.not-wide.is-page-story .main {
+
+    .feed-list,
+    .story-list {
+        display: none;
+    }
+
+    .story-detail {
+        width: 100%;
+    }
+
 }
 </style>
