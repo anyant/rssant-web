@@ -71,21 +71,9 @@
                     <span>，蚁阅服务器会根据此请求头展示你发布的订阅。</span>
                 </p>
                 <h4>Nginx配置</h4>
-                <pre>
-            location /publish/ {
-            proxy_pass {{ publishTarget }};
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-            proxy_set_header {{ publishHeader }};
-            }</pre>
+                <pre>{{ nginxConfig }}</pre>
                 <h4>Caddy配置</h4>
-                <pre>
-            {{ publishUrl }} {
-            reverse_proxy {{ publishTarget }}
-            header_up {{ publishHeader }}
-            }</pre>
+                <pre>{{ caddyConfig }}</pre>
             </div>
         </mu-dialog>
     </MoLayout>
@@ -131,13 +119,50 @@ export default {
             return this.publishConfig.root_url || 'https://rss.example.com'
         },
         publishTarget() {
-            return 'https://rss.anyant.com/publish/'
+            return 'https://rss.anyant.com'
         },
         publishHeaderValue() {
             return userPublishStore.config.unionid || 'your-publish-id'
         },
         publishHeader() {
-            return `x-rssant-publish: ${this.publishHeaderValue}`
+            return `X-Rssant-Publish: ${this.publishHeaderValue}`
+        },
+        nginxConfig() {
+            return `
+server {
+    listen 80;
+    server_name  _;
+
+    location = / {
+        return 302 /rssant/;
+    }
+
+    location / {
+        proxy_pass https://rss.anyant.com;
+        proxy_set_header Host "rss.anyant.com";
+        proxy_set_header X-Rssant-Publish "${this.publishHeaderValue}";
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+`.trim()
+        },
+        caddyConfig() {
+            return `
+:80 {
+    handle / {
+        redir / /rssant/
+    }
+
+    handle {
+        reverse_proxy https://rss.anyant.com {
+            header_up Host "rss.anyant.com"
+            header_up X-Rssant-Publish "${this.publishHeaderValue}"
+        }
+    }
+}
+`.trim()
         },
     },
     async mounted() {
