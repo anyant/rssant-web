@@ -6,6 +6,9 @@
                 <template v-slot:title>
                     <MoDebugTool class="title">{{ title }}</MoDebugTool>
                 </template>
+                <mu-button v-if="isPageFeed || isPageStory" icon class="action-detail" @click="goFeedDetail">
+                    <fa-icon size="18" icon="info-circle" />
+                </mu-button>
             </MoBackHeader>
             <MoLayout grey header class="main" :style="mainStyle">
                 <PubFeedList class="feed-list" :currentFeedId="currentFeedId" />
@@ -168,6 +171,12 @@ export default {
         imageViewerContainerGetter() {
             return this.$el.querySelector('.story-image-viewer')
         },
+        goFeedDetail() {
+            this.$router.push({
+                name: 'PubFeedDetailPage',
+                query: { id: this.currentFeedId },
+            })
+        },
     }
 }
 </script>
@@ -175,6 +184,19 @@ export default {
 
 <style lang="less" scoped>
 @import '~@/styles/common';
+
+.action-detail {
+    position: relative;
+    width: 32 * @pr;
+    height: 32 * @pr;
+    margin-left: 16 * @pr;
+}
+
+.action-detail {
+    position: relative;
+    right: -4 * @pr;
+    color: lighten(@antTextSemi, 5%);
+}
 
 .main {
 

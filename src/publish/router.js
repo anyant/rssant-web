@@ -1,5 +1,6 @@
 import Router from 'vue-router'
 import PubHomePage from '@/publish/views/HomePage'
+import PubFeedDetailPage from '@/publish/views/FeedDetailPage'
 import PubNotFoundPage from '@/publish/views/NotFoundPage'
 import { enableSafeBack } from '@/router'
 
@@ -8,6 +9,11 @@ const routes = [
     path: '/rssant/',
     name: 'PubHome',
     component: PubHomePage,
+  },
+  {
+    path: '/rssant/feed-detail',
+    name: 'PubFeedDetailPage',
+    component: PubFeedDetailPage,
   },
   { path: '*', component: PubNotFoundPage },
 ]
