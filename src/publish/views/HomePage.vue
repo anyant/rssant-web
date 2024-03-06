@@ -8,6 +8,7 @@
             </MoBackHeader>
             <MoLayout grey header class="main" :style="mainStyle">
                 <PubFeedList class="feed-list" :currentFeedId="currentFeedId" />
+                <MoRssantPlaceholder v-if="showRssantPlaceholder" />
                 <PubStoryList class="story-list" v-if="feed" :currentFeedId="currentFeedId"
                     :currentOffset="currentOffset" />
                 <PubStoryDetail class="story-detail" v-if="story" :currentFeedId="currentFeedId"
@@ -37,10 +38,11 @@ import PubFeedList from '@/publish/views/FeedList.vue';
 import PubStoryDetail from '@/publish/views/StoryDetail.vue';
 import { LAYOUT } from '@/plugin/common';
 import { publishConfigStore } from '@/publish/store/config';
+import MoRssantPlaceholder from '@/components/MoRssantPlaceholder'
 
 export default {
     components: {
-        MoBackHeader, MoDebugTool, MoLayout, PubStoryList, PubFeedList, PubStoryDetail
+        MoBackHeader, MoDebugTool, MoLayout, PubStoryList, PubFeedList, PubStoryDetail, MoRssantPlaceholder
     },
     data() {
         return {
@@ -144,6 +146,9 @@ export default {
                 return this.storyTitle
             }
             return this.websiteTitle
+        },
+        showRssantPlaceholder() {
+            return this.isHome && !this.feed && !this.story
         },
     },
     async mounted() {
