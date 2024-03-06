@@ -105,7 +105,7 @@ export default {
         },
         isHome() {
             if (this.isWide) { return true }
-            return _.isNil(this.currentFeedId) && _.isNil(this.currentOffset)
+            return this.isPageHome
         },
         feed() {
             if (_.isNil(this.currentFeedId)) {
@@ -152,7 +152,7 @@ export default {
             return this.websiteTitle
         },
         showRssantPlaceholder() {
-            return this.isHome && !this.feed && !this.story
+            return this.isWide && this.isPageHome && !this.feed && !this.story
         },
     },
     async mounted() {
