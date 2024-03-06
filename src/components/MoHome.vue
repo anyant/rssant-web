@@ -29,6 +29,9 @@
             <mu-list-item button @click="goFeedFavorited">
               <mu-list-item-title>我的收藏</mu-list-item-title>
             </mu-list-item>
+            <mu-list-item button @click="goPublishConfig">
+              <mu-list-item-title>发布订阅</mu-list-item-title>
+            </mu-list-item>
             <mu-list-item button @click="goHelp">
               <mu-list-item-title>蚁阅锦囊</mu-list-item-title>
               <span v-if="showMenuHelpDot" class="action-menu-help-dot"></span>
@@ -267,6 +270,10 @@ export default {
     },
     goFeedFavorited() {
       this.routeTo('/favorited')
+      this.isMenuOpen = false
+    },
+    goPublishConfig(){
+      this.routeTo('/publish-config')
       this.isMenuOpen = false
     },
     goHelp() {

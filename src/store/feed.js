@@ -38,7 +38,7 @@ function _sortGroupFeedList(feedList) {
   )
 }
 
-function sortFeedList(feedList) {
+export function sortFeedList(feedList) {
   // jungle 丛林    干度<500的订阅
   // garden 菌圃    干度>=500的订阅
   // trash  废墟    没有任何内容的订阅
@@ -175,14 +175,14 @@ function updateStateFeed(state, feed) {
   Vue.set(state.feeds, newFeed.id, newFeed)
 }
 
-function fixTitle(feed) {
+export function fixTitle(feed) {
   if (_.isEmpty(feed.title)) {
     feed.title = `#${feed.id}`
   }
   return feed
 }
 
-function normalizeFeedStoryOffset(feed) {
+export function normalizeFeedStoryOffset(feed) {
   if (_.isNil(feed.num_unread_storys) || _.isNil(feed.story_offset) || _.isNil(feed.total_storys)) {
     return feed
   }
@@ -403,6 +403,10 @@ export const feedStore = hamiVuex.store({
   },
   async setTitle({ feedId, title }) {
     let newFeed = await API.feed.setTitle({ id: feedId, title: title })
+    this.ADD_OR_UPDATE(newFeed)
+  },
+  async setPublish({ feedId, is_publish }) {
+    let newFeed = await API.feed.setPublish({ id: feedId, is_publish: is_publish })
     this.ADD_OR_UPDATE(newFeed)
   },
   async setAllGroup({ feedIds, group }) {

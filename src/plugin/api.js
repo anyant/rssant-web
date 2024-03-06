@@ -232,6 +232,9 @@ const API = {
     setTitle({ id, title }) {
       return client.put(`/feed/set-title`, { id, title })
     },
+    setPublish({ id, is_publish }) {
+      return client.put(`/feed/set-publish`, { id, is_publish })
+    },
     setAllGroup({ ids, group }) {
       return client.put(`/feed/set-all-group`, { ids, group })
     },
@@ -292,6 +295,31 @@ const API = {
     },
     fetchFulltext({ feed_id, offset }) {
       return client.post('/story/fetch-fulltext', { feed_id, offset })
+    },
+  },
+  userPublish: {
+    get() {
+      return client.post('/user_publish.get', {})
+    },
+    set({ unionid, is_enable, root_url, website_title, is_all_public }) {
+      return client.post('/user_publish.set', { unionid, is_enable, root_url, website_title, is_all_public })
+    },
+  },
+  publish: {
+    info() {
+      return client.post('/publish.info', {})
+    },
+    feedQuery({ detail, hints } = {}) {
+      return client.post('/publish.feed_query', { detail, hints })
+    },
+    feedGet({ id, detail }) {
+      return client.post(`/publish.feed_get`, { id, detail })
+    },
+    storyQuery({ feed_id, detail, offset, size } = {}) {
+      return client.post('/publish.story_query', { feed_id, detail, offset, size })
+    },
+    storyGet({ feed_id, offset, detail, set_readed }) {
+      return client.post(`/publish.story_get`, { feed_id, offset, detail, set_readed })
     },
   },
   imageProxy: {

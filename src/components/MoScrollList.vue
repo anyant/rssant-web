@@ -8,13 +8,7 @@
         </mu-button>
       </div>
     </transition>
-    <mescroll
-      ref="mescroll"
-      class="mescroll"
-      :down="mescrollDown"
-      :up="mescrollUp"
-      @init="mescrollInit"
-    >
+    <mescroll ref="mescroll" class="mescroll" :down="mescrollDown" :up="mescrollUp" @init="mescrollInit">
       <div class="item-list">
         <slot></slot>
       </div>
@@ -23,6 +17,21 @@
 </template>
 
 <script>
+/**
+ * List[ 0,     1,     2,     ....,     total-1 ]
+ * 
+ * 顺序
+ * initOffset=0
+ * loadInit(initOffset, size)
+ * loadPrev(beginOffset-size, size)
+ * loadNext(endOffset+1, size)
+ * 
+ * 倒序
+ * initOffset=total-1
+ * loadInit(initOffset-size+1, size)
+ * loadPrev(endOffset+1, size)
+ * loadNext(beginOffset-size, size)
+ */
 import _ from 'lodash'
 import { antBlue } from '@/plugin/common'
 
@@ -41,7 +50,6 @@ export default {
     },
     initOffset: {
       type: Number,
-      default: 0,
     },
     beginOffset: {
       type: Number,
@@ -60,6 +68,14 @@ export default {
     jump: {
       type: Function,
       required: false,
+    },
+    reversed: {
+      type: Boolean,
+      default: false,
+    },
+    enableUnreadPad: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -93,27 +109,51 @@ export default {
     offsetAll() {
       return this.items.length * this.itemSize
     },
-    hasPrev() {
+    realInitOffset() {
+      if (!_.isNil(this.initOffset)) {
+        return this.initOffset
+      }
+      if (this.reversed) {
+        return this.total - 1
+      } else {
+        return 0
+      }
+    },
+    hasOld() {
       if (this.total <= 0) {
         return false
       }
       if (this.items.length <= 0 || _.isNil(this.beginOffset)) {
-        return this.initOffset > 0
+        return this.realInitOffset > 0
       }
       return this.beginOffset > 0
     },
-    hasNext() {
+    hasNew() {
       if (this.total <= 0) {
         return false
       }
       if (this.items.length <= 0 || _.isNil(this.endOffset)) {
-        return this.initOffset < this.total
+        return this.realInitOffset < this.total
       }
       return this.endOffset < this.total - 1
     },
+    hasPrev() {
+      if (this.reversed) {
+        return this.hasNew
+      } else {
+        return this.hasOld
+      }
+    },
+    hasNext() {
+      if (this.reversed) {
+        return this.hasOld
+      } else {
+        return this.hasNew
+      }
+    },
     _deltaPages() {
-      let endOffset = _.defaultTo(this.endOffset, this.initOffset)
-      let beginOffset = _.defaultTo(this.beginOffset, this.initOffset)
+      let endOffset = _.defaultTo(this.endOffset, this.realInitOffset)
+      let beginOffset = _.defaultTo(this.beginOffset, this.realInitOffset)
       // consider preloaded pages even when it not loaded yet
       endOffset = Math.max(endOffset, beginOffset + this.numPageItems * 2)
       let delta = (this.total - endOffset) / this.numPageItems
@@ -127,7 +167,7 @@ export default {
     },
     jumpOffset() {
       let offset = this.total - this.numPageItems
-      return Math.max(offset, this.initOffset)
+      return Math.max(offset, this.realInitOffset)
     },
   },
   methods: {
@@ -146,6 +186,7 @@ export default {
       }
     },
     setInitUnreadPad() {
+      if (!this.enableUnreadPad) { return }
       // 让未读故事恰好能撑满一页
       let pad = this.mescroll.upwarp
       if (this.hasNext || _.isNil(pad)) {
@@ -153,7 +194,7 @@ export default {
       }
       let readedCount = 0
       for (let item of this.items) {
-        if (item.offset < this.initOffset) {
+        if (item.offset < this.realInitOffset) {
           readedCount += 1
         } else {
           break
@@ -170,10 +211,14 @@ export default {
       pad.style.height = `${padHeight}px`
     },
     loadInit() {
-      let initOffset = this.initOffset
+      let initOffset = this.realInitOffset
       if (this.total > 0 && this.items.length <= this.numPageItems) {
         if (this.hasNext) {
-          this.load({ offset: initOffset, size: this.numPageItems, isInit: true })
+          let offset = initOffset
+          if (this.reversed) {
+            offset = offset - this.numPageItems + 1
+          }
+          this.load({ offset: offset, size: this.numPageItems, isInit: true })
             .then(() => {
               this.loadNext()
             })
@@ -186,6 +231,9 @@ export default {
         } else if (this.hasPrev && this.items.length <= 0) {
           let size = Math.ceil(this.numPageItems * 0.8)
           let offset = Math.max(0, initOffset - size)
+          if (this.reversed) {
+            offset = Math.min(Math.max(0, initOffset), this.total - 1)
+          }
           this.load({ offset, size, isInit: true }).finally(this.endSuccess)
           return
         }
@@ -212,7 +260,12 @@ export default {
       }
       let prevItemsLength = this.items.length
       this.isPrevLoading = true
-      let offset = Math.max(0, this.beginOffset - this.numPageItems)
+      let offset;
+      if (this.reversed) {
+        offset = Math.min(this.total - 1, this.endOffset + 1)
+      } else {
+        offset = Math.max(0, this.beginOffset - this.numPageItems)
+      }
       this.load({ offset, size: this.numPageItems }).finally(() => {
         this.isPrevLoading = false
         this.endSuccess(prevItemsLength)
@@ -225,7 +278,13 @@ export default {
       }
       let prevItemsLength = this.items.length
       this.isNextLoading = true
-      this.load({ offset: this.endOffset + 1, size: this.numPageItems }).finally(() => {
+      let offset;
+      if (this.reversed) {
+        offset = Math.max(0, this.beginOffset - this.numPageItems)
+      } else {
+        offset = Math.min(this.total - 1, this.endOffset + 1)
+      }
+      this.load({ offset, size: this.numPageItems }).finally(() => {
         this.isNextLoading = false
         this.endSuccess(prevItemsLength)
       })

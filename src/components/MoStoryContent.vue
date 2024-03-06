@@ -1,79 +1,39 @@
 <template>
   <div class="story-content">
-    <div
-      class="story-wrapper"
-      :style="wrapperStyle"
-    >
-      <div
-        class="story-info"
-        v-if="story"
-      >
-        <div
-          id="story-info-title"
-          class="info-title"
-          v-story="titleForRender"
-        ></div>
+    <div class="story-wrapper" :style="wrapperStyle">
+      <div class="story-info" v-if="story">
+        <div id="story-info-title" class="info-title" v-story="titleForRender"></div>
         <div class="info-item">
           <span class="info-item-name">原文：</span>
-          <a
-            class="info-item-content story-link"
-            :href="story.link"
-            target="_blank"
-          >{{ storyLinkUnquoted }}</a>
+          <a class="info-item-content story-link" :href="story.link" target="_blank">{{ storyLinkUnquoted }}</a>
         </div>
         <div class="info-item">
           <span class="info-item-name">发布时间：</span>
           <span class="info-item-content">{{ dateText }}</span>
         </div>
       </div>
-      <div
-        class="content"
-        v-if="story"
-      >
-        <div
-          class="story-audio-wrapper"
-          v-if="story.audio_url"
-        >
+      <div class="content" v-if="story">
+        <div class="story-audio-wrapper" v-if="story.audio_url">
           <MoAudioPlayer :src="story.audio_url"></MoAudioPlayer>
         </div>
-        <div
-          class="story-iframe-wrapper"
-          v-if="story.iframe_url"
-        >
+        <div class="story-iframe-wrapper" v-if="story.iframe_url">
           <div class="story-iframe-loading-wrapper">
             <div class="story-iframe-loading">Loading</div>
           </div>
-          <iframe
-            :src="story.iframe_url"
-            scrolling="no"
-            border="0"
-            frameborder="no"
-            framespacing="0"
-            allowfullscreen="true"
-            referrerpolicy="no-referrer"
-          ></iframe>
+          <iframe :src="story.iframe_url" scrolling="no" border="0" frameborder="no" framespacing="0"
+            allowfullscreen="true" referrerpolicy="no-referrer"></iframe>
         </div>
-        <div
-          id="story-markdown-body"
-          class="markdown-body"
-          v-story="storyForRender"
-        ></div>
+        <div id="story-markdown-body" class="markdown-body" v-story="storyForRender"></div>
       </div>
     </div>
     <transition name="fade">
-      <div
-        v-if="nextStory"
-        class="next-story"
-      >
+      <div v-if="nextStory" class="next-story">
         <div class="next-story-label">
           <div class="next-story-label-line"></div>
           <div class="next-story-label-value">下一篇</div>
           <div class="next-story-label-line"></div>
         </div>
-        <a
-          class="next-story-link"
-          @click.prevent="openNextStory"
-        >{{ nextTitle }}</a>
+        <a class="next-story-link" @click.prevent="openNextStory">{{ nextTitle }}</a>
       </div>
     </transition>
   </div>
@@ -95,6 +55,7 @@ export default {
     story: Object,
     nextFeed: Object,
     nextStory: Object,
+    gotoNextStory: Function,
     showNextFeedTitle: Boolean,
     imageViewerContainerGetter: Function,
   },
@@ -255,6 +216,10 @@ export default {
       if (_.isNil(this.nextStory)) {
         return
       }
+      if (!_.isNil(this.gotoNextStory)) {
+        this.gotoNextStory()
+        return
+      }
       let feedId = this.nextStory.feed.id
       let offset = this.nextStory.offset
       let link = `/story?feed=${feedId}&offset=${offset}`
@@ -334,7 +299,8 @@ export default {
   position: relative;
   width: 100%;
   height: 0;
-  padding-bottom: 56.25%; /* 宽高比16:9 */
+  padding-bottom: 56.25%;
+  /* 宽高比16:9 */
 
   .story-iframe-loading-wrapper {
     position: absolute;

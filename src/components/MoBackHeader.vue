@@ -1,9 +1,9 @@
 <template>
-  <MoHeader :border="border">
+  <MoHeader :border="border" :class="{ 'is-home': isHome }">
     <div class="left" :class="{ 'center-title': centerTitle }">
-      <div class="back" @click="goBack">
+      <div v-if="!isHome" class="back" @click="goBack">
         <mu-button icon class="back-button">
-          <slot name="icon"><fa-icon size="18" icon="chevron-left"/></slot>
+          <slot name="icon"><fa-icon size="18" icon="chevron-left" /></slot>
         </mu-button>
       </div>
       <div class="title">
@@ -15,6 +15,7 @@
     </div>
   </MoHeader>
 </template>
+
 <script>
 import MoHeader from '@/components/MoHeader'
 
@@ -29,15 +30,19 @@ export default {
       type: Boolean,
       default: false,
     },
+    isHome: {
+      type: Boolean,
+      default: false,
+    },
   },
   methods: {
     goBack() {
-      this.$emit('back')
       this.$router.safeBack()
     },
   },
 }
 </script>
+
 <style lang="less" scoped>
 @import '~@/styles/common';
 
@@ -66,6 +71,7 @@ export default {
 
 .left.center-title {
   flex: 1;
+
   .title {
     width: 100%;
     text-align: center;
@@ -95,5 +101,11 @@ export default {
 .left {
   white-space: nowrap;
   overflow: hidden;
+}
+
+.is-home {
+  .title {
+    margin-left: 16*@pr;
+  }
 }
 </style>

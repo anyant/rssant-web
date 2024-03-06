@@ -6,9 +6,7 @@
     <div v-if="hasBoard" class="app-board" :style="boardStyle">
       <MoLayout grey header v-if="showPlaceholder">
         <MoHeader></MoHeader>
-        <div class="rssant-placeholder">
-          <div class="placeholder-title">蚁阅</div>
-        </div>
+        <MoBrandPlaceholder />
       </MoLayout>
       <keep-alive :include="keepAlivePages">
         <router-view :key="this.$route.fullPath" />
@@ -21,12 +19,13 @@
 import MoLayout from '@/components/MoLayout'
 import MoHome from '@/components/MoHome'
 import MoHeader from '@/components/MoHeader'
+import MoBrandPlaceholder from '@/components/MoBrandPlaceholder'
 import { keepAlivePages } from '@/router'
 import { rootStore } from '@/store/root'
 
 export default {
   name: 'MoHomePage',
-  components: { MoLayout, MoHome, MoHeader },
+  components: { MoLayout, MoHome, MoHeader, MoBrandPlaceholder },
   data() {
     return {
       isReady: false,
@@ -85,18 +84,5 @@ export default {
 
 .app-layout {
   background: @antBackGrey;
-}
-
-.rssant-placeholder {
-  display: flex;
-}
-
-.rssant-placeholder .placeholder-title {
-  font-size: 54 * @pr;
-  margin: auto;
-  font-family: Helvetica, Arial, sans-serif;
-  color: darken(@antBackGrey, 20%);
-  opacity: 0.33;
-  cursor: default;
 }
 </style>

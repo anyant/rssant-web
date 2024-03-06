@@ -17,6 +17,7 @@ import MoAccountConfirmEmailPage from '@/views/MoAccountConfirmEmailPage'
 import MoResetPasswordPage from '@/views/MoResetPasswordPage'
 import MoResetPasswordConfirmPage from '@/views/MoResetPasswordConfirmPage'
 import MoAccountPage from '@/views/MoAccountPage'
+import MoPublishConfigPage from '@/views/MoPublishConfigPage'
 import MoAboutPage from '@/views/MoAboutPage'
 import MoHelloPage from '@/views/MoHelloPage'
 import MoHelpPage from '@/views/MoHelpPage'
@@ -99,6 +100,12 @@ const boardRoutes = [
     path: 'feed-detail',
     name: 'FeedDetail',
     component: MoFeedDetailPage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: 'publish-config',
+    name: 'PublishConfig',
+    component: MoPublishConfigPage,
     meta: { loginRequired: true },
   },
 ]

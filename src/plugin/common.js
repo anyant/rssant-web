@@ -24,15 +24,25 @@ export const antLineGrey = '#EAEAEA' // 线条浅灰
 // 页面布局，注意和 common.less 保持一致
 function computeLayout(windowInnerWidth) {
   const appWidth = Math.min(1500, windowInnerWidth)
-  const hasBoard = appWidth >= 800
+  let mode = 'mobile'
+  if (appWidth >= 800) {
+    mode = 'board'
+  }
+  if (appWidth >= 1000) {
+    mode = 'wide'
+  }
+  const hasBoard = mode === 'board' || mode === 'wide'
+  const isWide = mode === 'wide'
   const mainWidth = Math.max(320, Math.min(480, Math.round(appWidth / 2.618)))
   const boardWidth = appWidth - mainWidth
   return {
     windowInnerWidth: windowInnerWidth,
+    mode: mode,
     appWidth: appWidth,
     hasBoard: hasBoard,
     mainWidth: hasBoard ? mainWidth : appWidth,
     boardWidth: hasBoard ? boardWidth : 0,
+    isWide: isWide,
   }
 }
 
@@ -47,7 +57,7 @@ window.addEventListener(
     if (newWidth !== LAYOUT.windowInnerWidth) {
       let newLayout = computeLayout(newWidth)
       // reload routes after change layout
-      if (newLayout.hasBoard !== LAYOUT.hasBoard) {
+      if (newLayout.mode !== LAYOUT.mode) {
         window.location.reload()
       }
       _.forEach(_.entries(newLayout), ([key, value]) => {

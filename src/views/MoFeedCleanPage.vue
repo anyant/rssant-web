@@ -5,39 +5,21 @@
         <template v-if="!hasSelected">整理订阅 #{{ numFeeds }}</template>
         <template v-else>选中 {{ selectedFeedIds.length }} 项</template>
       </template>
-      <mu-button
-        flat
-        class="action-group"
-        @click="groupSelected"
-        :class="{ 'action-group-disable': !hasSelected }"
-      >
+      <mu-button flat class="action-group" @click="groupSelected" :class="{ 'action-group-disable': !hasSelected }">
         <fa-icon icon="box" :size="15" />
       </mu-button>
-      <mu-button
-        flat
-        class="action-delete"
-        @click="deleteSelected"
-        :class="{ 'action-delete-disable': !hasSelected }"
-      >
+      <mu-button flat class="action-delete" @click="deleteSelected" :class="{ 'action-delete-disable': !hasSelected }">
         <fa-icon icon="trash" :size="16" />
       </mu-button>
-      <MoGroupNameSelectorDialog
-        :title="groupDialogTitle"
-        :open.sync="openGroupDialog"
-        @confirm="onSaveGroup"
-      />
+      <MoGroupNameSelectorDialog :title="groupDialogTitle" :open.sync="openGroupDialog" @confirm="onSaveGroup" />
     </MoBackHeader>
     <div class="main" ref="mainRef">
       <div v-for="group in feedGroups" :key="group.name" class="feed-group">
         <div class="group-title">
-          <mu-checkbox
-            class="group-checkbox"
-            @change="onCheckGroup(group)"
-            :ripple="false"
+          <mu-checkbox class="group-checkbox" @change="onCheckGroup(group)" :ripple="false"
             :input-value="isGroupHasCheccked(group)"
             :checked-icon="isGroupAllChecked(group) ? null : 'indeterminate_check_box'"
-            :color="groupCheckboxColor"
-          ></mu-checkbox>
+            :color="groupCheckboxColor"></mu-checkbox>
           <div class="group-name" @click="onToggleGroup(group.name)">{{ group.name }}</div>
           <div class="group-info" @click="onToggleGroup(group.name)">
             <span class="group-size">{{ sizeOfGroup(group) }}</span>
@@ -47,13 +29,8 @@
         </div>
         <template v-if="isGroupOpen(group.name)">
           <div v-for="item in group.items" :key="item.feed.id" class="feed-item">
-            <mu-checkbox
-              v-model="selectedFeedIds"
-              :value="item.feed.id"
-              :ripple="false"
-              :color="feedCheckboxColor"
-              class="feed-checkbox"
-            ></mu-checkbox>
+            <mu-checkbox v-model="selectedFeedIds" :value="item.feed.id" :ripple="false" :color="feedCheckboxColor"
+              class="feed-checkbox"></mu-checkbox>
             <div class="feed-info" @click="onFeedClick(item.feed)">
               <div class="feed-info-row1">
                 <div class="feed-title">{{ item.feed.title || item.feed.id }}</div>
@@ -75,46 +52,15 @@
 <script>
 import Vue from 'vue'
 import _ from 'lodash'
-import { differenceInDays } from 'date-fns'
-import { formatDate } from '@/plugin/datefmt'
 import { antGold, antInk } from '@/plugin/common'
 import MoBackHeader from '@/components/MoBackHeader.vue'
 import MoLayout from '@/components/MoLayout.vue'
 import MoGroupNameSelectorDialog from '@/components/MoGroupNameSelectorDialog.vue'
 
-import { GROUP_MUSHROOM, getGroupId, getGroupName } from '../plugin/feedGroupHelper'
+import { getGroupId } from '../plugin/feedGroupHelper'
 import { feedStore } from '@/store/feed'
 import { rootStore } from '@/store/root'
-
-function isBlank(value) {
-  return _.isNil(value) || value === ''
-}
-
-const FEED_ISSUE_TRASH = 'trash'
-const FEED_ISSUE_ERROR_CONNECT = 'error-connect'
-const FEED_ISSUE_ERROR_DENY = 'error-deny'
-const FEED_ISSUE_ERROR_HTTP = 'error-http'
-const FEED_ISSUE_ERROR_PARSE = 'error-parse'
-const FEED_ISSUE_ERROR_STATUS = 'error-status'
-const FEED_ISSUE_ZOMBY = 'zomby'
-
-const FEED_ISSUE_LIST = [
-  { key: FEED_ISSUE_TRASH, name: '无效订阅' },
-  { key: FEED_ISSUE_ERROR_CONNECT, name: '无法连接' },
-  { key: FEED_ISSUE_ERROR_DENY, name: '请求被拒' },
-  { key: FEED_ISSUE_ERROR_HTTP, name: '请求失败' },
-  { key: FEED_ISSUE_ERROR_PARSE, name: '无法解析' },
-  { key: FEED_ISSUE_ERROR_STATUS, name: '状态异常' },
-  { key: FEED_ISSUE_ZOMBY, name: '久未更新' },
-]
-
-const FEED_ISSUE_NAME_MAP = {}
-FEED_ISSUE_LIST.forEach(x => (FEED_ISSUE_NAME_MAP[x.key] = x.name))
-
-const FEED_ISSUE_LEVEL_MAP = {}
-FEED_ISSUE_LIST.forEach((issue, index) => {
-  FEED_ISSUE_LEVEL_MAP[issue.key] = -(FEED_ISSUE_LIST.length - index)
-})
+import { feedGroupStore } from '@/store/feedGroup'
 
 export default {
   components: { MoBackHeader, MoLayout, MoGroupNameSelectorDialog },
@@ -138,102 +84,16 @@ export default {
       return feedStore.numFeeds
     },
     getFeedIssue() {
-      function isTrashFeed(feed) {
-        let noUpdate = isBlank(feed.dt_latest_story_published)
-        return feed.total_storys <= 0 || noUpdate
-      }
-      function isErrorFeed(feed) {
-        return _.lowerCase(feed.status) === 'error'
-      }
-      let now = new Date()
-      function isZombyFeed(feed) {
-        let dt_latest = new Date(feed.dt_latest_story_published)
-        return differenceInDays(now, dt_latest) > 365
-      }
-      return feed => {
-        if (isTrashFeed(feed)) {
-          return FEED_ISSUE_TRASH
-        }
-        if (isErrorFeed(feed)) {
-          if (!_.isNil(feed.response_status)) {
-            if (feed.response_status < 0) {
-              return FEED_ISSUE_ERROR_CONNECT
-            } else if (feed.response_status === 401 || feed.response_status === 403) {
-              return FEED_ISSUE_ERROR_DENY
-            } else if (feed.response_status >= 400) {
-              return FEED_ISSUE_ERROR_HTTP
-            } else if (feed.response_status === 200 || feed.response_status === 304) {
-              return FEED_ISSUE_ERROR_PARSE
-            }
-          }
-          return FEED_ISSUE_ERROR_STATUS
-        }
-        if (isZombyFeed(feed)) {
-          return FEED_ISSUE_ZOMBY
-        }
-        return null
-      }
+      return feedGroupStore.getFeedIssue
     },
     getFeedIssueName() {
-      return key => _.defaultTo(FEED_ISSUE_NAME_MAP[key], key)
+      return feedGroupStore.getFeedIssueName
     },
     getFeedIssueLevel() {
-      return key => _.defaultTo(FEED_ISSUE_LEVEL_MAP[key], 0)
+      return feedGroupStore.getFeedIssueLevel
     },
     feedGroups() {
-      const self = this
-      const feedAPI = feedStore
-
-      let soloItems = []
-      let mushroomItems = []
-      let customGroups = []
-
-      function isMushroomFeed(feed) {
-        return feedAPI.groupOf(feed) === GROUP_MUSHROOM
-      }
-
-      function sortFeedItems(items) {
-        return _.sortBy(items, [
-          item => self.getFeedIssueLevel(item.issue),
-          item => new Date(item.feed.dt_latest_story_published),
-          item => item.feed.id,
-        ])
-      }
-
-      feedAPI.homeFeedList.forEach(feed => {
-        let issue = self.getFeedIssue(feed)
-        if (isMushroomFeed(feed)) {
-          mushroomItems.push({ feed, issue })
-        } else {
-          soloItems.push({ feed, issue })
-        }
-      })
-
-      feedAPI.feedGroups.forEach(group => {
-        let items = []
-        feedAPI.feedListOfGroup(group).forEach(feed => {
-          items.push({ feed, issue: self.getFeedIssue(feed) })
-        })
-        customGroups.push({
-          name: `分组:${group.name}`,
-          items: sortFeedItems(items),
-        })
-      })
-
-      let feedGroups = [
-        {
-          name: '无分组',
-          items: sortFeedItems(soloItems),
-        },
-        {
-          name: '品读',
-          items: sortFeedItems(mushroomItems),
-        },
-      ]
-      customGroups.forEach(x => feedGroups.push(x))
-
-      feedGroups = _.filter(feedGroups, group => group.items.length > 0)
-      return feedGroups
+      return feedGroupStore.feedGroups
     },
     hasSelected() {
       return this.selectedFeedIds.length > 0
@@ -369,29 +229,13 @@ export default {
       Vue.set(this.closedGroups, name, !this.closedGroups[name])
     },
     getFeedGroupName(feed) {
-      return getGroupName(feedStore.groupOf(feed))
+      return feedGroupStore.getFeedGroupName(feed)
     },
     totalStorys(feed) {
-      if (feed.total_storys > 999) {
-        return '999'
-      } else {
-        return `${feed.total_storys}`
-      }
+      return feedGroupStore.totalStorysText(feed)
     },
     formatFeedDate(feed) {
-      let dt_first = feed.dt_first_story_published
-      let dt_latest = feed.dt_latest_story_published
-      dt_first = isBlank(dt_first) ? '' : formatDate(dt_first)
-      dt_latest = isBlank(dt_latest) ? '' : formatDate(dt_latest)
-      if (isBlank(dt_first) && isBlank(dt_latest)) {
-        return '未知时间'
-      } else if (isBlank(dt_first) && !isBlank(dt_latest)) {
-        return `未知时间 ~ ${dt_latest}`
-      } else if (!isBlank(dt_first) && isBlank(dt_latest)) {
-        return `${dt_first} ~ 未知时间`
-      } else {
-        return `${dt_first} ~ ${dt_latest}`
-      }
+      return feedGroupStore.formatFeedDate(feed)
     },
   },
 }
@@ -447,6 +291,7 @@ export default {
 .feed-item {
   padding-top: 4 * @pr;
   padding-bottom: 4 * @pr;
+
   &:hover {
     background: lighten(@antGold, 48%);
   }
