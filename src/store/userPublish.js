@@ -11,6 +11,7 @@ export const userPublishStore = hamiVuex.store({
         is_enable: false,
         is_all_public: false,
         root_url: null,
+        website_title: null,
       },
     }
   },

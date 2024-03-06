@@ -17,13 +17,27 @@
 
                 <div class="config-item" v-if="publishConfig.is_enable">
                     <div class="title-root-url">
-                        <label class="label-root-url">自定义网址</label>
+                        <label class="label">自定义网址</label>
                     </div>
                     <div class="form-root-url">
-                        <mu-text-field class="input-root-url" placeholder="例如：https://www.example.com" full-width
+                        <mu-text-field class="input" placeholder="例如：https://www.example.com" full-width
                             v-model="form.root_url" :error-text="form.root_url_error">
                         </mu-text-field>
                         <span class="item-button item-button-save" @click="onSetRootUrl">
+                            <fa-icon class="item-button-icon" :color="antTextWhite" icon="save" />保存
+                        </span>
+                    </div>
+                </div>
+
+                <div class="config-item" v-if="publishConfig.is_enable">
+                    <div class="title-website-title">
+                        <label class="label">网站标题</label>
+                    </div>
+                    <div class="form-website-title">
+                        <mu-text-field class="input" placeholder="你的网站标题" full-width v-model="form.website_title"
+                            :error-text="form.website_title_error">
+                        </mu-text-field>
+                        <span class="item-button item-button-save" @click="onSetWebsiteTitle">
                             <fa-icon class="item-button-icon" :color="antTextWhite" icon="save" />保存
                         </span>
                     </div>
@@ -39,7 +53,7 @@
             <MoPublishConfigFeedList class="section-feed-list" v-if="isShowFeedList">
             </MoPublishConfigFeedList>
         </div>
-        <mu-dialog fullscreen scrollable padding="0" :open.sync="isGuideDialogOpen">
+        <mu-dialog fullscreen scrollable :padding="0" :open.sync="isGuideDialogOpen">
             <mu-appbar z-depth="0" color="#ffffff" text-color="#000000" title="配置说明">
                 <mu-button class="button-close" slot="right" :color="antBlue" flat @click="closeGuideDialog">
                     <fa-icon icon="times" :size="20" :color="antBlue"></fa-icon>
@@ -58,24 +72,25 @@
                 </p>
                 <h4>Nginx配置</h4>
                 <pre>
-location /publish/ {
-    proxy_pass {{ publishTarget }};
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Proto $scheme;
-    proxy_set_header {{ publishHeader }};
-}</pre>
+            location /publish/ {
+            proxy_pass {{ publishTarget }};
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header {{ publishHeader }};
+            }</pre>
                 <h4>Caddy配置</h4>
                 <pre>
-{{ publishUrl }} {
-    reverse_proxy {{ publishTarget }}
-    header_up {{ publishHeader }}
-}</pre>
+            {{ publishUrl }} {
+            reverse_proxy {{ publishTarget }}
+            header_up {{ publishHeader }}
+            }</pre>
             </div>
         </mu-dialog>
     </MoLayout>
 </template>
+
 <script>
 import MoBackHeader from '@/components/MoBackHeader'
 import MoLayout from '@/components/MoLayout'
@@ -100,6 +115,8 @@ export default {
             form: {
                 root_url: null,
                 root_url_error: null,
+                website_title: null,
+                website_title_error: null,
             },
         }
     },
@@ -126,6 +143,7 @@ export default {
     async mounted() {
         await userPublishStore.doLoad()
         this.form.root_url = this.publishConfig.root_url
+        this.form.website_title = this.publishConfig.website_title
         await feedStore.sync()
     },
     methods: {
@@ -147,6 +165,16 @@ export default {
                 return
             }
             this.form.root_url_error = null
+            this.$toast.success({ message: '设置保存成功' })
+        },
+        async onSetWebsiteTitle() {
+            try {
+                await userPublishStore.doSave({ website_title: this.form.website_title })
+            } catch (ex) {
+                this.form.website_title = ex.message
+                return
+            }
+            this.form.website_title = null
             this.$toast.success({ message: '设置保存成功' })
         },
         async onSetAllPublic(value) {
@@ -205,22 +233,30 @@ export default {
         }
     }
 
+    .title-website-title,
     .title-root-url {
-        margin-top: 24*@pr;
-
-        .label-root-url {
+        .label {
             font-size: 16*@pr;
             color: @antTextBlack;
             font-weight: bold;
         }
     }
 
+    .title-root-url {
+        margin-top: 24*@pr;
+    }
+
+    .title-website-title {
+        margin-top: 16*@pr;
+    }
+
+    .form-website-title,
     .form-root-url {
         display: flex;
         flex-direction: row;
         align-items: center;
 
-        .input-root-url {
+        .input {
             margin-bottom: 0;
             padding-top: 0;
             padding-bottom: 2*@pr;

@@ -1,17 +1,26 @@
 <template>
     <div class="publish-home-page" :class="pageClasses">
-        <MoBackHeader :isHome="isHome" border>
-            <template v-slot:title>
-                <MoDebugTool class="title">{{ title }}</MoDebugTool>
-            </template>
-        </MoBackHeader>
-        <MoLayout grey header class="main" :style="mainStyle">
-            <PubFeedList class="feed-list" :currentFeedId="currentFeedId" />
-            <PubStoryList class="story-list" v-if="feed" :currentFeedId="currentFeedId"
-                :currentOffset="currentOffset" />
-            <PubStoryDetail class="story-detail" v-if="story" :currentFeedId="currentFeedId"
-                :currentOffset="currentOffset" />
-        </MoLayout>
+        <template v-if="isReady">
+            <MoBackHeader :isHome="isHome" border>
+                <template v-slot:title>
+                    <MoDebugTool class="title">{{ title }}</MoDebugTool>
+                </template>
+            </MoBackHeader>
+            <MoLayout grey header class="main" :style="mainStyle">
+                <PubFeedList class="feed-list" :currentFeedId="currentFeedId" />
+                <PubStoryList class="story-list" v-if="feed" :currentFeedId="currentFeedId"
+                    :currentOffset="currentOffset" />
+                <PubStoryDetail class="story-detail" v-if="story" :currentFeedId="currentFeedId"
+                    :currentOffset="currentOffset" />
+            </MoLayout>
+        </template>
+
+        <template v-if="isPublishDisable">
+            <div class="disable-notice">
+                <div class="line line1">RSS发布订阅功能未开启</div>
+                <div class="line line2">如有疑问请联系网站管理员</div>
+            </div>
+        </template>
     </div>
 </template>
 
@@ -27,6 +36,7 @@ import PubStoryList from '@/publish/views/StoryList.vue';
 import PubFeedList from '@/publish/views/FeedList.vue';
 import PubStoryDetail from '@/publish/views/StoryDetail.vue';
 import { LAYOUT } from '@/plugin/common';
+import { publishConfigStore } from '@/publish/store/config';
 
 export default {
     components: {
@@ -106,6 +116,12 @@ export default {
                 offset: this.currentOffset,
             })
         },
+        isPublishDisable() {
+            return publishConfigStore.isLoaded && !publishConfigStore.config.is_enable
+        },
+        websiteTitle() {
+            return publishConfigStore.websiteTitle
+        },
         feedTitle() {
             return this.feed?.title || this.currentFeedId
         },
@@ -119,7 +135,7 @@ export default {
         },
         title() {
             if (this.isHome) {
-                return '蚁阅'
+                return this.websiteTitle
             }
             if (this.isPageFeed) {
                 return this.feedTitle
@@ -127,18 +143,22 @@ export default {
             if (this.isPageStory) {
                 return this.storyTitle
             }
-            return ''
+            return this.websiteTitle
         },
     },
     async mounted() {
+        await publishConfigStore.doLoad()
+        window.document.title = publishConfigStore.websiteTitle
+        if (!publishConfigStore.config.is_enable) {
+            return
+        }
+        this.isReady = true
         await publishFeedStore.doLoad()
         if (!_.isNil(this.currentFeedId) && !_.isNil(this.currentOffset)) {
             await publishStoryStore.doLoad({ feedId: this.currentFeedId, offset: this.currentOffset, detail: true })
         }
-        this.isReady = true
     },
-    methods: {
-    }
+    methods: {}
 }
 </script>
 
@@ -215,5 +235,12 @@ export default {
         width: 100%;
     }
 
+}
+
+.disable-notice {
+    font-size: 20*@pr;
+    text-align: center;
+    color: @antTextLight;
+    margin-top: 120*@pr;
 }
 </style>

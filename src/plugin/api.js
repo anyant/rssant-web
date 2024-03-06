@@ -301,8 +301,8 @@ const API = {
     get() {
       return client.post('/user_publish.get', {})
     },
-    set({ unionid, is_enable, root_url, is_all_public }) {
-      return client.post('/user_publish.set', { unionid, is_enable, root_url, is_all_public })
+    set({ unionid, is_enable, root_url, website_title, is_all_public }) {
+      return client.post('/user_publish.set', { unionid, is_enable, root_url, website_title, is_all_public })
     },
   },
   publish: {
