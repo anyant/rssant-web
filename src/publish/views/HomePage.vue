@@ -1,5 +1,6 @@
 <template>
     <div class="publish-home-page" :class="pageClasses">
+        <div class="story-image-viewer"></div>
         <template v-if="isReady">
             <MoBackHeader :isHome="isHome" border>
                 <template v-slot:title>
@@ -12,7 +13,7 @@
                 <PubStoryList class="story-list" v-if="feed" :currentFeedId="currentFeedId"
                     :currentOffset="currentOffset" />
                 <PubStoryDetail class="story-detail" v-if="story" :currentFeedId="currentFeedId"
-                    :currentOffset="currentOffset" />
+                    :currentOffset="currentOffset" :image-viewer-container-getter="imageViewerContainerGetter" />
             </MoLayout>
         </template>
 
@@ -94,7 +95,7 @@ export default {
                 return null
             }
             let offset = this.$route.query.offset
-            if (!offset) {
+            if (_.isNil(offset)) {
                 return null
             }
             return _.parseInt(offset)
@@ -163,7 +164,11 @@ export default {
             await publishStoryStore.doLoad({ feedId: this.currentFeedId, offset: this.currentOffset, detail: true })
         }
     },
-    methods: {}
+    methods: {
+        imageViewerContainerGetter() {
+            return this.$el.querySelector('.story-image-viewer')
+        },
+    }
 }
 </script>
 
