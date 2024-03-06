@@ -6,7 +6,7 @@
     <div v-if="hasBoard" class="app-board" :style="boardStyle">
       <MoLayout grey header v-if="showPlaceholder">
         <MoHeader></MoHeader>
-        <MoRssantPlaceholder />
+        <MoBrandPlaceholder />
       </MoLayout>
       <keep-alive :include="keepAlivePages">
         <router-view :key="this.$route.fullPath" />
@@ -19,13 +19,13 @@
 import MoLayout from '@/components/MoLayout'
 import MoHome from '@/components/MoHome'
 import MoHeader from '@/components/MoHeader'
-import MoRssantPlaceholder from '@/components/MoRssantPlaceholder'
+import MoBrandPlaceholder from '@/components/MoBrandPlaceholder'
 import { keepAlivePages } from '@/router'
 import { rootStore } from '@/store/root'
 
 export default {
   name: 'MoHomePage',
-  components: { MoLayout, MoHome, MoHeader, MoRssantPlaceholder },
+  components: { MoLayout, MoHome, MoHeader, MoBrandPlaceholder },
   data() {
     return {
       isReady: false,

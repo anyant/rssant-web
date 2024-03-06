@@ -7,12 +7,17 @@
                 <div class="bounce3"></div>
             </div>
         </div>
-        <transition-group class="list" name="list" tag="div" v-else>
+        <transition-group class="list" name="list" tag="div" v-if="!isLoading && !isEmpty">
             <MoFeedItem class="feed-item" :class="{ 'active': isActiveFeed(feed.id) }" v-for="feed in feedList"
                 :key="feed.id" :title="feed.title" :number="feed.total_storys"
                 :date="feed.dt_latest_story_published || feed.dt_created" :link="feed.id" :routeTo="onClickFeed">
             </MoFeedItem>
         </transition-group>
+        <template v-if="!isLoading && isEmpty">
+            <div class="empty-notice">
+                <div class="line line1">无公开的订阅</div>
+            </div>
+        </template>
     </div>
 </template>
 
@@ -36,6 +41,9 @@ export default {
         isLoading() {
             return publishFeedStore.isLoading
         },
+        isEmpty() {
+            return this.feedList.length <= 0
+        },
     },
     methods: {
         isActiveFeed(feedId) {
@@ -52,6 +60,13 @@ export default {
 
 <style lang="less" scoped>
 @import '~@/styles/common';
+
+.empty-notice {
+    font-size: 20*@pr;
+    text-align: center;
+    color: @antTextLight;
+    margin-top: 120*@pr;
+}
 
 .feed-list {
     .feed-item {
