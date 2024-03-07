@@ -91,6 +91,12 @@ export const userStore = hamiVuex.store({
     const deadline = this.balance.balance * 1000
     return deadline - NOW < 48 * HOURS
   },
+  get imageProxy() {
+    if (_.isNil(this.loginUser)) {
+      return null
+    }
+    return this.loginUser.image_proxy
+  },
   async login({ account, password } = {}) {
     if (!_.isNil(account)) {
       if (this.loading.isFinished) {

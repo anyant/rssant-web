@@ -12,6 +12,9 @@ export const publishConfigStore = hamiVuex.store({
   get websiteTitle() {
     return this.config.website_title || 'RSS订阅'
   },
+  get imageProxy() {
+    return this.config.image_proxy
+  },
   async doLoad() {
     let result = await API.publish.info()
     this.$patch({ config: result, isLoaded: true })
