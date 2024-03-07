@@ -57,8 +57,8 @@ export default {
             if (_.isNil(story)) {
                 return
             }
-            publishStoryStore.doLoad({
-                feedId: story.feed.id, offset: story.offset, detail: true,
+            publishStoryStore.doLoadDetail({
+                feedId: story.feed.id, offset: story.offset
             })
             let link = { query: { feed: story.feed.id, offset: story.offset } }
             this.$router.replace(link)

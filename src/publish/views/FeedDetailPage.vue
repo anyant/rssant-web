@@ -125,7 +125,7 @@ export default {
     return {}
   },
   async mounted() {
-    await publishFeedStore.doGet({ id: this.feedId, detail: true })
+    await publishFeedStore.doGetDetail({ id: this.feedId })
   },
   computed: {
     feedId() {

@@ -33,6 +33,15 @@ export const publishStoryStore = hamiVuex.store({
     let story = await API.publish.storyGet({ feed_id: feedId, offset, detail })
     this._addOrUpdate(story)
   },
+  async doLoadDetail({ feedId, offset }) {
+    let story = this.get({ feedId, offset })
+    if (!_.isNil(story)) {
+      if (story.content) {
+        return
+      }
+    }
+    await this.doLoad({ feedId, offset, detail: true })
+  },
   async doLoadList({ feedId, offset, detail, size, resetLoadedOffset, isInit }) {
     if (isInit) {
       // load at least N items to support image dedup

@@ -164,7 +164,7 @@ export default {
         this.isReady = true
         await publishFeedStore.doLoad()
         if (!_.isNil(this.currentFeedId) && !_.isNil(this.currentOffset)) {
-            await publishStoryStore.doLoad({ feedId: this.currentFeedId, offset: this.currentOffset, detail: true })
+            await publishStoryStore.doLoadDetail({ feedId: this.currentFeedId, offset: this.currentOffset })
         }
     },
     methods: {

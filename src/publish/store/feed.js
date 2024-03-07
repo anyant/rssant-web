@@ -3,6 +3,7 @@ import API from '@/plugin/api'
 import { fixTitle, normalizeFeedStoryOffset, sortFeedList } from '@/store/feed'
 import Loading from '@/plugin/loading'
 import Vue from 'vue'
+import _ from 'lodash'
 
 function normalizeFeed(feed) {
   let newFeed = {}
@@ -43,5 +44,14 @@ export const publishFeedStore = hamiVuex.store({
     this.$patch(state => {
       Vue.set(state.feedMap, feed.id, feed)
     })
+  },
+  async doGetDetail({ id }) {
+    let feed = this.get(id)
+    if (!_.isNil(feed)) {
+      if (feed.link || feed.encoding || feed.dt_checked) {
+        return
+      }
+    }
+    await this.doGet({ id, detail: true })
   },
 })

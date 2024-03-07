@@ -79,7 +79,7 @@ export default {
             if (feedId === this.currentFeedId && offset === this.currentOffset) {
                 return
             }
-            await publishStoryStore.doLoad({ feedId: feedId, offset: offset, detail: true })
+            await publishStoryStore.doLoadDetail({ feedId: feedId, offset: offset })
             if (_.isNil(this.currentOffset)) {
                 this.$router.push({ query: { feed: feedId, offset: offset } })
             } else {
