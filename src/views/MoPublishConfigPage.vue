@@ -196,7 +196,7 @@ server {
             try {
                 await userPublishStore.doSave({ website_title: this.form.website_title })
             } catch (ex) {
-                this.form.website_title = ex.message
+                this.form.website_title_error = ex.message
                 return
             }
             this.form.website_title = null
