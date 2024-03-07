@@ -218,45 +218,45 @@ const API = {
   },
   feed: {
     query({ detail, hints } = {}) {
-      return client.post('/feed/query', { detail, hints })
+      return client.post('/feed.query', { detail, hints })
     },
     getCreation({ id, detail }) {
-      return client.get(`/feed/creation/${id}`, { params: { detail } })
+      return client.post(`/feed.get_creation`, { id, detail })
     },
     queryCreationList({ detail } = {}) {
-      return client.get('/feed/creation', { params: { detail } })
+      return client.post('/feed.query_creation', { detail })
     },
     get({ id, detail }) {
-      return client.get(`/feed/${id}`, { params: { detail } })
+      return client.post(`/feed.get`, { id, detail })
     },
     setTitle({ id, title }) {
-      return client.put(`/feed/set-title`, { id, title })
+      return client.post(`/feed.set_title`, { id, title })
     },
     setPublish({ id, is_publish }) {
-      return client.put(`/feed/set-publish`, { id, is_publish })
+      return client.post(`/feed.set_publish`, { id, is_publish })
     },
     setAllGroup({ ids, group }) {
-      return client.put(`/feed/set-all-group`, { ids, group })
+      return client.post(`/feed.set_all_group`, { ids, group })
     },
     delete({ id }) {
-      return client.delete(`/feed/${id}`)
+      return client.post(`/feed.delete`, { id })
     },
     deleteAll({ ids = null } = {}) {
-      return client.post(`/feed/all/delete`, { ids })
+      return client.post(`/feed.delete_all`, { ids })
     },
     setStoryOffset({ id, offset }) {
-      return client.put(`/feed/${id}/offset`, { offset })
+      return client.post(`/feed.set_offset`, { id, offset })
     },
     setAllReaded({ ids } = {}) {
-      return client.put(`/feed/all/readed`, { ids })
+      return client.post(`/feed.set_all_readed`, { ids })
     },
     import({ text, group }) {
-      return client.post('/feed/import', { text, group })
+      return client.post('/feed.import', { text, group })
     },
     importFile({ file, group }) {
       var formData = new FormData()
       formData.append('file', file)
-      return client.post(`/feed/import/file`, formData, {
+      return client.post(`/feed.import_file`, formData, {
         params: { group },
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -270,31 +270,31 @@ const API = {
   },
   story: {
     query({ feed_id, detail, offset, size } = {}) {
-      return client.get('/story/query', { params: { feed_id, detail, offset, size } })
+      return client.post('/story.query', { feed_id, detail, offset, size })
     },
     queryRecent({ feed_ids, days, detail } = {}) {
-      return client.post('/story/recent', { feed_ids, days, detail })
+      return client.post('/story.query_recent', { feed_ids, days, detail })
     },
     queryBatch({ storys, detail }) {
-      return client.post('/story/query-batch', { storys, detail })
+      return client.post('/story.query_batch', { storys, detail })
     },
     get({ feed_id, offset, detail, set_readed }) {
-      return client.get(`/story/${feed_id}-${offset}`, { params: { detail, set_readed } })
+      return client.post(`/story.get`, { feed_id, offset, detail, set_readed })
     },
     listWatched({ detail } = {}) {
-      return client.get('/story/watched', { params: { detail } })
+      return client.post('/story.query_watched', { detail })
     },
     listFavorited({ detail } = {}) {
-      return client.get('/story/favorited', { params: { detail } })
+      return client.post('/story.query_favorited', { detail })
     },
     setWatched({ feed_id, offset, is_watched }) {
-      return client.put(`/story/${feed_id}-${offset}/watched`, { is_watched })
+      return client.post(`/story.set_watched`, { feed_id, offset, is_watched })
     },
     setFavorited({ feed_id, offset, is_favorited }) {
-      return client.put(`/story/${feed_id}-${offset}/favorited`, { is_favorited })
+      return client.post(`/story.set_favorited`, { feed_id, offset, is_favorited })
     },
     fetchFulltext({ feed_id, offset }) {
-      return client.post('/story/fetch-fulltext', { feed_id, offset })
+      return client.post('/story.fetch_fulltext', { feed_id, offset })
     },
   },
   userPublish: {
