@@ -1,6 +1,6 @@
 <template>
-    <div class="story-list">
-        <MoScrollList v-for="feed in [feed]" :key="feed.id" class="scroll-list" :itemSize="40" reversed
+    <div class="story-list" :class="{ 'mobile': isMobile, 'wide': !isMobile }">
+        <MoScrollList v-for="feed in [feed]" :key="feed.id" class="scroll-list" :itemSize="isMobile ? 48 : 40" reversed
             :items="storyList" :init-offset="currentOffset" :begin-offset="beginOffset" :end-offset="endOffset"
             :total="feed.total_storys" :load="loadStorys">
             <MoStoryItem class="story-item" :class="{ 'active': isActiveStory(story.feed.id, story.offset) }"
@@ -28,6 +28,10 @@ export default {
         },
         currentOffset: {
             type: Number,
+        },
+        isMobile: {
+            type: Boolean,
+            default: false,
         },
     },
     computed: {
@@ -92,16 +96,27 @@ export default {
 
 .story-list {
     position: relative;
+    padding-bottom: 8*@pr;
 
     .story-item {
         cursor: pointer;
+    }
 
-        &:hover {
-            background: lighten(@antFibre, 16%);
+    &.wide {
+        .story-item {
+            &:hover {
+                background: lighten(@antFibre, 16%);
+            }
+
+            &.active {
+                background: lighten(@antFibre, 12%);
+            }
         }
+    }
 
-        &.active {
-            background: lighten(@antFibre, 12%);
+    &.mobile {
+        .story-item {
+            margin-top: 8 * @pr;
         }
     }
 }

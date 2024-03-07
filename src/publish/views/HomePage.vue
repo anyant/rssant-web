@@ -11,10 +11,10 @@
                 </mu-button>
             </MoBackHeader>
             <MoLayout grey header class="main" :style="mainStyle">
-                <PubFeedList class="feed-list" :currentFeedId="currentFeedId" />
+                <PubFeedList class="feed-list" :currentFeedId="currentFeedId" :isMobile="!isWide" />
                 <MoBrandPlaceholder v-if="showRssantPlaceholder" />
                 <PubStoryList class="story-list" v-if="feed" :currentFeedId="currentFeedId"
-                    :currentOffset="currentOffset" />
+                    :currentOffset="currentOffset" :isMobile="!isWide" />
                 <PubStoryDetail class="story-detail" v-if="story" :currentFeedId="currentFeedId"
                     :currentOffset="currentOffset" :image-viewer-container-getter="imageViewerContainerGetter" />
             </MoLayout>

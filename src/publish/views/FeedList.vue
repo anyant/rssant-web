@@ -1,5 +1,5 @@
 <template>
-    <div class="feed-list">
+    <div class="feed-list" :class="{ 'mobile': isMobile, 'wide': !isMobile }">
         <div class="list-placeholder-wrapper" v-if="isLoading">
             <div class="list-placeholder spinner">
                 <div class="bounce1"></div>
@@ -32,6 +32,10 @@ export default {
     props: {
         currentFeedId: {
             type: String,
+        },
+        isMobile: {
+            type: Boolean,
+            default: false,
         },
     },
     computed: {
@@ -69,15 +73,28 @@ export default {
 }
 
 .feed-list {
+    padding-bottom: 8*@pr;
+    position: relative;
+
     .feed-item {
         cursor: pointer;
+    }
 
-        &:hover {
-            background: lighten(@antFibre, 16%);
+    &.wide {
+        .feed-item {
+            &:hover {
+                background: lighten(@antFibre, 16%);
+            }
+
+            &.active {
+                background: lighten(@antFibre, 12%);
+            }
         }
+    }
 
-        &.active {
-            background: lighten(@antFibre, 12%);
+    &.mobile {
+        .feed-item {
+            margin-top: 8 * @pr;
         }
     }
 }
