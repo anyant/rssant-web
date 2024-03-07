@@ -199,7 +199,7 @@ server {
                 this.form.website_title_error = ex.message
                 return
             }
-            this.form.website_title = null
+            this.form.website_title_error = null
             this.$toast.success({ message: '设置保存成功' })
         },
         async onSetAllPublic(value) {
