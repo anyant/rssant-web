@@ -2,6 +2,7 @@ import _ from 'lodash'
 import { API } from '@/plugin/api'
 import { hamiVuex } from '@/store'
 import { userStore } from '@/store/user'
+import { publishConfigStore } from '@/publish/store/config'
 
 export const imageProxyStore = hamiVuex.store({
   $name: 'image_proxy',
@@ -11,14 +12,14 @@ export const imageProxyStore = hamiVuex.store({
     }
   },
   get urlList() {
-    if (_.isNil(userStore.loginUser)) {
+    let imageProxy = userStore.imageProxy
+    if (_.isNil(imageProxy)) {
+      imageProxy = publishConfigStore.imageProxy
+    }
+    if (_.isNil(imageProxy) || !imageProxy.enable) {
       return []
     }
-    let image_proxy = userStore.loginUser.image_proxy
-    if (_.isNil(image_proxy) || !image_proxy.enable) {
-      return []
-    }
-    return image_proxy.url_s || []
+    return imageProxy.url_s || []
   },
   get isEnable() {
     return this.urlList.length > 0
