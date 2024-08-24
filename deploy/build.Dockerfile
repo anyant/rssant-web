@@ -1,4 +1,4 @@
-FROM node:16-alpine as build
+FROM node:16-alpine AS build
 
 ARG NPM_REGISTERY="--registry=https://registry.npmmirror.com"
 
