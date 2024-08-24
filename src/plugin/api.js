@@ -1,10 +1,11 @@
-import _ from 'lodash'
 import axios from 'axios'
 import Cookies from 'js-cookie'
+import _ from 'lodash'
 import Toast from 'muse-ui-toast'
 
-import Timeit from './timeit'
+import { downloadFile } from './download'
 import localConfig from './localConfig'
+import Timeit from './timeit'
 
 function isDebug() {
   return localConfig.DEBUG.get()
@@ -265,7 +266,13 @@ const API = {
     },
     exportOPML({ download } = {}) {
       download = download ? 'true' : 'false'
-      window.open(BASE_URL + `/feed/export/opml?download=${download}`, '_blank')
+      let url = BASE_URL + `/feed/export/opml?download=${download}`
+      Toast.info('开始导出 OPML 文件，请稍等...')
+      if (download) {
+        downloadFile(url, 'rssant.opml')
+      } else {
+        window.open(url, '_blank')
+      }
     },
   },
   story: {
@@ -331,4 +338,4 @@ const API = {
 }
 
 export default API
-export { API, BASE_URL, REQUEST_ITERCEPTORS, client }
+export { API, BASE_URL, client, REQUEST_ITERCEPTORS }
