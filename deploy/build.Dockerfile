@@ -13,4 +13,4 @@ COPY . .
 RUN npm run build
 
 VOLUME [ "/app/tmp/history" ]
-CMD npm run build_history
+CMD ["npm", "run", "build_history"]
