@@ -105,6 +105,9 @@ export const userStore = hamiVuex.store({
     }
     await this.loading.begin(async () => {
       let user = await API.user.login({ account, password })
+      if (!_.isEmpty(user.token)) {
+        localConfig.LOGIN_TOKEN.set(user.token)
+      }
       this.LOGIN(user)
       localConfig.HAS_LOGIN_HISTORY.set(true)
       this.syncVipCustomer()
@@ -178,6 +181,7 @@ export const userStore = hamiVuex.store({
     await API.user.confirmResetPassword({ token, uid, new_password })
   },
   async logout() {
+    localConfig.LOGIN_TOKEN.set(null)
     localFeeds.clear()
     await API.user.logout()
   },

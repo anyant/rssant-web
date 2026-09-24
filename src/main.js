@@ -28,8 +28,21 @@ import initREM from '@/plugin/rem'
 
 // PWA Service Worker
 import { initPWA } from '@/plugin/pwa'
+import localConfig from '@/plugin/localConfig'
+
+// OAuth 回调把 DRF token 放在 URL fragment 里带回来，这里取出并清掉地址栏
+function initLoginToken() {
+  let hash = window.location.hash || ''
+  let matched = /(?:^|&)login_token=([^&]+)/.exec(hash.replace(/^#/, ''))
+  if (!matched) {
+    return
+  }
+  localConfig.LOGIN_TOKEN.set(decodeURIComponent(matched[1]))
+  window.history.replaceState(null, '', window.location.pathname + window.location.search)
+}
 
 initPWA()
+initLoginToken()
 initREM(true, 32, 1)
 DarkMode.init()
 

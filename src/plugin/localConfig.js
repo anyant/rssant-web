@@ -7,6 +7,7 @@ const CONFIGS = {
   HELP_READED: { defaultValue: false },
   HAS_LOGIN_HISTORY: { defaultValue: false },
   VIP_NOTICED_TIMESTAMP: { defaultValue: 0 },
+  LOGIN_TOKEN: { defaultValue: null },
 }
 
 const localConfig = (function() {
