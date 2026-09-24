@@ -34,6 +34,16 @@ const client = axios.create({
 
 const REQUEST_ITERCEPTORS = [
   function(config) {
+    let loginToken = localConfig.LOGIN_TOKEN.get()
+    if (!_.isEmpty(loginToken)) {
+      if (_.isNil(config.headers)) {
+        config.headers = {}
+      }
+      config.headers['Authorization'] = `Token ${loginToken}`
+    }
+    return config
+  },
+  function(config) {
     let csrftoken = Cookies.get('csrftoken')
     if (!_.isNil(csrftoken)) {
       if (_.isNil(config.headers)) {
