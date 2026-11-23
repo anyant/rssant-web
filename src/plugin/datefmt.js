@@ -37,6 +37,26 @@ export function formatDateFriendly(date, now) {
   }
 }
 
+export function formatUpdateTime(date, now) {
+  if (_.isNil(date) || date === '') {
+    return ''
+  }
+  date = new Date(date)
+  if (_.isNil(now)) {
+    now = new Date()
+  }
+  if (isSameDay(now, date)) {
+    return '今天更新'
+  } else if (isSameDay(now, addDays(date, 1))) {
+    return '昨天更新'
+  }
+  let days = differenceInDays(now, date)
+  if (days > 0 && days <= 30) {
+    return `${days} 天前更新`
+  }
+  return format(date, 'MM-dd') + ' 更新'
+}
+
 export function formatFullDateFriendly(date) {
   if (_.isNil(date) || date === '') {
     return ''

@@ -19,6 +19,9 @@
         </mu-button>
         <transition name="mu-fade-transition">
           <mu-list ref="actionMenuListRef" class="action-menu-list" v-show="isMenuOpen">
+            <mu-list-item button @click="goDiscover">
+              <mu-list-item-title>发现订阅源</mu-list-item-title>
+            </mu-list-item>
             <mu-list-item button @click="goAccount">
               <mu-list-item-title>账号设置</mu-list-item-title>
               <span v-if="showMenuAccountDot" class="action-menu-account-dot"></span>
@@ -259,6 +262,10 @@ export default {
       }
       this.isMenuOpen = false
       window.removeEventListener('click', this.handleClickOutsideMenu)
+    },
+    goDiscover() {
+      this.$router.push('/discover')
+      this.isMenuOpen = false
     },
     goAccount() {
       this.routeTo('/account')

@@ -22,6 +22,8 @@ import MoHeader from '@/components/MoHeader'
 import MoBrandPlaceholder from '@/components/MoBrandPlaceholder'
 import { keepAlivePages } from '@/router'
 import { rootStore } from '@/store/root'
+import { feedStore } from '@/store/feed'
+import { shouldAutoEnterDiscover, markDiscoverAutoEntered } from '@/plugin/discover'
 
 export default {
   name: 'MoHomePage',
@@ -35,6 +37,10 @@ export default {
   mounted() {
     rootStore.syncFeedLoadMushrooms().then(() => {
       this.isReady = true
+      if (feedStore.numFeeds <= 0 && shouldAutoEnterDiscover()) {
+        markDiscoverAutoEntered()
+        this.$router.push('/discover')
+      }
     })
   },
   computed: {
