@@ -1,12 +1,15 @@
 @import '~@/styles/common';
 
-.legal-doc {
+// 用 .markdown-body.legal-doc 提高特异性，覆盖 github-markdown-css 的标题/链接/段落默认样式
+.markdown-body.legal-doc {
   h1 {
     font-size: 20 * @pr;
     line-height: 1.4;
     font-weight: bold;
     text-align: center;
     margin: 8 * @pr 0 18 * @pr;
+    padding-bottom: 0;
+    border-bottom: none;
     color: @antTextBlack;
   }
 
@@ -56,10 +59,4 @@
   strong {
     font-weight: bold;
   }
-}
-
-// github-markdown-css 的 h2 自带下边框；用更高的选择器去掉，保持法律页标题简洁
-.markdown-body.legal-doc h2 {
-  padding-bottom: 0;
-  border-bottom: none;
 }
