@@ -96,6 +96,7 @@
       <footer v-if="!isLoading && !error && categories.length" class="bottom-bar">
         <div class="count">已选 {{ selectedCount }} 个源</div>
         <mu-button
+          ref="startBtn"
           class="start-btn"
           :color="antGreen"
           :disabled="selectedCount === 0 || isSubscribing"
@@ -112,6 +113,7 @@
       :open.sync="isConfirmOpen"
       :title="confirmTitle"
       :overlay-close="false"
+      @click.native="onConfirmOverlayClick"
     >
       <div class="confirm-desc">内容可能不够读，以后可以在「发现」里添加。</div>
       <mu-button slot="actions" flat @click="isConfirmOpen = false">多选几个源</mu-button>
@@ -212,12 +214,30 @@ export default {
       }))
     },
   },
+  watch: {
+    isConfirmOpen(value) {
+      if (value) {
+        document.addEventListener('keydown', this.onConfirmKeydown)
+        this.focusConfirmDialog()
+      } else {
+        document.removeEventListener('keydown', this.onConfirmKeydown)
+        clearTimeout(this._confirmFocusTimer)
+        this.$nextTick(() => {
+          if (this.$refs.startBtn) {
+            this.$refs.startBtn.$el.focus()
+          }
+        })
+      }
+    },
+  },
   mounted() {
     window.addEventListener('resize', this.updateTabsOverflow)
     this.loadData()
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.updateTabsOverflow)
+    document.removeEventListener('keydown', this.onConfirmKeydown)
+    clearTimeout(this._confirmFocusTimer)
   },
   methods: {
     async loadData() {
@@ -371,6 +391,69 @@ export default {
         this.$toast.error({ message: '订阅失败：' + error.message, time: 10000 })
       } finally {
         this.isSubscribing = false
+      }
+    },
+    focusConfirmDialog() {
+      clearTimeout(this._confirmFocusTimer)
+      this._confirmFocusTimer = setTimeout(() => {
+        let dialog = document.querySelector('.discover-confirm-dialog .mu-dialog')
+        if (!dialog || dialog.offsetParent === null) {
+          this.focusConfirmDialog()
+          return
+        }
+        dialog.setAttribute('tabindex', '-1')
+        dialog.style.outline = 'none'
+        dialog.focus()
+      }, 350)
+    },
+    onConfirmOverlayClick(event) {
+      if (event.target === event.currentTarget) {
+        this.isConfirmOpen = false
+      }
+    },
+    onConfirmKeydown(event) {
+      if (!this.isConfirmOpen) {
+        return
+      }
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        this.isConfirmOpen = false
+        return
+      }
+      if (event.key !== 'Tab') {
+        return
+      }
+      let dialog = document.querySelector('.discover-confirm-dialog .mu-dialog')
+      if (!dialog) {
+        return
+      }
+      let focusables = Array.from(
+        dialog.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
+      ).filter(el => !el.disabled && el.offsetParent !== null)
+      if (focusables.length === 0) {
+        event.preventDefault()
+        return
+      }
+      let first = focusables[0]
+      let last = focusables[focusables.length - 1]
+      let active = document.activeElement
+      if (!focusables.includes(active)) {
+        event.preventDefault()
+        if (event.shiftKey) {
+          last.focus()
+        } else {
+          first.focus()
+        }
+        return
+      }
+      if (event.shiftKey) {
+        if (active === first || active === dialog) {
+          event.preventDefault()
+          last.focus()
+        }
+      } else if (active === last) {
+        event.preventDefault()
+        first.focus()
       }
     },
     openSheet() {
@@ -893,6 +976,11 @@ export default {
   line-height: 26 * @pr;
   font-weight: 600;
   color: @antTextSemi;
+}
+
+.discover-confirm-dialog /deep/ .mu-dialog-actions .mu-button:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2 * @pr rgba(102, 187, 106, 0.5) !important;
 }
 
 .confirm-desc {
