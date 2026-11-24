@@ -4,11 +4,41 @@
       <template v-slot:title>发现订阅源</template>
     </MoBackHeader>
     <div class="discover-body">
+      <div class="search-bar">
+        <div class="search-field" :class="{ focus: isSearchFocused }">
+          <fa-icon class="search-icon" icon="search" :size="14" />
+          <input
+            ref="searchInputEl"
+            :value="searchInput"
+            type="text"
+            class="search-input"
+            placeholder="搜索订阅源、分类"
+            aria-label="搜索订阅源"
+            autocomplete="off"
+            @input="onSearchInput"
+            @compositionstart="onSearchCompositionStart"
+            @compositionend="onSearchCompositionEnd"
+            @focus="isSearchFocused = true"
+            @blur="onSearchBlur"
+            @keydown.esc="clearSearch"
+          />
+          <button
+            v-if="searchInput"
+            type="button"
+            class="search-clear"
+            aria-label="清空搜索"
+            @mousedown.prevent
+            @click="clearSearch"
+          >
+            <fa-icon icon="times" :size="12" />
+          </button>
+        </div>
+      </div>
       <div v-if="isLoading" class="tabs-skeleton" aria-hidden="true">
         <span v-for="i in 4" :key="i" class="skeleton-tab"></span>
       </div>
       <div
-        v-else-if="!error && categories.length"
+        v-else-if="!error && categories.length && !isSearching"
         ref="tabsWrap"
         class="tabs-wrap"
         :class="{ 'has-overflow': hasOverflow, 'has-left': hasLeft }"
@@ -47,6 +77,11 @@
         </button>
       </div>
 
+      <div v-if="isSearching && !isLoading && !error && displayItems.length > 0" class="search-summary">
+        <span class="search-summary-query">搜索「{{ searchQuery.trim() }}」</span>
+        <span class="search-summary-count">找到 {{ displayItems.length }} 个源</span>
+      </div>
+
       <div v-if="isLoading" class="list-scroll" aria-busy="true">
         <div v-for="i in 6" :key="i" class="skeleton-row">
           <div class="skeleton-lines">
@@ -62,15 +97,22 @@
         <div class="state-error">{{ error }}</div>
         <button type="button" class="state-btn" @click="loadData">重试</button>
       </div>
-      <div v-else-if="activeItems.length === 0" class="state-full">
-        <div class="state-title">{{ categories.length ? '这个分类还没有可订阅的源' : '还没有可订阅的源' }}</div>
-        <div class="state-desc">{{ categories.length ? '可以看看其他分类，或稍后再来。' : '稍后再来看看。' }}</div>
-        <button type="button" class="state-btn" @click="onEmptyAction">
-          {{ categories.length && activeSlug !== 'featured' ? '看精选' : '刷新' }}
-        </button>
+      <div v-else-if="displayItems.length === 0" class="state-full">
+        <template v-if="isSearching && items.length > 0">
+          <div class="state-title">没有找到相关订阅源</div>
+          <div class="state-desc">换个关键词试试。</div>
+          <button type="button" class="state-btn" @click="clearSearch">清空搜索</button>
+        </template>
+        <template v-else>
+          <div class="state-title">{{ categories.length ? '这个分类还没有可订阅的源' : '还没有可订阅的源' }}</div>
+          <div class="state-desc">{{ categories.length ? '可以看看其他分类，或稍后再来。' : '稍后再来看看。' }}</div>
+          <button type="button" class="state-btn" @click="onEmptyAction">
+            {{ categories.length && activeSlug !== 'featured' ? '看精选' : '刷新' }}
+          </button>
+        </template>
       </div>
-      <div v-else ref="listScroll" class="list-scroll">
-        <div v-for="item in activeItems" :key="item.url" class="discover-row">
+      <div v-else ref="listScroll" class="list-scroll" :class="{ 'is-browse': !isGuideMode }">
+        <div v-for="item in displayItems" :key="item.category + ':' + item.url" class="discover-row">
           <div class="row-main">
             <div class="row-title">{{ item.title || item.url }}</div>
             <div v-if="item.editor_intro" class="row-intro">{{ item.editor_intro }}</div>
@@ -80,20 +122,29 @@
             <button
               type="button"
               class="sub-btn"
-              :class="{ selected: isSelected(item.url), subscribed: isSubscribed(item.url) }"
-              :aria-pressed="isSelected(item.url) ? 'true' : 'false'"
-              :aria-disabled="isSubscribed(item.url) ? 'true' : 'false'"
-              :disabled="isSubscribed(item.url)"
-              @click="toggleSelect(item.url)"
+              :class="{
+                selected: isGuideMode && isSelected(item.url),
+                subscribed: isSubscribed(item.url),
+                loading: isSubscribingUrl(item.url),
+              }"
+              :aria-pressed="isGuideMode ? (isSelected(item.url) ? 'true' : 'false') : null"
+              :aria-disabled="isSubscribed(item.url) || isSubscribingUrl(item.url) ? 'true' : 'false'"
+              :disabled="isSubscribed(item.url) || isSubscribingUrl(item.url)"
+              @click="onRowAction(item.url)"
             >
-              <fa-icon v-if="isSelected(item.url) || isSubscribed(item.url)" icon="check" :size="12" />
-              <span>{{ isSubscribed(item.url) ? '已订阅' : isSelected(item.url) ? '已选' : '订阅' }}</span>
+              <span v-if="isSubscribingUrl(item.url)" class="row-spinner"></span>
+              <fa-icon
+                v-else-if="(isGuideMode && isSelected(item.url)) || isSubscribed(item.url)"
+                icon="check"
+                :size="12"
+              />
+              <span>{{ rowButtonLabel(item.url) }}</span>
             </button>
           </div>
         </div>
       </div>
 
-      <footer v-if="!isLoading && !error && categories.length" class="bottom-bar">
+      <footer v-if="!isLoading && !error && categories.length && isGuideMode" class="bottom-bar">
         <div class="count">已选 {{ selectedCount }} 个源</div>
         <mu-button
           ref="startBtn"
@@ -186,12 +237,18 @@ export default {
       items: [],
       activeSlug: '',
       selectedUrls: [],
+      subscribingUrls: [],
+      submittedUrls: [],
       isConfirmOpen: false,
       confirmCount: 0,
       isSubscribing: false,
       isSheetOpen: false,
       hasOverflow: false,
       hasLeft: false,
+      searchInput: '',
+      searchQuery: '',
+      isSearchFocused: false,
+      isComposing: false,
     }
   },
   computed: {
@@ -203,6 +260,39 @@ export default {
     },
     selectedCount() {
       return this.selectedUrls.length
+    },
+    normalizedSearchQuery() {
+      return this.searchQuery.trim().toLowerCase()
+    },
+    isSearching() {
+      return this.normalizedSearchQuery !== ''
+    },
+    displayItems() {
+      if (!this.isSearching) {
+        return this.activeItems
+      }
+      let terms = this.normalizedSearchQuery.split(/\s+/)
+      let seen = new Set()
+      return this.items.filter(item => {
+        if (seen.has(item.url)) {
+          return false
+        }
+        let category = this.categories.find(category => category.slug === item.category)
+        let text = [item.title, item.editor_intro, category ? category.name : '']
+          .join(' ')
+          .toLowerCase()
+        if (!terms.every(term => text.includes(term))) {
+          return false
+        }
+        seen.add(item.url)
+        return true
+      })
+    },
+    isGuideMode() {
+      return this.$route.query.mode === 'guide'
+    },
+    totalFeedCount() {
+      return feedStore.numFeeds + this.selectedCount
     },
     confirmTitle() {
       return `只选了 ${this.confirmCount} 个源`
@@ -254,6 +344,8 @@ export default {
         this.items = data.items || []
         this.activeSlug = this.categories.length > 0 ? this.categories[0].slug : ''
         this.selectedUrls = []
+        this.subscribingUrls = []
+        this.submittedUrls = []
       } catch (error) {
         this.error = error.message
       } finally {
@@ -264,6 +356,47 @@ export default {
         })
       }
     },
+    onSearchInput(event) {
+      this.searchInput = event.target.value
+      if (this.isComposing || event.isComposing) {
+        return
+      }
+      this.applySearch()
+    },
+    onSearchCompositionStart() {
+      this.isComposing = true
+    },
+    onSearchCompositionEnd() {
+      this.isComposing = false
+      this.applySearch()
+    },
+    onSearchBlur() {
+      this.isSearchFocused = false
+      this.isComposing = false
+    },
+    applySearch() {
+      let wasSearching = this.isSearching
+      this.searchQuery = this.searchInput
+      this.$nextTick(() => {
+        if (this.$refs.listScroll) {
+          this.$refs.listScroll.scrollTop = 0
+        }
+        if (wasSearching && !this.isSearching) {
+          this.updateTabsOverflow()
+          this.scrollActiveTab()
+        }
+      })
+    },
+    clearSearch() {
+      this.searchInput = ''
+      this.isComposing = false
+      this.applySearch()
+      this.$nextTick(() => {
+        if (this.$refs.searchInputEl) {
+          this.$refs.searchInputEl.focus()
+        }
+      })
+    },
     updateTime(item) {
       return formatUpdateTime(item.dt_latest_story_published)
     },
@@ -271,7 +404,32 @@ export default {
       return this.selectedUrls.indexOf(url) >= 0
     },
     isSubscribed(url) {
-      return this.subscribedUrls.indexOf(url) >= 0
+      return this.subscribedUrls.indexOf(url) >= 0 || this.submittedUrls.indexOf(url) >= 0
+    },
+    isSubscribingUrl(url) {
+      return this.subscribingUrls.indexOf(url) >= 0
+    },
+    rowButtonLabel(url) {
+      if (this.isSubscribed(url)) {
+        return '已订阅'
+      }
+      if (this.isSubscribingUrl(url)) {
+        return '订阅中…'
+      }
+      if (this.isGuideMode && this.isSelected(url)) {
+        return '已选'
+      }
+      return '订阅'
+    },
+    onRowAction(url) {
+      if (this.isSubscribed(url) || this.isSubscribingUrl(url)) {
+        return
+      }
+      if (this.isGuideMode) {
+        this.toggleSelect(url)
+      } else {
+        this.subscribeOne(url)
+      }
     },
     toggleSelect(url) {
       if (this.isSubscribed(url)) {
@@ -356,12 +514,26 @@ export default {
       if (this.selectedCount === 0 || this.isSubscribing) {
         return
       }
-      if (this.selectedCount < 3) {
+      if (this.totalFeedCount < 3) {
         this.confirmCount = this.selectedCount
         this.isConfirmOpen = true
         return
       }
       this.subscribeSelected()
+    },
+    subscribeResultMessage(result, isSingle) {
+      let message
+      if (result.numCreatedFeeds > 0) {
+        message = `已订阅 ${result.numCreatedFeeds} 个源`
+      } else if (result.numFeedCreations > 0) {
+        message = `${result.numFeedCreations} 个链接正在查找中，稍后即可阅读`
+      } else {
+        message = isSingle ? '这个源已订阅' : '这些源都已订阅'
+      }
+      if (result.numExistedFeeds > 0 && result.numCreatedFeeds > 0) {
+        message += `，${result.numExistedFeeds} 个已存在`
+      }
+      return message
     },
     async subscribeSelected() {
       if (this.isSubscribing || this.selectedUrls.length === 0) {
@@ -373,24 +545,31 @@ export default {
           text: this.selectedUrls.join('\n'),
           group: null,
         })
-        let message
-        if (result.numCreatedFeeds > 0) {
-          message = `已订阅 ${result.numCreatedFeeds} 个源`
-        } else if (result.numFeedCreations > 0) {
-          message = `${result.numFeedCreations} 个链接正在查找中，稍后即可阅读`
-        } else {
-          message = '这些源都已订阅'
-        }
-        if (result.numExistedFeeds > 0 && result.numCreatedFeeds > 0) {
-          message += `，${result.numExistedFeeds} 个已存在`
-        }
-        this.$toast.success({ message: message, time: 10000 })
+        this.$toast.success({ message: this.subscribeResultMessage(result, false), time: 10000 })
         this.isConfirmOpen = false
         this.$router.replace('/')
       } catch (error) {
         this.$toast.error({ message: '订阅失败：' + error.message, time: 10000 })
       } finally {
         this.isSubscribing = false
+      }
+    },
+    async subscribeOne(url) {
+      if (this.isSubscribingUrl(url) || this.isSubscribed(url)) {
+        return
+      }
+      this.subscribingUrls.push(url)
+      try {
+        let result = await feedStore.import({ text: url, group: null })
+        this.submittedUrls.push(url)
+        this.$toast.success({ message: this.subscribeResultMessage(result, true), time: 10000 })
+      } catch (error) {
+        this.$toast.error({ message: '订阅失败：' + error.message, time: 10000 })
+      } finally {
+        let index = this.subscribingUrls.indexOf(url)
+        if (index >= 0) {
+          this.subscribingUrls.splice(index, 1)
+        }
       }
     },
     focusConfirmDialog() {
@@ -509,6 +688,97 @@ export default {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+.search-bar {
+  flex: none;
+  padding: 8 * @pr 16 * @pr;
+  background: @antBackWhite;
+  border-bottom: 1px solid @antLineGrey;
+}
+
+.search-field {
+  height: 40 * @pr;
+  display: flex;
+  align-items: center;
+  gap: 8 * @pr;
+  padding: 0 8 * @pr 0 10 * @pr;
+  border: 1px solid transparent;
+  border-radius: 2 * @pr;
+  background: #f5f5f5;
+
+  &.focus {
+    border-color: @antGreen;
+  }
+}
+
+.search-icon {
+  flex: none;
+  color: @antTextGrey;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: @antTextSemi;
+  font-size: 14 * @pr;
+  line-height: 20 * @pr;
+
+  &::placeholder {
+    color: @antTextLight;
+  }
+}
+
+.search-clear {
+  flex: none;
+  width: 24 * @pr;
+  height: 24 * @pr;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: @antTextGrey;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2 * @pr solid rgba(102, 187, 106, 0.5);
+    outline-offset: 2 * @pr;
+  }
+}
+
+.search-summary {
+  flex: none;
+  height: 40 * @pr;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12 * @pr;
+  padding: 0 16 * @pr;
+  background: @antBackWhite;
+  border-bottom: 1px solid @antLineGrey;
+  font-size: 13 * @pr;
+  line-height: 20 * @pr;
+  color: #666666;
+}
+
+.search-summary-query {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search-summary-count {
+  flex: none;
+  color: @antTextGrey;
+  font-variant-numeric: tabular-nums;
 }
 
 .tabs-wrap {
@@ -647,6 +917,10 @@ export default {
   padding: 16 * @pr;
 }
 
+.list-scroll.is-browse {
+  padding-bottom: calc(16 * @pr + env(safe-area-inset-bottom));
+}
+
 .discover-row {
   display: flex;
   align-items: center;
@@ -753,6 +1027,10 @@ export default {
     }
   }
 
+  &.loading {
+    cursor: default;
+  }
+
   &.subscribed {
     background: transparent;
     border-color: transparent;
@@ -764,6 +1042,16 @@ export default {
       background: transparent;
     }
   }
+}
+
+.row-spinner {
+  display: inline-block;
+  width: 12 * @pr;
+  height: 12 * @pr;
+  border: 2 * @pr solid rgba(102, 187, 106, 0.3);
+  border-top-color: @antGreen;
+  border-radius: 50%;
+  animation: discover-spin 0.8s linear infinite;
 }
 
 .bottom-bar {

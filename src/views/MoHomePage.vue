@@ -39,7 +39,7 @@ export default {
       this.isReady = true
       if (feedStore.numFeeds <= 0 && shouldAutoEnterDiscover()) {
         markDiscoverAutoEntered()
-        this.$router.push('/discover')
+        this.$router.push({ path: '/discover', query: { mode: 'guide' } })
       }
     })
   },
