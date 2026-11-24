@@ -111,8 +111,15 @@
           </button>
         </template>
       </div>
-      <div v-else ref="listScroll" class="list-scroll" :class="{ 'is-browse': !isGuideMode }">
-        <div v-for="item in displayItems" :key="item.category + ':' + item.url" class="discover-row">
+      <div
+        v-else
+        ref="listScroll"
+        class="list-scroll"
+        :class="{ 'is-browse': !isGuideMode }"
+        @scroll.passive="onListScroll"
+        @keydown="onListKeydown"
+      >
+        <div v-for="item in displayRows" :key="item.category + ':' + item.url" class="discover-row">
           <div class="row-main">
             <div class="row-title">{{ item.title || item.url }}</div>
             <div v-if="item.editor_intro" class="row-intro">{{ item.editor_intro }}</div>
@@ -123,22 +130,22 @@
               type="button"
               class="sub-btn"
               :class="{
-                selected: isGuideMode && isSelected(item.url),
-                subscribed: isSubscribed(item.url),
-                loading: isSubscribingUrl(item.url),
+                selected: item._selected,
+                subscribed: item._subscribed,
+                loading: item._subscribing,
               }"
-              :aria-pressed="isGuideMode ? (isSelected(item.url) ? 'true' : 'false') : null"
-              :aria-disabled="isSubscribed(item.url) || isSubscribingUrl(item.url) ? 'true' : 'false'"
-              :disabled="isSubscribed(item.url) || isSubscribingUrl(item.url)"
+              :aria-pressed="isGuideMode ? (item._selected ? 'true' : 'false') : null"
+              :aria-disabled="item._subscribed || item._subscribing ? 'true' : 'false'"
+              :disabled="item._subscribed || item._subscribing"
               @click="onRowAction(item.url)"
             >
-              <span v-if="isSubscribingUrl(item.url)" class="row-spinner"></span>
+              <span v-if="item._subscribing" class="row-spinner"></span>
               <fa-icon
-                v-else-if="(isGuideMode && isSelected(item.url)) || isSubscribed(item.url)"
+                v-else-if="item._selected || item._subscribed"
                 icon="check"
                 :size="12"
               />
-              <span>{{ rowButtonLabel(item.url) }}</span>
+              <span>{{ item._label }}</span>
             </button>
           </div>
         </div>
@@ -225,6 +232,8 @@ import { antGreen } from '@/plugin/common'
 import { formatUpdateTime } from '@/plugin/datefmt'
 import { feedStore } from '@/store/feed'
 
+const RENDER_BATCH_SIZE = 80
+
 export default {
   name: 'MoDiscoverPage',
   components: { MoLayout, MoBackHeader },
@@ -249,6 +258,8 @@ export default {
       searchQuery: '',
       isSearchFocused: false,
       isComposing: false,
+      // 首屏只渲染一批，滚动或键盘走到末尾时再追加，避免几千行一次挂载。
+      renderLimit: RENDER_BATCH_SIZE,
     }
   },
   computed: {
@@ -267,31 +278,87 @@ export default {
     isSearching() {
       return this.normalizedSearchQuery !== ''
     },
+    categoryNameBySlug() {
+      let result = {}
+      for (let category of this.categories) {
+        result[category.slug] = category.name
+      }
+      return result
+    },
+    searchRows() {
+      // 同一个 url 可能挂在多个分类下，且有各自的简介；每一行单独保留检索文本，
+      // 才能和现在「同一行命中全部词」的语义一致，也不会把不同行的词拼在一起。
+      let result = []
+      for (let item of this.items) {
+        let categoryName = this.categoryNameBySlug[item.category] || ''
+        let text = [item.title, item.editor_intro, categoryName].join(' ').toLowerCase()
+        result.push({ item, text })
+      }
+      return result
+    },
     displayItems() {
       if (!this.isSearching) {
         return this.activeItems
       }
       let terms = this.normalizedSearchQuery.split(/\s+/)
-      // 同一个源可以同时挂在「精选」和某个分类下，搜索是全量范围，必须按 url 去重，
-      // 否则同一个源会出现两行，v-for 的 key 也会冲突。
+      // 同一个 url 可同时在多个分类下、且简介可能不同；逐行匹配后在首次命中处保留一条。
       let seen = new Set()
-      return this.items.filter(item => {
-        if (seen.has(item.url)) {
-          return false
+      let result = []
+      for (let row of this.searchRows) {
+        let url = row.item.url
+        if (seen.has(url)) {
+          continue
         }
-        let category = this.categories.find(category => category.slug === item.category)
-        let text = [item.title, item.editor_intro, category ? category.name : '']
-          .join(' ')
-          .toLowerCase()
-        if (!terms.every(term => text.includes(term))) {
-          return false
+        if (terms.every(term => row.text.includes(term))) {
+          seen.add(url)
+          result.push(row.item)
         }
-        seen.add(item.url)
-        return true
-      })
+      }
+      return result
     },
     isGuideMode() {
       return this.$route.query.mode === 'guide'
+    },
+    subscribedUrlSet() {
+      return new Set(this.subscribedUrls)
+    },
+    submittedUrlSet() {
+      return new Set(this.submittedUrls)
+    },
+    selectedUrlSet() {
+      return new Set(this.selectedUrls)
+    },
+    subscribingUrlSet() {
+      return new Set(this.subscribingUrls)
+    },
+    // 模板逐行调用依赖订阅列表的 computed 时，Vue 2 会把每个订阅登记到当前渲染 watcher；
+    // 这里每次渲染只取一次集合，行上只放展示需要的字段。
+    displayRows() {
+      let subscribed = this.subscribedUrlSet
+      let submitted = this.submittedUrlSet
+      let selected = this.selectedUrlSet
+      let subscribing = this.subscribingUrlSet
+      let isGuideMode = this.isGuideMode
+      return this.displayItems.slice(0, this.renderLimit).map(item => {
+        let isSubscribed = subscribed.has(item.url) || submitted.has(item.url)
+        let isSubscribing = subscribing.has(item.url)
+        let isSelected = selected.has(item.url)
+        let label = '订阅'
+        if (isSubscribed) {
+          label = '已订阅'
+        } else if (isSubscribing) {
+          label = '订阅中…'
+        } else if (isGuideMode && isSelected) {
+          label = '已选'
+        }
+        return {
+          ...item,
+          _subscribed: isSubscribed,
+          _subscribing: isSubscribing,
+          _selected: isGuideMode && isSelected,
+          _label: label,
+        }
+      })
     },
     totalFeedCount() {
       return feedStore.numFeeds + this.selectedCount
@@ -330,6 +397,10 @@ export default {
     window.removeEventListener('resize', this.updateTabsOverflow)
     document.removeEventListener('keydown', this.onConfirmKeydown)
     clearTimeout(this._confirmFocusTimer)
+    if (this._appendFrame) {
+      cancelAnimationFrame(this._appendFrame)
+      this._appendFrame = null
+    }
   },
   methods: {
     async loadData() {
@@ -348,6 +419,7 @@ export default {
         this.selectedUrls = []
         this.subscribingUrls = []
         this.submittedUrls = []
+        this.resetRenderLimit()
       } catch (error) {
         this.error = error.message
       } finally {
@@ -357,6 +429,55 @@ export default {
           this.scrollActiveTab()
         })
       }
+    },
+    onListScroll() {
+      if (this._appendFrame) {
+        return
+      }
+      let el = this.$refs.listScroll
+      this._appendFrame = requestAnimationFrame(() => {
+        this._appendFrame = null
+        if (this._isDestroyed || !el || this.renderLimit >= this.displayItems.length) {
+          return
+        }
+        if (el.scrollTop + el.clientHeight >= el.scrollHeight - 200) {
+          this.renderLimit += RENDER_BATCH_SIZE
+        }
+      })
+    },
+    onListKeydown(event) {
+      if (event.key !== 'Tab' || event.shiftKey) {
+        return
+      }
+      if (this.renderLimit >= this.displayItems.length) {
+        return
+      }
+      let el = this.$refs.listScroll
+      if (!el) {
+        return
+      }
+      let rows = el.querySelectorAll('.discover-row')
+      if (rows.length === 0 || !rows[rows.length - 1].contains(event.target)) {
+        return
+      }
+      event.preventDefault()
+      let nextIndex = rows.length
+      this.renderLimit += RENDER_BATCH_SIZE
+      this.$nextTick(() => {
+        let nextRows = this.$refs.listScroll ? this.$refs.listScroll.querySelectorAll('.discover-row') : []
+        let nextRow = nextRows[nextIndex]
+        let nextButton = nextRow ? nextRow.querySelector('.sub-btn') : null
+        if (nextButton) {
+          nextButton.focus()
+        }
+      })
+    },
+    resetRenderLimit() {
+      if (this._appendFrame) {
+        cancelAnimationFrame(this._appendFrame)
+        this._appendFrame = null
+      }
+      this.renderLimit = RENDER_BATCH_SIZE
     },
     onSearchInput(event) {
       this.searchInput = event.target.value
@@ -379,6 +500,7 @@ export default {
     applySearch() {
       let wasSearching = this.isSearching
       this.searchQuery = this.searchInput
+      this.resetRenderLimit()
       this.$nextTick(() => {
         if (this.$refs.listScroll) {
           this.$refs.listScroll.scrollTop = 0
@@ -402,26 +524,11 @@ export default {
     updateTime(item) {
       return formatUpdateTime(item.dt_latest_story_published)
     },
-    isSelected(url) {
-      return this.selectedUrls.indexOf(url) >= 0
-    },
     isSubscribed(url) {
-      return this.subscribedUrls.indexOf(url) >= 0 || this.submittedUrls.indexOf(url) >= 0
+      return this.subscribedUrlSet.has(url) || this.submittedUrlSet.has(url)
     },
     isSubscribingUrl(url) {
-      return this.subscribingUrls.indexOf(url) >= 0
-    },
-    rowButtonLabel(url) {
-      if (this.isSubscribed(url)) {
-        return '已订阅'
-      }
-      if (this.isSubscribingUrl(url)) {
-        return '订阅中…'
-      }
-      if (this.isGuideMode && this.isSelected(url)) {
-        return '已选'
-      }
-      return '订阅'
+      return this.subscribingUrlSet.has(url)
     },
     onRowAction(url) {
       if (this.isSubscribed(url) || this.isSubscribingUrl(url)) {
@@ -449,6 +556,7 @@ export default {
         return
       }
       this.activeSlug = slug
+      this.resetRenderLimit()
       this.$nextTick(() => {
         if (this.$refs.listScroll) {
           this.$refs.listScroll.scrollTop = 0
