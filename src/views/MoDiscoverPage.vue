@@ -4,11 +4,41 @@
       <template v-slot:title>发现订阅源</template>
     </MoBackHeader>
     <div class="discover-body">
+      <div class="search-bar">
+        <div class="search-field" :class="{ focus: isSearchFocused }">
+          <fa-icon class="search-icon" icon="search" :size="14" />
+          <input
+            ref="searchInputEl"
+            :value="searchInput"
+            type="text"
+            class="search-input"
+            placeholder="搜索订阅源、分类"
+            aria-label="搜索订阅源"
+            autocomplete="off"
+            @input="onSearchInput"
+            @compositionstart="onSearchCompositionStart"
+            @compositionend="onSearchCompositionEnd"
+            @focus="isSearchFocused = true"
+            @blur="onSearchBlur"
+            @keydown.esc="clearSearch"
+          />
+          <button
+            v-if="searchInput"
+            type="button"
+            class="search-clear"
+            aria-label="清空搜索"
+            @mousedown.prevent
+            @click="clearSearch"
+          >
+            <fa-icon icon="times" :size="12" />
+          </button>
+        </div>
+      </div>
       <div v-if="isLoading" class="tabs-skeleton" aria-hidden="true">
         <span v-for="i in 4" :key="i" class="skeleton-tab"></span>
       </div>
       <div
-        v-else-if="!error && categories.length"
+        v-else-if="!error && categories.length && !isSearching"
         ref="tabsWrap"
         class="tabs-wrap"
         :class="{ 'has-overflow': hasOverflow, 'has-left': hasLeft }"
@@ -47,6 +77,11 @@
         </button>
       </div>
 
+      <div v-if="isSearching && !isLoading && !error" class="search-summary">
+        <span class="search-summary-query">搜索「{{ searchQuery.trim() }}」</span>
+        <span class="search-summary-count">找到 {{ displayItems.length }} 个源</span>
+      </div>
+
       <div v-if="isLoading" class="list-scroll" aria-busy="true">
         <div v-for="i in 6" :key="i" class="skeleton-row">
           <div class="skeleton-lines">
@@ -62,15 +97,22 @@
         <div class="state-error">{{ error }}</div>
         <button type="button" class="state-btn" @click="loadData">重试</button>
       </div>
-      <div v-else-if="activeItems.length === 0" class="state-full">
-        <div class="state-title">{{ categories.length ? '这个分类还没有可订阅的源' : '还没有可订阅的源' }}</div>
-        <div class="state-desc">{{ categories.length ? '可以看看其他分类，或稍后再来。' : '稍后再来看看。' }}</div>
-        <button type="button" class="state-btn" @click="onEmptyAction">
-          {{ categories.length && activeSlug !== 'featured' ? '看精选' : '刷新' }}
-        </button>
+      <div v-else-if="displayItems.length === 0" class="state-full">
+        <template v-if="isSearching && items.length > 0">
+          <div class="state-title">没有找到相关订阅源</div>
+          <div class="state-desc">换个关键词试试。</div>
+          <button type="button" class="state-btn" @click="clearSearch">清空搜索</button>
+        </template>
+        <template v-else>
+          <div class="state-title">{{ categories.length ? '这个分类还没有可订阅的源' : '还没有可订阅的源' }}</div>
+          <div class="state-desc">{{ categories.length ? '可以看看其他分类，或稍后再来。' : '稍后再来看看。' }}</div>
+          <button type="button" class="state-btn" @click="onEmptyAction">
+            {{ categories.length && activeSlug !== 'featured' ? '看精选' : '刷新' }}
+          </button>
+        </template>
       </div>
       <div v-else ref="listScroll" class="list-scroll" :class="{ 'is-browse': !isGuideMode }">
-        <div v-for="item in activeItems" :key="item.url" class="discover-row">
+        <div v-for="item in displayItems" :key="item.category + ':' + item.url" class="discover-row">
           <div class="row-main">
             <div class="row-title">{{ item.title || item.url }}</div>
             <div v-if="item.editor_intro" class="row-intro">{{ item.editor_intro }}</div>
@@ -203,6 +245,10 @@ export default {
       isSheetOpen: false,
       hasOverflow: false,
       hasLeft: false,
+      searchInput: '',
+      searchQuery: '',
+      isSearchFocused: false,
+      isComposing: false,
     }
   },
   computed: {
@@ -214,6 +260,33 @@ export default {
     },
     selectedCount() {
       return this.selectedUrls.length
+    },
+    normalizedSearchQuery() {
+      return this.searchQuery.trim().toLowerCase()
+    },
+    isSearching() {
+      return this.normalizedSearchQuery !== ''
+    },
+    displayItems() {
+      if (!this.isSearching) {
+        return this.activeItems
+      }
+      let terms = this.normalizedSearchQuery.split(/\s+/)
+      let seen = new Set()
+      return this.items.filter(item => {
+        if (seen.has(item.url)) {
+          return false
+        }
+        let category = this.categories.find(category => category.slug === item.category)
+        let text = [item.title, item.editor_intro, category ? category.name : '']
+          .join(' ')
+          .toLowerCase()
+        if (!terms.every(term => text.includes(term))) {
+          return false
+        }
+        seen.add(item.url)
+        return true
+      })
     },
     isGuideMode() {
       return this.$route.query.mode === 'guide'
@@ -282,6 +355,47 @@ export default {
           this.scrollActiveTab()
         })
       }
+    },
+    onSearchInput(event) {
+      this.searchInput = event.target.value
+      if (this.isComposing || event.isComposing) {
+        return
+      }
+      this.applySearch()
+    },
+    onSearchCompositionStart() {
+      this.isComposing = true
+    },
+    onSearchCompositionEnd() {
+      this.isComposing = false
+      this.applySearch()
+    },
+    onSearchBlur() {
+      this.isSearchFocused = false
+      this.isComposing = false
+    },
+    applySearch() {
+      let wasSearching = this.isSearching
+      this.searchQuery = this.searchInput
+      this.$nextTick(() => {
+        if (this.$refs.listScroll) {
+          this.$refs.listScroll.scrollTop = 0
+        }
+        if (wasSearching && !this.isSearching) {
+          this.updateTabsOverflow()
+          this.scrollActiveTab()
+        }
+      })
+    },
+    clearSearch() {
+      this.searchInput = ''
+      this.isComposing = false
+      this.applySearch()
+      this.$nextTick(() => {
+        if (this.$refs.searchInputEl) {
+          this.$refs.searchInputEl.focus()
+        }
+      })
     },
     updateTime(item) {
       return formatUpdateTime(item.dt_latest_story_published)
@@ -574,6 +688,97 @@ export default {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+.search-bar {
+  flex: none;
+  padding: 8 * @pr 16 * @pr;
+  background: @antBackWhite;
+  border-bottom: 1px solid @antLineGrey;
+}
+
+.search-field {
+  height: 40 * @pr;
+  display: flex;
+  align-items: center;
+  gap: 8 * @pr;
+  padding: 0 8 * @pr 0 10 * @pr;
+  border: 1px solid transparent;
+  border-radius: 2 * @pr;
+  background: #f5f5f5;
+
+  &.focus {
+    border-color: @antGreen;
+  }
+}
+
+.search-icon {
+  flex: none;
+  color: @antTextGrey;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: @antTextSemi;
+  font-size: 14 * @pr;
+  line-height: 20 * @pr;
+
+  &::placeholder {
+    color: @antTextLight;
+  }
+}
+
+.search-clear {
+  flex: none;
+  width: 24 * @pr;
+  height: 24 * @pr;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: @antTextGrey;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2 * @pr solid rgba(102, 187, 106, 0.5);
+    outline-offset: 2 * @pr;
+  }
+}
+
+.search-summary {
+  flex: none;
+  height: 40 * @pr;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12 * @pr;
+  padding: 0 16 * @pr;
+  background: @antBackWhite;
+  border-bottom: 1px solid @antLineGrey;
+  font-size: 13 * @pr;
+  line-height: 20 * @pr;
+  color: #666666;
+}
+
+.search-summary-query {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search-summary-count {
+  flex: none;
+  color: @antTextGrey;
+  font-variant-numeric: tabular-nums;
 }
 
 .tabs-wrap {

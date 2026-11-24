@@ -33,6 +33,7 @@ faLibrary.add(fas.faAngleDown)
 faLibrary.add(fas.faBox)
 faLibrary.add(fas.faSyncAlt)
 faLibrary.add(fas.faTimes)
+faLibrary.add(fas.faSearch)
 
 /**
  * solid icons:
