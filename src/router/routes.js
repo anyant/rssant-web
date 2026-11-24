@@ -20,6 +20,7 @@ import MoAccountPage from '@/views/MoAccountPage'
 import MoPublishConfigPage from '@/views/MoPublishConfigPage'
 import MoAboutPage from '@/views/MoAboutPage'
 import MoHelloPage from '@/views/MoHelloPage'
+import MoDiscoverPage from '@/views/MoDiscoverPage'
 import MoHelpPage from '@/views/MoHelpPage'
 import MoNotFoundPage from '@/views/MoNotFoundPage'
 
@@ -133,6 +134,12 @@ const routes = [
     path: '/hello',
     name: 'Hello',
     component: MoHelloPage,
+  },
+  {
+    path: '/discover',
+    name: 'Discover',
+    component: MoDiscoverPage,
+    meta: { loginRequired: true },
   },
   {
     path: '/login',

@@ -5,6 +5,7 @@ import { isLaunchFromPWA } from '@/plugin/pwa'
 import { reportEvent } from '@/plugin/metric'
 import localFeeds from '@/plugin/localFeeds'
 import localConfig from '@/plugin/localConfig'
+import { resetDiscoverAutoEntry } from '@/plugin/discover'
 import { hamiVuex } from '.'
 import { formatDate } from '@/plugin/datefmt'
 
@@ -99,6 +100,7 @@ export const userStore = hamiVuex.store({
   },
   async login({ account, password } = {}) {
     if (!_.isNil(account)) {
+      resetDiscoverAutoEntry()
       if (this.loading.isFinished) {
         this.loading.reset()
       }
@@ -181,6 +183,7 @@ export const userStore = hamiVuex.store({
     await API.user.confirmResetPassword({ token, uid, new_password })
   },
   async logout() {
+    resetDiscoverAutoEntry()
     localConfig.LOGIN_TOKEN.set(null)
     localFeeds.clear()
     await API.user.logout()

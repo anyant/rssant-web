@@ -68,6 +68,10 @@
           >导入文件</mu-button>
         </div>
       </div>
+      <router-link class="discover-entry" to="/discover">
+        不知道订什么？去发现订阅源
+        <fa-icon icon="chevron-right" :size="12" />
+      </router-link>
       <MoCreationList ref="creationListRef" class="creation-list"></MoCreationList>
     </div>
   </MoLayout>
@@ -339,11 +343,26 @@ export default {
   }
 }
 
+.discover-entry {
+  position: absolute;
+  top: 196 * @pr;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4 * @pr;
+  height: 32 * @pr;
+  color: #2e7d32;
+  font-size: 13 * @pr;
+  text-decoration: none;
+}
+
 .creation-list {
   position: absolute;
   left: 0;
   right: 0;
-  top: (48 + 140 + 32) * @pr;
+  top: 244 * @pr;
   bottom: 0;
   overflow-y: auto;
   padding-bottom: 8 * @pr;

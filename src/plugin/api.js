@@ -141,6 +141,11 @@ function convertPasswordMessage(passwordMessage) {
 }
 
 const API = {
+  discover: {
+    get() {
+      return client.post('/discover.get')
+    },
+  },
   user: {
     login({ account, password } = {}) {
       return client.post('/user/login/', { account, password })
