@@ -54,7 +54,6 @@
 <p>11.2 如果更新涉及你的重要权利，我们会以显著方式提示；你继续使用本服务，视为接受更新后的协议。</p>
 <h2>十二、联系我们</h2>
 <p>邮箱：guyskk@anyant.com</p>
-<p>投诉与举报：/complaint</p>
   </MoDocPage>
 </template>
 
