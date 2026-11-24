@@ -77,7 +77,7 @@
         </button>
       </div>
 
-      <div v-if="isSearching && !isLoading && !error" class="search-summary">
+      <div v-if="isSearching && !isLoading && !error && displayItems.length > 0" class="search-summary">
         <span class="search-summary-query">搜索「{{ searchQuery.trim() }}」</span>
         <span class="search-summary-count">找到 {{ displayItems.length }} 个源</span>
       </div>
