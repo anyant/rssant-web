@@ -7,9 +7,8 @@
     <div class="center">
       <img
         src="@/assets/guyskk-qrcode.jpg"
-        alt="微信号:guyskk"
+        alt="微信二维码"
         width="160"
-        height="160"
       />
     </div>
     <div class="center">

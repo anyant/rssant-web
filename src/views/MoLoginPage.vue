@@ -24,6 +24,7 @@
           <mu-button @click="login" class="button-login" :color="antGreen" :disabled="isLoginDisabled">登录</mu-button>
           <mu-ripple class="button-forgot" @click="() => this.$router.push('/reset-password')">忘了密码？</mu-ripple>
         </div>
+        <MoConsentLine action="登录" />
         <div class="register">
           <MoAntGreenButton @click="goRegister">没有账号？去注册</MoAntGreenButton>
         </div>
@@ -43,10 +44,11 @@ import MoLayout from '@/components/MoLayout'
 import MoAntGreenButton from '@/components/MoAntGreenButton'
 import MoThirdpartLogin from '@/components/MoThirdpartLogin'
 import MoFooter from '@/components/MoFooter'
+import MoConsentLine from '@/components/MoConsentLine'
 import { userStore } from '@/store/user'
 
 export default {
-  components: { MoAntGreenButton, MoThirdpartLogin, MoLayout, MoFooter },
+  components: { MoAntGreenButton, MoThirdpartLogin, MoLayout, MoFooter, MoConsentLine },
   data() {
     return {
       antGreen,
@@ -162,7 +164,7 @@ export default {
 }
 
 .register {
-  margin-top: 56 * @pr;
+  margin-top: 40 * @pr;
 }
 
 .thirdpart {

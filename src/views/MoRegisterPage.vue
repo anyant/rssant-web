@@ -32,6 +32,7 @@
             >注册</mu-button
           >
         </div>
+        <MoConsentLine action="注册" />
         <div class="login">
           <MoAntGreenButton @click="goLogin">已有账号？去登录</MoAntGreenButton>
         </div>
@@ -51,10 +52,11 @@ import MoLayout from '@/components/MoLayout'
 import MoAntGreenButton from '@/components/MoAntGreenButton'
 import MoThirdpartLogin from '@/components/MoThirdpartLogin'
 import MoFooter from '@/components/MoFooter'
+import MoConsentLine from '@/components/MoConsentLine'
 import { userStore } from '@/store/user'
 
 export default {
-  components: { MoAntGreenButton, MoThirdpartLogin, MoLayout, MoFooter },
+  components: { MoAntGreenButton, MoThirdpartLogin, MoLayout, MoFooter, MoConsentLine },
   data() {
     return {
       antGreen,
@@ -197,7 +199,7 @@ export default {
 }
 
 .login {
-  margin-top: 56 * @pr;
+  margin-top: 40 * @pr;
 }
 
 .thirdpart {

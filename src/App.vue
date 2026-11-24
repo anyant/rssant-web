@@ -23,6 +23,7 @@ export default {
 <style lang="less">
 @import '~@/styles/common';
 @import '~@/styles/markdown';
+@import '~@/styles/legal';
 
 #timeit {
   position: fixed;

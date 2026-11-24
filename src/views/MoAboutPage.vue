@@ -37,6 +37,11 @@
             target="_blank"
           >更新日志</a>
         </div>
+        <div class="legal-links">
+          <router-link to="/terms">用户协议</router-link>
+          <router-link to="/privacy">隐私政策</router-link>
+          <router-link to="/complaint">投诉与举报</router-link>
+        </div>
       </div>
     </div>
   </MoLayout>
@@ -104,6 +109,22 @@ export default {
   .link {
     margin-left: 16 * @pr;
     margin-right: 16 * @pr;
+  }
+}
+
+.legal-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding-top: 14 * @pr;
+
+  a {
+    margin: 0 9 * @pr;
+    font-size: 13 * @pr;
+    color: @antTextGrey;
+    text-decoration: none;
+    border-bottom: 1px solid @antLineGrey;
+    line-height: 1.5;
   }
 }
 </style>

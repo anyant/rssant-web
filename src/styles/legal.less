@@ -1,0 +1,62 @@
+@import '~@/styles/common';
+
+// 用 .markdown-body.legal-doc 提高特异性，覆盖 github-markdown-css 的标题/链接/段落默认样式
+.markdown-body.legal-doc {
+  h1 {
+    font-size: 20 * @pr;
+    line-height: 1.4;
+    font-weight: bold;
+    text-align: center;
+    margin: 8 * @pr 0 18 * @pr;
+    padding-bottom: 0;
+    border-bottom: none;
+    color: @antTextBlack;
+  }
+
+  .doc-meta {
+    text-align: center;
+    font-size: 12 * @pr;
+    color: @antTextLight;
+    margin: -8 * @pr 0 18 * @pr;
+  }
+
+  h2 {
+    font-size: 16 * @pr;
+    line-height: 1.5;
+    font-weight: bold;
+    margin: 26 * @pr 0 8 * @pr;
+    padding-bottom: 0;
+    border-bottom: none;
+    color: @antTextBlack;
+  }
+
+  p {
+    font-size: 15 * @pr;
+    line-height: 1.8;
+    margin: 9 * @pr 0;
+    color: @antTextSemi;
+  }
+
+  ul,
+  ol {
+    margin: 8 * @pr 0;
+    padding-left: 22 * @pr;
+  }
+
+  li {
+    font-size: 15 * @pr;
+    line-height: 1.8;
+    margin: 4 * @pr 0;
+    color: @antTextSemi;
+  }
+
+  a {
+    color: @antTextSemi;
+    text-decoration: none;
+    border-bottom: 1px solid lighten(@antTextSemi, 15%);
+  }
+
+  strong {
+    font-weight: bold;
+  }
+}

@@ -51,6 +51,21 @@
       </div>
       <div class="divider"></div>
       <div class="action-group">
+        <div class="action-row" @click="goTerms">
+          <span class="action-label">用户协议</span>
+          <fa-icon class="action-icon" icon="chevron-right" />
+        </div>
+        <div class="action-row" @click="goPrivacy">
+          <span class="action-label">隐私政策</span>
+          <fa-icon class="action-icon" icon="chevron-right" />
+        </div>
+        <div class="action-row" @click="goComplaint">
+          <span class="action-label">投诉与举报</span>
+          <fa-icon class="action-icon" icon="chevron-right" />
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="action-group">
         <div class="action-row action-logout" @click="onLogout">
           <span class="action-label">退出登录</span>
         </div>
@@ -166,6 +181,15 @@ export default {
     },
     goAbout() {
       this.$router.push('/about')
+    },
+    goTerms() {
+      this.$router.push('/terms')
+    },
+    goPrivacy() {
+      this.$router.push('/privacy')
+    },
+    goComplaint() {
+      this.$router.push('/complaint')
     },
     goChangelog() {
       window.open('/changelog', '_blank')
