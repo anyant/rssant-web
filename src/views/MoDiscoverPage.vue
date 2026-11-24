@@ -69,7 +69,7 @@
           {{ categories.length && activeSlug !== 'featured' ? '看精选' : '刷新' }}
         </button>
       </div>
-      <div v-else ref="listScroll" class="list-scroll">
+      <div v-else ref="listScroll" class="list-scroll" :class="{ 'is-browse': !isGuideMode }">
         <div v-for="item in activeItems" :key="item.url" class="discover-row">
           <div class="row-main">
             <div class="row-title">{{ item.title || item.url }}</div>
@@ -80,20 +80,29 @@
             <button
               type="button"
               class="sub-btn"
-              :class="{ selected: isSelected(item.url), subscribed: isSubscribed(item.url) }"
-              :aria-pressed="isSelected(item.url) ? 'true' : 'false'"
-              :aria-disabled="isSubscribed(item.url) ? 'true' : 'false'"
-              :disabled="isSubscribed(item.url)"
-              @click="toggleSelect(item.url)"
+              :class="{
+                selected: isGuideMode && isSelected(item.url),
+                subscribed: isSubscribed(item.url),
+                loading: isSubscribingUrl(item.url),
+              }"
+              :aria-pressed="isGuideMode ? (isSelected(item.url) ? 'true' : 'false') : null"
+              :aria-disabled="isSubscribed(item.url) || isSubscribingUrl(item.url) ? 'true' : 'false'"
+              :disabled="isSubscribed(item.url) || isSubscribingUrl(item.url)"
+              @click="onRowAction(item.url)"
             >
-              <fa-icon v-if="isSelected(item.url) || isSubscribed(item.url)" icon="check" :size="12" />
-              <span>{{ isSubscribed(item.url) ? '已订阅' : isSelected(item.url) ? '已选' : '订阅' }}</span>
+              <span v-if="isSubscribingUrl(item.url)" class="row-spinner"></span>
+              <fa-icon
+                v-else-if="(isGuideMode && isSelected(item.url)) || isSubscribed(item.url)"
+                icon="check"
+                :size="12"
+              />
+              <span>{{ rowButtonLabel(item.url) }}</span>
             </button>
           </div>
         </div>
       </div>
 
-      <footer v-if="!isLoading && !error && categories.length" class="bottom-bar">
+      <footer v-if="!isLoading && !error && categories.length && isGuideMode" class="bottom-bar">
         <div class="count">已选 {{ selectedCount }} 个源</div>
         <mu-button
           ref="startBtn"
@@ -186,6 +195,8 @@ export default {
       items: [],
       activeSlug: '',
       selectedUrls: [],
+      subscribingUrls: [],
+      submittedUrls: [],
       isConfirmOpen: false,
       confirmCount: 0,
       isSubscribing: false,
@@ -203,6 +214,12 @@ export default {
     },
     selectedCount() {
       return this.selectedUrls.length
+    },
+    isGuideMode() {
+      return this.$route.query.mode === 'guide'
+    },
+    totalFeedCount() {
+      return feedStore.numFeeds + this.selectedCount
     },
     confirmTitle() {
       return `只选了 ${this.confirmCount} 个源`
@@ -254,6 +271,8 @@ export default {
         this.items = data.items || []
         this.activeSlug = this.categories.length > 0 ? this.categories[0].slug : ''
         this.selectedUrls = []
+        this.subscribingUrls = []
+        this.submittedUrls = []
       } catch (error) {
         this.error = error.message
       } finally {
@@ -271,7 +290,32 @@ export default {
       return this.selectedUrls.indexOf(url) >= 0
     },
     isSubscribed(url) {
-      return this.subscribedUrls.indexOf(url) >= 0
+      return this.subscribedUrls.indexOf(url) >= 0 || this.submittedUrls.indexOf(url) >= 0
+    },
+    isSubscribingUrl(url) {
+      return this.subscribingUrls.indexOf(url) >= 0
+    },
+    rowButtonLabel(url) {
+      if (this.isSubscribed(url)) {
+        return '已订阅'
+      }
+      if (this.isSubscribingUrl(url)) {
+        return '订阅中…'
+      }
+      if (this.isGuideMode && this.isSelected(url)) {
+        return '已选'
+      }
+      return '订阅'
+    },
+    onRowAction(url) {
+      if (this.isSubscribed(url) || this.isSubscribingUrl(url)) {
+        return
+      }
+      if (this.isGuideMode) {
+        this.toggleSelect(url)
+      } else {
+        this.subscribeOne(url)
+      }
     },
     toggleSelect(url) {
       if (this.isSubscribed(url)) {
@@ -356,12 +400,26 @@ export default {
       if (this.selectedCount === 0 || this.isSubscribing) {
         return
       }
-      if (this.selectedCount < 3) {
+      if (this.totalFeedCount < 3) {
         this.confirmCount = this.selectedCount
         this.isConfirmOpen = true
         return
       }
       this.subscribeSelected()
+    },
+    subscribeResultMessage(result, isSingle) {
+      let message
+      if (result.numCreatedFeeds > 0) {
+        message = `已订阅 ${result.numCreatedFeeds} 个源`
+      } else if (result.numFeedCreations > 0) {
+        message = `${result.numFeedCreations} 个链接正在查找中，稍后即可阅读`
+      } else {
+        message = isSingle ? '这个源已订阅' : '这些源都已订阅'
+      }
+      if (result.numExistedFeeds > 0 && result.numCreatedFeeds > 0) {
+        message += `，${result.numExistedFeeds} 个已存在`
+      }
+      return message
     },
     async subscribeSelected() {
       if (this.isSubscribing || this.selectedUrls.length === 0) {
@@ -373,24 +431,31 @@ export default {
           text: this.selectedUrls.join('\n'),
           group: null,
         })
-        let message
-        if (result.numCreatedFeeds > 0) {
-          message = `已订阅 ${result.numCreatedFeeds} 个源`
-        } else if (result.numFeedCreations > 0) {
-          message = `${result.numFeedCreations} 个链接正在查找中，稍后即可阅读`
-        } else {
-          message = '这些源都已订阅'
-        }
-        if (result.numExistedFeeds > 0 && result.numCreatedFeeds > 0) {
-          message += `，${result.numExistedFeeds} 个已存在`
-        }
-        this.$toast.success({ message: message, time: 10000 })
+        this.$toast.success({ message: this.subscribeResultMessage(result, false), time: 10000 })
         this.isConfirmOpen = false
         this.$router.replace('/')
       } catch (error) {
         this.$toast.error({ message: '订阅失败：' + error.message, time: 10000 })
       } finally {
         this.isSubscribing = false
+      }
+    },
+    async subscribeOne(url) {
+      if (this.isSubscribingUrl(url) || this.isSubscribed(url)) {
+        return
+      }
+      this.subscribingUrls.push(url)
+      try {
+        let result = await feedStore.import({ text: url, group: null })
+        this.submittedUrls.push(url)
+        this.$toast.success({ message: this.subscribeResultMessage(result, true), time: 10000 })
+      } catch (error) {
+        this.$toast.error({ message: '订阅失败：' + error.message, time: 10000 })
+      } finally {
+        let index = this.subscribingUrls.indexOf(url)
+        if (index >= 0) {
+          this.subscribingUrls.splice(index, 1)
+        }
       }
     },
     focusConfirmDialog() {
@@ -647,6 +712,10 @@ export default {
   padding: 16 * @pr;
 }
 
+.list-scroll.is-browse {
+  padding-bottom: calc(16 * @pr + env(safe-area-inset-bottom));
+}
+
 .discover-row {
   display: flex;
   align-items: center;
@@ -753,6 +822,10 @@ export default {
     }
   }
 
+  &.loading {
+    cursor: default;
+  }
+
   &.subscribed {
     background: transparent;
     border-color: transparent;
@@ -764,6 +837,16 @@ export default {
       background: transparent;
     }
   }
+}
+
+.row-spinner {
+  display: inline-block;
+  width: 12 * @pr;
+  height: 12 * @pr;
+  border: 2 * @pr solid rgba(102, 187, 106, 0.3);
+  border-top-color: @antGreen;
+  border-radius: 50%;
+  animation: discover-spin 0.8s linear infinite;
 }
 
 .bottom-bar {
