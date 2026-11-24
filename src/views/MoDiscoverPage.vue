@@ -272,6 +272,8 @@ export default {
         return this.activeItems
       }
       let terms = this.normalizedSearchQuery.split(/\s+/)
+      // 同一个源可以同时挂在「精选」和某个分类下，搜索是全量范围，必须按 url 去重，
+      // 否则同一个源会出现两行，v-for 的 key 也会冲突。
       let seen = new Set()
       return this.items.filter(item => {
         if (seen.has(item.url)) {
