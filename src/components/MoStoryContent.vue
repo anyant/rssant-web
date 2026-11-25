@@ -11,6 +11,20 @@
           <span class="info-item-name">发布时间：</span>
           <span class="info-item-content">{{ dateText }}</span>
         </div>
+        <div class="info-item info-item-enclosure" v-if="enclosureLinks.length > 0">
+          <span class="info-item-name">附件：</span>
+          <span class="info-item-content enclosure-links">
+            <a
+              v-for="item in enclosureLinks"
+              :key="item.url"
+              class="enclosure-link"
+              :href="item.url"
+              :title="item.url"
+              target="_blank"
+              rel="noreferrer"
+            >{{ item.text }}</a>
+          </span>
+        </div>
       </div>
       <div class="content" v-if="story">
         <div class="story-audio-wrapper" v-if="story.audio_url">
@@ -94,6 +108,15 @@ export default {
         minHeight: `${this.$LAYOUT.windowInnerHeight - 48}px`,
       }
     },
+    enclosureLinks() {
+      let urls = _.get(this.story, 'enclosure_urls')
+      if (!_.isArray(urls)) {
+        return []
+      }
+      return urls
+        .filter(url => _.isString(url) && !_.isEmpty(url))
+        .map(url => ({ url, text: this.enclosureLinkText(url) }))
+    },
     nextTitle() {
       if (_.isNil(this.nextStory)) {
         return ''
@@ -114,6 +137,36 @@ export default {
     initMathjax()
   },
   methods: {
+    enclosureLinkText(url) {
+      if (url.toLowerCase().startsWith('magnet:')) {
+        return this.magnetLinkText(url)
+      }
+      return this.httpLinkText(url)
+    },
+    magnetLinkText(url) {
+      let index = url.indexOf('?')
+      let query = index >= 0 ? url.slice(index + 1) : ''
+      let name = new URLSearchParams(query).get('dn')
+      return _.isEmpty(name) ? '磁力链接' : `${name}（磁力）`
+    },
+    httpLinkText(url) {
+      let parsed = null
+      try {
+        parsed = new URL(url)
+      } catch (ex) {
+        return url
+      }
+      let segments = parsed.pathname.split('/').filter(x => !_.isEmpty(x))
+      let segment = segments.length > 0 ? segments[segments.length - 1] : ''
+      if (_.isEmpty(segment)) {
+        return parsed.hostname || url
+      }
+      try {
+        return decodeURIComponent(segment)
+      } catch (ex) {
+        return segment
+      }
+    },
     onStoryRendered(dom) {
       this.setupImageProxy(dom)
       this.setupImageViewer(dom)
@@ -271,6 +324,29 @@ export default {
 
 .story-link {
   white-space: nowrap;
+  color: @antBlue;
+  font-size: 14 * @pr;
+  line-height: 1.25;
+}
+
+.info-item-enclosure {
+  align-items: flex-start;
+}
+
+.enclosure-links {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 16 * @pr;
+  row-gap: 2 * @pr;
+}
+
+.enclosure-link {
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   color: @antBlue;
   font-size: 14 * @pr;
   line-height: 1.25;
