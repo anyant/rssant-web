@@ -20,8 +20,8 @@
       :end-offset="endOffset"
       :total="feed.total_storys"
       :load="loadStorys"
-      :jump="onJump"
-      :enableUnreadPad="true"
+      :jump="isNewFirst ? null : onJump"
+      :enable-unread-pad="!isNewFirst"
     >
       <MoStoryItem
         v-for="story in storyList"
@@ -56,10 +56,12 @@ import { pageStore } from '@/store/page'
 export default {
   components: { MoBackHeader, MoLayout, MoStoryItem, MoScrollList, MoReadedButton },
   data() {
+    // 在组件创建时就取恢复位置：mescroll 的 init 早于 mounted，晚取会按默认位置滚动
+    let page = pageStore.getPage(`/feed?id=${this.$route.query.id}`)
     return {
       storyOpened: {},
       readingStoryOffset: null,
-      restoreOffset: null,
+      restoreOffset: _.isNil(page) ? null : page.topOffset,
       keyboard: Keyboard(),
     }
   },
@@ -119,9 +121,18 @@ export default {
         return story.is_read || story.offset < feed.story_offset
       }
     },
+    lastReadingOffset() {
+      let page = pageStore.getPage(this.viewKey)
+      return _.isNil(page) ? null : page.readingOffset
+    },
     isReading() {
       let feed = this.feed
+      let lastReadingOffset = this.lastReadingOffset
       return (story) => {
+        if (this.isNewFirst) {
+          // 先看最新：未读游标不动，用最后打开的文章高亮
+          return !_.isNil(lastReadingOffset) && story.offset === lastReadingOffset
+        }
         let isReading = !_.isNil(this.readingStoryOffset) && story.offset === this.readingStoryOffset
         let isLastOpened = story.offset === feed.story_offset - 1
         return isReading || isLastOpened
@@ -129,8 +140,6 @@ export default {
     },
   },
   async mounted() {
-    let page = pageStore.getPage(this.viewKey)
-    this.restoreOffset = _.isNil(page) ? null : page.topOffset
     if (_.isNil(this.feed)) {
       await feedStore.load({ feedId: this.feedId })
     }
@@ -163,7 +172,10 @@ export default {
     onRead(story) {
       let scrollList = this.$refs.scrollList
       let topOffset = _.isNil(scrollList) ? null : scrollList.getTopOffset()
-      pageStore.setPage(this.viewKey, { topOffset: topOffset })
+      pageStore.setPage(this.viewKey, {
+        topOffset: topOffset,
+        readingOffset: story.offset,
+      })
       this.readingStoryOffset = story.offset
     },
     setAllReaded() {

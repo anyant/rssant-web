@@ -17,7 +17,14 @@
       <span v-else-if="prevLoadError">加载失败，点击重试</span>
       <span v-else>加载更早的文章</span>
     </div>
-    <mescroll ref="mescroll" class="mescroll" :down="mescrollDown" :up="mescrollUp" @init="mescrollInit">
+    <mescroll
+      ref="mescroll"
+      class="mescroll"
+      :class="{ 'has-load-prev': !reversed }"
+      :down="mescrollDown"
+      :up="mescrollUp"
+      @init="mescrollInit"
+    >
       <div class="item-list">
         <slot></slot>
       </div>
@@ -46,6 +53,7 @@ import { antBlue } from '@/plugin/common'
 
 const MIN_PAD_HEIGHT = 52
 const ITEM_LIST_PADDING = 2
+const LOAD_PREV_HEIGHT = 40
 
 export default {
   props: {
@@ -171,11 +179,15 @@ export default {
       let delta = (this.total - endOffset) / this.numPageItems
       return Math.floor(Math.max(0, delta))
     },
+    contentFits() {
+      // 内容不足一屏时无法滚动，直接露出「加载更早」，否则更早的文章加载不出来
+      return this.items.length * this.itemSize <= this.pageSize - LOAD_PREV_HEIGHT
+    },
     showLoadPrev() {
       if (this.reversed || !this.hasPrev || this.items.length <= 0) {
         return false
       }
-      return this.isScrolled
+      return this.isScrolled || this.contentFits
     },
     needJump() {
       if (_.isNil(this.jump)) {
@@ -222,7 +234,8 @@ export default {
       if (unreadCount <= 0) {
         return
       }
-      let padHeight = this.pageSize - unreadCount * this.itemSize - ITEM_LIST_PADDING
+      let loadPrevHeight = this.reversed ? 0 : LOAD_PREV_HEIGHT
+      let padHeight = this.pageSize - loadPrevHeight - unreadCount * this.itemSize - ITEM_LIST_PADDING
       if (padHeight <= MIN_PAD_HEIGHT) {
         return
       }
@@ -261,15 +274,16 @@ export default {
       this.updateScrollTop(initOffset)
     },
     updateScrollTop(offset) {
-      let scrollTop = 0
+      // 按列表方向定位：顺序列表里目标行上方是更小的 offset，倒序列表里是更大的 offset
+      let index = 0
       for (let item of this.items) {
-        if (item.offset < offset) {
-          scrollTop += this.itemSize
-        } else {
+        let isAbove = this.reversed ? item.offset > offset : item.offset < offset
+        if (!isAbove) {
           break
         }
+        index += 1
       }
-      this.mescroll.setScrollTop(scrollTop)
+      this.mescroll.setScrollTop(index * this.itemSize)
     },
     loadPrev() {
       if (this.isPrevLoading || !this.hasPrev || this.items.length <= 0) {
@@ -345,7 +359,8 @@ export default {
       this.loadNext()
     },
     onScroll(mescroll, y, isUp) {
-      this.isScrolled = y > 80
+      // 顶部预留了「加载更早」的位置，滚动一下就自然露出
+      this.isScrolled = y > 0
       if (!isUp || this.isNextLoading || !this.hasNext || this.items.length <= 0) {
         return
       }
@@ -376,6 +391,11 @@ export default {
   bottom: 0;
   height: auto;
   max-width: @maxWidth;
+}
+
+// 旧的在前：顶部固定留出「加载更早的文章」的位置，吸顶条不会压住当前行
+.mescroll.has-load-prev {
+  top: 40 * @pr;
 }
 
 .item-list {

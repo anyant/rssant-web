@@ -162,6 +162,8 @@ export default {
       if (!_.isEmpty(this.story.link) && (this.isCtrlKeyHold || isPoorContent)) {
         this.openLinkInNewTab()
       } else if (!_.isEmpty(this.routerLink)) {
+        // 点标题/「>>>」进文章页也要记录当前位置，返回时才能恢复
+        this.$emit('read')
         this.$router.push(this.routerLink)
       }
     },
