@@ -5,7 +5,11 @@
 </template>
 
 <script>
+import MoLayout from '@/components/MoLayout.vue'
+import MoStoryReader from '@/components/MoStoryReader.vue'
+
 export default {
+  components: { MoLayout, MoStoryReader },
   computed: {
     feedId() {
       return this.$route.query.feed
