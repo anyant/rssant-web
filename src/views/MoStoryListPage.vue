@@ -22,7 +22,7 @@
       :load="loadStorys"
       :jump="isNewFirst ? null : onJump"
       :enable-unread-pad="!isNewFirst"
-      :load-prev-enabled="!isNewFirst"
+      :load-prev-enabled="!isNewFirst && isDesktop"
     >
       <MoStoryItem
         v-for="story in storyList"
@@ -106,6 +106,10 @@ export default {
     },
     isNewFirst() {
       return isNewFirst()
+    },
+    isDesktop() {
+      // 手机有下拉加载，列表里不再重复一个「加载更早」入口，否则短列表会默认露出来顶掉第一行
+      return window.matchMedia('(hover: hover) and (pointer: fine)').matches
     },
     initOffset() {
       if (!_.isNil(this.restoreOffset)) {
