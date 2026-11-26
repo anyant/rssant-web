@@ -5,7 +5,7 @@
     </MoBackHeader>
     <div class="creation-info" v-if="creation">
       <MoFeedDetailInfoItem name="URL" :value="creation.url" />
-      <MoFeedDetailInfoItem name="状态" :value="creation.status" />
+      <MoFeedDetailInfoItem name="状态" :value="statusText" />
       <MoFeedDetailInfoItem name="分组" :value="groupName" />
       <MoFeedDetailInfoItem
         v-if="feedLink"
@@ -15,6 +15,10 @@
         :value="feedTitle"
       />
       <MoFeedDetailInfoItem name="创建时间" :value="dateText" />
+      <div class="creation-error" v-if="showErrorMessage">
+        <fa-icon class="creation-error-icon" icon="exclamation-circle" :size="14" />
+        <div class="creation-error-text">{{ errorMessage }}</div>
+      </div>
       <div class="message-title">
         <div class="message-title-line"></div>
         <span class="message-title-text">日志信息</span>
@@ -33,6 +37,13 @@ import { formatFullDateFriendly } from '@/plugin/datefmt'
 import { getGroupName } from '@/plugin/feedGroupHelper'
 import { rootStore } from '@/store/root'
 import { feedStore } from '@/store/feed'
+
+const STATUS_TEXT_MAP = {
+  pending: '等待查找',
+  updating: '正在查找',
+  ready: '已添加',
+  error: '添加失败',
+}
 
 export default {
   components: { MoBackHeader, MoLayout, MoFeedDetailInfoItem },
@@ -61,6 +72,25 @@ export default {
     },
     dateText() {
       return formatFullDateFriendly(this.creation && this.creation.dt_created)
+    },
+    statusText() {
+      if (_.isNil(this.creation)) {
+        return ''
+      }
+      return _.defaultTo(STATUS_TEXT_MAP[this.creation.status], this.creation.status)
+    },
+    errorMessage() {
+      if (_.isNil(this.creation)) {
+        return ''
+      }
+      return _.defaultTo(this.creation.error_message, '')
+    },
+    showErrorMessage() {
+      return (
+        !_.isNil(this.creation) &&
+        this.creation.status === 'error' &&
+        !_.isEmpty(this.errorMessage)
+      )
     },
     feedId() {
       if (_.isNil(this.creation) || _.isEmpty(this.creation.feed_id)) {
@@ -109,6 +139,28 @@ export default {
   padding-left: 16 * @pr;
   padding-right: 16 * @pr;
   padding-bottom: 16 * @pr;
+}
+
+.creation-error {
+  display: flex;
+  align-items: flex-start;
+  margin-top: 16 * @pr;
+  padding: 12 * @pr 16 * @pr;
+  background: mix(@antRed, @antBackWhite, 8%);
+  border-radius: 4 * @pr;
+}
+
+.creation-error-icon {
+  flex-shrink: 0;
+  margin-top: 3 * @pr;
+  margin-right: 8 * @pr;
+  color: @antRed;
+}
+
+.creation-error-text {
+  font-size: 14 * @pr;
+  line-height: 24 * @pr;
+  color: @antTextSemi;
 }
 
 .message {
