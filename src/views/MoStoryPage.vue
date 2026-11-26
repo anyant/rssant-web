@@ -17,34 +17,34 @@
         >
           <fa-icon size="18" v-if="!isFetchLoading" icon="ellipsis-h" />
         </mu-button>
+        <mu-list
+          class="action-menu-list"
+          :class="{ 'is-keyboard': isMenuKeyboard }"
+          ref="actionMenuListRef"
+          v-show="isMenuOpen"
+          role="menu"
+          @keydown.native="onMenuKeydown"
+        >
+          <mu-list-item
+            button
+            role="menuitem"
+            tabindex="0"
+            data-menu-action="font"
+            @click="openReadingFont"
+          >
+            <mu-list-item-title>阅读字号</mu-list-item-title>
+          </mu-list-item>
+          <mu-list-item
+            button
+            role="menuitem"
+            tabindex="0"
+            data-menu-action="fetch"
+            @click="onFetchFulltextFromMenu"
+          >
+            <mu-list-item-title>抓取全文</mu-list-item-title>
+          </mu-list-item>
+        </mu-list>
       </div>
-      <mu-list
-        class="action-menu-list"
-        :class="{ 'is-keyboard': isMenuKeyboard }"
-        ref="actionMenuListRef"
-        v-show="isMenuOpen"
-        role="menu"
-        @keydown.native="onMenuKeydown"
-      >
-        <mu-list-item
-          button
-          role="menuitem"
-          tabindex="0"
-          data-menu-action="font"
-          @click="openReadingFont"
-        >
-          <mu-list-item-title>阅读字号</mu-list-item-title>
-        </mu-list-item>
-        <mu-list-item
-          button
-          role="menuitem"
-          tabindex="0"
-          data-menu-action="fetch"
-          @click="onFetchFulltextFromMenu"
-        >
-          <mu-list-item-title>抓取全文</mu-list-item-title>
-        </mu-list-item>
-      </mu-list>
       <mu-button
         icon
         class="action-favorited"
@@ -356,36 +356,15 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 @import '~@/styles/common';
-
-.story {
-  background: #ffffff;
-}
-
-.action-menu-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  margin-right: 16 * @pr;
-}
-
-.action-more,
-.action-favorited {
-  position: relative;
-  right: -4 * @pr;
-  width: 32 * @pr;
-  height: 32 * @pr;
-  color: @antTextBlack;
-}
 
 .action-menu-list {
   .header-menu-popover;
 
-  // 菜单挂在头部下方 8px，右边缘和 ⋯ 按钮对齐（头部右内边距 16 + 按钮 32 + 间距 16 − 按钮右移 4）
-  // 百分比以头部 padding box 计算，头部还有 1px 底边，所以是 +9
-  top: calc(100% + 9 * @pr) !important;
-  right: 60 * @pr;
+  // 菜单挂在 ⋯ 按钮下方 8px（按钮高 32 + 距头顶部 16 的视觉留白 → 17），右边缘和按钮对齐
+  top: calc(100% + 17 * @pr) !important;
+  right: -4 * @pr;
   min-width: 112 * @pr;
   overflow: hidden;
 
@@ -412,4 +391,29 @@ export default {
     transform: translateY(0);
   }
 }
+</style>
+
+<style lang="less" scoped>
+@import '~@/styles/common';
+
+.story {
+  background: #ffffff;
+}
+
+.action-menu-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-right: 16 * @pr;
+}
+
+.action-more,
+.action-favorited {
+  position: relative;
+  right: -4 * @pr;
+  width: 32 * @pr;
+  height: 32 * @pr;
+  color: @antTextBlack;
+}
+
 </style>
