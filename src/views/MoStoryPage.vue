@@ -171,6 +171,10 @@ export default {
       return this.$el.querySelector('.story-image-viewer')
     },
     onMoreClick(event) {
+      // 抓取全文时 ⋯ 只显示进度，不展开菜单
+      if (this.isFetchLoading) {
+        return
+      }
       // 键盘触发的 click，detail 为 0
       this.toggleMenu(event.detail === 0)
     },
