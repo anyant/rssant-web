@@ -30,6 +30,14 @@ export const userStore = hamiVuex.store({
   LOGIN(loginUser) {
     this.$patch({ loginUser: loginUser })
   },
+  SET_TOKEN(token) {
+    localConfig.LOGIN_TOKEN.set(token)
+    if (!_.isNil(this.loginUser)) {
+      this.$patch(state => {
+        state.loginUser.token = token
+      })
+    }
+  },
   CONFIGURE_PASSWORD() {
     if (!_.isNil(this.loginUser)) {
       this.$patch(state => {

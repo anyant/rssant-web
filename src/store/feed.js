@@ -475,7 +475,7 @@ export const feedStore = hamiVuex.store({
     return this._handleImportedFeedResult(data)
   },
   exportOPML({ download } = {}) {
-    API.feed.exportOPML({ download })
+    return API.feed.exportOPML({ download })
   },
   async setStoryOffset({ feedId, offset }) {
     if (this.get(feedId).story_offset !== offset) {

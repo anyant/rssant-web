@@ -66,6 +66,9 @@ module.exports = {
       '/changelog': {
         target: 'http://127.0.0.1:6788',
       },
+      '/docs': {
+        target: 'http://127.0.0.1:6788',
+      },
     },
   },
 }

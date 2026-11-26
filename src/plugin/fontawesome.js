@@ -34,6 +34,7 @@ faLibrary.add(fas.faAngleDown)
 faLibrary.add(fas.faBox)
 faLibrary.add(fas.faTimes)
 faLibrary.add(fas.faSearch)
+faLibrary.add(fas.faDownload)
 
 /**
  * solid icons:
