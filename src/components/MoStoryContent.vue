@@ -2,7 +2,7 @@
   <div class="story-content">
     <div class="story-wrapper" :style="wrapperStyle">
       <div class="story-info" v-if="story">
-        <div id="story-info-title" class="info-title" v-story="titleForRender"></div>
+        <div id="story-info-title" class="info-title" :style="titleStyle" v-story="titleForRender"></div>
         <div class="info-item">
           <span class="info-item-name">原文：</span>
           <a class="info-item-content story-link" :href="story.link" target="_blank">{{ storyLinkUnquoted }}</a>
@@ -37,7 +37,7 @@
           <iframe :src="story.iframe_url" scrolling="no" border="0" frameborder="no" framespacing="0"
             allowfullscreen="true" referrerpolicy="no-referrer"></iframe>
         </div>
-        <div id="story-markdown-body" class="markdown-body" v-story="storyForRender"></div>
+        <div id="story-markdown-body" class="markdown-body" :style="contentStyle" v-story="storyForRender"></div>
       </div>
     </div>
     <transition name="fade">
@@ -61,6 +61,7 @@ import * as ImageHelper from '@/plugin/image'
 import MoAudioPlayer from '@/components/MoAudioPlayer'
 import 'viewerjs/dist/viewer.css'
 import Viewer from 'viewerjs'
+import reading, { READING_TITLE_OFFSET } from '@/plugin/reading'
 import { imageProxyStore } from '@/store/imageProxy'
 
 export default {
@@ -116,6 +117,12 @@ export default {
       return urls
         .filter(url => _.isString(url) && !_.isEmpty(url))
         .map(url => ({ url, text: this.enclosureLinkText(url) }))
+    },
+    titleStyle() {
+      return { fontSize: `${reading.fontSize + READING_TITLE_OFFSET}px` }
+    },
+    contentStyle() {
+      return { fontSize: `${reading.fontSize}px` }
     },
     nextTitle() {
       if (_.isNil(this.nextStory)) {
