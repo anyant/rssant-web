@@ -205,6 +205,9 @@ function addOrUpdateCreation(state, creation) {
   if (!_.isNil(old) && _.isEmpty(creation.message)) {
     creation.message = old.message
   }
+  if (!_.isNil(old) && _.isEmpty(creation.error_message)) {
+    creation.error_message = old.error_message
+  }
   Vue.set(state.creations, creation.id, creation)
 }
 
@@ -442,7 +445,10 @@ export const feedStore = hamiVuex.store({
               clearInterval(token)
             }, 3500)
             feedStore.load({ feedId: creation.feed_id, detail: true })
-          } else if (creation.status === 'error' || numTry <= 0) {
+          } else if (creation.status === 'error') {
+            clearInterval(token)
+            this.loadCreation({ creationId, detail: true })
+          } else if (numTry <= 0) {
             clearInterval(token)
           }
         })
