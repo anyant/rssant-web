@@ -1,6 +1,6 @@
 <template>
   <MoLayout grey header>
-    <MoBackHeader border>
+    <MoBackHeader border :is-home="readerMode">
       <template v-slot:title>{{ numUnreadText }}{{ feedTitle }}</template>
       <MoReadedButton @click="setAllReaded" class="action-readed"></MoReadedButton>
       <mu-button icon class="action-detail" @click="goFeedDetail">
@@ -24,9 +24,13 @@
       <MoStoryItem
         v-for="story in storyList"
         :key="story.offset"
-        :isOpened.sync="storyOpened[story.offset]"
+        :class="{ 'reader-active': isCurrentStory(story) }"
+        :solo="readerMode"
+        :isOpened="!readerMode && storyOpened[story.offset]"
+        @update:isOpened="onUpdateOpened(story, $event)"
+        @click="onSelectStory(story)"
         :isReaded="isReaded(story)"
-        :isReading="isReading(story)"
+        :isReading="!readerMode && isReading(story)"
         :isFavorited="story.is_favorited"
         :feedId="feedId"
         :offset="story.offset"
@@ -60,6 +64,13 @@ export default {
     }
   },
   computed: {
+    readerMode() {
+      return this.$LAYOUT.isReader
+    },
+    readerOffset() {
+      let offset = parseInt(this.$route.query.offset)
+      return Number.isNaN(offset) ? null : offset
+    },
     feedId() {
       return this.$route.query.id
     },
@@ -121,6 +132,24 @@ export default {
     this.keyboard.destroy()
   },
   methods: {
+    isCurrentStory(story) {
+      return this.readerMode && story.feed.id === this.feedId && story.offset === this.readerOffset
+    },
+    onUpdateOpened(story, isOpened) {
+      if (this.readerMode) {
+        return
+      }
+      this.$set(this.storyOpened, story.offset, isOpened)
+    },
+    onSelectStory(story) {
+      if (!this.readerMode) {
+        return
+      }
+      this.$router.push({
+        path: this.$route.path,
+        query: { ...this.$route.query, feed: story.feed.id, offset: story.offset },
+      })
+    },
     getNextStoryInfo({ feedId, offset }) {
       let story = storyStore.get({ feedId, offset: offset + 1 })
       return { story, shouldLoadNext: true }
@@ -179,5 +208,9 @@ export default {
 
 .story-item {
   margin-top: 8 * @pr;
+}
+
+.story-item.reader-active {
+  background: #eef4f8;
 }
 </style>

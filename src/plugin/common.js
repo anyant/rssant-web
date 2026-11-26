@@ -33,6 +33,8 @@ function computeLayout(windowInnerWidth) {
   }
   const hasBoard = mode === 'board' || mode === 'wide'
   const isWide = mode === 'wide'
+  // 三栏阅读：窗口够宽时同时显示订阅、列表、正文
+  const isReader = appWidth >= 1280
   const mainWidth = Math.max(320, Math.min(480, Math.round(appWidth / 2.618)))
   const boardWidth = appWidth - mainWidth
   return {
@@ -43,6 +45,7 @@ function computeLayout(windowInnerWidth) {
     mainWidth: hasBoard ? mainWidth : appWidth,
     boardWidth: hasBoard ? boardWidth : 0,
     isWide: isWide,
+    isReader: isReader,
   }
 }
 

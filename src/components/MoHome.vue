@@ -47,6 +47,32 @@
       </div>
     </MoHeader>
     <div class="main" ref="mainRef">
+      <div class="reader-feed-list" v-if="reader && isReady && !isEmpty">
+        <template v-for="item in readerItems">
+          <MoFeedGroupItem
+            v-if="item.kind === 'group'"
+            :key="item.key"
+            class="reader-group-item"
+            :class="{ 'reader-group-active': item.link === currentListLink }"
+            :title="item.title"
+            :number="item.number"
+            :date="item.date"
+            :link="item.link"
+            :routeTo="routeTo"
+          ></MoFeedGroupItem>
+          <MoFeedItem
+            v-else
+            :key="item.key"
+            class="reader-feed-item"
+            :class="{ 'reader-feed-active': item.feed.id === currentFeedId }"
+            :title="item.feed.title"
+            :number="item.feed.num_unread_storys"
+            :date="item.feed.dt_latest_story_published || item.feed.dt_created"
+            :link="'/feed?id=' + item.feed.id"
+            :routeTo="routeTo"
+          ></MoFeedItem>
+        </template>
+      </div>
       <div class="list-placeholder-wrapper" v-if="!isReady">
         <div class="list-placeholder spinner">
           <div class="bounce1"></div>
@@ -68,6 +94,7 @@
         </div>
       </transition>
       <transition-group
+        v-if="!reader"
         class="list list-upper"
         name="list"
         tag="div"
@@ -84,6 +111,7 @@
         ></MoFeedVirtualItem>
       </transition-group>
       <transition-group
+        v-if="!reader"
         class="list list-lower"
         name="list"
         tag="div"
@@ -110,6 +138,8 @@ import _ from 'lodash'
 import MoHeader from '@/components/MoHeader'
 import MoDebugTool from '@/components/MoDebugTool'
 import MoFeedVirtualItem from '@/components/MoFeedVirtualItem.vue'
+import MoFeedItem from '@/components/MoFeedItem.vue'
+import MoFeedGroupItem from '@/components/MoFeedGroupItem.vue'
 import MoReadedButton from '@/components/MoReadedButton.vue'
 import MoHeaderTip from '@/components/MoHeaderTip.vue'
 
@@ -125,11 +155,16 @@ const ITEM_HEIGHT = 48
 const PAGE_SIZE = Math.ceil(window.innerHeight / ITEM_HEIGHT)
 
 export default {
-  components: { MoHeader, MoDebugTool, MoFeedVirtualItem, MoReadedButton, MoHeaderTip },
+  components: { MoHeader, MoDebugTool, MoFeedVirtualItem, MoReadedButton, MoHeaderTip, MoFeedItem, MoFeedGroupItem },
   props: {
     vid: {
       type: String,
       default: '/',
+    },
+    // 三栏阅读的左栏：分组下直接列出订阅
+    reader: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -149,6 +184,49 @@ export default {
     }
   },
   computed: {
+    currentFeedId() {
+      return this.$route.query.id || null
+    },
+    currentListLink() {
+      let query = this.$route.query
+      if (this.$route.name === 'Mushroom') {
+        return '/mushroom'
+      }
+      if (this.$route.name === 'FeedGroup') {
+        return `/group?name=${query.name}`
+      }
+      return null
+    },
+    readerItems() {
+      let items = []
+      for (let group of this.groups) {
+        items.push({
+          key: `group:${group.title}`,
+          kind: 'group',
+          title: group.title,
+          number: group.getNumber(),
+          date: group.getDate(),
+          link: group.link,
+        })
+        if (group.title === '品读') {
+          continue
+        }
+        let feedGroup = feedStore.getGroupByName(group.title)
+        for (let feed of feedStore.feedListOfGroup(feedGroup)) {
+          if (_.isNil(feed)) {
+            continue
+          }
+          items.push({ key: feed.id, kind: 'feed', feed: feed })
+        }
+      }
+      for (let feed of this.feedList) {
+        if (_.isNil(feed)) {
+          continue
+        }
+        items.push({ key: feed.id, kind: 'feed', feed: feed })
+      }
+      return items
+    },
     groups() {
       if (this.isEmpty) {
         return []
@@ -454,6 +532,23 @@ export default {
 
 <style lang="less" scoped>
 @import '~@/styles/common';
+
+.reader-feed-list {
+  padding-bottom: 8 * @pr;
+}
+
+.reader-group-item {
+  margin-top: 12 * @pr;
+}
+
+.reader-feed-item {
+  margin-top: 2 * @pr;
+}
+
+.reader-feed-active,
+.reader-group-active {
+  background: #eef4f8;
+}
 
 .title {
   color: @antTextBlack;
