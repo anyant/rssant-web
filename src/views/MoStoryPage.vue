@@ -17,34 +17,34 @@
         >
           <fa-icon size="18" v-if="!isFetchLoading" icon="ellipsis-h" />
         </mu-button>
-        <mu-list
-          class="action-menu-list"
-          :class="{ 'is-keyboard': isMenuKeyboard }"
-          ref="actionMenuListRef"
-          v-show="isMenuOpen"
-          role="menu"
-          @keydown.native="onMenuKeydown"
-        >
-          <mu-list-item
-            button
-            role="menuitem"
-            tabindex="0"
-            data-menu-action="font"
-            @click="openReadingFont"
-          >
-            <mu-list-item-title>阅读字号</mu-list-item-title>
-          </mu-list-item>
-          <mu-list-item
-            button
-            role="menuitem"
-            tabindex="0"
-            data-menu-action="fetch"
-            @click="onFetchFulltextFromMenu"
-          >
-            <mu-list-item-title>抓取全文</mu-list-item-title>
-          </mu-list-item>
-        </mu-list>
       </div>
+      <mu-list
+        class="action-menu-list"
+        :class="{ 'is-keyboard': isMenuKeyboard }"
+        ref="actionMenuListRef"
+        v-show="isMenuOpen"
+        role="menu"
+        @keydown.native="onMenuKeydown"
+      >
+        <mu-list-item
+          button
+          role="menuitem"
+          tabindex="0"
+          data-menu-action="font"
+          @click="openReadingFont"
+        >
+          <mu-list-item-title>阅读字号</mu-list-item-title>
+        </mu-list-item>
+        <mu-list-item
+          button
+          role="menuitem"
+          tabindex="0"
+          data-menu-action="fetch"
+          @click="onFetchFulltextFromMenu"
+        >
+          <mu-list-item-title>抓取全文</mu-list-item-title>
+        </mu-list-item>
+      </mu-list>
       <mu-button
         icon
         class="action-favorited"
@@ -382,9 +382,10 @@ export default {
 .action-menu-list {
   .header-menu-popover;
 
-  // 菜单锚在 ⋯ 上，右边缘和按钮对齐
-  top: calc(100% + 8 * @pr) !important;
-  right: -4 * @pr;
+  // 菜单挂在头部下方 8px，右边缘和 ⋯ 按钮对齐（头部右内边距 16 + 按钮 32 + 间距 16 − 按钮右移 4）
+  // 百分比以头部 padding box 计算，头部还有 1px 底边，所以是 +9
+  top: calc(100% + 9 * @pr) !important;
+  right: 60 * @pr;
   min-width: 112 * @pr;
   overflow: hidden;
 
