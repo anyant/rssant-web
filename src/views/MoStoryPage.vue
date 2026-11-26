@@ -359,7 +359,8 @@ export default {
 <style lang="less">
 @import '~@/styles/common';
 
-.action-menu-list {
+// 限定在阅读页，避免影响首页同名的下拉菜单
+.story .action-menu-list {
   .header-menu-popover;
 
   // 菜单挂在 ⋯ 按钮下方 8px（按钮高 32 + 距头顶部 16 的视觉留白 → 17），右边缘和按钮对齐
