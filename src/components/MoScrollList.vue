@@ -106,6 +106,7 @@ export default {
       isScrolled: false,
       prevLoadError: false,
       isLoadPrevByButton: false,
+      contentOverflow: false,
       mescrollDown: {
         auto: false,
         callback: this.onMescrolDown,
@@ -179,15 +180,12 @@ export default {
       let delta = (this.total - endOffset) / this.numPageItems
       return Math.floor(Math.max(0, delta))
     },
-    contentFits() {
-      // 内容不足一屏时无法滚动，直接露出「加载更早」，否则更早的文章加载不出来
-      return this.items.length * this.itemSize <= this.pageSize - LOAD_PREV_HEIGHT
-    },
     showLoadPrev() {
       if (this.reversed || !this.hasPrev || this.items.length <= 0) {
         return false
       }
-      return this.isScrolled || this.contentFits
+      // 内容不足一屏时滚不动，直接露出「加载更早」，否则更早的文章加载不出来
+      return this.isScrolled || !this.contentOverflow
     },
     needJump() {
       if (_.isNil(this.jump)) {
@@ -201,7 +199,16 @@ export default {
     },
   },
   methods: {
+    updateContentOverflow() {
+      this.$nextTick(() => {
+        let el = this.$el && this.$el.querySelector('.mescroll')
+        if (!_.isNil(el)) {
+          this.contentOverflow = el.scrollHeight > el.clientHeight + 1
+        }
+      })
+    },
     endSuccess(prevItemsLength) {
+      this.updateContentOverflow();
       prevItemsLength = _.defaultTo(prevItemsLength, 0)
       let dataSize = this.items.length - prevItemsLength
       this.mescroll.endSuccess(dataSize, this.hasNext)
