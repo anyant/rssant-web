@@ -5,6 +5,7 @@ const CONFIGS = {
   DEBUG: { defaultValue: false },
   PWA_ENABLE: { defaultValue: false },
   HELP_READED: { defaultValue: false },
+  READING_FONT_SIZE: { defaultValue: 15 },
   HAS_LOGIN_HISTORY: { defaultValue: false },
   VIP_NOTICED_TIMESTAMP: { defaultValue: 0 },
   LOGIN_TOKEN: { defaultValue: null },
