@@ -22,6 +22,7 @@
       :load="loadStorys"
       :jump="isNewFirst ? null : onJump"
       :enable-unread-pad="!isNewFirst"
+      :load-prev-enabled="!isNewFirst"
     >
       <MoStoryItem
         v-for="story in storyList"

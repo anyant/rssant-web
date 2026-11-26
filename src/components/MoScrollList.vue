@@ -8,24 +8,13 @@
         </mu-button>
       </div>
     </transition>
-    <div
-      v-if="showLoadPrev"
-      class="load-prev"
-      @click="loadPrevByButton"
-    >
-      <span v-if="isPrevLoading">加载中…</span>
-      <span v-else-if="prevLoadError">加载失败，点击重试</span>
-      <span v-else>加载更早的文章</span>
-    </div>
-    <mescroll
-      ref="mescroll"
-      class="mescroll"
-      :class="{ 'has-load-prev': !reversed }"
-      :down="mescrollDown"
-      :up="mescrollUp"
-      @init="mescrollInit"
-    >
+    <mescroll ref="mescroll" class="mescroll" :down="mescrollDown" :up="mescrollUp" @init="mescrollInit">
       <div class="item-list">
+        <div v-if="showLoadPrev" class="load-prev" @click="loadPrevByButton">
+          <span v-if="isPrevLoading">加载中…</span>
+          <span v-else-if="prevLoadError">加载失败，点击重试</span>
+          <span v-else>加载更早的文章</span>
+        </div>
         <slot></slot>
       </div>
     </mescroll>
@@ -94,6 +83,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    loadPrevEnabled: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     let pageSize = window.innerHeight - 48
@@ -103,10 +96,8 @@ export default {
       numPageItems: numPageItems,
       isPrevLoading: false,
       isNextLoading: false,
-      isScrolled: false,
       prevLoadError: false,
       isLoadPrevByButton: false,
-      contentOverflow: false,
       mescrollDown: {
         auto: false,
         callback: this.onMescrolDown,
@@ -181,11 +172,10 @@ export default {
       return Math.floor(Math.max(0, delta))
     },
     showLoadPrev() {
-      if (this.reversed || !this.hasPrev || this.items.length <= 0) {
+      if (!this.loadPrevEnabled || this.reversed || !this.hasPrev || this.items.length <= 0) {
         return false
       }
-      // 内容不足一屏时滚不动，直接露出「加载更早」，否则更早的文章加载不出来
-      return this.isScrolled || !this.contentOverflow
+      return true
     },
     needJump() {
       if (_.isNil(this.jump)) {
@@ -199,16 +189,7 @@ export default {
     },
   },
   methods: {
-    updateContentOverflow() {
-      this.$nextTick(() => {
-        let el = this.$el && this.$el.querySelector('.mescroll')
-        if (!_.isNil(el)) {
-          this.contentOverflow = el.scrollHeight > el.clientHeight + 1
-        }
-      })
-    },
     endSuccess(prevItemsLength) {
-      this.updateContentOverflow();
       prevItemsLength = _.defaultTo(prevItemsLength, 0)
       let dataSize = this.items.length - prevItemsLength
       this.mescroll.endSuccess(dataSize, this.hasNext)
@@ -241,8 +222,7 @@ export default {
       if (unreadCount <= 0) {
         return
       }
-      let loadPrevHeight = this.reversed ? 0 : LOAD_PREV_HEIGHT
-      let padHeight = this.pageSize - loadPrevHeight - unreadCount * this.itemSize - ITEM_LIST_PADDING
+      let padHeight = this.pageSize - this.loadPrevHeight() - unreadCount * this.itemSize - ITEM_LIST_PADDING
       if (padHeight <= MIN_PAD_HEIGHT) {
         return
       }
@@ -290,7 +270,14 @@ export default {
         }
         index += 1
       }
-      this.mescroll.setScrollTop(index * this.itemSize)
+      let el = this.$el && this.$el.querySelector('.mescroll')
+      let maxScroll = _.isNil(el) ? 0 : el.scrollHeight - el.clientHeight
+      let scrollTop = this.loadPrevHeight() + index * this.itemSize
+      if (maxScroll < this.loadPrevHeight()) {
+        // 内容不足一屏时滚不动，停在顶部，别把「加载更早」那一行截掉
+        scrollTop = 0
+      }
+      this.mescroll.setScrollTop(scrollTop)
     },
     loadPrev() {
       if (this.isPrevLoading || !this.hasPrev || this.items.length <= 0) {
@@ -308,7 +295,7 @@ export default {
       this.load({ offset, size: this.numPageItems }).then(() => {
         if (this.isLoadPrevByButton && this.mescroll) {
           this.$nextTick(() => {
-            this.mescroll.setScrollTop(0)
+            this.mescroll.setScrollTop(this.loadPrevHeight())
           })
         }
       }).catch(() => {
@@ -320,11 +307,14 @@ export default {
         this.mescroll.endDownScroll()
       })
     },
+    loadPrevHeight() {
+      return this.showLoadPrev ? LOAD_PREV_HEIGHT : 0
+    },
     getTopOffset() {
       if (!this.mescroll || this.items.length <= 0) {
         return null
       }
-      let y = this.mescroll.getScrollTop()
+      let y = Math.max(0, this.mescroll.getScrollTop() - this.loadPrevHeight())
       let index = Math.floor(y / this.itemSize)
       index = Math.min(Math.max(0, index), this.items.length - 1)
       let item = this.items[index]
@@ -366,8 +356,6 @@ export default {
       this.loadNext()
     },
     onScroll(mescroll, y, isUp) {
-      // 顶部预留了「加载更早」的位置，滚动一下就自然露出
-      this.isScrolled = y > 0
       if (!isUp || this.isNextLoading || !this.hasNext || this.items.length <= 0) {
         return
       }
@@ -400,11 +388,6 @@ export default {
   max-width: @maxWidth;
 }
 
-// 旧的在前：顶部固定留出「加载更早的文章」的位置，吸顶条不会压住当前行
-.mescroll.has-load-prev {
-  top: 40 * @pr;
-}
-
 .item-list {
   padding-bottom: 2 * @pr;
 }
@@ -422,17 +405,11 @@ export default {
 }
 
 .load-prev {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
   height: 40 * @pr;
-  z-index: 998;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: fade(#ffffff, 96%);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  background: #ffffff;
   color: @antBlue;
   font-size: 14 * @pr;
   cursor: pointer;
