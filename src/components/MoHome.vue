@@ -53,7 +53,7 @@
             v-if="item.kind === 'group'"
             :key="item.key"
             class="reader-group-item"
-            :class="{ 'reader-group-active': item.link === currentListLink }"
+            :class="{ 'reader-group-active': isCurrentGroup(item) }"
             :title="item.title"
             :number="item.number"
             :date="item.date"
@@ -187,15 +187,11 @@ export default {
     currentFeedId() {
       return this.$route.query.id || null
     },
-    currentListLink() {
-      let query = this.$route.query
-      if (this.$route.name === 'Mushroom') {
-        return '/mushroom'
+    currentGroupName() {
+      if (this.$route.name !== 'FeedGroup') {
+        return null
       }
-      if (this.$route.name === 'FeedGroup') {
-        return `/group?name=${query.name}`
-      }
-      return null
+      return this.$route.query.name
     },
     readerItems() {
       let items = []
@@ -309,6 +305,12 @@ export default {
     }
   },
   methods: {
+    isCurrentGroup(item) {
+      if (item.link === '/mushroom') {
+        return this.$route.name === 'Mushroom'
+      }
+      return item.title === this.currentGroupName
+    },
     numTextOf(n) {
       return n > 0 ? n : ''
     },

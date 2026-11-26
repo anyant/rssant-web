@@ -44,6 +44,7 @@
           :next-feed="nextFeed"
           :next-story="nextStory"
           :show-next-feed-title="showNextFeedTitle"
+          :gotoNextStory="gotoNextStory"
           :image-viewer-container-getter="imageViewerContainerGetter"
         ></MoStoryContent>
       </div>
@@ -56,6 +57,7 @@
       :next-feed="nextFeed"
       :next-story="nextStory"
       :show-next-feed-title="showNextFeedTitle"
+      :gotoNextStory="gotoNextStory"
       :image-viewer-container-getter="imageViewerContainerGetter"
     ></MoStoryContent>
   </div>
@@ -185,6 +187,16 @@ export default {
     openReadingFont() {
       this.isFontDialogOpen = true
     },
+    gotoNextStory() {
+      let next = this.nextStoryInfo.story
+      if (_.isNil(next)) {
+        return
+      }
+      this.$router.replace({
+        path: this.$route.path,
+        query: { ...this.$route.query, feed: next.feed.id, offset: next.offset },
+      })
+    },
     toggleFavorited() {
       if (_.isNil(this.story)) {
         return
@@ -233,40 +245,51 @@ export default {
       this.isError = false
       if (this.isEmpty) {
         // 三栏右栏未选文章时只加载订阅信息
-        await this.loadFeed({ feed: this.feed, feedId: this.feedId })
+        try {
+          await this.loadFeed({ feed: this.feed, feedId: this.feedId })
+        } catch (err) {
+          this.isError = true
+        }
         return
       }
-      let isLoading = false
-      let feedLoaded = this.loadFeed({ feed: this.feed, feedId: this.feedId })
-      let storyLoaded = this.loadStory({
-        story: this.story,
-        feedId: this.feedId,
-        offset: this.offset,
-        setReaded: !this.isReaded,
-      })
-      if (_.isNil(this.story) || _.isEmpty(this.story.content)) {
-        isLoading = true
-      }
+      let isLoading = _.isNil(this.story) || _.isEmpty(this.story.content)
       this.isLoading = isLoading
       try {
-        await feedLoaded
-        await storyLoaded
+        await this.loadFeed({ feed: this.feed, feedId: this.feedId })
+        await this.loadStory({
+          story: this.story,
+          feedId: this.feedId,
+          offset: this.offset,
+          setReaded: !this.isReaded,
+        })
         // 当 story 已加载但仍未读时，loadStory 不会更新已读状态，需要单独更新
         if (!_.isNil(this.feed) && !_.isNil(this.story) && !this.isReaded) {
           feedStore.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
-        }
-        if (this.nextStoryInfo.shouldLoadNext) {
-          let hasNext = this.offset + 1 < this.feed.total_storys
-          if (hasNext) {
-            let next = storyStore.get({ feedId: this.feedId, offset: this.offset + 1 })
-            await this.loadStory({ story: next, feedId: this.feedId, offset: this.offset + 1 })
-          }
         }
       } catch (err) {
         this.isError = true
       }
       this.isLoading = false
       this.scrollToTop()
+      // 预加载下一篇失败不影响当前文章
+      if (!this.isError) {
+        this.preloadNextStory()
+      }
+    },
+    async preloadNextStory() {
+      if (!this.nextStoryInfo.shouldLoadNext || _.isNil(this.feed)) {
+        return
+      }
+      try {
+        let hasNext = this.offset + 1 < this.feed.total_storys
+        if (!hasNext) {
+          return
+        }
+        let next = storyStore.get({ feedId: this.feedId, offset: this.offset + 1 })
+        await this.loadStory({ story: next, feedId: this.feedId, offset: this.offset + 1 })
+      } catch (err) {
+        // 预加载失败忽略，打开下一篇时会重试
+      }
     },
     scrollToTop() {
       if (this.panel) {
