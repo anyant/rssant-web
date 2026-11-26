@@ -5,6 +5,9 @@
         收藏
         <span class="num-total">{{ favorited.length }}</span>
       </template>
+      <mu-button icon class="action-export" @click="exportFavorited">
+        <fa-icon class="action-icon" icon="download" />
+      </mu-button>
     </MoBackHeader>
     <div class="feed-story-list" ref="mainRef">
       <MoFeedStoryItem
@@ -28,6 +31,9 @@ import MoFeedStoryItem from '@/components/MoFeedStoryItem.vue'
 import { storyStore } from '@/store/story'
 import { rootStore } from '@/store/root'
 import { feedStore } from '@/store/feed'
+import { API } from '@/plugin/api'
+import { todayStamp } from '@/plugin/download'
+import { confirmAndDownload } from '@/plugin/export'
 
 export default {
   components: { MoBackHeader, MoLayout, MoFeedStoryItem },
@@ -56,6 +62,15 @@ export default {
       let feed = feedStore.get(feedId)
       return _.isNil(feed) ? feedId : feed.title
     },
+    exportFavorited() {
+      confirmAndDownload({
+        vm: this,
+        title: '导出收藏',
+        message: '导出全部收藏，包含正文和文章信息，打包成一个压缩包。',
+        request: () => API.story.exportFavorited(),
+        filename: () => `rssant-favorites-${todayStamp()}.zip`,
+      })
+    },
   },
   savePageState() {
     this.$pageState.saveScrollTop({ el: this.$refs.mainRef })
@@ -82,5 +97,17 @@ export default {
   font-weight: normal;
   margin-left: 8 * @pr;
   margin-right: 4 * @pr;
+}
+
+.action-export {
+  position: relative;
+  width: 32 * @pr;
+  height: 32 * @pr;
+  margin-left: 16 * @pr;
+}
+
+.action-icon {
+  display: inline-block;
+  width: 22 * @pr;
 }
 </style>

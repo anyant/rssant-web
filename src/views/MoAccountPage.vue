@@ -33,6 +33,10 @@
           <span class="action-label">导出订阅</span>
           <fa-icon class="action-icon" icon="chevron-right" />
         </div>
+        <div class="action-row" @click="exportFavorited">
+          <span class="action-label">导出收藏</span>
+          <fa-icon class="action-icon" icon="chevron-right" />
+        </div>
         <div class="action-row" @click="onClickDarkMode">
           <span class="action-label">夜间模式</span>
           <span>
@@ -84,6 +88,9 @@ import { antGold, antRed, antGreen } from '@/plugin/common'
 import DarkMode from '@/plugin/darkmode'
 import { userStore } from '@/store/user'
 import { feedStore } from '@/store/feed'
+import { API } from '@/plugin/api'
+import { todayStamp } from '@/plugin/download'
+import { confirmAndDownload } from '@/plugin/export'
 
 export default {
   name: 'MoAccountPage',
@@ -174,7 +181,22 @@ export default {
       userStore.connectGithub({ next: '/' })
     },
     exportOPML() {
-      feedStore.exportOPML({ download: true })
+      confirmAndDownload({
+        vm: this,
+        title: '导出订阅',
+        message: '导出全部订阅，保存为 OPML 文件，可以导入其他阅读器。',
+        request: () => feedStore.exportOPML({ download: true }),
+        filename: () => 'rssant.opml',
+      })
+    },
+    exportFavorited() {
+      confirmAndDownload({
+        vm: this,
+        title: '导出收藏',
+        message: '导出全部收藏，包含正文和文章信息，打包成一个压缩包。',
+        request: () => API.story.exportFavorited(),
+        filename: () => `rssant-favorites-${todayStamp()}.zip`,
+      })
     },
     async goVip() {
       await userStore.openVipHomeLink()

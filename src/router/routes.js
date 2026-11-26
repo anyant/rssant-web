@@ -17,6 +17,7 @@ import MoAccountConfirmEmailPage from '@/views/MoAccountConfirmEmailPage'
 import MoResetPasswordPage from '@/views/MoResetPasswordPage'
 import MoResetPasswordConfirmPage from '@/views/MoResetPasswordConfirmPage'
 import MoAccountPage from '@/views/MoAccountPage'
+import MoAgentPage from '@/views/MoAgentPage'
 import MoPublishConfigPage from '@/views/MoPublishConfigPage'
 import MoAboutPage from '@/views/MoAboutPage'
 import MoTermsPage from '@/views/MoTermsPage'
@@ -32,6 +33,12 @@ const boardRoutes = [
     path: 'account',
     name: 'Account',
     component: MoAccountPage,
+    meta: { loginRequired: true },
+  },
+  {
+    path: 'agent',
+    name: 'Agent',
+    component: MoAgentPage,
     meta: { loginRequired: true },
   },
   {

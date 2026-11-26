@@ -3,7 +3,6 @@ import Cookies from 'js-cookie'
 import _ from 'lodash'
 import Toast from 'muse-ui-toast'
 
-import { downloadFile } from './download'
 import localConfig from './localConfig'
 import Timeit from './timeit'
 
@@ -218,6 +217,9 @@ const API = {
           throw error
         })
     },
+    resetToken() {
+      return client.post('/user/reset_token/')
+    },
     logout() {
       return client.post(`/auth/logout/`)
     },
@@ -280,17 +282,19 @@ const API = {
       })
     },
     exportOPML({ download } = {}) {
-      download = download ? 'true' : 'false'
-      let url = BASE_URL + `/feed/export/opml?download=${download}`
-      Toast.info('开始导出 OPML 文件，请稍等...')
-      if (download) {
-        downloadFile(url, 'rssant.opml')
-      } else {
-        window.open(url, '_blank')
-      }
+      return client.get('/feed/export/opml', {
+        params: { download: download ? 'true' : 'false' },
+        responseType: 'blob',
+      })
+    },
+    exportStories({ id } = {}) {
+      return client.get(`/feed/${id}/export/stories`, { responseType: 'blob' })
     },
   },
   story: {
+    exportFavorited() {
+      return client.get('/story/export/favorited', { responseType: 'blob' })
+    },
     query({ feed_id, detail, offset, size } = {}) {
       return client.post('/story.query', { feed_id, detail, offset, size })
     },

@@ -19,6 +19,9 @@
         </mu-button>
         <transition name="mu-fade-transition">
           <mu-list ref="actionMenuListRef" class="action-menu-list" v-show="isMenuOpen">
+            <mu-list-item button @click="goAgent">
+              <mu-list-item-title>用 AI 阅读</mu-list-item-title>
+            </mu-list-item>
             <mu-list-item button @click="goDiscover">
               <mu-list-item-title>发现订阅源</mu-list-item-title>
             </mu-list-item>
@@ -262,6 +265,10 @@ export default {
       }
       this.isMenuOpen = false
       window.removeEventListener('click', this.handleClickOutsideMenu)
+    },
+    goAgent() {
+      this.routeTo('/agent')
+      this.isMenuOpen = false
     },
     goDiscover() {
       this.$router.push('/discover')

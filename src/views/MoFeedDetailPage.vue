@@ -2,6 +2,9 @@
   <MoLayout header>
     <MoBackHeader border>
       <template v-slot:title>{{ feedTitle }}</template>
+      <mu-button icon class="action-export" @click="exportStories">
+        <fa-icon class="action-icon" icon="download" />
+      </mu-button>
       <mu-button icon class="action-delete" @click="deleteFeed">
         <fa-icon class="action-icon" icon="trash" />
       </mu-button>
@@ -45,6 +48,9 @@ import { formatFullDateFriendly } from '@/plugin/datefmt'
 import { getGroupName, getGroupId } from '@/plugin/feedGroupHelper'
 import { rootStore } from '@/store/root'
 import { feedStore } from '@/store/feed'
+import { API } from '@/plugin/api'
+import { todayStamp } from '@/plugin/download'
+import { confirmAndDownload } from '@/plugin/export'
 
 const FEED_FIELDS = [
   {
@@ -246,6 +252,15 @@ export default {
       }
       done()
     },
+    exportStories() {
+      confirmAndDownload({
+        vm: this,
+        title: '导出文章',
+        message: '导出这个订阅当前保留的文章，包含正文和文章信息，打包成一个压缩包。',
+        request: () => API.feed.exportStories({ id: this.feedId }),
+        filename: () => `rssant-feed-${this.feedId}-${todayStamp()}.zip`,
+      })
+    },
     deleteFeed() {
       this.$confirm(`删除订阅 “${this.feedTitle}” ？`, '提示', {
         type: 'warning',
@@ -294,7 +309,8 @@ export default {
   width: 22 * @pr;
 }
 
-.action-delete {
+.action-delete,
+.action-export {
   position: relative;
   width: 32 * @pr;
   height: 32 * @pr;
