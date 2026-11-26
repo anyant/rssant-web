@@ -36,7 +36,7 @@ import { antGold } from '@/plugin/common'
 import { formatDateFriendly } from '@/plugin/datefmt'
 import MoIconAngleRight3 from '@/components/MoIconAngleRight3'
 import * as ImageHelper from '@/plugin/image'
-import { storyStore } from '@/store/story'
+import { storyStore, isNewFirst } from '@/store/story'
 import { feedStore } from '@/store/feed'
 import { imageProxyStore } from '@/store/imageProxy'
 
@@ -181,7 +181,11 @@ export default {
           await promise
         }
       } else if (!this.isReaded) {
-        feedStore.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
+        if (isNewFirst()) {
+          storyStore.setRead({ feedId: this.feedId, offset: this.offset, is_read: true })
+        } else {
+          feedStore.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
+        }
       }
       this.$emit('read')
       if (!this.isOpened && this.isCtrlKeyHold) {

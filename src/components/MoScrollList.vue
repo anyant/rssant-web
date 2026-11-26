@@ -8,6 +8,15 @@
         </mu-button>
       </div>
     </transition>
+    <div
+      v-if="showLoadPrev"
+      class="load-prev"
+      @click="loadPrevByButton"
+    >
+      <span v-if="isPrevLoading">加载中…</span>
+      <span v-else-if="prevLoadError">加载失败，点击重试</span>
+      <span v-else>加载更早的文章</span>
+    </div>
     <mescroll ref="mescroll" class="mescroll" :down="mescrollDown" :up="mescrollUp" @init="mescrollInit">
       <div class="item-list">
         <slot></slot>
@@ -86,6 +95,9 @@ export default {
       numPageItems: numPageItems,
       isPrevLoading: false,
       isNextLoading: false,
+      isScrolled: false,
+      prevLoadError: false,
+      isLoadPrevByButton: false,
       mescrollDown: {
         auto: false,
         callback: this.onMescrolDown,
@@ -158,6 +170,12 @@ export default {
       endOffset = Math.max(endOffset, beginOffset + this.numPageItems * 2)
       let delta = (this.total - endOffset) / this.numPageItems
       return Math.floor(Math.max(0, delta))
+    },
+    showLoadPrev() {
+      if (this.reversed || !this.hasPrev || this.items.length <= 0) {
+        return false
+      }
+      return this.isScrolled
     },
     needJump() {
       if (_.isNil(this.jump)) {
@@ -266,11 +284,38 @@ export default {
       } else {
         offset = Math.max(0, this.beginOffset - this.numPageItems)
       }
-      this.load({ offset, size: this.numPageItems }).finally(() => {
+      this.load({ offset, size: this.numPageItems }).then(() => {
+        if (this.isLoadPrevByButton && this.mescroll) {
+          this.$nextTick(() => {
+            this.mescroll.setScrollTop(0)
+          })
+        }
+      }).catch(() => {
+        this.prevLoadError = true
+      }).finally(() => {
         this.isPrevLoading = false
+        this.isLoadPrevByButton = false
         this.endSuccess(prevItemsLength)
         this.mescroll.endDownScroll()
       })
+    },
+    getTopOffset() {
+      if (!this.mescroll || this.items.length <= 0) {
+        return null
+      }
+      let y = this.mescroll.getScrollTop()
+      let index = Math.floor(y / this.itemSize)
+      index = Math.min(Math.max(0, index), this.items.length - 1)
+      let item = this.items[index]
+      return _.isNil(item) ? null : item.offset
+    },
+    loadPrevByButton() {
+      if (this.isPrevLoading || !this.hasPrev) {
+        return
+      }
+      this.prevLoadError = false
+      this.isLoadPrevByButton = true
+      this.loadPrev()
     },
     loadNext() {
       if (this.isNextLoading || !this.hasNext || this.items.length <= 0) {
@@ -300,6 +345,7 @@ export default {
       this.loadNext()
     },
     onScroll(mescroll, y, isUp) {
+      this.isScrolled = y > 80
       if (!isUp || this.isNextLoading || !this.hasNext || this.items.length <= 0) {
         return
       }
@@ -346,6 +392,23 @@ export default {
 .fade-leave-to {
   opacity: 0;
   transform: translate3d(0, 50%, 0);
+}
+
+.load-prev {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40 * @pr;
+  z-index: 998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: fade(#ffffff, 96%);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  color: @antBlue;
+  font-size: 14 * @pr;
+  cursor: pointer;
 }
 
 .jump-to-latest {

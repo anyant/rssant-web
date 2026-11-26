@@ -316,6 +316,12 @@ const API = {
     setWatched({ feed_id, offset, is_watched }) {
       return client.post(`/story.set_watched`, { feed_id, offset, is_watched })
     },
+    setRead({ feed_id, offset, is_read }) {
+      return client.post(`/story.set_read`, { feed_id, offset, is_read })
+    },
+    queryUnreadBatch({ storys, detail }) {
+      return client.post(`/story.query_unread_batch`, { storys, detail })
+    },
     setFavorited({ feed_id, offset, is_favorited }) {
       return client.post(`/story.set_favorited`, { feed_id, offset, is_favorited })
     },

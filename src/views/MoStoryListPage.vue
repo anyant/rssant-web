@@ -9,11 +9,13 @@
     </MoBackHeader>
     <MoScrollList
       v-if="feed"
+      ref="scrollList"
       class="story-list"
       :vid="`/feed?id=${feedId}`"
       :itemSize="48"
       :items="storyList"
-      :init-offset="feed.story_offset"
+      :reversed="isNewFirst"
+      :init-offset="initOffset"
       :begin-offset="beginOffset"
       :end-offset="endOffset"
       :total="feed.total_storys"
@@ -46,9 +48,10 @@ import MoStoryItem from '@/components/MoStoryItem'
 import MoScrollList from '@/components/MoScrollList'
 import MoReadedButton from '@/components/MoReadedButton'
 import Keyboard from '@/plugin/keyboard'
-import { storyStore } from '@/store/story'
+import { storyStore, isNewFirst } from '@/store/story'
 import { rootStore } from '@/store/root'
 import { feedStore } from '@/store/feed'
+import { pageStore } from '@/store/page'
 
 export default {
   components: { MoBackHeader, MoLayout, MoStoryItem, MoScrollList, MoReadedButton },
@@ -56,12 +59,16 @@ export default {
     return {
       storyOpened: {},
       readingStoryOffset: null,
+      restoreOffset: null,
       keyboard: Keyboard(),
     }
   },
   computed: {
     feedId() {
       return this.$route.query.id
+    },
+    viewKey() {
+      return `/feed?id=${this.feedId}`
     },
     feed() {
       return feedStore.get(this.feedId)
@@ -94,10 +101,22 @@ export default {
         return s.offset >= offset.begin && s.offset <= offset.end
       })
     },
+    isNewFirst() {
+      return isNewFirst()
+    },
+    initOffset() {
+      if (!_.isNil(this.restoreOffset)) {
+        return this.restoreOffset
+      }
+      if (this.isNewFirst) {
+        return Math.max(0, this.feed.total_storys - 1)
+      }
+      return this.feed.story_offset
+    },
     isReaded() {
       let feed = this.feed
       return (story) => {
-        return story.offset < feed.story_offset
+        return story.is_read || story.offset < feed.story_offset
       }
     },
     isReading() {
@@ -110,6 +129,8 @@ export default {
     },
   },
   async mounted() {
+    let page = pageStore.getPage(this.viewKey)
+    this.restoreOffset = _.isNil(page) ? null : page.topOffset
     if (_.isNil(this.feed)) {
       await feedStore.load({ feedId: this.feedId })
     }
@@ -122,7 +143,11 @@ export default {
   },
   methods: {
     getNextStoryInfo({ feedId, offset }) {
-      let story = storyStore.get({ feedId, offset: offset + 1 })
+      let nextOffset = this.isNewFirst ? offset - 1 : offset + 1
+      if (nextOffset < 0) {
+        return { story: null, shouldLoadNext: false }
+      }
+      let story = storyStore.get({ feedId, offset: nextOffset })
       return { story, shouldLoadNext: true }
     },
     loadStorys({ offset, size, resetLoadedOffset, isInit }) {
@@ -136,6 +161,9 @@ export default {
       })
     },
     onRead(story) {
+      let scrollList = this.$refs.scrollList
+      let topOffset = _.isNil(scrollList) ? null : scrollList.getTopOffset()
+      pageStore.setPage(this.viewKey, { topOffset: topOffset })
       this.readingStoryOffset = story.offset
     },
     setAllReaded() {

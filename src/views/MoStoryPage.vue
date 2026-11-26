@@ -109,7 +109,7 @@ export default {
       if (_.isNil(this.feed) || _.isNil(this.story)) {
         return false
       }
-      return this.story.offset < this.feed.story_offset
+      return this.story.is_read || this.story.offset < this.feed.story_offset
     },
     starColor() {
       if (this.isFavorited) {
