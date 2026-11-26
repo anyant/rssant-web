@@ -5,7 +5,7 @@
         收藏
         <span class="num-total">{{ favorited.length }}</span>
       </template>
-      <mu-button icon class="action-export" @click="exportFavorited">
+      <mu-button icon class="action-export" :disabled="exporting" @click="exportFavorited">
         <fa-icon class="action-icon" icon="download" />
       </mu-button>
     </MoBackHeader>
@@ -37,6 +37,11 @@ import { confirmAndDownload } from '@/plugin/export'
 
 export default {
   components: { MoBackHeader, MoLayout, MoFeedStoryItem },
+  data() {
+    return {
+      exporting: false,
+    }
+  },
   props: {
     vid: {
       type: String,
@@ -63,12 +68,17 @@ export default {
       return _.isNil(feed) ? feedId : feed.title
     },
     exportFavorited() {
+      if (this.exporting) {
+        return
+      }
       confirmAndDownload({
         vm: this,
         title: '导出收藏',
         message: '导出全部收藏，包含正文和文章信息，打包成一个压缩包。',
         request: () => API.story.exportFavorited(),
         filename: () => `rssant-favorites-${todayStamp()}.zip`,
+        pendingMessage: '正在打包收藏…',
+        setBusy: value => { this.exporting = value },
       })
     },
   },

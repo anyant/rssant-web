@@ -15,7 +15,7 @@
       <p class="section-text">令牌长期有效，不会过期。</p>
       <div class="reset-btn" @click="resetToken">重置令牌</div>
       <p class="warning">
-        令牌等同于账号密码，只发给你信任的 AI。重置后旧令牌立即失效，已经发给 AI 的提示词不能再读取数据；当前登录不受影响。
+        令牌等同于账号密码，只发给你信任的 AI。重置后旧令牌立即失效，已经发给 AI 的提示词不能再读取数据；当前登录和其他网页设备不受影响。
       </p>
     </div>
   </MoLayout>
@@ -181,6 +181,11 @@ export default {
 }
 
 .reset-btn {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44 * @pr;
   padding: 11 * @pr 0;
   margin-bottom: 12 * @pr;
   border: 1px solid @antLineGrey;

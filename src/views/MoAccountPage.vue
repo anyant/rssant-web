@@ -29,11 +29,11 @@
             <fa-icon class="action-icon" icon="chevron-right" />
           </span>
         </div>
-        <div class="action-row" @click="exportOPML">
+        <div class="action-row" :class="{ disabled: exporting }" @click="exportOPML">
           <span class="action-label">导出订阅</span>
           <fa-icon class="action-icon" icon="chevron-right" />
         </div>
-        <div class="action-row" @click="exportFavorited">
+        <div class="action-row" :class="{ disabled: exporting }" @click="exportFavorited">
           <span class="action-label">导出收藏</span>
           <fa-icon class="action-icon" icon="chevron-right" />
         </div>
@@ -102,6 +102,7 @@ export default {
       antGreen,
       isDarkModeDialogOpen: false,
       darkModeValue: DarkMode.get(),
+      exporting: false,
     }
   },
   computed: {
@@ -181,21 +182,31 @@ export default {
       userStore.connectGithub({ next: '/' })
     },
     exportOPML() {
+      if (this.exporting) {
+        return
+      }
       confirmAndDownload({
         vm: this,
         title: '导出订阅',
         message: '导出全部订阅，保存为 OPML 文件，可以导入其他阅读器。',
         request: () => feedStore.exportOPML({ download: true }),
         filename: () => 'rssant.opml',
+        pendingMessage: '正在导出订阅…',
+        setBusy: value => { this.exporting = value },
       })
     },
     exportFavorited() {
+      if (this.exporting) {
+        return
+      }
       confirmAndDownload({
         vm: this,
         title: '导出收藏',
         message: '导出全部收藏，包含正文和文章信息，打包成一个压缩包。',
         request: () => API.story.exportFavorited(),
         filename: () => `rssant-favorites-${todayStamp()}.zip`,
+        pendingMessage: '正在打包收藏…',
+        setBusy: value => { this.exporting = value },
       })
     },
     async goVip() {

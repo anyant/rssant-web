@@ -2,7 +2,7 @@
   <MoLayout header>
     <MoBackHeader border>
       <template v-slot:title>{{ feedTitle }}</template>
-      <mu-button icon class="action-export" @click="exportStories">
+      <mu-button icon class="action-export" :disabled="exporting" @click="exportStories">
         <fa-icon class="action-icon" icon="download" />
       </mu-button>
       <mu-button icon class="action-delete" @click="deleteFeed">
@@ -177,7 +177,9 @@ const FEED_FIELDS = [
 export default {
   components: { MoBackHeader, MoLayout, MoFeedDetailInfoItem, MoGroupNameSelector },
   data() {
-    return {}
+    return {
+      exporting: false,
+    }
   },
   async mounted() {
     await feedStore.load({ feedId: this.feedId, detail: true })
@@ -253,12 +255,17 @@ export default {
       done()
     },
     exportStories() {
+      if (this.exporting) {
+        return
+      }
       confirmAndDownload({
         vm: this,
         title: '导出文章',
         message: '导出这个订阅当前保留的文章，包含正文和文章信息，打包成一个压缩包。',
         request: () => API.feed.exportStories({ id: this.feedId }),
         filename: () => `rssant-feed-${this.feedId}-${todayStamp()}.zip`,
+        pendingMessage: '正在打包文章…',
+        setBusy: value => { this.exporting = value },
       })
     },
     deleteFeed() {
