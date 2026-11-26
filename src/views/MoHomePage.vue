@@ -28,7 +28,6 @@
 </template>
 
 <script>
-import _ from 'lodash'
 import MoLayout from '@/components/MoLayout'
 import MoHome from '@/components/MoHome'
 import MoHeader from '@/components/MoHeader'
