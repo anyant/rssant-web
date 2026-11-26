@@ -18,7 +18,7 @@
           <fa-icon size="18" v-if="!isFetchLoading" icon="ellipsis-h" />
         </mu-button>
         <mu-list
-          class="action-menu-list"
+          class="reading-menu"
           :class="{ 'is-keyboard': isMenuKeyboard }"
           ref="actionMenuListRef"
           v-show="isMenuOpen"
@@ -359,11 +359,11 @@ export default {
 <style lang="less">
 @import '~@/styles/common';
 
-// 限定在阅读页，避免影响首页同名的下拉菜单
-.story .action-menu-list {
+// reading-menu 只用在阅读页的 ⋯ 菜单，避免和首页的 .action-menu-list 互相影响
+.reading-menu {
   .header-menu-popover;
 
-  // 菜单挂在 ⋯ 按钮下方 8px（按钮高 32 + 距头顶部 16 的视觉留白 → 17），右边缘和按钮对齐
+  // 相对 ⋯ 按钮（.action-menu-wrapper）定位：距头部底边 8px、距按钮底边 17px；右边缘与按钮对齐
   top: calc(100% + 17 * @pr) !important;
   right: -4 * @pr;
   min-width: 112 * @pr;
