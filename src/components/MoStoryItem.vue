@@ -3,7 +3,7 @@
     <div
       v-if="preview"
       class="story-preview-item"
-      :class="{ 'story-preview-item-readed': isReaded && !isReading }"
+      :class="{ 'story-preview-item-readed': isReaded }"
       tabindex="0"
       role="link"
       @click="onPreviewOpen"
@@ -316,14 +316,17 @@ export default {
         this.$emit('click')
         return
       }
-      // 标已读旁路执行，不等待接口；接口失败也不影响打开文章
-      try {
-        let { promise } = this.markReaded()
-        if (promise && _.isFunction(promise.catch)) {
-          promise.catch(() => {})
+      // 列表里已有正文时顺手标已读（旁路执行，不等待接口，失败也不影响打开文章）；
+      // 正文要等文章页加载时，由文章页按同样的阅读顺序规则标，避免点一次发两次详情请求。
+      if (!_.isEmpty(this.story.content)) {
+        try {
+          let { promise } = this.markReaded()
+          if (promise && _.isFunction(promise.catch)) {
+            promise.catch(() => {})
+          }
+        } catch (ex) {
+          // 标已读失败不阻塞打开文章
         }
-      } catch (ex) {
-        // 标已读失败不阻塞打开文章
       }
       this.goPreviewLink()
     },
