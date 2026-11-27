@@ -1,6 +1,6 @@
 <template>
   <MoLayout grey header>
-    <MoBackHeader border>
+    <MoBackHeader border :is-home="readerMode">
       <template v-slot:title>{{ numUnreadText }}{{ name }}</template>
       <MoReadedButton @click="setAllReaded" class="action-readed"></MoReadedButton>
       <mu-button icon class="action-detail" @click="goFeedGroupDetail">
@@ -14,6 +14,9 @@
         :feed="item.feed"
         :story="item.story"
         :keyboard="keyboard"
+        :readerMode="readerMode"
+        :activeStoryKey="activeStoryKey"
+        @select="onSelectStory"
       ></MoFeedVirtualItem>
     </div>
   </MoLayout>
@@ -44,6 +47,20 @@ export default {
     }
   },
   computed: {
+    readerMode() {
+      return this.$LAYOUT.isReader
+    },
+    readerOffset() {
+      let offset = parseInt(this.$route.query.offset)
+      return Number.isNaN(offset) ? null : offset
+    },
+    activeStoryKey() {
+      let feedId = this.$route.query.feed
+      if (_.isNil(feedId) || _.isNil(this.readerOffset)) {
+        return null
+      }
+      return `${feedId}:${this.readerOffset}`
+    },
     computedVid() {
       return `/group?name=${this.name}`
     },
@@ -109,6 +126,15 @@ export default {
     next()
   },
   methods: {
+    onSelectStory(story) {
+      if (!this.readerMode) {
+        return
+      }
+      this.$router.push({
+        path: this.$route.path,
+        query: { ...this.$route.query, feed: story.feed.id, offset: story.offset },
+      })
+    },
     getNextStoryInfo({ groupName, feedId, offset }) {
       let mushrooms = storyStore.mushroomsOfGroup(groupName)
       let story = storyStore.nextMushroomOf({

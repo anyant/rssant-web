@@ -1,5 +1,9 @@
 <template>
-  <div class="feed-story-item" :class="{ 'feed-story-item-readed': isReaded }" @click="goStory">
+  <div
+    class="feed-story-item"
+    :class="{ 'feed-story-item-readed': isReaded, 'feed-story-item-active': active }"
+    @click="goStory"
+  >
     <div class="feed-title" @click.stop="goFeed">{{ feedTitle }}</div>
     <div class="story-title">{{ storyTitle }}</div>
     <div class="story-date">{{ dateText }}</div>
@@ -25,6 +29,15 @@ export default {
       type: Boolean,
       default: false,
     },
+    // 三栏阅读：点行选中文章，不跳转
+    readerMode: {
+      type: Boolean,
+      default: false,
+    },
+    active: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {}
@@ -46,6 +59,10 @@ export default {
       this.myRouteTo(`/feed?id=${this.feedId}`)
     },
     goStory() {
+      if (this.readerMode) {
+        this.$emit('select')
+        return
+      }
       if (this.isCtrlKeyHold && !_.isEmpty(this.storyLink)) {
         if (!_.isNil(this.isReaded) && !this.isReaded) {
           feedStore.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
@@ -73,6 +90,10 @@ export default {
   justify-content: space-between;
   background: #fff;
   cursor: pointer;
+}
+
+.feed-story-item-active {
+  background: #eef4f8;
 }
 
 .feed-story-item-readed {

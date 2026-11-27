@@ -20,6 +20,14 @@ export default Vue.component('MoFeedVirtualItem', {
     },
     keyboard: {},
     routeTo: Function,
+    readerMode: {
+      type: Boolean,
+      default: false,
+    },
+    activeStoryKey: {
+      type: String,
+      default: null,
+    },
   },
   methods: {
     isStoryReaded(story) {
@@ -55,6 +63,11 @@ export default Vue.component('MoFeedVirtualItem', {
           storyDate: story.dt_published,
           storyLink: story.link,
           isCtrlKeyHold: this.keyboard.isCtrlKeyHold,
+          readerMode: this.readerMode,
+          active: this.activeStoryKey === `${story.feed.id}:${story.offset}`,
+        },
+        on: {
+          select: () => this.$emit('select', story),
         },
       })
     } else {

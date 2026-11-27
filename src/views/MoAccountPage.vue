@@ -96,12 +96,12 @@
       :overlay-close="false"
     >
       <div class="story-order-option">
-        <mu-radio value="old_first" v-model="storyOrderValue" label="旧的在前" :ripple="false"></mu-radio>
-        <div class="story-order-desc">打开一篇，比它更早的文章都标为已读</div>
+        <mu-radio value="old_first" v-model="storyOrderValue" label="最早在前" :ripple="false"></mu-radio>
+        <div class="story-order-desc">打开一篇，更早的标为已读</div>
       </div>
       <div class="story-order-option">
-        <mu-radio value="new_first" v-model="storyOrderValue" label="先看最新" :ripple="false"></mu-radio>
-        <div class="story-order-desc">最新在上，打开一篇只标这一篇</div>
+        <mu-radio value="new_first" v-model="storyOrderValue" label="最新在前" :ripple="false"></mu-radio>
+        <div class="story-order-desc">打开一篇，只标这一篇</div>
       </div>
       <mu-button slot="actions" flat color="primary" @click="onConfirmStoryOrder">确定</mu-button>
     </mu-dialog>
@@ -192,7 +192,7 @@ export default {
       return _.isNil(user) ? '' : user.username
     },
     storyOrderText() {
-      return this.storyOrderValue === 'new_first' ? '先看最新' : '旧的在前'
+      return this.storyOrderValue === 'new_first' ? '最新在前' : '最早在前'
     },
     articleListText() {
       return this.articleListValue === 'summary' ? '标题和摘要' : '仅标题'
@@ -294,6 +294,10 @@ export default {
     },
     onConfirmStoryOrder() {
       this.isStoryOrderDialogOpen = false
+      // 没有切换顺序就什么都不做，避免无意义的整页刷新
+      if (this.storyOrderValue === localConfig.STORY_ORDER.get()) {
+        return
+      }
       localConfig.STORY_ORDER.set(this.storyOrderValue)
       setTimeout(() => {
         window.location.reload()

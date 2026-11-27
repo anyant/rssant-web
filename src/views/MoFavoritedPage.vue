@@ -1,6 +1,6 @@
 <template>
   <MoLayout grey header>
-    <MoBackHeader border>
+    <MoBackHeader border :is-home="readerMode">
       <template v-slot:title>
         收藏
         <span class="num-total">{{ favorited.length }}</span>
@@ -19,6 +19,9 @@
         :storyTitle="story.title"
         :storyDate="story.dt_published"
         :isReaded="null"
+        :readerMode="readerMode"
+        :active="isCurrentStory(story)"
+        @select="onSelectStory(story)"
       ></MoFeedStoryItem>
     </div>
   </MoLayout>
@@ -58,11 +61,33 @@ export default {
     storyStore.setNextStoryGetter(null)
   },
   computed: {
+    readerMode() {
+      return this.$LAYOUT.isReader
+    },
+    readerOffset() {
+      let offset = parseInt(this.$route.query.offset)
+      return Number.isNaN(offset) ? null : offset
+    },
     favorited() {
       return storyStore.favorited
     },
   },
   methods: {
+    isCurrentStory(story) {
+      if (!this.readerMode) {
+        return false
+      }
+      return this.$route.query.feed === story.feed.id && this.readerOffset === story.offset
+    },
+    onSelectStory(story) {
+      if (!this.readerMode) {
+        return
+      }
+      this.$router.push({
+        path: this.$route.path,
+        query: { ...this.$route.query, feed: story.feed.id, offset: story.offset },
+      })
+    },
     getFeedTitle(feedId) {
       let feed = feedStore.get(feedId)
       return _.isNil(feed) ? feedId : feed.title
