@@ -51,6 +51,13 @@
             <fa-icon class="action-icon" icon="chevron-right" />
           </span>
         </div>
+        <div class="action-row" @click="onClickArticleList">
+          <span class="action-label">文章列表</span>
+          <span>
+            <span>{{ articleListText }}</span>
+            <fa-icon class="action-icon" icon="chevron-right" />
+          </span>
+        </div>
         <div class="action-row" @click="goAbout">
           <span class="action-label">蚁阅介绍</span>
           <fa-icon class="action-icon" icon="chevron-right" />
@@ -98,6 +105,21 @@
       </div>
       <mu-button slot="actions" flat color="primary" @click="onConfirmStoryOrder">确定</mu-button>
     </mu-dialog>
+    <mu-dialog
+      title="文章列表"
+      :open.sync="isArticleListDialogOpen"
+      :overlay-close="false"
+    >
+      <div class="story-order-option">
+        <mu-radio value="title" v-model="articleListValue" label="仅标题" :ripple="false"></mu-radio>
+        <div class="story-order-desc">列表更紧凑，一屏看到更多标题</div>
+      </div>
+      <div class="story-order-option">
+        <mu-radio value="summary" v-model="articleListValue" label="标题和摘要" :ripple="false"></mu-radio>
+        <div class="story-order-desc">每条标题下多显示两三行文章开头</div>
+      </div>
+      <mu-button slot="actions" flat color="primary" @click="onConfirmArticleList">确定</mu-button>
+    </mu-dialog>
   </MoLayout>
 </template>
 
@@ -127,6 +149,8 @@ export default {
       darkModeValue: DarkMode.get(),
       isStoryOrderDialogOpen: false,
       storyOrderValue: localConfig.STORY_ORDER.get(),
+      isArticleListDialogOpen: false,
+      articleListValue: localConfig.ARTICLE_LIST_CONTENT.get(),
       exporting: false,
     }
   },
@@ -169,6 +193,9 @@ export default {
     },
     storyOrderText() {
       return this.storyOrderValue === 'new_first' ? '最新在前' : '最早在前'
+    },
+    articleListText() {
+      return this.articleListValue === 'summary' ? '标题和摘要' : '仅标题'
     },
     darkModeStatus() {
       if (!DarkMode.isSupported()) {
@@ -275,6 +302,14 @@ export default {
       setTimeout(() => {
         window.location.reload()
       }, 150)
+    },
+    onClickArticleList() {
+      this.articleListValue = localConfig.ARTICLE_LIST_CONTENT.get()
+      this.isArticleListDialogOpen = true
+    },
+    onConfirmArticleList() {
+      this.isArticleListDialogOpen = false
+      localConfig.ARTICLE_LIST_CONTENT.set(this.articleListValue)
     },
     onLogout() {
       userStore.logout().then(() => {

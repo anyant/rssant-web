@@ -1,32 +1,52 @@
 <template>
   <div class="story-item" :class="{ 'story-item-ctrl': isCtrlKeyHold }">
-    <div class="story-header" :class="{ 'story-header-readed': isReaded }" v-if="!isOpened" @click="onOpen">
-      <div class="story-title">{{ title }}</div>
-      <div class="story-date">{{ dateText }}</div>
-    </div>
-    <div class="story-preview" :class="{ 'story-preview-readed': isReaded && !isReading }" v-if="isOpened">
-      <div class="story-preview-header" @click="onOpen">
-        <div class="story-preview-title">{{ title }}</div>
-        <mu-button icon class="story-favorited" @click.stop="toggleFavorited">
-          <fa-icon size="18" v-if="isFavorited" icon="star" :color="starColor" />
-          <fa-icon size="18" v-else icon="far/star" :color="starColor" />
-        </mu-button>
-      </div>
-      <div class="story-preview-summary" @click="handleSummaryClick" :class="{
-    'story-preview-summary-show-image': isShowImage,
-    'story-preview-summary-ignore-image': isIgnoreImage,
-  }">
-        <div v-if="isShowImage" class="story-preview-image" :class="{ 'story-preview-image-loading': !isImageReady }">
-          <img @load="onPreviewImageLoad" @error="onPreviewImageError" referrerpolicy="no-referrer" :src="imageUrl" />
+    <div
+      v-if="preview"
+      class="story-preview-item"
+      :class="{ 'story-preview-item-readed': isReaded }"
+      tabindex="0"
+      role="link"
+      @click="onPreviewOpen"
+      @keydown.enter.prevent="onPreviewOpen"
+      @keydown.space.prevent="onPreviewOpen"
+    >
+      <div class="story-preview-item-body">
+        <div class="story-preview-item-head">
+          <div ref="previewTitle" class="story-preview-item-title">{{ title }}</div>
+          <div class="story-preview-item-date">{{ dateText }}</div>
         </div>
-        {{ story.summary }}
-      </div>
-      <div class="story-preview-link" @click="goLink">
-        <MoIconAngleRight3 class="story-preview-link-fade" />
-        <MoIconAngleRight3 class="story-preview-link-main" />
-        <MoIconAngleRight3 class="story-preview-link-fade" />
+        <div class="story-preview-item-summary" :style="previewSummaryStyle">{{ previewSummary }}</div>
       </div>
     </div>
+    <template v-else>
+      <div class="story-header" :class="{ 'story-header-readed': isReaded }" v-if="!isOpened" @click="onOpen">
+        <div class="story-title">{{ title }}</div>
+        <div class="story-date">{{ dateText }}</div>
+      </div>
+      <div class="story-preview" :class="{ 'story-preview-readed': isReaded && !isReading }" v-if="isOpened">
+        <div class="story-preview-header" @click="onOpen">
+          <div class="story-preview-title">{{ title }}</div>
+          <mu-button icon class="story-favorited" @click.stop="toggleFavorited">
+            <fa-icon size="18" v-if="isFavorited" icon="star" :color="starColor" />
+            <fa-icon size="18" v-else icon="far/star" :color="starColor" />
+          </mu-button>
+        </div>
+        <div class="story-preview-summary" @click="handleSummaryClick" :class="{
+      'story-preview-summary-show-image': isShowImage,
+      'story-preview-summary-ignore-image': isIgnoreImage,
+    }">
+          <div v-if="isShowImage" class="story-preview-image" :class="{ 'story-preview-image-loading': !isImageReady }">
+            <img @load="onPreviewImageLoad" @error="onPreviewImageError" referrerpolicy="no-referrer" :src="imageUrl" />
+          </div>
+          {{ story.summary }}
+        </div>
+        <div class="story-preview-link" @click="goLink">
+          <MoIconAngleRight3 class="story-preview-link-fade" />
+          <MoIconAngleRight3 class="story-preview-link-main" />
+          <MoIconAngleRight3 class="story-preview-link-fade" />
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -39,6 +59,20 @@ import * as ImageHelper from '@/plugin/image'
 import { storyStore, isNewFirst } from '@/store/story'
 import { feedStore } from '@/store/feed'
 import { imageProxyStore } from '@/store/imageProxy'
+
+function stripHtml(html) {
+  if (_.isEmpty(html)) {
+    return ''
+  }
+  return html
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .trim()
+}
 
 export default {
   components: { MoIconAngleRight3 },
@@ -67,6 +101,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    preview: {
+      type: Boolean,
+      default: false,
+    },
     feedId: {
       type: String,
       required: true,
@@ -85,6 +123,7 @@ export default {
       isImageReady: false,
       isImageNeedProxy: false,
       isImageProxyFailed: false,
+      previewSummaryLines: 3,
     }
   },
   computed: {
@@ -130,8 +169,51 @@ export default {
     routerLink() {
       return `/story?feed=${this.feedId}&offset=${this.offset}`
     },
+    previewSummary() {
+      if (!_.isEmpty(this.story.summary)) {
+        return this.story.summary
+      }
+      return stripHtml(this.story.content)
+    },
+    previewSummaryStyle() {
+      return {
+        '-webkit-line-clamp': this.previewSummaryLines,
+        'max-height': this.previewSummaryLines * 22 + 'px',
+      }
+    },
+  },
+  watch: {
+    title() {
+      if (this.preview) {
+        this.updatePreviewSummaryLines()
+      }
+    },
+    preview(value) {
+      if (value) {
+        this.updatePreviewSummaryLines()
+      }
+    },
+  },
+  mounted() {
+    if (this.preview) {
+      this.updatePreviewSummaryLines()
+      window.addEventListener('resize', this.updatePreviewSummaryLines)
+    }
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.updatePreviewSummaryLines)
   },
   methods: {
+    updatePreviewSummaryLines() {
+      this.$nextTick(() => {
+        let el = this.$refs.previewTitle
+        if (_.isNil(el)) {
+          return
+        }
+        // 标题 1 行时摘要 3 行，标题 2 行时摘要 2 行；正文区始终 4 行。
+        this.previewSummaryLines = el.getBoundingClientRect().height > 30 ? 2 : 3
+      })
+    },
     onPreviewImageLoad() {
       this.isImageReady = true
     },
@@ -167,11 +249,7 @@ export default {
         this.$router.push(this.routerLink)
       }
     },
-    async onOpen() {
-      if (this.solo) {
-        this.$emit('click')
-        return
-      }
+    markReaded() {
       if (_.isEmpty(this.story.summary) || _.isEmpty(this.story.content)) {
         let promise = storyStore.load({
           feedId: this.feedId,
@@ -179,15 +257,33 @@ export default {
           detail: true,
           setReaded: !this.isReaded,
         })
-        if (_.isEmpty(this.story.summary) && _.isEmpty(this.story.content)) {
-          await promise
+        return {
+          promise,
+          wait: _.isEmpty(this.story.summary) && _.isEmpty(this.story.content),
         }
       } else if (!this.isReaded) {
         if (isNewFirst()) {
-          storyStore.setRead({ feedId: this.feedId, offset: this.offset, is_read: true })
+          return {
+            promise: storyStore.setRead({ feedId: this.feedId, offset: this.offset, is_read: true }),
+            wait: false,
+          }
         } else {
-          feedStore.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
+          return {
+            promise: feedStore.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 }),
+            wait: false,
+          }
         }
+      }
+      return { promise: null, wait: false }
+    },
+    async onOpen() {
+      if (this.solo) {
+        this.$emit('click')
+        return
+      }
+      let { promise, wait } = this.markReaded()
+      if (wait) {
+        await promise
       }
       this.$emit('read')
       if (!this.isOpened && this.isCtrlKeyHold) {
@@ -195,6 +291,44 @@ export default {
       } else {
         this.$emit('update:isOpened', !this.isOpened)
       }
+    },
+    goPreviewLink() {
+      // 预览模式总是先进站内全文页，由文章页负责加载正文；
+      // 只有已经拿到很短的正文、或 Ctrl/⌘ 点击时才打开原文。
+      if (!_.isEmpty(this.story.link) && this.isCtrlKeyHold) {
+        this.openLinkInNewTab()
+        return
+      }
+      let isPoorContent = !_.isEmpty(this.story.content) && this.story.content.length <= 20
+      if (isPoorContent && !_.isEmpty(this.story.link)) {
+        this.openLinkInNewTab()
+        return
+      }
+      if (!_.isEmpty(this.routerLink)) {
+        this.$emit('read')
+        this.$router.push(this.routerLink)
+      } else if (!_.isEmpty(this.story.link)) {
+        this.openLinkInNewTab()
+      }
+    },
+    onPreviewOpen() {
+      if (this.solo) {
+        this.$emit('click')
+        return
+      }
+      // 列表里已有正文时顺手标已读（旁路执行，不等待接口，失败也不影响打开文章）；
+      // 正文要等文章页加载时，由文章页按同样的阅读顺序规则标，避免点一次发两次详情请求。
+      if (!_.isEmpty(this.story.content)) {
+        try {
+          let { promise } = this.markReaded()
+          if (promise && _.isFunction(promise.catch)) {
+            promise.catch(() => {})
+          }
+        } catch (ex) {
+          // 标已读失败不阻塞打开文章
+        }
+      }
+      this.goPreviewLink()
     },
   },
 }
@@ -346,5 +480,86 @@ export default {
 .story-header,
 .story-preview-header {
   cursor: pointer;
+}
+
+.story-item.reader-active .story-preview-item {
+  /* 三栏读者模式下，当前文章的底色透出来 */
+  background: transparent;
+}
+
+.story-preview-item {
+  box-sizing: border-box;
+  height: 122 * @pr;
+  padding: 12 * @pr 16 * @pr 14 * @pr;
+  background: #fff;
+  cursor: pointer;
+}
+
+.story-preview-item-body {
+  height: 96 * @pr;
+  display: flex;
+  flex-direction: column;
+}
+
+.story-preview-item-head {
+  display: flex;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+
+.story-preview-item-title {
+  flex: 1;
+  min-width: 0;
+  max-height: 44 * @pr;
+  overflow: hidden;
+  font-size: 15 * @pr;
+  line-height: 22 * @pr;
+  font-weight: 600;
+  color: #000;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.story-preview-item-date {
+  flex-shrink: 0;
+  width: 44 * @pr;
+  margin-left: 8 * @pr;
+  font-size: 12 * @pr;
+  line-height: 22 * @pr;
+  text-align: right;
+  color: @antTextGrey;
+  white-space: nowrap;
+}
+
+.story-preview-item-summary {
+  margin-top: 8 * @pr;
+  overflow: hidden;
+  font-size: 14 * @pr;
+  line-height: 22 * @pr;
+  color: @antTextSemi;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+}
+
+.story-preview-item-readed {
+
+  .story-preview-item-title,
+  .story-preview-item-summary {
+    color: @antTextGrey;
+  }
+
+  .story-preview-item-date {
+    color: @antTextLight;
+  }
+}
+
+.story-preview-item:active {
+  background: #f5f5f5;
+}
+
+.story-preview-item:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2 * @pr @antBlue;
 }
 </style>

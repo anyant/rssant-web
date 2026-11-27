@@ -12,7 +12,7 @@
       ref="scrollList"
       class="story-list"
       :vid="`/feed?id=${feedId}`"
-      :itemSize="48"
+      :itemSize="itemSize"
       :items="storyList"
       :reversed="isNewFirst"
       :init-offset="initOffset"
@@ -32,6 +32,7 @@
         :isOpened="!readerMode && storyOpened[story.offset]"
         @update:isOpened="onUpdateOpened(story, $event)"
         @click="onSelectStory(story)"
+        :preview="isPreviewMode"
         :isReaded="isReaded(story)"
         :isReading="!readerMode && isReading(story)"
         :isFavorited="story.is_favorited"
@@ -53,6 +54,7 @@ import MoStoryItem from '@/components/MoStoryItem'
 import MoScrollList from '@/components/MoScrollList'
 import MoReadedButton from '@/components/MoReadedButton'
 import Keyboard from '@/plugin/keyboard'
+import localConfig from '@/plugin/localConfig'
 import { storyStore, isNewFirst } from '@/store/story'
 import { rootStore } from '@/store/root'
 import { feedStore } from '@/store/feed'
@@ -117,6 +119,13 @@ export default {
     },
     isNewFirst() {
       return isNewFirst()
+    },
+    isPreviewMode() {
+      return localConfig.ARTICLE_LIST_CONTENT.get() === 'summary'
+    },
+    itemSize() {
+      // 摘要模式：条目 122px + 8px 条缝；标题模式沿用 48px
+      return this.isPreviewMode ? 130 : 48
     },
     isDesktop() {
       // 手机有下拉加载，列表里不再重复一个「加载更早」入口，否则短列表会默认露出来顶掉第一行
@@ -265,4 +274,5 @@ export default {
 .story-item.reader-active {
   background: #eef4f8;
 }
+
 </style>
