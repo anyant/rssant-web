@@ -256,13 +256,16 @@ export default {
       let isLoading = _.isNil(this.story) || _.isEmpty(this.story.content)
       this.isLoading = isLoading
       try {
-        await this.loadFeed({ feed: this.feed, feedId: this.feedId })
-        await this.loadStory({
+        // 订阅和文章并行拉取，冷启动直开文章时少一次往返
+        let feedLoaded = this.loadFeed({ feed: this.feed, feedId: this.feedId })
+        let storyLoaded = this.loadStory({
           story: this.story,
           feedId: this.feedId,
           offset: this.offset,
           setReaded: !this.isReaded,
         })
+        await feedLoaded
+        await storyLoaded
         // 当 story 已加载但仍未读时，loadStory 不会更新已读状态，需要单独更新
         if (!_.isNil(this.feed) && !_.isNil(this.story) && !this.isReaded) {
           if (isNewFirst()) {
