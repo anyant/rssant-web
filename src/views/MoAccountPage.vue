@@ -44,6 +44,13 @@
             <fa-icon class="action-icon" icon="chevron-right" />
           </span>
         </div>
+        <div class="action-row" @click="onClickStoryOrder">
+          <span class="action-label">阅读顺序</span>
+          <span>
+            <span>{{ storyOrderText }}</span>
+            <fa-icon class="action-icon" icon="chevron-right" />
+          </span>
+        </div>
         <div class="action-row" @click="goAbout">
           <span class="action-label">蚁阅介绍</span>
           <fa-icon class="action-icon" icon="chevron-right" />
@@ -76,6 +83,21 @@
       </div>
       <div class="divider"></div>
     </div>
+    <mu-dialog
+      title="阅读顺序"
+      :open.sync="isStoryOrderDialogOpen"
+      :overlay-close="false"
+    >
+      <div class="story-order-option">
+        <mu-radio value="old_first" v-model="storyOrderValue" label="旧的在前" :ripple="false"></mu-radio>
+        <div class="story-order-desc">打开一篇，比它更早的文章都标为已读</div>
+      </div>
+      <div class="story-order-option">
+        <mu-radio value="new_first" v-model="storyOrderValue" label="先看最新" :ripple="false"></mu-radio>
+        <div class="story-order-desc">最新在上，打开一篇只标这一篇</div>
+      </div>
+      <mu-button slot="actions" flat color="primary" @click="onConfirmStoryOrder">确定</mu-button>
+    </mu-dialog>
   </MoLayout>
 </template>
 
@@ -86,6 +108,7 @@ import MoBackHeader from '@/components/MoBackHeader'
 import MoDarkModeDialog from '@/components/MoDarkModeDialog'
 import { antGold, antRed, antGreen } from '@/plugin/common'
 import DarkMode from '@/plugin/darkmode'
+import localConfig from '@/plugin/localConfig'
 import { userStore } from '@/store/user'
 import { feedStore } from '@/store/feed'
 import { API } from '@/plugin/api'
@@ -102,6 +125,8 @@ export default {
       antGreen,
       isDarkModeDialogOpen: false,
       darkModeValue: DarkMode.get(),
+      isStoryOrderDialogOpen: false,
+      storyOrderValue: localConfig.STORY_ORDER.get(),
       exporting: false,
     }
   },
@@ -141,6 +166,9 @@ export default {
     username() {
       let user = userStore.loginUser
       return _.isNil(user) ? '' : user.username
+    },
+    storyOrderText() {
+      return this.storyOrderValue === 'new_first' ? '先看最新' : '旧的在前'
     },
     darkModeStatus() {
       if (!DarkMode.isSupported()) {
@@ -233,6 +261,17 @@ export default {
     onDarkModeChange() {
       this.darkModeValue = DarkMode.get()
     },
+    onClickStoryOrder() {
+      this.storyOrderValue = localConfig.STORY_ORDER.get()
+      this.isStoryOrderDialogOpen = true
+    },
+    onConfirmStoryOrder() {
+      this.isStoryOrderDialogOpen = false
+      localConfig.STORY_ORDER.set(this.storyOrderValue)
+      setTimeout(() => {
+        window.location.reload()
+      }, 150)
+    },
     onLogout() {
       userStore.logout().then(() => {
         window.location.assign('/')
@@ -289,6 +328,17 @@ export default {
 .action-label {
   font-weight: bold;
   font-size: 16 * @pr;
+}
+
+.story-order-option {
+  padding: 8 * @pr 0;
+}
+
+.story-order-desc {
+  padding-left: 32 * @pr;
+  color: @antTextGrey;
+  font-size: 12 * @pr;
+  line-height: 1.4;
 }
 
 .action-icon {

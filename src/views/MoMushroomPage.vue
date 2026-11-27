@@ -8,6 +8,7 @@
       </mu-button>
     </MoBackHeader>
     <div class="list" ref="mainRef">
+      <div class="empty-placeholder" v-if="virtualList.length <= 0">暂无未读文章</div>
       <MoFeedVirtualItem
         v-for="item in virtualList"
         :key="item.id"
@@ -163,6 +164,19 @@ export default {
 
 .list {
   padding-bottom: 8 * @pr;
+}
+
+.empty-placeholder {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15 * @pr;
+  color: @antTextGrey;
 }
 
 .list .feed-story-item {

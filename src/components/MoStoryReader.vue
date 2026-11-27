@@ -71,7 +71,7 @@ import MoHeader from '@/components/MoHeader.vue'
 import MoReadingActions from '@/components/MoReadingActions.vue'
 import MoReadingFontDialog from '@/components/MoReadingFontDialog.vue'
 import MoStoryContent from '@/components/MoStoryContent.vue'
-import { storyStore } from '@/store/story'
+import { storyStore, isNewFirst } from '@/store/story'
 import { rootStore } from '@/store/root'
 import { feedStore } from '@/store/feed'
 
@@ -115,7 +115,11 @@ export default {
       if (_.isNil(this.feed) || _.isNil(this.story)) {
         return false
       }
-      return this.story.offset < this.feed.story_offset
+      return this.story.is_read || this.story.offset < this.feed.story_offset
+    },
+    // 切换文章时只触发一次加载；feedId 和 offset 同时变时不重复请求
+    storyKey() {
+      return `${this.feedId}:${this.offset}`
     },
     story() {
       if (_.isNil(this.offset)) {
@@ -164,10 +168,7 @@ export default {
     },
   },
   watch: {
-    feedId() {
-      this.loadFeedAndStory()
-    },
-    offset() {
+    storyKey() {
       this.loadFeedAndStory()
     },
     isFontDialogOpen(value) {
@@ -264,7 +265,12 @@ export default {
         })
         // 当 story 已加载但仍未读时，loadStory 不会更新已读状态，需要单独更新
         if (!_.isNil(this.feed) && !_.isNil(this.story) && !this.isReaded) {
-          feedStore.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
+          if (isNewFirst()) {
+            // 先看最新：只标当前这一篇，不推进未读游标
+            await storyStore.setRead({ feedId: this.feedId, offset: this.offset, is_read: true })
+          } else {
+            feedStore.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
+          }
         }
       } catch (err) {
         this.isError = true
@@ -281,12 +287,13 @@ export default {
         return
       }
       try {
-        let hasNext = this.offset + 1 < this.feed.total_storys
+        let nextOffset = isNewFirst() ? this.offset - 1 : this.offset + 1
+        let hasNext = nextOffset >= 0 && nextOffset < this.feed.total_storys
         if (!hasNext) {
           return
         }
-        let next = storyStore.get({ feedId: this.feedId, offset: this.offset + 1 })
-        await this.loadStory({ story: next, feedId: this.feedId, offset: this.offset + 1 })
+        let next = storyStore.get({ feedId: this.feedId, offset: nextOffset })
+        await this.loadStory({ story: next, feedId: this.feedId, offset: nextOffset })
       } catch (err) {
         // 预加载失败忽略，打开下一篇时会重试
       }
