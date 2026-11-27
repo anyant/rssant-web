@@ -10,6 +10,7 @@ const CONFIGS = {
   VIP_NOTICED_TIMESTAMP: { defaultValue: 0 },
   LOGIN_TOKEN: { defaultValue: null },
   STORY_ORDER: { defaultValue: 'old_first' },
+  ARTICLE_LIST_CONTENT: { defaultValue: 'title' },
 }
 
 const localConfig = (function() {
