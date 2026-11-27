@@ -135,7 +135,7 @@ export default {
       let lastReadingOffset = this.lastReadingOffset
       return (story) => {
         if (this.isNewFirst) {
-          // 先看最新：未读游标不动，用最后打开的文章高亮
+          // 最新在前：未读游标不动，用最后打开的文章高亮
           return !_.isNil(lastReadingOffset) && story.offset === lastReadingOffset
         }
         let isReading = !_.isNil(this.readingStoryOffset) && story.offset === this.readingStoryOffset

@@ -328,7 +328,7 @@ export default {
       // 当 story 已加载但仍未读时，loadStory 不会更新已读状态，需要单独更新
       if (!_.isNil(this.feed) && !_.isNil(this.story) && !this.isReaded) {
         if (isNewFirst()) {
-          // 先看最新：只标当前这一篇，不推进未读游标
+          // 最新在前：只标当前这一篇，不推进未读游标
           await storyStore.setRead({ feedId: this.feedId, offset: this.offset, is_read: true })
         } else {
           feedStore.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
