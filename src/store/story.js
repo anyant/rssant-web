@@ -4,13 +4,18 @@ import { isAfter } from 'date-fns'
 import Loading from '@/plugin/loading'
 import { API } from '@/plugin/api'
 import * as feedGroupHelper from '@/plugin/feedGroupHelper'
+import localConfig from '@/plugin/localConfig'
 import { hamiVuex } from '.'
 import { feedStore } from './feed'
 
+export function isNewFirst() {
+  return localConfig.STORY_ORDER.get() === 'new_first'
+}
+
 function sortMushrooms(mushrooms) {
-  return _.sortBy(mushrooms, [
+  let sorted = _.sortBy(mushrooms, [
     function(x) {
-      return isReaded(x)
+      return isReaded(x) ? 1 : 0
     },
     function(x) {
       return new Date(x.dt_published)
@@ -20,6 +25,7 @@ function sortMushrooms(mushrooms) {
     },
     'offset',
   ])
+  return isNewFirst() ? _.reverse(sorted) : sorted
 }
 
 export const MIN_STORYS_FOR_IMAGE_DEDUP = 10
@@ -105,6 +111,9 @@ function setFeedTotalStorysIfUpdated(feedId, storys) {
 }
 
 function isReaded(story) {
+  if (story.is_read) {
+    return true
+  }
   let feed = feedStore.get(story.feed.id)
   if (_.isNil(feed)) {
     return false
@@ -239,7 +248,8 @@ export const storyStore = hamiVuex.store({
     if (_.isNil(feedStorys)) {
       return []
     }
-    return _.sortBy(_.values(feedStorys), ['offset'])
+    let list = _.sortBy(_.values(feedStorys), ['offset'])
+    return isNewFirst() ? _.reverse(list) : list
   },
   mushroomsOfGroup(group) {
     let keys = _.filter(this.mushroomKeys, key => {
@@ -323,10 +333,35 @@ export const storyStore = hamiVuex.store({
     await API.story.setWatched({ feed_id: feedId, offset, is_watched: is_watched })
     this.SET_WATCHED({ feed_id: feedId, offset, is_watched })
   },
+  async setRead({ feedId, offset, is_read }) {
+    let feedStorys = this.storys[feedId]
+    let oldStory = _.isNil(feedStorys) ? null : feedStorys[offset]
+    let wasRead = _.isNil(oldStory) ? false : oldStory.is_read
+    await API.story.setRead({ feed_id: feedId, offset, is_read })
+    this.$patch(state => {
+      let storys = state.storys[feedId]
+      if (!_.isNil(storys) && !_.isNil(storys[offset])) {
+        storys[offset].is_read = is_read
+      }
+    })
+    if (!wasRead && is_read) {
+      feedStore.SET_STORY_READ({ id: feedId, is_read: true })
+    }
+  },
   async load({ feedId, offset, detail, setReaded }) {
-    let story = await API.story.get({ feed_id: feedId, offset, detail, set_readed: setReaded })
+    let newFirst = isNewFirst()
+    let story = await API.story.get({
+      feed_id: feedId,
+      offset,
+      detail,
+      set_readed: setReaded && !newFirst,
+    })
+    if (setReaded && newFirst) {
+      await this.setRead({ feedId: feedId, offset: offset, is_read: true })
+      story.is_read = true
+    }
     this.ADD_OR_UPDATE(story)
-    if (setReaded) {
+    if (setReaded && !newFirst) {
       feedStore.SET_STORY_OFFSET({ id: feedId, offset: offset + 1 })
     }
   },
@@ -349,7 +384,7 @@ export const storyStore = hamiVuex.store({
   },
   async loadMushrooms({ mushroomKeys, detail }) {
     await this.mushroomsLoading.begin(async () => {
-      let data = await API.story.queryBatch({ storys: mushroomKeys, detail })
+      let data = await API.story.queryUnreadBatch({ storys: mushroomKeys, detail })
       let mushrooms = sortMushrooms(data.storys)
       this.ADD_OR_UPDATE_MUSHROOMS(mushrooms)
     })

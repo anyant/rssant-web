@@ -74,7 +74,7 @@ import MoLayout from '@/components/MoLayout.vue'
 import MoBackHeader from '@/components/MoBackHeader.vue'
 import MoStoryContent from '@/components/MoStoryContent.vue'
 import MoReadingFontDialog from '@/components/MoReadingFontDialog.vue'
-import { storyStore } from '@/store/story'
+import { storyStore, isNewFirst } from '@/store/story'
 import { rootStore } from '@/store/root'
 import { feedStore } from '@/store/feed'
 
@@ -109,7 +109,7 @@ export default {
       if (_.isNil(this.feed) || _.isNil(this.story)) {
         return false
       }
-      return this.story.offset < this.feed.story_offset
+      return this.story.is_read || this.story.offset < this.feed.story_offset
     },
     starColor() {
       if (this.isFavorited) {
@@ -327,20 +327,26 @@ export default {
       await storyLoaded
       // 当 story 已加载但仍未读时，loadStory 不会更新已读状态，需要单独更新
       if (!_.isNil(this.feed) && !_.isNil(this.story) && !this.isReaded) {
-        feedStore.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
+        if (isNewFirst()) {
+          // 先看最新：只标当前这一篇，不推进未读游标
+          await storyStore.setRead({ feedId: this.feedId, offset: this.offset, is_read: true })
+        } else {
+          feedStore.setStoryOffset({ feedId: this.feedId, offset: this.offset + 1 })
+        }
       }
       this.scrollToTop()
       if (this.nextStoryInfo.shouldLoadNext) {
-        let hasNext = this.offset + 1 < this.feed.total_storys
+        let nextOffset = isNewFirst() ? this.offset - 1 : this.offset + 1
+        let hasNext = nextOffset >= 0 && nextOffset < this.feed.total_storys
         if (hasNext) {
           let next = storyStore.get({
             feedId: this.feedId,
-            offset: this.offset + 1,
+            offset: nextOffset,
           })
           await this.loadStory({
             story: next,
             feedId: this.feedId,
-            offset: this.offset + 1,
+            offset: nextOffset,
           })
         }
       }

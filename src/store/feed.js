@@ -80,7 +80,6 @@ function _pickMushroomKeys(feed, dt_recent) {
     if (feed.num_unread_storys >= 1 && feed.num_unread_storys <= 3) {
       mushroomKeys.push({
         feed_id: feed.id,
-        offset: feed.story_offset,
         limit: feed.num_unread_storys,
       })
     } else if (feed.total_storys > 0) {
@@ -88,7 +87,6 @@ function _pickMushroomKeys(feed, dt_recent) {
       if (isAfter(dt_latest, dt_recent)) {
         mushroomKeys.push({
           feed_id: feed.id,
-          offset: feed.total_storys - 1,
           limit: 1,
         })
       }
@@ -98,7 +96,6 @@ function _pickMushroomKeys(feed, dt_recent) {
     if (feed.num_unread_storys >= 1 && feed.num_unread_storys <= 3) {
       mushroomKeys.push({
         feed_id: feed.id,
-        offset: feed.story_offset,
         limit: feed.num_unread_storys,
       })
     }
@@ -285,6 +282,16 @@ export const feedStore = hamiVuex.store({
         })
       }
       updateFeedList(state)
+    })
+  },
+  SET_STORY_READ({ id, is_read }) {
+    this.$patch(state => {
+      let feed = state.feeds[id]
+      if (_.isNil(feed)) {
+        return
+      }
+      let delta = is_read ? -1 : 1
+      feed.num_unread_storys = Math.max(0, feed.num_unread_storys + delta)
     })
   },
   SET_STORY_OFFSET({ id, offset }) {

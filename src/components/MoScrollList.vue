@@ -10,6 +10,11 @@
     </transition>
     <mescroll ref="mescroll" class="mescroll" :down="mescrollDown" :up="mescrollUp" @init="mescrollInit">
       <div class="item-list">
+        <div v-if="showLoadPrev" class="load-prev" @click="loadPrevByButton">
+          <span v-if="isPrevLoading">加载中…</span>
+          <span v-else-if="prevLoadError">加载失败，点击重试</span>
+          <span v-else>加载更早的文章</span>
+        </div>
         <slot></slot>
       </div>
     </mescroll>
@@ -37,6 +42,7 @@ import { antBlue } from '@/plugin/common'
 
 const MIN_PAD_HEIGHT = 52
 const ITEM_LIST_PADDING = 2
+const LOAD_PREV_HEIGHT = 40
 
 export default {
   props: {
@@ -77,6 +83,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    loadPrevEnabled: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     let pageSize = window.innerHeight - 48
@@ -86,6 +96,8 @@ export default {
       numPageItems: numPageItems,
       isPrevLoading: false,
       isNextLoading: false,
+      prevLoadError: false,
+      isLoadPrevByButton: false,
       mescrollDown: {
         auto: false,
         callback: this.onMescrolDown,
@@ -159,6 +171,12 @@ export default {
       let delta = (this.total - endOffset) / this.numPageItems
       return Math.floor(Math.max(0, delta))
     },
+    showLoadPrev() {
+      if (!this.loadPrevEnabled || this.reversed || !this.hasPrev || this.items.length <= 0) {
+        return false
+      }
+      return true
+    },
     needJump() {
       if (_.isNil(this.jump)) {
         return false
@@ -204,7 +222,7 @@ export default {
       if (unreadCount <= 0) {
         return
       }
-      let padHeight = this.pageSize - unreadCount * this.itemSize - ITEM_LIST_PADDING
+      let padHeight = this.pageSize - this.loadPrevHeight() - unreadCount * this.itemSize - ITEM_LIST_PADDING
       if (padHeight <= MIN_PAD_HEIGHT) {
         return
       }
@@ -243,13 +261,21 @@ export default {
       this.updateScrollTop(initOffset)
     },
     updateScrollTop(offset) {
-      let scrollTop = 0
+      // 按列表方向定位：顺序列表里目标行上方是更小的 offset，倒序列表里是更大的 offset
+      let index = 0
       for (let item of this.items) {
-        if (item.offset < offset) {
-          scrollTop += this.itemSize
-        } else {
+        let isAbove = this.reversed ? item.offset > offset : item.offset < offset
+        if (!isAbove) {
           break
         }
+        index += 1
+      }
+      let el = this.$el && this.$el.querySelector('.mescroll')
+      let maxScroll = _.isNil(el) ? 0 : el.scrollHeight - el.clientHeight
+      let scrollTop = this.loadPrevHeight() + index * this.itemSize
+      if (maxScroll < this.loadPrevHeight()) {
+        // 内容不足一屏时滚不动，停在顶部，别把「加载更早」那一行截掉
+        scrollTop = 0
       }
       this.mescroll.setScrollTop(scrollTop)
     },
@@ -266,11 +292,41 @@ export default {
       } else {
         offset = Math.max(0, this.beginOffset - this.numPageItems)
       }
-      this.load({ offset, size: this.numPageItems }).finally(() => {
+      this.load({ offset, size: this.numPageItems }).then(() => {
+        if (this.isLoadPrevByButton && this.mescroll) {
+          this.$nextTick(() => {
+            this.mescroll.setScrollTop(this.loadPrevHeight())
+          })
+        }
+      }).catch(() => {
+        this.prevLoadError = true
+      }).finally(() => {
         this.isPrevLoading = false
+        this.isLoadPrevByButton = false
         this.endSuccess(prevItemsLength)
         this.mescroll.endDownScroll()
       })
+    },
+    loadPrevHeight() {
+      return this.showLoadPrev ? LOAD_PREV_HEIGHT : 0
+    },
+    getTopOffset() {
+      if (!this.mescroll || this.items.length <= 0) {
+        return null
+      }
+      let y = Math.max(0, this.mescroll.getScrollTop() - this.loadPrevHeight())
+      let index = Math.floor(y / this.itemSize)
+      index = Math.min(Math.max(0, index), this.items.length - 1)
+      let item = this.items[index]
+      return _.isNil(item) ? null : item.offset
+    },
+    loadPrevByButton() {
+      if (this.isPrevLoading || !this.hasPrev) {
+        return
+      }
+      this.prevLoadError = false
+      this.isLoadPrevByButton = true
+      this.loadPrev()
     },
     loadNext() {
       if (this.isNextLoading || !this.hasNext || this.items.length <= 0) {
@@ -346,6 +402,17 @@ export default {
 .fade-leave-to {
   opacity: 0;
   transform: translate3d(0, 50%, 0);
+}
+
+.load-prev {
+  height: 40 * @pr;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  color: @antBlue;
+  font-size: 14 * @pr;
+  cursor: pointer;
 }
 
 .jump-to-latest {

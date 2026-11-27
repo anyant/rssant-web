@@ -9,17 +9,20 @@
     </MoBackHeader>
     <MoScrollList
       v-if="feed"
+      ref="scrollList"
       class="story-list"
       :vid="`/feed?id=${feedId}`"
       :itemSize="48"
       :items="storyList"
-      :init-offset="feed.story_offset"
+      :reversed="isNewFirst"
+      :init-offset="initOffset"
       :begin-offset="beginOffset"
       :end-offset="endOffset"
       :total="feed.total_storys"
       :load="loadStorys"
-      :jump="onJump"
-      :enableUnreadPad="true"
+      :jump="isNewFirst ? null : onJump"
+      :enable-unread-pad="!isNewFirst"
+      :load-prev-enabled="!isNewFirst && isDesktop"
     >
       <MoStoryItem
         v-for="story in storyList"
@@ -46,22 +49,29 @@ import MoStoryItem from '@/components/MoStoryItem'
 import MoScrollList from '@/components/MoScrollList'
 import MoReadedButton from '@/components/MoReadedButton'
 import Keyboard from '@/plugin/keyboard'
-import { storyStore } from '@/store/story'
+import { storyStore, isNewFirst } from '@/store/story'
 import { rootStore } from '@/store/root'
 import { feedStore } from '@/store/feed'
+import { pageStore } from '@/store/page'
 
 export default {
   components: { MoBackHeader, MoLayout, MoStoryItem, MoScrollList, MoReadedButton },
   data() {
+    // 在组件创建时就取恢复位置：mescroll 的 init 早于 mounted，晚取会按默认位置滚动
+    let page = pageStore.getPage(`/feed?id=${this.$route.query.id}`)
     return {
       storyOpened: {},
       readingStoryOffset: null,
+      restoreOffset: _.isNil(page) ? null : page.topOffset,
       keyboard: Keyboard(),
     }
   },
   computed: {
     feedId() {
       return this.$route.query.id
+    },
+    viewKey() {
+      return `/feed?id=${this.feedId}`
     },
     feed() {
       return feedStore.get(this.feedId)
@@ -94,15 +104,40 @@ export default {
         return s.offset >= offset.begin && s.offset <= offset.end
       })
     },
+    isNewFirst() {
+      return isNewFirst()
+    },
+    isDesktop() {
+      // 手机有下拉加载，列表里不再重复一个「加载更早」入口，否则短列表会默认露出来顶掉第一行
+      return window.matchMedia('(hover: hover) and (pointer: fine)').matches
+    },
+    initOffset() {
+      if (!_.isNil(this.restoreOffset)) {
+        return this.restoreOffset
+      }
+      if (this.isNewFirst) {
+        return Math.max(0, this.feed.total_storys - 1)
+      }
+      return this.feed.story_offset
+    },
     isReaded() {
       let feed = this.feed
       return (story) => {
-        return story.offset < feed.story_offset
+        return story.is_read || story.offset < feed.story_offset
       }
+    },
+    lastReadingOffset() {
+      let page = pageStore.getPage(this.viewKey)
+      return _.isNil(page) ? null : page.readingOffset
     },
     isReading() {
       let feed = this.feed
+      let lastReadingOffset = this.lastReadingOffset
       return (story) => {
+        if (this.isNewFirst) {
+          // 先看最新：未读游标不动，用最后打开的文章高亮
+          return !_.isNil(lastReadingOffset) && story.offset === lastReadingOffset
+        }
         let isReading = !_.isNil(this.readingStoryOffset) && story.offset === this.readingStoryOffset
         let isLastOpened = story.offset === feed.story_offset - 1
         return isReading || isLastOpened
@@ -122,7 +157,11 @@ export default {
   },
   methods: {
     getNextStoryInfo({ feedId, offset }) {
-      let story = storyStore.get({ feedId, offset: offset + 1 })
+      let nextOffset = this.isNewFirst ? offset - 1 : offset + 1
+      if (nextOffset < 0) {
+        return { story: null, shouldLoadNext: false }
+      }
+      let story = storyStore.get({ feedId, offset: nextOffset })
       return { story, shouldLoadNext: true }
     },
     loadStorys({ offset, size, resetLoadedOffset, isInit }) {
@@ -136,6 +175,12 @@ export default {
       })
     },
     onRead(story) {
+      let scrollList = this.$refs.scrollList
+      let topOffset = _.isNil(scrollList) ? null : scrollList.getTopOffset()
+      pageStore.setPage(this.viewKey, {
+        topOffset: topOffset,
+        readingOffset: story.offset,
+      })
       this.readingStoryOffset = story.offset
     },
     setAllReaded() {
