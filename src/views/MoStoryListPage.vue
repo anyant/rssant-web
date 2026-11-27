@@ -275,8 +275,4 @@ export default {
   background: #eef4f8;
 }
 
-/* 摘要条目自带白底，三栏读者模式下让当前文章的底色透出来 */
-.story-item.reader-active .story-preview-item {
-  background: transparent;
-}
 </style>

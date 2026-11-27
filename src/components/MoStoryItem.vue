@@ -455,6 +455,11 @@ export default {
   cursor: pointer;
 }
 
+.story-item.reader-active .story-preview-item {
+  /* 三栏读者模式下，当前文章的底色透出来 */
+  background: transparent;
+}
+
 .story-preview-item {
   box-sizing: border-box;
   height: 122 * @pr;
