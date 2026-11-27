@@ -292,16 +292,40 @@ export default {
         this.$emit('update:isOpened', !this.isOpened)
       }
     },
-    async onPreviewOpen() {
+    goPreviewLink() {
+      // 预览模式总是先进站内全文页，由文章页负责加载正文；
+      // 只有已经拿到很短的正文、或 Ctrl/⌘ 点击时才打开原文。
+      if (!_.isEmpty(this.story.link) && this.isCtrlKeyHold) {
+        this.openLinkInNewTab()
+        return
+      }
+      let isPoorContent = !_.isEmpty(this.story.content) && this.story.content.length <= 20
+      if (isPoorContent && !_.isEmpty(this.story.link)) {
+        this.openLinkInNewTab()
+        return
+      }
+      if (!_.isEmpty(this.routerLink)) {
+        this.$emit('read')
+        this.$router.push(this.routerLink)
+      } else if (!_.isEmpty(this.story.link)) {
+        this.openLinkInNewTab()
+      }
+    },
+    onPreviewOpen() {
       if (this.solo) {
         this.$emit('click')
         return
       }
-      let { promise } = this.markReaded()
-      if (promise) {
-        await promise
+      // 标已读旁路执行，不等待接口；接口失败也不影响打开文章
+      try {
+        let { promise } = this.markReaded()
+        if (promise && _.isFunction(promise.catch)) {
+          promise.catch(() => {})
+        }
+      } catch (ex) {
+        // 标已读失败不阻塞打开文章
       }
-      this.goLink()
+      this.goPreviewLink()
     },
   },
 }
